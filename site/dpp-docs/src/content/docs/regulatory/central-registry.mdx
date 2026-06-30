@@ -1,0 +1,33 @@
+---
+title: EU Central Registry
+description: What the EU Central Registry is, what it requires of implementations, and how Odal prepares for the registry API once it is published.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+ESPR establishes a central registry operated by the European Commission as the authoritative directory of registered passports. The registry is one of the regulation's structural mechanisms for letting authorities, recyclers, and market-surveillance bodies find a passport from a product without needing to know which platform issued it.
+
+## What the central registry is
+
+The registry is a directory, not a store. It holds the mapping from product identifier (typically GS1 GTIN plus serial) to passport location (the issuing platform's resolver endpoint). It does **not** hold the passport content. The content lives at the issuing platform; the registry just tells the world where to look.
+
+This design is the right one because it lets the regulation centralise discovery without centralising data. The market-surveillance authority that needs to inspect a batch of textile passports queries the registry to find each batch's resolver endpoint, then queries each resolver for the actual passport content. The registry does not become a single point of failure for passport content; it does become a single point of failure for *discovery*, which is a more tractable operational problem.
+
+## What the registry requires of implementations
+
+The registry's API is being defined at the time of writing. The expected requirements are: every published passport must be registered with the registry, the registration carries the product identifier and the resolver endpoint, the issuing platform must keep the registration in sync as passports are suspended or archived, and the platform must respond to registry health checks.
+
+Odal has prepared for this: the interface the registry will expose is already modelled, so the live connection can land quickly once the API is published. Until then, the registry connection lives in the engine and waits on the upstream specification.
+
+<Aside type="note" title="Status">
+Activation of the registry integration is on the longer roadmap, [contingent on the registry API being published](https://odal-node.io/roadmap). The interface is already modelled, so the implementation can land in days rather than months once the upstream API stabilises.
+</Aside>
+
+## Why pre-investing in the bridge
+
+Designing the central-registry interface before the registry exists is unusual, and it has a specific rationale. ESPR is a regulation in active definition, and the registry API is being co-defined with the implementation community (CIRPASS-2, the standards bodies, the early-mover platforms). Having a stable, opinion-bearing interface ready means the project can contribute to the API definition from a position of having already thought about the shape it wants the API to take. Showing up to the design conversation with an empty notebook is a worse position than showing up with a draft.
+
+## Read next
+
+[ESPR Overview](/regulatory/espr) — the framework regulation that mandates the registry.
+[Standards & interoperability](/core/standards) — the open standards a passport speaks.

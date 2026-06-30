@@ -1,0 +1,23 @@
+---
+title: Extending it — sectors & plugins
+description: New regulation arrives sector by sector and keeps moving; the core absorbs it through a single extension seam, so a new sector is a plugin, not a rewrite.
+---
+
+ESPR does not arrive all at once. It lands sector by sector — batteries, then textiles, then electronics — and each sector's rules keep changing as the delegated acts are finalised. The core is built so that movement is normal: every sector's compliance logic enters through one seam.
+
+## One seam, many sectors
+
+Each sector's rules live behind a single, shared interface. Adding a sector, or updating one when the regulation changes, means supplying new logic to that seam — not modifying the system around it. A frozen deployment falls behind; a maintained one simply receives the update.
+
+## Sandboxed by default
+
+Sector logic runs in an isolated, resource-limited sandbox. It can do its job — validate a passport against the sector's rules — and nothing more: it cannot reach the network, the filesystem, or the rest of the node. That keeps each sector's logic independent and safe to update on its own.
+
+## Open, not gated
+
+The seam is an architectural boundary, never a commercial one. The built-in sectors and any added later use the exact same mechanism, and all of them are open. New regulatory coverage is never a paid unlock.
+
+## Read next
+
+- [What the core does](/core/overview) — the standard sectors plug into.
+- [Battery DPP](/regulatory/battery) · [Textile DPP](/regulatory/textile) · [Electronics DPP](/regulatory/electronics) — sectors in context.

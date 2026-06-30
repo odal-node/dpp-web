@@ -1,0 +1,52 @@
+---
+title: Licensing
+description: The open-core licensing model — Apache-2.0 for dpp-core, BSL-1.1 for dpp-engine, and the self-host grant that lets anyone run a production node.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The project uses an open-core model with two licences, each chosen to match what the code does.
+
+## The split
+
+| Layer | Repository | Licence | What it covers |
+|---|---|---|---|
+| **Regulatory core** | `dpp-core` | Apache-2.0 | Domain types, schemas, validation rules, sector plugins, compliance calculators, crypto primitives, digital-link resolution |
+| **Operational platform** | `dpp-engine` | BSL-1.1 | Managed hosting, observability, deployment automation, operational tooling |
+
+The rule is simple: if the code exists because an EU regulation changed, it lives in `dpp-core` under Apache-2.0. If it exists because of how the system is deployed or operated, it lives in `dpp-engine` under BSL-1.1. See the [Core Concepts](/core-concepts) page for the full architectural rationale.
+
+## BSL-1.1 — what it permits
+
+The Business Source Licence 1.1 is a source-available licence that converts to Apache-2.0 after a defined change date. For `dpp-engine`, it permits:
+
+- **Any non-production use** — evaluation, testing, integration work, local development.
+- **Production self-hosting** — deploying `dpp-engine` on your own infrastructure to issue, sign, store, and serve DPPs for your own organisation's products and compliance, at no charge. This is the self-host grant.
+- **Contribution and modification** — you may fork and modify the source.
+
+It restricts:
+
+- **Competing managed-SaaS deployment** — you may not offer `dpp-engine` as a commercial managed service to third parties while the BSL-1.1 term is active. This restriction lifts when the change date arrives and the licence converts to Apache-2.0.
+
+<Aside type="note" title="Change date">
+Each `dpp-engine` release ships with a specific change date in its licence header — four years after that release's date. After the change date, that release converts to Apache-2.0 permanently. The `LICENSE` file is authoritative; this page is a summary.
+</Aside>
+
+## Dependency licences
+
+`dpp-engine` builds on `dpp-core` (Apache-2.0) and other open-source dependencies. Each crate's `Cargo.toml` declares its full dependency tree. The key third-party licences are:
+
+- **Axum / Tokio** — MIT (HTTP framework and async runtime).
+- **wasmtime** — Apache-2.0 (the sector-plugin sandbox).
+- **ed25519-dalek** — BSD 3-Clause (signing).
+- **PostgreSQL** — PostgreSQL Licence (liberal, BSD-style).
+- **Redis** — BSD 3-Clause (resolver cache).
+- **NATS** — Apache-2.0 (event bus).
+
+No dependency introduces a copyleft obligation that would propagate to `dpp-engine` users.
+
+## Read next
+
+[Core Concepts](/core-concepts) — the architectural principle behind the licence split.
+[Self-Hosting](/engine/self-hosted) — deploying `dpp-engine` on your own infrastructure.
+[What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see) — why the core is designed so that regulatory capability is never gated.

@@ -1,0 +1,31 @@
+---
+title: Introduction
+description: What Odal Node is, who it's for, and why it's built the way it is.
+---
+
+Odal Node is infrastructure for creating, signing, and serving **EU Digital Product Passports (DPPs)** under the Ecodesign for Sustainable Products Regulation (ESPR). It lets a manufacturer produce passports that anyone can verify — without handing their production data to a third party.
+
+## Who it's for
+
+- **Manufacturers and operators** facing an ESPR deadline who need to issue compliant passports and keep control of their data.
+- **Developers** who want to self-host the standard, on their own infrastructure, with no licence keys and no capability caps.
+- **Authorities, recyclers, and customers** who need to verify a passport is genuine — which they can do against the manufacturer's public identity, with Odal nowhere in the loop.
+
+## How it's organised
+
+Odal Node is two parts with two licences:
+
+| Part | Licence | What it is |
+|---|---|---|
+| [`dpp-core`](https://github.com/odal-node/dpp-core) | Apache‑2.0 | The regulatory standard — the rules a compliant passport must satisfy. |
+| [`dpp-engine`](https://github.com/odal-node/dpp-engine) | BSL‑1.1 | The service that runs those rules in production. |
+
+> The core is the rulebook. The engine is the service that uses the rulebook.
+
+The split is deliberate, and it is the subject of [Core Concepts](/core-concepts): the standard stays open and free, while the operational layer around it is what sustains the project.
+
+## Next steps
+
+- [Quick Start](/quick-start) — run a node and produce your first signed passport.
+- [Core Concepts](/core-concepts) — the three ideas behind everything here.
+- [Self-Hosting](/engine/self-hosted) — run the engine on your own infrastructure.

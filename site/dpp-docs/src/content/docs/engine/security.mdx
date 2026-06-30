@@ -1,0 +1,50 @@
+---
+title: Operating a node securely
+description: How a running node protects keys, data, and access in production — the runtime around the core's cryptographic guarantees, and how the node fails safe.
+---
+
+The core defines how a passport is signed and trusted. The engine's job is to run that in production without becoming the weak link. This page covers what protects a live node: where the signing key lives, how access is controlled, and how the node behaves when something is missing or fails.
+
+## The signing key never leaves the node
+
+The operator's Ed25519 signing key is generated and held on their own infrastructure, encrypted at rest, and used in-process — the node signs passports itself, with no separate signing service and no key to hand off. Odal never holds it; in a self-hosted deployment Odal has no access to the node at all. The cryptography of how the key is generated and protected is the core's; see [Security & cryptography](/core/security) and [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see).
+
+## Two ways in, both accountable
+
+A node accepts two kinds of credential, and the public read path needs neither.
+
+- **API keys** — for machines and integrations, presented as Bearer tokens. The full key is shown once, at creation, and is never stored: the node keeps only a one-way hash of it plus a short prefix used to find the right record quickly. A revoked or expired key is refused, and the comparison is constant-time so a near-miss leaks nothing. Each key carries a scope — read, write, or admin — so a credential grants no more authority than its job needs.
+- **Admin login** — a local username and password supplied through the node's environment, used for first setup and for recovery. It is not stored in the database.
+- **Self-lockout guard** — a key cannot revoke itself, so an automated rotation can't accidentally strand you mid-operation; the admin login is the deliberate recovery path.
+
+The public passport endpoint requires no credential at all — it only ever serves passports that are already published, and is never a way back into an operator's data.
+
+## Least privilege in the database
+
+The node connects to PostgreSQL with an application role that cannot change the schema and cannot delete rows. Schema migrations run under a *separate*, privileged credential that is used only at startup and never kept in the live connection pool. On top of that, the database enforces the [permanence guarantees](/engine/retention) itself — a trigger rejects edits to a locked passport, and the audit trail is append-only at the database level — so those rules hold even if application code is wrong.
+
+## The node fails closed
+
+A node refuses to start without its secrets — database credentials, the key-store passphrase, the signing domain. The production stack goes further and refuses to start on left-over development defaults. There is no insecure default that quietly "just works"; a misconfigured node does not run rather than running unsafely.
+
+## Sector logic is sandboxed
+
+Each sector's compliance logic runs in a Wasm sandbox with no filesystem, no network, and no system clock or randomness, capped at 64 MiB of memory and a fixed CPU budget (fuel metering). A buggy or hostile plugin exhausts its budget and is stopped — it can never reach the signing key, the database, or the rest of the node. This is the host enforcing, with concrete limits, the sandbox model described in [Security & cryptography](/core/security).
+
+## The database is the source of truth
+
+Persistence comes first; everything else is a notification. Lifecycle events are published only *after* the database write commits, and a failure to publish is logged, never propagated — a passport is published whether or not the event bus is healthy. Optional infrastructure degrades to a no-op instead of blocking the node, so a single-node deployment needs no message broker to function. Anything consuming events treats them as hints and reads the database for canonical state.
+
+## One operator, one node
+
+A node serves exactly one operator. Isolation is a property of the deployment — its own node, its own database — not an in-process setting that could be misconfigured. There is no shared cluster, no cross-operator code path, and no per-row tenant scoping to get wrong; the failure modes of multi-tenancy are absent because multi-tenancy is absent. Serving many operators means running many nodes, an infrastructure concern handled above the node, never inside it. See [How the node works](/engine/architecture).
+
+## Reporting a vulnerability
+
+The engine implements no cryptography of its own — it delegates all of it to the core. Dependencies are scanned for known advisories on every change. Suspected vulnerabilities go to **security@odal-node.io** under coordinated disclosure, never to a public issue first.
+
+## Read next
+
+- [Permanence & retention](/engine/retention) — the long-term guarantees this runtime enforces.
+- [How the node works](/engine/architecture) — the pipeline these protections wrap.
+- [Security & cryptography](/core/security) — the cryptographic model the engine runs on.

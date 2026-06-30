@@ -1,0 +1,32 @@
+---
+title: Access Control (Art. 10)
+description: ESPR Article 10's three-tier access model — public, restricted, and private information — and how Odal enforces the boundaries.
+---
+
+ESPR Article 10 establishes that a Digital Product Passport carries three categories of information with different access rules. The categories are not advisory — they are part of the regulation's substantive requirements, and an implementation that does not enforce them is not compliant.
+
+## The three tiers
+
+**Public information** is available to anyone who scans the QR code. It includes the product identity, the manufacturer, the basic compliance summary, and the information needed for a consumer to make informed sustainability decisions.
+
+**Restricted information** is available to authorised actors — recyclers, repair operators, dismantlers, customs and market-surveillance authorities. It includes the detailed material composition needed for end-of-life processing, the technical specifications needed for repair, and the compliance evidence needed for authority verification.
+
+**Private information** is available only to the economic operator. It includes anything that the operator legitimately considers commercial confidential — supplier identities, formulation details, manufacturing recipes — that does not need to be disclosed for the public-good purposes Article 10 protects.
+
+## How Odal enforces the boundaries
+
+Every field in a passport carries a tier marker, and every access request arrives with a credential — a Verifiable Credential issued by a trusted authority (a national body, a sector association) that asserts which actor category the requester belongs to. Odal evaluates the request against the passport's access policy: does the credential authorise the requested tier, is it signed by a trusted issuer, has it expired.
+
+That evaluation is a **pure function** — no network, no database — so it runs inside the resolver at the edge, deciding each request in microseconds without reaching back into the node. The answer is simply allow or deny.
+
+## Why credential-based access and not API keys
+
+The natural alternative — handing out API keys to recyclers and authorities — fails on three properties. API keys are bearer secrets that get reused, leaked, or sold. API keys do not carry a verifiable identity assertion — possession is proof of access, but not proof of who the holder is. API keys are bound to a single issuer's authentication system, which means every regulator has to integrate with every platform separately.
+
+Verifiable Credentials solve all three. They are non-bearer (the holder proves possession of the credential's bound private key), they carry a verifiable identity assertion (the issuer is signed into the credential), and they integrate uniformly with any platform that knows how to verify them.
+
+## Read next
+
+[What the core does](/core/overview) — how passports are signed and verified.
+[ESPR Overview](/regulatory/espr) — the framework regulation Article 10 sits inside.
+[How the node works](/engine/architecture) — the public read path that enforces these access boundaries on every request.

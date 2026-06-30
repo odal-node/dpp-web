@@ -1,0 +1,38 @@
+---
+title: Permanence & retention
+description: A published passport must stay accessible and unaltered for years. How a node guarantees permanence by construction, in line with ESPR Article 9.
+---
+
+ESPR Article 9 makes a published passport a long-lived obligation, not a transient record. Once a product is on the market, its passport has to stay accessible for the period its delegated act sets — at least ten years after end-of-life for batteries — and a backup has to exist with an independent, certified third party so the passport survives even if the operator does not.
+
+A node is built so those guarantees hold by construction, not by good behaviour. Permanence is not a policy an operator opts into; it is a property of how the software works.
+
+## Publishing locks a passport
+
+The moment a passport is published, a retention lock is set on it — and it is never cleared. A locked passport can still change *state*: it can be suspended during a recall, or archived at end-of-life. But its *content* can no longer be edited. Only a draft is mutable; once a passport becomes a signed, published proof, it is fixed.
+
+## There is no delete
+
+The node's storage interface has no delete operation at all. This is a structural guarantee rather than a setting: a published passport cannot be removed, regardless of what the database underneath would technically allow, and regardless of who operates the node. The capability simply does not exist in the surface that talks to the data — and, as a second line of defence, the database itself rejects the change (see [Operating a node securely](/engine/security)).
+
+## History is append-only
+
+Every transition — created, published, suspended, archived — is written to an audit trail as it happens. Entries are only ever added; they are never rewritten or deleted. A passport's provenance can therefore be examined years later and trusted to reflect what actually occurred, in the order it occurred.
+
+## Archival is a state, not an ending
+
+When a product reaches end-of-life, its passport moves to *archived* — read-only, but still resolvable. The regulation's record-keeping window outlives the product itself, and archival keeps the passport readable for that entire window instead of removing it. End-of-life is a lifecycle state, never a deletion.
+
+## The address stays stable
+
+The QR code on a product encodes a resolver address that has to keep working for the full retention period — potentially long after the product was made. GS1 Digital Link and the EU Central Registry add a layer of indirection between the printed identifier and the passport's current location: the registry maps a product's identifier to wherever its passport lives, so an operator can move or re-home the resolver without reprinting a single label. The physical mark stays valid even as the infrastructure behind it changes.
+
+## The independent backup
+
+Article 9's second requirement — a backup held by a certified third party, so a passport survives an operator's insolvency or shutdown — is the operator's obligation. The [proof-bound model](/getting-started/what-odal-can-and-cannot-see) makes it tractable: what has to be preserved is the signed passport and its history, not a sprawling production dataset. The registry-backed mechanisms that support discovery and continuity are modelled and waiting on the upstream specification — see [EU Central Registry](/regulatory/central-registry).
+
+## Read next
+
+- [Operating a node securely](/engine/security) — how the database enforces these guarantees independently of application code.
+- [How the node works](/engine/architecture) — where retention sits in the passport pipeline.
+- [EU Central Registry](/regulatory/central-registry) — discovery, registration, and long-term continuity.

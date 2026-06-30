@@ -1,0 +1,23 @@
+{
+  "name": "dpp-docs",
+  "description": "Technical documentation site for docs.odal-node.io. Astro 5 + Starlight + Cloudflare Pages. Sibling of dpp-landing.",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.30.6",
+    "@odal/brand-tokens": "workspace:*",
+    "astro": "^5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9",
+    "vite-plugin-static-copy": "^4.1.0",
+    "typescript": "^5"
+  }
+}

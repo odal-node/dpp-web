@@ -1,0 +1,37 @@
+---
+title: How the node works
+description: A node takes product data in, validates and signs it locally, keeps only the proof, and serves it for verification — one operator, one node.
+---
+
+The engine is the service that runs the core's rules in production. In its simplest form it is a single node: one operator, on infrastructure they control, running the whole pipeline from raw input to a verifiable passport.
+
+## The pipeline
+
+A node does four things, in order:
+
+1. **Take data in** — product data arrives from a file or an existing system.
+2. **Validate and sign** — the node checks the data against the sector's rules and signs the result with the operator's own key. This is where the proof-bound guarantee lives: the raw input is used to produce the proof, then discarded.
+3. **Keep only the proof** — the signed passport and its history are stored; the raw production data is not.
+4. **Serve it** — the passport is made resolvable, so a scan or a lookup returns the right view to the right audience.
+
+## The pieces
+
+Inside the node, three surfaces handle those steps:
+
+- The **write path** — where a passport is created, validated, signed, and versioned.
+- **Bulk import** — for bringing many products in at once, each becoming a draft that flows into the write path.
+- The **public read path** — where a published passport is served and verified, and where the [access tiers](/regulatory/access-control) are enforced on every request.
+
+Signing happens inside the node itself — the operator's key never leaves their infrastructure. What the node keeps and what it discards is covered in [Permanence & retention](/engine/retention) and [Operating a node securely](/engine/security).
+
+## One operator per node
+
+A node serves a single operator. There are no shared tenants and no cross-operator access; isolation is a property of the deployment, not a setting inside it. Scaling to many operators is an infrastructure concern, handled by running more nodes — not by mixing operators inside one.
+
+## Read next
+
+- [Permanence & retention](/engine/retention) — what a node keeps, and the guarantees that hold for years.
+- [Operating a node securely](/engine/security) — how the node protects keys, data, and access.
+- [Self-Hosting](/engine/self-hosted) — run a node on your own infrastructure.
+- [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see) — the data boundary, precisely.
+- [Licensing](/engine/licensing) — the terms the engine ships under.

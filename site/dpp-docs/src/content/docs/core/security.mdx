@@ -1,0 +1,46 @@
+---
+title: Security & cryptography
+description: How a passport proves it is genuine — the signatures, identities, and key handling that let anyone verify a passport without trusting Odal, or the issuer's servers.
+---
+
+A Digital Product Passport is only worth the trust you can place in it. The core's security model exists to answer one question for anyone who meets a passport — a consumer, a recycler, a market-surveillance authority: *is this genuine, unaltered, and issued by who it claims to be?* It answers with open, audited cryptography and without depending on Odal being online — or existing.
+
+## A passport is a signed proof, not a record
+
+When a passport is published, the validated data is wrapped as a W3C Verifiable Credential and signed with the issuer's own Ed25519 key. The signature covers the exact bytes of the passport: change a single value afterwards and verification fails. A passport is therefore not a database entry you have to take on faith — it is a proof that carries its own evidence.
+
+## The trust root is the issuer's own domain
+
+A signature only means something if you know whose key made it. The core anchors identity with `did:web`: the issuer publishes their public key as a small document at a well-known address on their own domain (`/.well-known/did.json`). Verifying a passport is then an ordinary web lookup — fetch the issuer's key, check the signature.
+
+The trust inherits from DNS and HTTPS — the same infrastructure that already secures the issuer's website. There is no blockchain, no central authority that has to stay online, and no role for Odal in the verification path. What this guarantees is **authenticity** (the named issuer signed it), **integrity** (it has not been altered), and **binding** (it refers to the specific product). What it deliberately does *not* guarantee is that the issuer's figures are *correct* — the core provides the proof, not the truth behind it.
+
+## Rotating keys without breaking the past
+
+Signing keys change over time — a key is retired, a new one takes over. The core treats this as a routine, non-destructive operation. Retired keys are kept in the issuer's identity document, and every signature names the exact key that produced it. A new key signs new passports; passports signed by an older key still verify against that older key.
+
+This matters because a passport must stay verifiable for the regulation's full retention window — ten years or more. Rotating a key never invalidates anything already published, and never requires reprinting a label.
+
+## Keys are protected at rest
+
+A signing key is generated from the operating system's own randomness — never derived from a password, so never guessable. The private key is then stored encrypted, never in the clear:
+
+- The passphrase that unlocks the store is put through **Argon2id**, a deliberately slow, memory-hard function, to produce the encryption key. This makes guessing the passphrase by brute force impractical even with the file in hand.
+- That key encrypts the store with **AES-256-GCM**, an authenticated cipher — so the contents are both hidden and protected against modification.
+- A separate integrity check (HMAC) covers the whole file, so tampering is detected — including an attempt to *downgrade* the protection to a weaker scheme.
+- Key material is wiped from memory as soon as it is no longer needed.
+
+The practical guarantee is simple: the encrypted key file on its own is useless without the passphrase. Where that store lives and how a running node guards it is covered in [Operating a node securely](/engine/security).
+
+## Binding the proof to the physical product
+
+The QR code printed on a product points to its passport, and carries a short fingerprint of the passport's signature alongside the link. That fingerprint ties the printed label to one specific signed passport — a counterfeit label that points at a real passport but was never signed for that print does not match. It is an anti-counterfeiting layer that does not require the entire signature to be squeezed onto a small or damaged label.
+
+Suspected vulnerabilities go to **security@odal-node.io** under coordinated disclosure — never a public issue first.
+
+## Read next
+
+- [What the core does](/core/overview) — the standard these guarantees protect.
+- [Standards & interoperability](/core/standards) — `did:web` and the open standards verification relies on.
+- [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see) — the data boundary, stated precisely.
+- [Operating a node securely](/engine/security) — how a running node guards keys and access in production.

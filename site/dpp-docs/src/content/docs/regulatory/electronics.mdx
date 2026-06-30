@@ -1,0 +1,56 @@
+---
+title: Electronics DPP
+description: The electronics delegated act under ESPR — tiered scope, data requirements, the repairability dimension, and where it stands.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The electronics delegated act was adopted on 18 March 2026 and entered into force on 1 April 2026. It is the most commercially significant DPP mandate in the near term because of the sheer volume of electronics placed on the EU market and the tiered effective dates that create two distinct compliance windows.
+
+## Scope and timeline
+
+The act applies to electrical and electronic equipment (EEE) placed on the EU market, with a tiered rollout:
+
+| Tier | Product category | Effective date |
+|---|---|---|
+| **High-end** | AI servers, high-performance computing, high-end PCBs, foldable-display devices | 1 April 2026 (immediate) |
+| **Low-end** | Consumer electronics — earphones, chargers, cables, small household appliances, and other general EEE | 1 January 2027 |
+
+The tiered structure means that high-end manufacturers are already subject to DPP requirements, while low-end manufacturers have until the end of 2026 to prepare. Both tiers share the same data categories; the difference is the deadline.
+
+## Data requirements
+
+The electronics DPP carries the following data categories:
+
+**Product identity** — manufacturer identification, product model, product code, place of manufacture. These are the base details every passport carries.
+
+**Eco-design parameters** — carbon footprint declaration (product-level, following the methodology in the act's annexes), energy efficiency class, material efficiency indicators. These feed the open compliance calculators.
+
+**Hazardous substances** — Substances of Very High Concern (SVHC) as defined under REACH, and CMR (carcinogenic, mutagenic, toxic to reproduction) substances. The passport must declare presence or absence, with concentration data where applicable.
+
+**Recycling and end-of-life** — disassembly instructions, material-recovery information, spare-parts availability (including the number of years spare parts are guaranteed to be available), and preparation for re-use indicators. The EU's 2025 repairability rules for smartphones and tablets are directly relevant here — the repairability scoring framework feeds into this data category.
+
+**Supply-chain traceability** — the chain from component supplier to finished product, with geographic origin information where consumer-protection regulators require it.
+
+## The repairability dimension
+
+Electronics is the first sector where repairability scoring has a mature regulatory framework feeding into DPP requirements. The EU's repairability label (applicable to smartphones, tablets, and expanding categories since June 2025) produces a score that the electronics DPP must carry, and an electronics passport carries it as a first-class field.
+
+This matters because repairability is not a static number — component availability changes, scoring methodologies are updated, and the delegated act's annexes may revise what constitutes a "repairable" product. Odal handles that by versioning the rules and recording which version a passport was validated against.
+
+## Where it stands
+
+<Aside type="caution" title="In progress">
+The electronics sector is under active development; the rest of the sectors already run on the same mechanism it will use.
+</Aside>
+
+The groundwork is in place: electronics slots into the same sector seam every other sector uses, so what remains is finalising the fields against the adopted act and validating them on a real manufacturer's data set. The open work — reading the act's annexes to fix the field mapping, settling the carbon-footprint methodology, and pinning down concrete fields like the spare-parts availability guarantee — is research against the regulation, not architectural change.
+
+Until those fields are pinned to the adopted act, an electronics passport is validated structurally but not yet given a binding compliance verdict — the same *not-yet-assessed* stance every sector takes where the law has not fully landed, described in the [ESPR Overview](/regulatory/espr).
+
+## Read next
+
+[Battery DPP](/regulatory/battery) — the battery-sector delegated act, the nearest hard mandate.
+[Textile DPP](/regulatory/textile) — the textile-sector delegated act and the unsold-goods provision.
+[ESPR Overview](/regulatory/espr) — the framework regulation.
+[Access Control (Art. 10)](/regulatory/access-control) — the three-tier access model that applies across all sectors.

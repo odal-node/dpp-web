@@ -1,0 +1,23 @@
+---
+title: What the core does
+description: The core is the EU Digital Product Passport standard expressed in code — the rules a compliant passport must satisfy, with no infrastructure attached.
+---
+
+The core is the regulatory standard expressed in code: the rules a compliant Digital Product Passport must satisfy. It is open under Apache-2.0, carries no infrastructure — no database, no server, no configuration — and anyone may build on it.
+
+## What it gives you
+
+- **A definition of a passport** — its identity, who issued it, what it's made of, the sector-specific data the regulation requires, and the lifecycle it moves through. (The exact shape lives in the [code](https://github.com/odal-node/dpp-core), which is the authoritative reference.)
+- **Validation** — a passport is checked against its sector's versioned schema. This is a pure, local operation: no network, no services, nothing leaves the machine.
+- **Signing and verification** — a valid passport is signed with the issuer's own key, binding it to their published identity. Anyone can then verify it on their own, without the issuer's systems and without Odal.
+- **A lifecycle** — draft, published, suspended, archived. The transitions are one-directional and recorded, so a passport's history can't be quietly rewritten.
+
+## Why it has no infrastructure
+
+Keeping the core pure is what makes the open-core boundary real: if a piece of code needs a database or a network, it isn't part of the standard — it belongs in the engine. It also means the same rules run anywhere, from a server to an edge runtime, unchanged.
+
+## Read next
+
+- [Standards & interoperability](/core/standards) — the open standards a passport speaks.
+- [Extending it: sectors & plugins](/core/sectors) — how new regulation enters without a rewrite.
+- [Regulatory Context](/regulatory/espr) — how the standard maps to ESPR.

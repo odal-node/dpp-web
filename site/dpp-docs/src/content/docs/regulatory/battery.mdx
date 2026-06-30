@@ -1,0 +1,40 @@
+---
+title: Battery DPP
+description: The EU Battery Regulation (EU 2023/1542) — what a battery passport carries under Annex XIII, the supply-chain due-diligence record, and which checks are binding today.
+---
+
+The Battery Regulation (EU 2023/1542) is the first product-group regulation that mandates a Digital Product Passport in production. It applies to portable, industrial, light-means-of-transport (LMT), electric-vehicle (EV), and stationary energy storage batteries. The regulation is already in force, and the staged compliance dates have begun passing their first checkpoints.
+
+## What the regulation requires
+
+The battery passport itself is established by **Article 77**, and the information it must carry is set out in **Annex XIII**: the carbon footprint over the battery's lifecycle, the materials composition (with a particular focus on critical and recycled content), the State of Health (SoH) and remaining capacity for second-life evaluation, the chemistry classification, the responsible party for end-of-life management, and the supply-chain due-diligence statement.
+
+## Supply-chain due diligence
+
+The regulation requires the economic operator to identify, prevent, and address risks in their cobalt, lithium, nickel, and natural-graphite supply chains, on terms aligned with the OECD Due Diligence Guidance, with staged checkpoints — annual reporting, third-party verification, and public disclosure.
+
+Odal does not perform the due-diligence work itself — that is the operator's responsibility. What the passport captures is the **record** of it: the due-diligence statement, references to third-party verification, and a cryptographic link from the published passport back to the audited statement.
+
+## How Odal carries it
+
+A battery passport records the Annex XIII fields the regulation requires, with the constraints the regulation sets, versioned so that a regulation update lands as a new version without invalidating existing passports. The battery sector's rules — validating the content and confirming the due-diligence statement is present and well-formed — run through the core's sector seam, the same way every sector does.
+
+## What is checked today
+
+The Battery Regulation is in force, but its requirements switch on in stages, and Odal validates only what is actually binding:
+
+- **Enforced now** — the long-standing bans on mercury and cadmium (carried forward from the Batteries Directive, in force since 2008), and cross-field coherence checks such as a battery's operating-temperature range being internally consistent.
+- **Declared now, binding later** — the Annex X minimum recycled-content shares for cobalt, lithium, nickel, and lead. These are finalised law but do not take effect until 2031, rising again in 2036, so today they are surfaced as advisory rather than as a pass/fail verdict.
+- **Awaiting a delegated act** — minimum state-of-health thresholds (Article 10) and the A–E carbon-footprint class (Article 7), whose methodologies the Commission has not yet adopted.
+
+The passport itself becomes mandatory on **18 February 2027**. As each later requirement takes effect, the battery sector's checks extend to cover it, and passports already issued stay valid. The reasoning behind issuing a binding verdict only where the law binds is the [honesty model](/regulatory/espr) every sector follows.
+
+## What is changing
+
+The Battery Regulation interacts with the broader ESPR framework as ESPR's delegated acts begin landing. The expectation across the regulatory community is that ESPR-aligned battery passports will become the canonical form, with the Battery Regulation's specific Annex XIII requirements layered on top. `dpp-core` tracks both vocabularies so existing battery passports remain valid as the framework converges.
+
+## Read next
+
+[Textile DPP](/regulatory/textile) — the comparable analysis for the textile delegated act.
+[Extending: sectors & plugins](/core/sectors) — how a sector's rules plug into the core.
+[What the core does](/core/overview) — the standard a battery passport implements.

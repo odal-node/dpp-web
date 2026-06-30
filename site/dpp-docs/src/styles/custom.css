@@ -1,0 +1,51 @@
+/*
+ * Odal Node — Starlight custom styles.
+ * Map Starlight's CSS variables onto the shared brand tokens so the docs
+ * site picks up brand changes automatically when @odal/brand-tokens updates.
+ */
+
+@import "@odal/brand-tokens/tokens.css";
+
+:root {
+  /* Dark theme defaults (Starlight uses :root for dark mode). */
+  --sl-color-accent-low: var(--odal-primary-900);
+  --sl-color-accent: var(--odal-primary-500);
+  --sl-color-accent-high: var(--odal-primary-300);
+
+  --sl-font: var(--odal-font-sans);
+  --sl-font-mono: var(--odal-font-mono);
+}
+
+[data-theme="light"] {
+  --sl-color-accent-low: var(--odal-primary-50);
+  --sl-color-accent: var(--odal-primary-500);
+  --sl-color-accent-high: var(--odal-primary-700);
+  --sl-color-text-accent: var(--odal-primary-800)!important;
+}
+
+/*
+ * Keep inline-code tokens in tables (package names like `dpp-engine`) on one
+ * line — browsers otherwise break them at the hyphen when a column is narrow.
+ * Auto table layout then widens the column to fit instead of wrapping.
+ */
+.sl-markdown-content table code {
+  white-space: nowrap;
+}
+
+/*
+ * Alpha / in-development banner — match the landing's status badge (the
+ * regulatory amber token family). Calm attention, not alarm. The token values
+ * are static so the banner reads identically in light and dark themes.
+ */
+.sl-banner {
+  --sl-color-banner-bg: #fff7ed; /* regulatory-bg */
+  background: var(--sl-color-banner-bg);
+  color: #9a3412; /* regulatory-text */
+  border-bottom: 1px solid #fdba74; /* regulatory-border */
+  font-size: var(--sl-text-xs);
+  font-weight: 500;
+  text-wrap: balance;
+}
+.sl-banner a {
+  color: #9a3412;
+}

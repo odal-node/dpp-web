@@ -1,0 +1,22 @@
+---
+title: Standards & interoperability
+description: Odal Node speaks the open standards the regulation itself cites, so passports interoperate with the wider ecosystem instead of becoming a silo.
+---
+
+A passport is only useful if the rest of the world can read it. The core speaks the open standards the regulation itself references, so a passport works with existing tooling rather than locking you into one vendor's format.
+
+## The standards it speaks
+
+- **GS1 Digital Link** — the identifier scheme behind the QR code on a product. A scan resolves the product to its passport, and the same link can serve different views to different audiences (a consumer, a recycler, an authority).
+- **W3C Verifiable Credentials with `did:web`** — how a passport proves who issued it. Identity is anchored in the issuer's own domain, so verification is an ordinary web lookup — no central registry, no blockchain, no dependency on Odal staying online.
+- **IDTA Asset Administration Shell** — an industrial submodel projection, so a passport can flow into Industry 4.0 systems that already speak AAS.
+
+## Tracked as they finalise
+
+Harmonised DPP standards (CEN/CENELEC JTC 24) are still being written. The core tracks them and updates as they land, so a passport stays aligned with the standard rather than a snapshot of it.
+
+## Read next
+
+- [What the core does](/core/overview) — the standard the passport implements.
+- [Extending it: sectors & plugins](/core/sectors) — how sector rules plug in.
+- [EU Central Registry](/regulatory/central-registry) — registration and the registry interface.

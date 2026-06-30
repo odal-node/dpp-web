@@ -1,0 +1,32 @@
+---
+title: Self-hosting
+description: Run a node on your own infrastructure with the odal CLI. Your keys and your data stay with you; only the proof is published.
+---
+
+Self-hosting is the default way to run Odal Node. You run the engine on infrastructure you control, with your own keys — there are no licence keys, no passport caps, and no capability behind a paywall. Production self-hosting for your own organisation is free under the engine's licence.
+
+## What you need
+
+Docker, and the source tree. Everything is driven by the `odal` CLI.
+
+## The shape of it
+
+1. **Configure your secrets.** A node fails closed without them, by design — database credentials, a key-store passphrase, and your admin login live in a local environment file you create.
+2. **Bring it up.** Running `odal` walks you through it: it builds and starts the node, then onboards you and mints your first API key. The first start compiles from source and takes a few minutes; later starts are immediate.
+3. **Verify health.** `odal status` confirms the node is up and serving.
+
+The [Quick Start](/quick-start) is the condensed version of this flow.
+
+## What stays with you
+
+Your signing key is generated and held on your own infrastructure and never leaves it. Your raw production data is discarded after signing. What persists is the signed passport, its history, and the metadata needed to serve it — nothing more. This holds regardless of who operates the node; see [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see).
+
+## Keeping current
+
+The engine and the sector rules move as the regulation does. Updating a node brings in the latest validated sector schemas and fixes; a node you never update keeps working but drifts from the regulation over time.
+
+## Read next
+
+- [How the node works](/engine/architecture) — what's running under the hood.
+- [The CLI](/engine/cli) — the commands you'll use day to day.
+- [Licensing](/engine/licensing) — the self-host grant in full.

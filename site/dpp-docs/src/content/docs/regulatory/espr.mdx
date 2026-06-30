@@ -1,0 +1,65 @@
+---
+title: ESPR Overview
+description: The Ecodesign for Sustainable Products Regulation — what it is, what it requires, and how Odal meets its Digital Product Passport articles.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The Ecodesign for Sustainable Products Regulation (ESPR, EU 2024/1781) is the framework regulation that establishes the Digital Product Passport requirement across the European Union. It entered into force in 2024, and the first product-group delegated acts started landing immediately. By 2027, every product placed on the EU market that falls under a delegated act needs a machine-readable DPP.
+
+## What ESPR requires
+
+The regulation establishes three core obligations that shape every implementation. The first is the **passport itself** — every regulated product must have a machine-readable Digital Product Passport accessible via a data carrier (typically a QR code) on the product. The second is **regulatory access control** — the passport must distinguish between public information, information available to authorised actors, and private information, with cryptographic enforcement of the boundaries. The third is **retention** — the passport must remain accessible for the lifetime of the product plus a regulator-defined retention horizon (10 to 20 years depending on sector).
+
+## What ESPR does not specify
+
+The regulation is deliberately technology-neutral in important places. It does not mandate a specific data format, a specific identity method, a specific cryptographic scheme, or a specific resolution scheme. The delegated acts (per product group) tighten these decisions, and the standards bodies (GS1, IDTA, W3C, CEN/CENELEC JTC 24) fill in the technical detail.
+
+The implications for the implementation are that the platform has to track several converging standards simultaneously and update its schemas as the standards bodies publish.
+
+## How Odal maps to ESPR
+
+Odal covers the articles of ESPR that are technically substantive for a passport implementation:
+
+**Articles 8 and 9** — the format of the passport and its data carrier: the passport itself is the format, and GS1 Digital Link is how a scan resolves to it.
+
+**Article 10** — the three-tier access control. Odal carries the tier boundaries and the resolver enforces them on every request.
+
+**Article 12** — the transfer of responsibility from one economic operator to another along the supply chain, implemented as a dual-signature chain: both transferor and transferee sign, creating a verifiable chain of custody.
+
+**Article 13** — public access to passports. The resolver serves the public view, cached to stay fast under load.
+
+**Article 22** — the ban on destroying unsold consumer products, with the reporting obligations that flow through the passport. Odal carries a dedicated unsold-goods passport variant that records the disposal pathway as a verifiable record.
+
+<Aside type="tip" title="The implementation matrix">
+A row-by-row matrix mapping each ESPR article to where it is implemented is maintained in the `dpp-core` repository.
+</Aside>
+
+## Which sectors are covered
+
+ESPR is a framework; the binding detail arrives through per-product-group delegated acts, staggered across years. Odal carries a seam — a versioned schema and a sector plugin — for each sector below, so widening coverage is a matter of the regulation maturing, not of re-engineering. The status reflects what the regulation requires today, not what the software can already parse.
+
+| Sector | Regulatory basis | Status today |
+|---|---|---|
+| **Battery** | EU 2023/1542 | In force — passport mandatory 18 Feb 2027; substance limits enforced now |
+| **Textile** | ESPR delegated act (in drafting) | Structural validation now; unsold-goods ban (Art. 22) applies from 2026 |
+| **Electronics** | ESPR delegated act (adopted Mar 2026) | Phasing in — high-end from Apr 2026, the rest from Jan 2027 |
+| **Steel · Aluminium** | CBAM 2023/956 / ESPR | Reference benchmarks only; no DPP mandate yet (aluminium expected ~2030) |
+| **Construction** | CPR 2024/3110 | Awaiting delegated acts (2028–2032) |
+| **Toys** | EU 2025/2509 | Awaiting delegated act (~2030) |
+| **Furniture · Detergent · Tyre** | ESPR | Seams in place; awaiting delegated acts |
+
+Battery, textile, and electronics have dedicated pages below; the rest run on the same mechanism, waiting on their regulation.
+
+## What a compliance result actually claims
+
+Within any sector, some obligations are in force while others wait on a delegated act, and Odal is deliberate about not overstating what it can certify. Every passport is checked for structural and cross-field validity — that runs for every sector, in force or not. But a *binding* determination — a verdict of compliant or non-compliant — is issued only where the underlying obligation actually binds. Where it does not, the result is recorded as **not assessed** rather than guessed, and the passport carries that honestly.
+
+As each delegated act takes effect, the matching sector's determination switches on, with no change to passports already issued. This is why a battery's banned-substance limits are enforced today while its 2031 recycled-content minima are surfaced only as advisory until they bind. The system would rather say *not yet assessed* than assert a compliance claim the law does not yet support.
+
+## Read next
+
+[Battery DPP](/regulatory/battery) — the battery-sector delegated act in detail.
+[Textile DPP](/regulatory/textile) — the textile-sector delegated act in detail.
+[Access Control (Art. 10)](/regulatory/access-control) — the three-tier model in detail.
+[EU Central Registry](/regulatory/central-registry) — what the central registry is and what it is not.

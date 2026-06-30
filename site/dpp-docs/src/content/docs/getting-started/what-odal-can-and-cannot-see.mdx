@@ -1,0 +1,45 @@
+---
+title: What Odal can and cannot see
+description: A precise statement of data access by deployment model — the proof-bound architecture, stated as verifiable facts.
+---
+
+The proof-bound architecture means that raw production data is validated and signed locally on the operator's infrastructure, then discarded. Only the signed proof is stored and served. This page states precisely what Odal can see, cannot see, and could see but does not — by deployment model.
+
+## By deployment
+
+| Property | Self-hosted | Managed (Future) |
+|---|---|---|
+| Node discards raw inputs; stores only the signed proof | Yes — architectural invariant | Yes — architectural invariant |
+| Odal (the entity) can access stored data | No — not present in the deployment | Constrained by access controls, audit logging, and contract |
+| Odal can sign on the operator's behalf | No | No — the operator holds the signing keys |
+
+## What we can see
+
+The signed passport published to a resolver we operate, and the metadata required to serve it:
+
+- The GS1 Digital Link resolver cache
+- The DID document (public by definition)
+- The audit trail of signature and status transitions (managed deployments only)
+
+## What we cannot see
+
+- Your private signing keys — held in-process on your infrastructure, encrypted at rest via Argon2id-derived AES-256-GCM, never transmitted
+- Your raw production data, supply-chain detail beyond passport content, or import files
+- In a self-hosted deployment: nothing at all — we have no access to the instance, the database, or the keys
+
+## What we could see but do not
+
+The contents of your import files. The software reads them once, validates the data, signs the passport, and discards the input. There is no setting, configuration, or internal code path that retains the raw import after signing — it is not a choice made per customer; it is how the software works.
+
+## The mechanism
+
+1. **Import** — product data arrives at your node (CSV, Excel, ERP export) on infrastructure you control.
+2. **Validate** — locally against versioned sector schemas. Validation is a pure function — no network calls.
+3. **Sign** — your Ed25519 private key, generated and held in-process, signs the validated passport into a JWS bound to your `did:web` identity.
+4. **Publish** — only the signed passport becomes resolvable. The raw input is discarded.
+5. **Verify** — anyone verifies against your public DID Document. Odal is not in the verify loop.
+
+## Read next
+
+[Core Concepts](/core-concepts) — the three governing principles, including this one.
+[Licensing](/engine/licensing) — the open-core model and the self-host grant.

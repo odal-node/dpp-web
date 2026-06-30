@@ -1,0 +1,36 @@
+---
+title: Core Concepts
+description: The three ideas behind Odal Node — the proof-bound architecture, the open-core boundary, and the single seam through which new regulation enters.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Three ideas explain almost everything about how Odal Node is built and why. Understand these and the rest of the documentation — and the code — reads easily. This page is the synthesis; each idea has a fuller treatment under Design Principles.
+
+## Proof-bound: the data stays yours
+
+The most important decision in the project is that raw production data never enters Odal's systems. The manufacturer validates a passport locally, signs it with their own key, and publishes only the signed proof. Odal stores proofs, not production data — no supply-chain detail, no trade secrets, no raw inputs.
+
+This is a property of the software, not a promise about our conduct. Because the node discards the inputs after signing, there is nothing for an operator — or for us — to hand over later. Verification needs only the signed passport and the manufacturer's public identity; it does not need Odal to be online, or to exist.
+
+A fuller treatment of the data boundary is in [What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see).
+
+## Open-core: a clean line between regulation and business
+
+Odal Node is two parts with two licences. The **core** is the regulatory standard, open under Apache-2.0 — the rules a compliant passport must satisfy. The **engine** is the service that runs those rules in production, source-available under BSL-1.1 with a self-host grant.
+
+One rule decides which side any change belongs on: *if it changes because an EU regulation changed, it belongs in the core; if it changes because of how the system is deployed or operated, it belongs in the engine.* The dependency only ever points one way — the engine uses the core; the core knows nothing of the engine.
+
+A fuller treatment is in [Licensing](/engine/licensing).
+
+## One seam for new regulation
+
+Regulation arrives sector by sector, and it keeps moving. So the core is built around a single extension point: each sector's compliance logic plugs in through one seam, and new sectors and revised rules enter there without changing anything around them.
+
+<Aside type="note" title="The seam is technical, not commercial">
+That extension point is an architectural boundary, never a paywall. The built-in sectors and any added later use the same mechanism, and all of it is open — new regulatory coverage is never a paid unlock.
+</Aside>
+
+## Where to go next
+
+To run a node, start with the [Quick Start](/quick-start). To understand what Odal Node can and cannot see, read [What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see). To check regulatory alignment, start with the [ESPR Overview](/regulatory/espr).
