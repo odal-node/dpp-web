@@ -1,0 +1,21 @@
+{
+  "name": "dpp-web",
+  "description": "Workspace root for odal-node.io (dpp-landing) and docs.odal-node.io (dpp-docs).",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.5.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev:landing": "pnpm --filter dpp-landing dev",
+    "dev:docs": "pnpm --filter dpp-docs dev",
+    "build:landing": "pnpm --filter dpp-landing build",
+    "build:docs": "pnpm --filter dpp-docs build",
+    "build": "pnpm -r build",
+    "check": "pnpm -r check",
+    "preview:landing": "pnpm --filter dpp-landing preview",
+    "preview:docs": "pnpm --filter dpp-docs preview",
+    "clean": "pnpm -r exec rm -rf dist .astro node_modules && rm -rf node_modules"
+  }
+}

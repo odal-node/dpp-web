@@ -1,0 +1,7 @@
+packages:
+  - "site/dpp-landing"
+  - "site/dpp-docs"
+  - "packages/*"
+allowBuilds:
+  esbuild: true
+  sharp: true

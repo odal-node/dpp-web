@@ -1,0 +1,145 @@
+/*
+ * @odal/brand-tokens — CSS custom properties + Tailwind 4 @theme block.
+ *
+ * Two layers:
+ *   1. :root { --odal-* } — raw brand values for direct CSS use (used by
+ *      docs.odal-node.io's Starlight custom.css and any non-Tailwind site).
+ *   2. @theme { --color-* } — Tailwind 4 theme exposure so any Astro site
+ *      that does `@import "tailwindcss"; @import "@odal/brand-tokens/tokens.css";`
+ *      gets utility classes for the full brand palette without further config.
+ *
+ * Palette decision 2026-06-10 (docs/redesign/DESIGN_SPEC.md §1): the brand
+ * colour system follows the logo — navy field (#080C2C) + ice-blue strokes
+ * (#B7D4F0) — with a darkened action blue for interactive elements so links
+ * and buttons hold AA contrast on white. The former green scale is retired.
+ * The `primary-*` token NAMES are kept so existing utility classes keep
+ * working; only the values changed.
+ *
+ * Keep this file in sync with colors.ts / typography.ts / spacing.ts.
+ * See CONTRIBUTING.md section 4 for the synchronisation rule.
+ */
+
+:root {
+  /* primary scale — navy/ice blue family, anchored on the logo.
+     50–300 are ice tints (logo stroke is 300); 500/600 are the interactive
+     action blues; 800/900 are the navy surfaces (logo field is 900). */
+  --odal-primary-50:  #eff5fb;
+  --odal-primary-100: #e3eef9;
+  --odal-primary-200: #c9def3;
+  --odal-primary-300: #b7d4f0;
+  --odal-primary-400: #5e8fc7;
+  --odal-primary-500: #2563a8;
+  --odal-primary-600: #1d4f87;
+  --odal-primary-700: #163d6b;
+  --odal-primary-800: #11173f;
+  --odal-primary-900: #080c2c;
+
+  /* named brand aliases (read better in hand-written CSS) */
+  --odal-navy-900:   var(--odal-primary-900);
+  --odal-navy-800:   var(--odal-primary-800);
+  --odal-ice-300:    var(--odal-primary-300);
+  --odal-ice-100:    var(--odal-primary-100);
+  --odal-action-600: var(--odal-primary-500);
+  --odal-action-700: var(--odal-primary-600);
+
+  /* neutral scale */
+  --odal-neutral-0:    #ffffff;
+  --odal-neutral-50:   #fafaf9;
+  --odal-neutral-100:  #f5f5f4;
+  --odal-neutral-200:  #e7e5e4;
+  --odal-neutral-300:  #d6d3d1;
+  --odal-neutral-400:  #a8a29e;
+  --odal-neutral-500:  #78716c;
+  --odal-neutral-600:  #57534e;
+  --odal-neutral-700:  #44403c;
+  --odal-neutral-800:  #292524;
+  --odal-neutral-900:  #1c1917;
+  --odal-neutral-1000: #0a0a09;
+
+  /* regulatory semantic (deadline callouts) — unchanged */
+  --odal-regulatory-bg:     #fff7ed;
+  --odal-regulatory-border: #fdba74;
+  --odal-regulatory-text:   #9a3412;
+
+  /* status badges — semantic, not brand: shipped = green stays green */
+  --odal-status-released:    #2e7d32;
+  --odal-status-active:      #d97706;
+  --odal-status-development: var(--odal-neutral-500);
+
+  /* typography */
+  --odal-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+                    "Helvetica Neue", Arial, sans-serif;
+  --odal-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas,
+                    "Liberation Mono", monospace;
+  --odal-line-tight: 1.25;
+  --odal-line-body:  1.6;
+
+  /* spacing (8px base + 12px outlier) */
+  --odal-space-1:  0.25rem;
+  --odal-space-2:  0.5rem;
+  --odal-space-3:  0.75rem;
+  --odal-space-4:  1rem;
+  --odal-space-6:  1.5rem;
+  --odal-space-8:  2rem;
+  --odal-space-12: 3rem;
+  --odal-space-16: 4rem;
+  --odal-space-24: 6rem;
+  --odal-space-32: 8rem;
+
+  /* radius / shadow */
+  --odal-radius-none: 0;
+  --odal-radius-sm:   2px;
+  --odal-radius-md:   6px;
+  --odal-radius-lg:   12px;
+  --odal-shadow-e1:   0 1px 2px rgba(0,0,0,0.04);
+  --odal-shadow-e2:   0 8px 24px rgba(0,0,0,0.08);
+}
+
+/*
+ * Tailwind 4 theme exposure.
+ * Any site that imports this file after `@import "tailwindcss";` gets
+ * utility classes (bg-primary-500, text-neutral-900, font-sans, etc.).
+ */
+@theme {
+  --color-primary-50:  #eff5fb;
+  --color-primary-100: #e3eef9;
+  --color-primary-200: #c9def3;
+  --color-primary-300: #b7d4f0;
+  --color-primary-400: #5e8fc7;
+  --color-primary-500: #2563a8;
+  --color-primary-600: #1d4f87;
+  --color-primary-700: #163d6b;
+  --color-primary-800: #11173f;
+  --color-primary-900: #080c2c;
+
+  --color-navy-900: #080c2c;
+  --color-navy-800: #11173f;
+  --color-ice-300:  #b7d4f0;
+  --color-ice-100:  #e3eef9;
+
+  --color-neutral-0:    #ffffff;
+  --color-neutral-50:   #fafaf9;
+  --color-neutral-100:  #f5f5f4;
+  --color-neutral-200:  #e7e5e4;
+  --color-neutral-300:  #d6d3d1;
+  --color-neutral-400:  #a8a29e;
+  --color-neutral-500:  #78716c;
+  --color-neutral-600:  #57534e;
+  --color-neutral-700:  #44403c;
+  --color-neutral-800:  #292524;
+  --color-neutral-900:  #1c1917;
+  --color-neutral-1000: #0a0a09;
+
+  --color-regulatory-bg:     #fff7ed;
+  --color-regulatory-border: #fdba74;
+  --color-regulatory-text:   #9a3412;
+
+  --color-status-released:    #2e7d32;
+  --color-status-active:      #d97706;
+  --color-status-development: #78716c;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+               "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas,
+               "Liberation Mono", monospace;
+}

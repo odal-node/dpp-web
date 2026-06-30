@@ -1,0 +1,18 @@
+{
+  "name": "@odal/brand-tokens",
+  "description": "Shared brand tokens (colour, typography, spacing) for odal-node.io and docs.odal-node.io.",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./colors": "./src/colors.ts",
+    "./typography": "./src/typography.ts",
+    "./spacing": "./src/spacing.ts",
+    "./tokens.css": "./src/tokens.css"
+  },
+  "files": [
+    "src"
+  ]
+}
