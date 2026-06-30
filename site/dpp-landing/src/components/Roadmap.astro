@@ -1,0 +1,42 @@
+---
+// Roadmap.astro — three-column status display. Data lives in src/data/roadmap.json
+// (WEB_CONTENT_STRATEGY.md §4.8) so editors change JSON, not components.
+// Status enum: shipped | in-build | horizon — the "honest status" framing.
+import data from "../data/roadmap.json";
+
+type Status = "shipped" | "in-build" | "horizon";
+const { columns } = data as {
+  columns: {
+    status: Status;
+    title: string;
+    description: string;
+    items: { label: string; detail: string }[];
+  }[];
+};
+
+const dotClass: Record<Status, string> = {
+  shipped: "bg-status-released",
+  "in-build": "bg-status-active",
+  horizon: "bg-status-development",
+};
+---
+
+<div class="grid gap-8 md:grid-cols-3">
+  {columns.map((col) => (
+    <article class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
+      <header class="mb-4 flex items-center gap-2">
+        <span class={`inline-block h-2.5 w-2.5 rounded-full ${dotClass[col.status]}`}></span>
+        <h3 class="m-0 text-lg font-semibold text-neutral-900">{col.title}</h3>
+      </header>
+      <p class="mb-4 text-sm text-neutral-600">{col.description}</p>
+      <ul class="m-0 list-none space-y-3 p-0">
+        {col.items.map((it) => (
+          <li>
+            <p class="m-0 text-sm font-medium text-neutral-900">{it.label}</p>
+            <p class="m-0 text-xs leading-relaxed text-neutral-500">{it.detail}</p>
+          </li>
+        ))}
+      </ul>
+    </article>
+  ))}
+</div>

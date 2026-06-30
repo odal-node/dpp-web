@@ -1,0 +1,108 @@
+---
+// Hero.astro — the highest-stakes block on the entire site. See docs/BRAND.md §2.
+// Navy band with the brand mark as a quiet watermark; ice text; two CTAs;
+// one-line trust row. Copy source: docs/WEB_CONTENT_STRATEGY.md §4.1.
+import Watermark from "../assets/favicon.svg";
+import StatusBadge from "./StatusBadge.astro";
+interface Props {
+  eyebrow?: string;
+  title: string;
+  subtitle: string;
+  primaryHref: string;
+  primaryLabel: string;
+  secondaryHref: string;
+  secondaryLabel: string;
+  trustRow?: string[];
+  /** Show the alpha / in-development status badge in the eyebrow row. */
+  status?: boolean;
+}
+const {
+  eyebrow,
+  title,
+  subtitle,
+  primaryHref,
+  primaryLabel,
+  secondaryHref,
+  secondaryLabel,
+  trustRow = [],
+  status = false,
+} = Astro.props;
+---
+
+<section class="relative overflow-hidden bg-primary-900 text-primary-100 min-h-120">
+  <!-- thin accent line at the very top of the band — adds definition without imagery -->
+  <div class="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary-300/50 to-transparent" aria-hidden="true"></div>
+  <!-- soft radial depth behind the headline; decorative, reduced-motion-safe (static) -->
+  <div
+    class="pointer-events-none absolute -left-32 -top-24 h-120 w-120 rounded-full opacity-40 blur-3xl"
+    style="background: radial-gradient(closest-side, rgba(94,143,199,0.18), transparent);"
+    aria-hidden="true"
+  ></div>
+  <!-- watermark mark, decorative -->
+  <!-- <svg
+    viewBox="0 0 512 512"
+    aria-hidden="true"
+    class="pointer-events-none absolute -right-16 top-1/2 hidden h-[420px] w-[420px] -translate-y-1/2 opacity-[0.07] lg:block"
+  >
+    <g fill="none" stroke="#B7D4F0" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="256" cy="256" r="230" stroke-width="17" />
+      <path stroke-width="8" d="M191 354 Q189 296 191 232 Q190 228 194 224 L250 174 Q256 169 262 174 L318 224 Q322 228 321 233 Q323 297 321 354" />
+      <path stroke-width="4" d="M168 356 Q256 361 344 356" />
+      <circle cx="172" cy="152" r="10" stroke-width="4" />
+      <path stroke-width="1.8" opacity="0.7" d="M146 252 L154 198 L168 162 M180 146 L204 122 L256 98 L308 120 L348 150 L366 196 L372 250" />
+    </g>
+    <g fill="#B7D4F0">
+      <circle cx="204" cy="122" r="5" /><circle cx="256" cy="98" r="5.5" /><circle cx="308" cy="120" r="5" />
+      <circle cx="348" cy="150" r="4.5" /><circle cx="366" cy="196" r="4" /><circle cx="154" cy="198" r="4" />
+    </g>
+  </svg> -->
+  <Watermark aria-hidden="true" class="pointer-events-none absolute -right-16 top-1/2 hidden h-120 w-120 -translate-y-1/2 opacity-[0.07] lg:block" />
+
+  <div class="relative mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:px-8">
+    <div class="max-w-3xl">
+      {(eyebrow || status) && (
+        <div class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+          {eyebrow && (
+            <p class="m-0 text-xs font-semibold uppercase tracking-widest text-primary-300">
+              {eyebrow}
+            </p>
+          )}
+          {status && <StatusBadge tone="navy" label="Alpha · Active development" />}
+        </div>
+      )}
+      <h1 class="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl">
+        {title}
+      </h1>
+      <p class="mb-10 max-w-2xl text-lg leading-body text-primary-200">
+        {subtitle}
+      </p>
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <!-- <a
+          href={primaryHref}
+          class="group inline-flex items-center justify-center gap-2 rounded-md bg-primary-300 px-6 py-3 font-medium text-primary-900 no-underline shadow-sm transition-colors hover:bg-primary-200 hover:no-underline"
+        >
+          {primaryLabel}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-0.5" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a> -->
+        <a
+          href={secondaryHref}
+          class="inline-flex items-center justify-center rounded-md border border-primary-300/40 px-6 py-3 font-medium text-primary-100 no-underline transition-colors hover:border-primary-300 hover:bg-primary-300/5 hover:no-underline"
+        >
+          {secondaryLabel}
+        </a>
+      </div>
+      {trustRow.length > 0 && (
+        <ul class="not-prose mt-10 flex flex-wrap items-center gap-x-3 gap-y-2 p-0 text-sm text-primary-300/80">
+          {trustRow.map((item, i) => (
+            <li class="m-0 flex items-center gap-3">
+              {i > 0 && <span class="h-3 w-px bg-primary-300/25" aria-hidden="true"></span>}
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+---
+// waitlist.astro — minimal waitlist signup.
+// Deliberately backend-free: no form, no form service, no CMS, nothing stored
+// by us. To join, visitors email the public mailbox directly — consistent with
+// the project's transparency and git-only posture.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+
+const title = "Join the waitlist — Odal Node";
+const description =
+  "Email the team to be kept posted. Nothing is stored on this site.";
+
+const MAILBOX = "contact@odal-node.io";
+---
+
+<Base title={title} description={description}>
+  <Section eyebrow="Waitlist" title="Join the waitlist.">
+    <p>
+      Odal Node is in active development (alpha). To be kept posted, email
+      <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a> with a sentence about your
+      products or what you're looking for.
+    </p>
+    <p>
+      We tend to the mailbox roughly once a week, so expect a reply within a few
+      days and we hope to get in touch with you directly.
+    </p>
+  </Section>
+</Base>

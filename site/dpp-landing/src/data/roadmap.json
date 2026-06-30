@@ -1,0 +1,43 @@
+{
+  "_comment": "Roadmap data — the single editable source for the landing roadmap (WEB_CONTENT_STRATEGY.md §4.8). Status enum: shipped | in-build | horizon. Rule: every numeric claim cites where it is measured, or it is omitted. No project-milestone months — regulatory dates live in deadlines.json.",
+  "columns": [
+    {
+      "status": "shipped",
+      "title": "Shipped",
+      "description": "Verified and available today.",
+      "items": [
+        { "label": "Open regulatory core", "detail": "The EU DPP standard in Rust — pure, dependency-free, and fully open" },
+        { "label": "Sector schemas", "detail": "Battery, textile and steel" },
+        { "label": "Signing and identity", "detail": "Local signing, did:web identity, and key rotation" },
+        { "label": "Resolution and interop", "detail": "GS1 Digital Link, QR, and AAS submodel export" },
+        { "label": "Sandboxed sector plugins", "detail": "Each sector's rules run isolated, with signature verification" },
+        { "label": "End-to-end node", "detail": "Create, sign, publish, and resolve a passport end to end" },
+        { "label": "Bulk import", "detail": "CSV and Excel with dry-run validation and per-row errors" }
+      ]
+    },
+    {
+      "status": "in-build",
+      "title": "In build",
+      "description": "Under active work with a defined target.",
+      "items": [
+        { "label": "Electronics sector", "detail": "Schema and plugin, prepared ahead of an electronics delegated act" },
+        { "label": "EU Central Registry connector", "detail": "Ready for the registry API; activates when the specification publishes" },
+        { "label": "eIDAS qualified-seal path", "detail": "Qualified trust service provider selection in progress" },
+        { "label": "Unsold-goods disclosure export", "detail": "Report artifact for the July 2026 textile obligation" },
+        { "label": "Operator dashboard", "detail": "Passport management UI for managed and self-hosted nodes" }
+      ]
+    },
+    {
+      "status": "horizon",
+      "title": "Horizon",
+      "description": "Planned; not in active work. No dates are promised here on purpose.",
+      "items": [
+        { "label": "Multi-operator hosting", "detail": "Isolated per-operator deployments at fleet scale" },
+        { "label": "Edge-cached public resolver", "detail": "CDN-cached passport pages for global scan latency" },
+        { "label": "Further sectors", "detail": "Construction, tyres, furniture, detergents — as delegated acts finalise" },
+        { "label": "Conformance services", "detail": "Verification badge against EN 18222/18223 once the standards are final" },
+        { "label": "EBSI did:ebsi", "detail": "EU-operated DID method as an alternative issuer-identity path, if registry requirements call for it" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import OurRoadmap from "../components/Roadmap.astro";
+
+const title = "Roadmap — Odal Node";
+const description =
+  "What is shipped, what is under active development, and what is on the longer horizon for the dpp-core library and the dpp-engine infrastructure.";
+---
+
+<Base title={title} description={description}>
+  <Section eyebrow="Public roadmap" title="Development status across the two repositories.">
+    <p>
+      This page mirrors the three-category roadmap presented on the home page and
+      adds detail. The categories are deliberately not tied to specific quarters —
+      timing on regulatory infrastructure is contingent on too many external
+      events (delegated act publication dates, schema-body votes, registry API
+      availability) to be promised precisely. The category itself is the
+      commitment.
+    </p>
+    <p>
+      The roadmap is reviewed and updated fortnightly. See
+      <a href="https://github.com/orgs/odal-node/projects">the public GitHub project board</a>
+      for live status on individual items.
+    </p>
+  </Section>
+
+  <Section eyebrow="Status" title="The three categories." tone="muted">
+    <div class="not-prose">
+      <OurRoadmap />
+    </div>
+  </Section>
+
+  <Section eyebrow="How this is maintained" title="What moves a feature between categories.">
+    <p>
+      A feature moves from <strong>Horizon</strong> to <strong>In build</strong>
+      when it enters a sprint and has a named owner. It moves from
+      <strong>In build</strong> to <strong>Shipped</strong> when it is in a
+      tagged release of the relevant repository, has documentation on
+      <a href="https://docs.odal-node.io">docs.odal-node.io</a>, and has an
+      automated test exercising it through the running system — "shipped" means
+      verified, not merged.
+    </p>
+    <p>
+      Items can move backwards. Discovering that a feature in build needs more
+      foundational work is a reasonable outcome of building it; that work moves
+      back to the horizon with a note explaining what was learned. Honesty about
+      reversals is preferable to silently letting an item drift for six months
+      without status.
+    </p>
+  </Section>
+</Base>

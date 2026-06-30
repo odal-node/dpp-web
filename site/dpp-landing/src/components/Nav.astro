@@ -1,0 +1,105 @@
+---
+// Nav.astro — top navigation. Mark + wordmark left; links + CTA right.
+// Lockup matches the docs (Starlight) site-title for cross-site parity:
+// navy mark + accent wordmark at --sl-text-h4 scale, weight 600.
+import StatusBadge from "./StatusBadge.astro";
+// Use the real brand mark (currentColor variant of odal-mark) rather than a
+// hand-rolled inline SVG, so the nav stays in sync with the brand asset and the
+// mark inherits the wordmark's colour. Astro 5 imports .svg as a component.
+import OdalMark from "../assets/favicon.svg";
+
+const links = [
+  { href: "https://docs.odal-node.io", label: "Docs", external: true },
+  // { href: "/trust", label: "Trust", external: false },
+  // { href: "/roadmap", label: "Roadmap", external: false },
+  // { href: "/about", label: "About", external: false },
+  { href: "https://github.com/odal-node", label: "GitHub", external: true },
+];
+const current = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-50 border-b border-neutral-100 bg-gray-100">
+  <nav class="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-6" aria-label="Main">
+    <div class="flex items-center gap-3">
+      <a href="/" class="site-title flex items-center gap-6 font-semibold tracking-tight text-primary-800 no-underline hover:no-underline">
+        <OdalMark aria-hidden="true" class="h-8 w-8 shrink-0 md:h-10 md:w-10" />
+         <!-- <img src={OdalMark2.src} alt="Odal Node" class="h-8 w-8 shrink-0 md:h-9 md:w-9 rounded-full" /> -->
+        <span class="text-xl md:text-2xl tracking-normal">Odal Node</span>
+      </a>
+      <!-- Honest project status — pre-1.0, alpha. Kept next to the wordmark so
+           it is the first thing read, not buried. Hidden on the narrowest
+           screens to protect the hamburger layout; shown again in the mobile panel. -->
+      <!-- <StatusBadge tone="light" class="hidden sm:inline-flex" label="Alpha" /> -->
+    </div>
+
+    <!-- desktop links -->
+    <div class="hidden items-center gap-1 md:flex">
+      {links.map((l) => (
+        <a
+          href={l.href}
+          aria-current={!l.external && current === l.href ? "page" : undefined}
+          class={`rounded-md px-3 py-2 text-sm font-medium no-underline hover:bg-neutral-100 ${
+            !l.external && current === l.href
+              ? "text-primary-900 underline decoration-2 underline-offset-8"
+              : "text-neutral-600 hover:text-neutral-900"
+          }`}
+          {...(l.external ? { rel: "noopener" } : {})}
+        >
+          {l.label}
+        </a>
+      ))}
+      <a
+        href="/waitlist"
+        class="ml-2 rounded-md bg-primary-800 px-4 py-2 text-sm font-medium text-white no-underline hover:bg-primary-900 hover:no-underline"
+      >
+        Join the waitlist
+      </a>
+    </div>
+
+    <!-- mobile hamburger -->
+    <button
+      id="nav-toggle"
+      type="button"
+      class="inline-flex items-center justify-center rounded-md p-2 text-neutral-700 hover:bg-neutral-100 md:hidden"
+      aria-controls="nav-menu"
+      aria-expanded="false"
+      aria-label="Open menu"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- mobile panel -->
+  <div id="nav-menu" class="hidden border-t border-neutral-200 bg-white px-4 pb-4 pt-2 md:hidden">
+    <div class="px-3 pb-2 pt-1">
+      <StatusBadge tone="light" label="Alpha · in active development" />
+    </div>
+    {links.map((l) => (
+      <a
+        href={l.href}
+        class="block rounded-md px-3 py-2.5 text-sm font-medium text-neutral-700 no-underline hover:bg-neutral-100"
+        {...(l.external ? { rel: "noopener" } : {})}
+      >
+        {l.label}
+      </a>
+    ))}
+    <a
+      href="/waitlist"
+      class="mt-2 block rounded-md bg-primary-800 px-3 py-2.5 text-center text-sm font-medium text-white no-underline hover:bg-primary-600"
+    >
+      Join the waitlist
+    </a>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById("nav-toggle");
+  const menu = document.getElementById("nav-menu");
+  toggle?.addEventListener("click", () => {
+    const open = menu?.classList.toggle("hidden") === false;
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  });
+</script>

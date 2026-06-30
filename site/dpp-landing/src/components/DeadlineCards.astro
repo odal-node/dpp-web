@@ -1,0 +1,23 @@
+---
+// DeadlineCards.astro — the regulatory clock. Data: src/data/deadlines.json.
+// Uses the regulatory semantic tokens (amber family) — these are deadline
+// callouts, not brand surfaces. Every card carries its legal citation.
+import data from "../data/deadlines.json";
+const { deadlines } = data;
+---
+
+<div class="grid gap-6 md:grid-cols-3">
+  {deadlines.map((d) => (
+    <article class="rounded-md border border-regulatory-border bg-regulatory-bg p-6">
+      <p class="m-0 text-sm font-semibold uppercase tracking-wide text-regulatory-text">
+        {d.dateLabel}
+      </p>
+      <h3 class="mb-1 mt-2 text-xl font-semibold text-neutral-900">{d.title}</h3>
+      <p class="m-0 mb-3 text-xs font-medium uppercase tracking-wide text-neutral-500">
+        {d.who}
+      </p>
+      <p class="m-0 text-sm leading-body text-neutral-700">{d.summary}</p>
+      <p class="m-0 mt-4 text-xs text-neutral-500">{d.citation}</p>
+    </article>
+  ))}
+</div>

@@ -1,0 +1,32 @@
+---
+// Section.astro — a standard content section with an eyebrow, title, and slot.
+// Tones (DESIGN_SPEC §5): default = white, muted = warm grey, tinted = ice.
+interface Props {
+  eyebrow?: string;
+  title: string;
+  id?: string;
+  tone?: "default" | "muted" | "tinted";
+  /** Widen the inner container for grid-heavy sections. */
+  wide?: boolean;
+}
+const { eyebrow, title, id, tone = "default", wide = false } = Astro.props;
+const bg =
+  tone === "muted" ? "bg-neutral-50" : tone === "tinted" ? "bg-primary-50" : "bg-transparent";
+const width = wide ? "max-w-6xl" : "max-w-5xl";
+---
+
+<section id={id} class={`${bg} py-16 md:py-24`}>
+  <div class={`${width} mx-auto px-4 sm:px-6 lg:px-8`}>
+    {eyebrow && (
+      <p class="mb-3 text-xs font-semibold uppercase tracking-widest text-primary-500">
+        {eyebrow}
+      </p>
+    )}
+    <h2 class="mb-6 text-3xl font-bold text-neutral-900">
+      {title}
+    </h2>
+    <div class="prose prose-neutral max-w-none leading-body">
+      <slot />
+    </div>
+  </div>
+</section>

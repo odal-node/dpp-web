@@ -1,0 +1,32 @@
+{
+  "_comment": "Regulatory deadlines shown on the landing page. Every entry needs a citation. The _verify fields are internal notes — NOT rendered — and must be cleared by the compliance lead before launch (source: docs/WEB_CONTENT_STRATEGY.md §4.2).",
+  "deadlines": [
+    {
+      "date": "2026-07-19",
+      "dateLabel": "19 July 2026",
+      "title": "Unsold goods",
+      "who": "Large companies",
+      "summary": "Destruction of unsold textiles and footwear is banned for large companies, and destruction practices must be disclosed.",
+      "citation": "ESPR (EU) 2024/1781, Art. 25",
+      "_verify": "Confirmed: Art. 25; large companies from 19 Jul 2026; medium-sized from 19 Jul 2030; micro/small exempt. Destruction exceptions in Delegated Reg. C(2026) 659."
+    },
+    {
+      "date": "2027-02-18",
+      "dateLabel": "18 February 2027",
+      "title": "Battery passports",
+      "who": "EV, industrial (>2 kWh), LMT",
+      "summary": "Every battery in scope placed on the EU market needs a digital battery passport, registered in the EU central registry.",
+      "citation": "Regulation (EU) 2023/1542, Art. 77",
+      "_verify": "Solid per internal docs; re-confirm registry-registration modalities when the spec lands."
+    },
+    {
+      "date": "2030-12-31",
+      "dateLabel": "Next, from 2026",
+      "title": "Priority sectors next",
+      "who": "Textiles, iron & steel, furniture, tyres",
+      "summary": "The ESPR 2025–2030 working plan sets the order: textiles and iron & steel lead the first delegated acts, each fixing its own DPP application date when adopted. Electronics is not a priority sector in this plan.",
+      "citation": "ESPR 2025–2030 Working Plan, COM(2025) 187",
+      "_verify": "Working plan confirmed (adopted 16 Apr 2025; six priority groups: textiles, furniture, mattresses, tyres, iron & steel, aluminium). Update per-sector dates as each delegated act is adopted."
+    }
+  ]
+}

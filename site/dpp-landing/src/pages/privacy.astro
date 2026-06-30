@@ -1,0 +1,97 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+
+const title = "Privacy policy — Odal Node";
+const description =
+  "How the Odal Node website handles your data: no cookies, no analytics, no third-party trackers. What the host sees, and what reaches us.";
+
+// This policy covers the website at odal-node.io only — a static site with no
+// backend. How the Odal Node software handles product data is a separate,
+// architectural question; see /trust.
+const MAILBOX = "security@odal-node.io";
+
+// TODO(legal): once a registered entity exists, name the data controller and
+// its jurisdiction here and in the "Who is responsible" section below.
+---
+
+<Base title={title} description={description}>
+  <!-- <Section eyebrow="Privacy" title="What this site collects, and what it does not.">
+    <p>
+      This policy covers the website at <strong>odal-node.io</strong> — the pages
+      you are reading now. It is deliberately short, because the site is
+      deliberately simple: it is a static website with no backend, no accounts,
+      and no database. There is nothing here that quietly watches you.
+    </p>
+    <p>
+      How the Odal Node <em>software</em> handles product data is a separate
+      question, and an architectural one rather than a policy one — the node
+      validates and signs locally, then discards the raw input. That story is
+      told on the <a href="/trust">trust page</a>. This page is only about the
+      website.
+    </p>
+  </Section> -->
+
+  <Section eyebrow="Privacy Policy" title="No cookies, no analytics, no trackers.">
+    <ul>
+      <li>The site sets <strong>no cookies</strong> and uses no local storage to track you.</li>
+      <li>There is <strong>no analytics</strong> — no Google Analytics, Plausible, Fathom, or any equivalent.</li>
+      <li>There are <strong>no third-party trackers, advertising pixels, or social embeds</strong>.</li>
+      <li>We do not build a profile of you, and we do not sell or share data — there is nothing to sell.</li>
+      <li>The only data that exists is what your browser unavoidably sends to load a web page, and anything you choose to email us.</li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="Hosting" title="What the host sees. " tone="tinted">
+    <p>
+      The site is served as static files by <strong>Cloudflare Pages</strong>.
+      As with any website, your browser must connect to a server to load a page,
+      and that connection is visible to the host. To deliver the site and protect
+      it from abuse, Cloudflare processes standard request metadata: your
+      <strong>IP address</strong>, the time of the request, the page requested,
+      your browser's user-agent string, and similar technical details.
+    </p>
+    <p>
+      We use this for nothing. We do not run analytics over it and we do not
+      receive it as an identifiable record of you. It is processed by Cloudflare
+      as our hosting provider — acting as a data processor on our behalf — for
+      content delivery, TLS, and security (such as DDoS protection), under
+      Cloudflare's own terms. See
+      <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.
+      Our legal basis for this processing is our legitimate interest in serving
+      and securing the site.
+    </p>
+  </Section>
+
+  <Section eyebrow="Off-site links" title="Where the site sends you.">
+    <p>
+      Some links lead off this site — the <a href="https://docs.odal-node.io" rel="noopener">documentation</a>,
+      our <a href="https://github.com/odal-node" rel="noopener">GitHub organisation</a>,
+      and a few cited standards. Once you follow them you are on someone else's
+      property, governed by their privacy practices, not this one. We have no
+      control over what those services collect.
+    </p>
+  </Section>
+
+  <Section eyebrow="Your rights" title="What you can ask of us." tone="tinted">
+    <p>
+      Under the GDPR and equivalent laws you can ask us to confirm what personal
+      data we hold about you, to correct it, to send you a copy, or to delete it.
+      Because the only personal data we hold is whatever you have emailed us, a
+      request usually amounts to "delete our correspondence", which we will do.
+    </p>
+    <p>
+      To exercise any of these rights, or to ask a privacy question, write to
+      <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a>. If you believe we have handled
+      your data improperly, you also have the right to lodge a complaint with your
+      local data protection authority.
+    </p>
+  </Section>
+
+  <Section eyebrow="Responsibility & changes" title="Who is responsible, and how this page changes.">
+    <p>
+      <strong>Odal Node</strong> is responsible for this website and for the
+      personal data described above. For any data or privacy matter, the contact
+      is <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a>.
+    </p>
+</Base>

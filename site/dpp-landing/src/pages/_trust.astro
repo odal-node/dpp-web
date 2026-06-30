@@ -1,0 +1,113 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+
+const title = "Trust — Odal Node";
+const description =
+  "What Odal can see, cannot see, and could see but does not. The proof-bound architecture, stated precisely.";
+---
+
+<Base title={title} description={description}>
+  <Section eyebrow="Data and trust" title="What Odal Node can and cannot see.">
+    <p>
+      Odal Node is built on a proof-bound architecture: the manufacturer's
+      raw production data is validated and signed locally, on infrastructure
+      the manufacturer controls, then discarded. Only the signed proof is
+      stored and served. This is a property of the software, not a policy
+      promise — it holds regardless of who operates the node.
+    </p>
+  </Section>
+
+  <!-- <Section eyebrow="The breakdown" title="Stated precisely." wide>
+    <div class="grid gap-8 md:grid-cols-3">
+      <div>
+        <h3 class="text-lg font-semibold text-neutral-900">We can see</h3>
+        <p class="mt-2 text-sm leading-body text-neutral-600">
+          The signed passport you publish to a resolver we operate, and the
+          metadata required to serve it (the GS1 Digital Link, the DID
+          document, the resolution cache). In a managed deployment: the node's
+          audit trail of signatures and status transitions.
+        </p>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-neutral-900">We cannot see</h3>
+        <p class="mt-2 text-sm leading-body text-neutral-600">
+          Your private signing keys (held in-process on your infrastructure,
+          encrypted at rest, never transmitted). Your raw production data,
+          supply-chain detail beyond passport content, or import files.
+          In a self-hosted deployment: nothing at all — we have no access to
+          the instance.
+        </p>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-neutral-900">We could see but do not</h3>
+        <p class="mt-2 text-sm leading-body text-neutral-600">
+          The contents of your import files. The software reads them once,
+          validates the data, signs the passport, and discards the input.
+          There is no setting, configuration, or internal path that retains
+          the raw import after signing — it is not a choice we make per
+          customer; it is how the software works.
+        </p>
+      </div>
+    </div>
+  </Section> -->
+
+  <Section eyebrow="By deployment" title="The guarantee differs, and stating that plainly is part of the design." tone="tinted">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-neutral-200 text-left">
+          <th class="pb-2 pr-4 font-semibold text-neutral-900">Property</th>
+          <th class="pb-2 pr-4 font-semibold text-neutral-900">Self-hosted</th>
+          <th class="pb-2 font-semibold text-neutral-900">Managed</th>
+        </tr>
+      </thead>
+      <tbody class="text-neutral-600">
+        <tr class="border-b border-neutral-100">
+          <td class="py-3 pr-4">Node discards raw inputs; stores only the signed proof</td>
+          <td class="py-3 pr-4">Yes — architectural invariant</td>
+          <td class="py-3">Yes — architectural invariant</td>
+        </tr>
+        <tr class="border-b border-neutral-100">
+          <td class="py-3 pr-4">Odal can access stored data</td>
+          <td class="py-3 pr-4">No — not present in the deployment</td>
+          <td class="py-3">Constrained by access controls, audit logging, and contract</td>
+        </tr>
+        <tr>
+          <td class="py-3 pr-4">Odal can sign on the operator's behalf</td>
+          <td class="py-3 pr-4">No</td>
+          <td class="py-3">No — the operator holds the signing keys</td>
+        </tr>
+      </tbody>
+    </table>
+  </Section>
+
+  <Section eyebrow="How it works" title="The mechanism, not the promise.">
+    <ol>
+      <li>
+        <strong>Import.</strong> Product data arrives at your node — CSV, Excel,
+        or an ERP export. This happens on infrastructure you control.
+      </li>
+      <li>
+        <strong>Validate.</strong> The node validates locally against versioned
+        sector schemas. Validation is a pure function — no network calls, no
+        third-party API.
+      </li>
+      <li>
+        <strong>Sign.</strong> Your private signing key — generated and held
+        in-process on your infrastructure — signs the validated passport.
+        The result is a signature cryptographically bound to your published
+        <code>did:web</code> identity.
+      </li>
+      <li>
+        <strong>Publish.</strong> Only the signed passport becomes publicly
+        resolvable via QR and GS1 Digital Link. The raw input is discarded.
+      </li>
+      <li>
+        <strong>Verify.</strong> Any consumer, authority, or recycler verifies
+        the signature against your public DID Document. Verification does not
+        require Odal to be online or to exist.
+      </li>
+    </ol>
+  </Section>
+
+</Base>

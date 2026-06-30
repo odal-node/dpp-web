@@ -1,0 +1,56 @@
+---
+// Footer.astro — closing trust signals on the navy band. No newsletter, no social row.
+// Uses the shared brand mark (currentColor variant) tinted ice for the dark band,
+// so it stays in sync with the asset instead of a hand-rolled inline copy.
+import OdalMark from "../assets/favicon.svg";
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-primary-900 text-primary-200">
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 text-sm sm:px-6 md:grid-cols-3 lg:px-8">
+    <div>
+      <p class="mb-2 flex items-center gap-2 font-semibold text-white">
+        <OdalMark aria-hidden="true" class="h-6 w-6 shrink-0 text-primary-300" />
+        Odal Node
+      </p>
+      <p class="leading-body text-primary-300">
+        Signed by you. Verified by anyone.
+      </p>
+      <p class="mt-2 leading-body text-primary-300/80">
+        Sovereign Digital Product Passport infrastructure for EU ESPR.
+      </p>
+      <!-- <p class="mt-3 leading-body text-primary-300/80">
+        Apache-2.0 core — anyone may build on it.
+      </p> -->
+    </div>
+
+    <div>
+      <p class="mb-2 font-semibold text-white">Project</p>
+      <ul class="m-0 list-none space-y-1 p-0">
+        <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-core">dpp-core on GitHub</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-engine">dpp-engine on GitHub</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="mb-2 font-semibold text-white">Privacy &amp; security</p>
+      <ul class="m-0 list-none space-y-1 p-0">
+        <!-- <li><a class="text-primary-200 hover:text-white" href="/contact">Contact</a></li> -->
+        <li><a class="text-primary-200 hover:text-white" href="/privacy">Privacy policy</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-engine/blob/main/docs/project/SECURITY.md">Security policy</a></li>
+        <!-- <li><a class="text-primary-200 hover:text-white" href="mailto:contact@odal-node.io">contact@odal-node.io</a></li> -->
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-primary-800">
+    <div class="mx-auto flex max-w-6xl px-4 py-4 text-xs text-primary-300/70 flex-row justify-between sm:px-6 lg:px-8">
+      <p class="m-0">
+        &copy; {year} Odal Node
+      </p>
+      <p class="m-0">
+        <a class="text-primary-300/70 hover:text-primary-200" href="https://github.com/odal-node">github.com/odal-node</a>
+      </p>
+    </div>
+  </div>
+</footer>

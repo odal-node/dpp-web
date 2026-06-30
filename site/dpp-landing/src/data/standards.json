@@ -1,0 +1,10 @@
+{
+  "_comment": "Standards row — names and one-line roles only; no third-party logos we do not have rights to use.",
+  "standards": [
+    { "name": "GS1 Digital Link", "role": "Product identification and QR resolution" },
+    { "name": "W3C Verifiable Credentials", "role": "Credential format for signed passports" },
+    { "name": "did:web", "role": "Issuer identity, anchored in DNS and HTTPS" },
+    { "name": "IDTA AAS", "role": "Industrial submodel export for Industry 4.0 consumers" },
+    { "name": "CEN/CENELEC JTC 24", "role": "Harmonised DPP standards — tracked as they finalise" }
+  ]
+}

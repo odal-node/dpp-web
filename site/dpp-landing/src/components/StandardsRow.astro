@@ -1,0 +1,15 @@
+---
+// StandardsRow.astro — text badges only (no third-party logos without rights).
+// Data: src/data/standards.json.
+import data from "../data/standards.json";
+const { standards } = data;
+---
+
+<ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-5">
+  {standards.map((s) => (
+    <li class="rounded-md border border-neutral-200 bg-neutral-0 p-4 transition-colors hover:border-primary-300">
+      <p class="m-0 text-sm font-semibold text-neutral-900">{s.name}</p>
+      <p class="m-0 mt-1 text-xs leading-body text-neutral-600">{s.role}</p>
+    </li>
+  ))}
+</ul>

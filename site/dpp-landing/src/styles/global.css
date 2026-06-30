@@ -1,0 +1,53 @@
+/*
+ * dpp-landing — global stylesheet.
+ *
+ * Order of imports is meaningful:
+ *   1. "tailwindcss" pulls in Tailwind 4's base, components, utilities layers.
+ *   2. "@odal/brand-tokens/tokens.css" provides --odal-* raw variables AND a
+ *      Tailwind @theme block exposing --color-primary-*, etc. as Tailwind
+ *      utility classes. That file lives under packages/brand-tokens/.
+ *
+ * After this CSS loads, every Tailwind utility class for the brand palette
+ * (bg-primary-500, text-neutral-900, font-sans, etc.) is available.
+ *
+ * Below the imports we set the few page-wide defaults that benefit from being
+ * applied in @layer base — fonts, colour, line-height, focus-ring style,
+ * smooth-scroll preference.
+ */
+
+@import "tailwindcss";
+@import "@odal/brand-tokens/tokens.css";
+
+@layer base {
+  html {
+    font-family: var(--odal-font-sans);
+    line-height: var(--odal-line-body);
+    color: var(--odal-neutral-900);
+    background: var(--odal-neutral-0);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Light-first design with dark *sections* (hero, footer) rather than a
+     global dark mode — decision in docs/redesign/DESIGN_SPEC.md §1. */
+
+  h1, h2, h3, h4 {
+    font-weight: 600;
+    line-height: var(--odal-line-tight);
+    letter-spacing: -0.01em;
+  }
+
+  a {
+    color: var(--odal-action-600);
+    text-decoration: none;
+  }
+  a:hover { text-decoration: underline; }
+  a:focus-visible {
+    outline: 2px solid var(--odal-action-600);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}

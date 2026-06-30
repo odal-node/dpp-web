@@ -1,0 +1,166 @@
+---
+// odal-node.io — home page.
+// Section order and copy per docs/WEB_CONTENT_STRATEGY.md §4.
+// Terminology and claims rules: see §7 (no capability-tier language, no claims
+// ahead of shipped code, "proof-bound" never "no-touch").
+import DeadlineCards from "../components/DeadlineCards.astro";
+import Hero from "../components/Hero.astro";
+import Section from "../components/Section.astro";
+import StandardsRow from "../components/StandardsRow.astro";
+import Base from "../layouts/Base.astro";
+
+const title = "Odal Node — Signed by you. Verified by anyone.";
+const description =
+  "Sovereign infrastructure for EU Digital Product Passports. Validated and signed on your infrastructure with your keys — only the signed proof is stored and served.";
+
+// The end-to-end process as one timeline. On the landing the underlying
+// services (integrator, validation, vault + in-process signing, resolver) are
+// deliberately merged into a single flow; the docs keep them as separate pages.
+const steps = [
+  { label: "Import", body: "Product data from CSV, Excel, or your ERP into your own node." },
+  { label: "Validate", body: "Against versioned sector schemas tracking the regulation, locally." },
+  { label: "Sign", body: "With your own key, generated and held on your infrastructure." },
+  { label: "Publish", body: "Only the signed passport becomes resolvable, via QR and GS1 Digital Link." },
+];
+---
+
+<Base title={title} description={description}>
+  <Hero
+    eyebrow="EU Digital Product Passports"
+    status
+    title="Signed by you. Verified by anyone."
+    subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated and signed on your infrastructure, with your keys — only the signed proof is stored and served. Anyone can verify it."
+    primaryHref="https://docs.odal-node.io/quick-start"
+    primaryLabel="Self-host now"
+    secondaryHref="https://docs.odal-node.io"
+    secondaryLabel="Read the docs"
+  />
+
+  <Section eyebrow="Why now" title="The deadlines are set. The infrastructure mostly isn't." wide>
+    <p>
+      Compliance arrives sector by sector, date by date — not "everything by 2027."
+      Three dated obligations are already in law:
+    </p>
+    <div class="not-prose mt-8">
+      <DeadlineCards />
+    </div>
+    <p class="mt-8">
+      The question is whether the infrastructure you adopt now still fits the next
+      sector's act. Odal Node is built so that it does: new sectors arrive as schema
+      and plugin updates, not as new systems.
+    </p>
+  </Section>
+
+  <Section eyebrow="How it works" title="Proof-bound: the data stays yours. The proof is what travels." tone="tinted">
+    <p>
+      Manufacturers keep trade secrets. Regulators and customers need data they can
+      trust. A proof-bound architecture serves both without asking either to
+      compromise: raw production data is validated and signed locally, then
+      discarded — only the signed passport is stored and served.
+    </p>
+    <div class="not-prose my-6">
+      <ol class="grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-4">
+        {steps.map((s, i) => (
+          <li>
+            <div class="flex items-center">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-primary-500 bg-neutral-0 text-sm font-semibold text-primary-700">
+                {i + 1}
+              </span>
+              {i < steps.length - 1 && (
+                <span class="ml-3 hidden h-0.5 flex-1 bg-primary-200 md:block" aria-hidden="true"></span>
+              )}
+            </div>
+            <h3 class="mb-1 mt-4 text-base font-semibold text-neutral-900">{s.label}</h3>
+            <p class="m-0 text-sm leading-body text-neutral-600">{s.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+    <p>
+      Any consumer, authority, or recycler verifies the signature against your public
+      DID document — without Odal in the loop. What the node stores: the signed
+      passport, the audit trail, the signature. What it never stores: raw import
+      files, supply-chain detail beyond passport content, or your private keys.
+    </p>
+  </Section>
+
+  <Section eyebrow="What you get" title="Built for the compliance officer and the engineer at the same desk." wide>
+    <div class="not-prose grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {[
+        {
+          k: "Proof-bound by architecture",
+          v: "Raw inputs are discarded after signing. A property of the software, not a policy promise.",
+        },
+        {
+          k: "Standards-native",
+          v: "GS1 Digital Link 1.2 resolution, W3C VC 2.0 credentials, did:web identity, AAS submodel export.",
+        },
+        {
+          k: "Sandboxed sector plugins",
+          v: "Each sector's compliance logic runs in an isolated sandbox. New regulations land as plugins, not rewrites.",
+        },
+        {
+          k: "Honest open-core",
+          v: "dpp-core (the regulatory standard in Rust) is Apache-2.0, full capability, forever. dpp-engine is BSL-1.1 with a real self-host grant — production self-hosting is free.",
+        },
+        {
+          k: "No vendor lock-in",
+          v: "The node is a single, self-contained service. You can run it on your own infrastructure, or on a cloud you control.",
+        },
+        {
+          k: "Self-host in minutes",
+          v: "One compose file. No licence keys, no passport caps. Ever.",
+        },
+      ].map((f) => (
+        <article class="rounded-md border border-neutral-200 bg-neutral-0 p-6 transition-colors hover:border-primary-300">
+          <h3 class="mb-2 mt-0 text-base font-semibold text-neutral-900">{f.k}</h3>
+          <p class="m-0 text-sm leading-body text-neutral-600">{f.v}</p>
+        </article>
+      ))}
+    </div>
+  </Section>
+
+
+  <Section eyebrow="Data and trust" title="What Odal Node can and cannot see." tone="tinted" wide>
+    <p>
+      Proof-bound is not a promise about our conduct; it is a property of the
+      software. The node validates and signs locally, then discards the raw
+      input — so there is no data for us to access, by construction. Stated
+      precisely:
+    </p>
+    <div class="not-prose mt-8 grid gap-6 md:grid-cols-3">
+      <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
+        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We can see</h3>
+        <p class="m-0 text-sm leading-body text-neutral-600">
+          The signed passport you publish to a resolver we operate, and the
+          metadata required to serve it.
+        </p>
+      </div>
+      <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
+        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We cannot see</h3>
+        <p class="m-0 text-sm leading-body text-neutral-600">
+          Your private keys (held in-process on your infrastructure), your raw
+          production data, your supply-chain detail.
+        </p>
+      </div>
+      <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
+        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We could see but do not</h3>
+        <p class="m-0 text-sm leading-body text-neutral-600">
+          The contents of your import files, which the node discards after
+          validation.
+        </p>
+      </div>
+    </div>
+    <p class="mt-8 text-sm">
+      <!-- <a href="/trust" class="font-medium">Read the full breakdown →</a> -->
+    </p>
+  </Section>
+
+  <!-- <GetStarted /> -->
+
+  <Section eyebrow="Standards" title="Built on the standards the regulation itself cites." tone="muted" wide>
+    <div class="not-prose mt-2">
+      <StandardsRow />
+    </div>
+  </Section>
+</Base>

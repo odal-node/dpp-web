@@ -1,0 +1,90 @@
+---
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+
+const title = "About — Odal Node";
+const description =
+  "Where Odal Node is built, who is building it, and how it relates to the European standards ecosystem.";
+---
+
+<Base title={title} description={description}>
+  <Section eyebrow="About" title="A small team, a public standard, and a long view.">
+    <p>
+      Odal Node is built in Skopje, North Macedonia, by a small team focused on
+      one specific job: providing the open-source infrastructure that lets
+      manufacturers comply with the EU Digital Product Passport requirements
+      under the Ecodesign for Sustainable Products Regulation. The project is
+      deliberately scoped to that job. It is not a broad sustainability
+      platform; it is not a generic supply-chain product; it is the regulatory
+      compliance pipe for ESPR, no more and no less.
+    </p>
+  </Section>
+
+  <Section eyebrow="Ecosystem" title="The standards bodies and pilot programmes the project works within." tone="muted">
+    <p>
+      The credibility of an open-source standard implementation comes from the
+      ecosystem that recognises it. The project implements
+      <strong>GS1 Digital Link 1.2</strong> for resolution, is applying for
+      observer participation in <strong>CIRPASS-2</strong> — the EU project
+      building out the Digital Product Passport ecosystem — and tracks the
+      <strong>CEN/CENELEC JTC 24</strong> schema work, updating the relevant
+      sector schemas as the standards bodies publish.
+    </p>
+    <p>
+      These relationships are not endorsements. They are participation in the
+      same conversations that produce the regulation the project implements.
+      Being in the room matters when the regulation is written; staying in the
+      room matters when it evolves.
+    </p>
+  </Section>
+
+  <Section eyebrow="Positioning" title="A system of proof, not a system of record." tone="tinted">
+    <p>
+      Most compliance software is a <strong>system of record</strong>: the
+      operator hands over their raw supply-chain data, and the vendor holds it,
+      stores it, and must be trusted with it. Odal Node is a
+      <strong>system of proof</strong>: the operator keeps the data and signs it
+      locally; only the signed proof leaves their infrastructure. The difference
+      is not a feature comparison — it is a different relationship to the
+      operator's data, and it is the reason the architecture exists.
+    </p>
+    <p>
+      That posture extends to competitors. The <code>dpp-core</code> library is
+      Apache-2.0 and offered as a genuine starting point for the whole
+      ecosystem — anyone, including a direct competitor, may build on it. A fork
+      is welcome to the code; what a fork cannot copy is staying current with the
+      regulation and operating the trust services. Those are earned, not
+      licensed, and that is by design.
+    </p>
+  </Section>
+
+  <Section eyebrow="Philosophy" title="Why the project is built the way it is.">
+    <p>
+      Two principles govern every architectural decision. The first is the
+      <strong>proof-bound architecture</strong>: raw production data never enters
+      Odal's systems. The manufacturer signs locally with their own key, and
+      only the proof leaves their infrastructure — proof-bound describes the
+      mechanism, not a promise. The second is the
+      <strong>open-core boundary</strong>: code that implements regulation is
+      Apache-2.0 in <code>dpp-core</code>; code that implements the commercial
+      operational layer is BSL-1.1 in <code>dpp-engine</code>. These principles
+      protect the credibility of the standard and the sustainability of the
+      project at the same time.
+    </p>
+    <p>
+      A longer treatment of both principles, with the architectural consequences
+      drawn out, lives in
+      <a href="https://docs.odal-node.io/design/proof-bound">the design principles section</a>
+      of the documentation.
+    </p>
+  </Section>
+
+  <Section eyebrow="Contact" title="How to reach the team." tone="muted">
+    <p>
+      General enquiries: <a href="mailto:hello@odal-node.io">hello@odal-node.io</a>.
+      Security reports: <a href="mailto:security@odal-node.io">security@odal-node.io</a>
+      (do not open public issues for vulnerabilities). Technical questions:
+      <a href="https://github.com/odal-node/dpp-core/issues">GitHub Issues on dpp-core</a>.
+    </p>
+  </Section>
+</Base>

@@ -1,0 +1,40 @@
+---
+// StatusBadge.astro — a single, honest project-status pill.
+// Signals that the project is pre-1.0 and the product is at alpha maturity.
+// Deliberately minimal (WEB_CONTENT_STRATEGY.md §9, §7): no enthusiasm, no
+// claim beyond "early". Two tones so it reads on light (nav) and navy (hero).
+//
+// Uses the regulatory amber token family already in brand-tokens for the light
+// variant (a calm, attention-but-not-alarm colour the site already uses), and
+// the ice palette for the navy variant.
+interface Props {
+  /** "light" = for white surfaces (nav). "navy" = for the dark hero band. */
+  tone?: "light" | "navy";
+  /** Show the leading status dot. */
+  dot?: boolean;
+  /** Extra classes for positioning. */
+  class?: string;
+  /** Optional label override. Defaults to the standard wording. */
+  label?: string;
+}
+const { tone = "light", dot = true, class: extra = "", label = "Alpha · in active development" } =
+  Astro.props;
+
+const base =
+  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap";
+const tones = {
+  light: "border-regulatory-border bg-regulatory-bg text-regulatory-text",
+  navy: "border-primary-300/30 bg-primary-300/10 text-primary-200",
+};
+const dotTone = {
+  light: "bg-regulatory-text",
+  navy: "bg-primary-300",
+};
+---
+
+<span class={`${base} ${tones[tone]} ${extra}`}>
+  {dot && (
+    <span class={`h-1.5 w-1.5 rounded-full ${dotTone[tone]}`} aria-hidden="true"></span>
+  )}
+  {label}
+</span>
