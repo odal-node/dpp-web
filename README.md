@@ -4,7 +4,7 @@
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/odal-node/dpp-web/actions/workflows/ci.yml/badge.svg)](https://github.com/odal-node/dpp-web/actions/workflows/ci.yml)
-[![Node 20+](https://img.shields.io/badge/Node-20%2B-brightgreen.svg)](https://nodejs.org/)
+[![Node 22.13+](https://img.shields.io/badge/Node-22.13%2B-brightgreen.svg)](https://nodejs.org/)
 [![Status: Active Development](https://img.shields.io/badge/Status-Active%20Development-green.svg)]()
 
 The two public-facing web properties for Odal Node, organised as a pnpm workspace and deployed as two independent Cloudflare Pages projects.
@@ -70,7 +70,7 @@ pnpm -r build
 pnpm -r check
 ```
 
-Prerequisites: Node.js 20+ and pnpm (managed via [corepack](https://nodejs.org/api/corepack.html) — the exact version is pinned in `package.json` `packageManager`).
+Prerequisites: Node.js 22.13+ (LTS 24 recommended — pnpm 11 requires `node:sqlite`, unavailable before 22.13) and pnpm (managed via [corepack](https://nodejs.org/api/corepack.html) — the exact version is pinned in `package.json` `packageManager`).
 
 ---
 
