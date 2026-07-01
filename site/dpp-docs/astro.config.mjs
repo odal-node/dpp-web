@@ -42,11 +42,13 @@ export default defineConfig({
       social: {
         github: 'https://github.com/odal-node/dpp-core',
       },
-      editLink: {
-        // Docs content lives in THIS repo (dpp-web), not dpp-core.
-        baseUrl: 'https://github.com/odal-node/dpp-web/edit/main/site/dpp-docs/',
-      },
       favicon: '/favicon.svg',
+      head: [
+        { tag: 'meta', attrs: { property: 'og:image', content: 'https://docs.odal-node.io/favicon.svg' } },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '400' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '400' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://docs.odal-node.io/favicon.svg' } },
+      ],
       sidebar: [
         {
           label: 'Getting Started',

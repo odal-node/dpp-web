@@ -14,7 +14,7 @@ interface Props {
 
 const { title, description, canonical } = Astro.props;
 const canonicalHref = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
-const ogImage = new URL("/assets/favicon.svg", Astro.site).toString();
+const ogImage = new URL("/favicon.svg", Astro.site).toString();
 ---
 
 <!doctype html>
@@ -26,7 +26,7 @@ const ogImage = new URL("/assets/favicon.svg", Astro.site).toString();
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalHref} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/assets/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="theme-color" content="#080C2C" />
 
     <!-- Open Graph -->
