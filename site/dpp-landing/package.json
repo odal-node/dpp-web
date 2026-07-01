@@ -3,6 +3,7 @@
   "description": "Marketing landing page for odal-node.io. Astro 5 + Tailwind 4 (via @tailwindcss/vite) + Cloudflare Pages. Sibling of dpp-docs.",
   "type": "module",
   "version": "0.1.0",
+  "license": "Apache-2.0",
   "private": true,
   "scripts": {
     "dev": "astro dev",

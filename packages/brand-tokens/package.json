@@ -2,6 +2,7 @@
   "name": "@odal/brand-tokens",
   "description": "Shared brand tokens (colour, typography, spacing) for odal-node.io and docs.odal-node.io.",
   "version": "0.1.0",
+  "license": "Apache-2.0",
   "private": true,
   "type": "module",
   "main": "./src/index.ts",

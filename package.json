@@ -1,6 +1,7 @@
 {
   "name": "dpp-web",
   "description": "Workspace root for odal-node.io (dpp-landing) and docs.odal-node.io (dpp-docs).",
+  "license": "Apache-2.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.5.1",
