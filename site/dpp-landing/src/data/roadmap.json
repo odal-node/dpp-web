@@ -12,6 +12,10 @@
         { "label": "Resolution and interop", "detail": "GS1 Digital Link, QR, and AAS submodel export" },
         { "label": "Sandboxed sector plugins", "detail": "Each sector's rules run isolated, with signature verification" },
         { "label": "End-to-end node", "detail": "Create, sign, publish, and resolve a passport end to end" },
+        { "label": "Full lifecycle provenance", "detail": "Suspend, archive, typed end-of-life, and dual-signed transfer of responsibility — on a tamper-evident, hash-chained audit trail" },
+        { "label": "Evidence dossiers + offline verification", "detail": "Export a signed dossier and verify it with zero network — no trust in Odal required" },
+        { "label": "Registry-ready outbox", "detail": "Registration intent survives crashes and drains with backoff; the live connector activates when the EU publishes its API" },
+        { "label": "Signed compliance-ruleset channel", "detail": "Rulesets arrive as Ed25519-signed bundles, verified fail-closed and hot-swapped; a production node refuses placeholder trust adapters" },
         { "label": "Bulk import", "detail": "CSV and Excel with dry-run validation and per-row errors" }
       ]
     },

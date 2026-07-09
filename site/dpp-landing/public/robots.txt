@@ -1,0 +1,22 @@
+# robots.txt — odal-node.io
+
+User-agent: *
+Allow: /
+
+Sitemap: https://odal-node.io/sitemap-index.xml
+
+# ---- Content signals (EU Directive 2019/790, Art. 4) ----
+# As a condition of accessing this website, you agree to abide by the following
+# content signals:
+#
+# (a)  If a content-signal = yes, you may collect content for the corresponding
+#      use.
+# (b)  If a content-signal = no, you may not collect content for the
+#      corresponding use.
+# (c)  If the website operator does not include a content signal for a
+#      corresponding use, the website operator neither grants nor restricts
+#      permission via content signal with respect to the corresponding use.
+#
+# search:   yes
+# ai-input: no
+# ai-train: no

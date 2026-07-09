@@ -10,11 +10,34 @@ interface Props {
   description: string;
   /** Override the canonical URL if the page is reached at more than one path. */
   canonical?: string;
+  /** Additional JSON-LD structured data blocks (array of objects). */
+  jsonLd?: Record<string, unknown>[];
+  /** Set true on error pages (404) to add noindex. */
+  noindex?: boolean;
 }
 
-const { title, description, canonical } = Astro.props;
+const { title, description, canonical, jsonLd = [], noindex = false } = Astro.props;
 const canonicalHref = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
-const ogImage = new URL("/favicon.svg", Astro.site).toString();
+const ogImage = new URL("/og-image.png", Astro.site).toString();
+
+// Base structured data — present on every page.
+const organizationLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Odal Node",
+  url: "https://odal-node.io",
+  logo: new URL("/favicon.svg", Astro.site).toString(),
+  description:
+    "Open-source infrastructure for EU Digital Product Passports under the Ecodesign for Sustainable Products Regulation (ESPR).",
+  sameAs: ["https://github.com/odal-node"],
+};
+
+const websiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Odal Node",
+  url: "https://odal-node.io",
+};
 ---
 
 <!doctype html>
@@ -24,6 +47,7 @@ const ogImage = new URL("/favicon.svg", Astro.site).toString();
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonicalHref} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
@@ -35,22 +59,31 @@ const ogImage = new URL("/favicon.svg", Astro.site).toString();
     <meta property="og:url" content={canonicalHref} />
     <meta property="og:type" content="website" />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="400" />
-    <meta property="og:image:height" content="400" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Odal Node" />
+    <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
+    {jsonLd.map((block) => (
+      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+    ))}
   </head>
   <body class="min-h-screen flex flex-col bg-neutral-0 text-neutral-900">
-    <!-- <a
+    <a
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-60 focus:px-3 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded-md"
     >
       Skip to content
-    </a> -->
+    </a>
 
     <Nav />
 

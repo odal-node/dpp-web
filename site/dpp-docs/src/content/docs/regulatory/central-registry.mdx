@@ -17,7 +17,7 @@ This design is the right one because it lets the regulation centralise discovery
 
 The registry's API is being defined at the time of writing. The expected requirements are: every published passport must be registered with the registry, the registration carries the product identifier and the resolver endpoint, the issuing platform must keep the registration in sync as passports are suspended or archived, and the platform must respond to registry health checks.
 
-Odal has prepared for this: the interface the registry will expose is already modelled, so the live connection can land quickly once the API is published. Until then, the registry connection lives in the engine and waits on the upstream specification.
+Odal has prepared for this beyond modelling the interface: **every published passport already commits its registration intent to a durable outbox, in the same database transaction as the publish itself.** A background worker drains that outbox with retry and backoff. The practical consequence: publishing never blocks on the registry, a crash never loses a registration, and the day the Commission's API goes live, the accumulated backlog registers without a single passport falling through. (For context: the Commission's own deadline to set up the registry was 19 July 2026; as of this writing, the API specification remains unpublished — so this durable-queue posture is not caution, it's the correct engineering for the actual situation.)
 
 <Aside type="note" title="Status">
 Activation of the registry integration is on the longer roadmap, [contingent on the registry API being published](https://odal-node.io/roadmap). The interface is already modelled, so the implementation can land in days rather than months once the upstream API stabilises.

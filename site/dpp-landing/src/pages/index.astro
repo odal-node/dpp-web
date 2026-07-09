@@ -9,9 +9,29 @@ import Section from "../components/Section.astro";
 import StandardsRow from "../components/StandardsRow.astro";
 import Base from "../layouts/Base.astro";
 
-const title = "Odal Node — Signed by you. Verified by anyone.";
+const title = "Odal Node — EU Digital Product Passport Infrastructure | ESPR Compliance";
 const description =
-  "Sovereign infrastructure for EU Digital Product Passports. Validated and signed on your infrastructure with your keys — only the signed proof is stored and served.";
+  "Open-source infrastructure for EU Digital Product Passports (DPP) under ESPR. Self-hosted, sovereign compliance — your product data is validated and signed with your keys. Battery, textile, and electronics passports.";
+
+// Page-specific structured data.
+const softwareAppLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Odal Node",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Linux, Docker",
+  description:
+    "Self-hosted infrastructure for EU Digital Product Passports (DPP) under the Ecodesign for Sustainable Products Regulation (ESPR). Validates product data against sector schemas, signs with your keys, and publishes verifiable passports via GS1 Digital Link.",
+  url: "https://odal-node.io",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "EUR",
+    description: "Open-core: dpp-core is Apache-2.0; dpp-engine is BSL-1.1 with free self-host grant.",
+  },
+  license: "https://opensource.org/licenses/Apache-2.0",
+  codeRepository: "https://github.com/odal-node/dpp-core",
+};
 
 // The end-to-end process as one timeline. On the landing the underlying
 // services (integrator, validation, vault + in-process signing, resolver) are
@@ -24,7 +44,7 @@ const steps = [
 ];
 ---
 
-<Base title={title} description={description}>
+<Base title={title} description={description} jsonLd={[softwareAppLd]}>
   <Hero
     eyebrow="EU Digital Product Passports"
     status

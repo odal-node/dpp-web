@@ -25,11 +25,11 @@ Odal covers the articles of ESPR that are technically substantive for a passport
 
 **Article 10** — the three-tier access control. Odal carries the tier boundaries and the resolver enforces them on every request.
 
-**Article 12** — the transfer of responsibility from one economic operator to another along the supply chain, implemented as a dual-signature chain: both transferor and transferee sign, creating a verifiable chain of custody.
+**Transfer of responsibility** — when a product changes economic operator along the supply chain, Odal implements a dual-signature chain: both transferor and transferee sign, creating a verifiable chain of custody. One honest note: ESPR has **no single article** establishing transfer mechanics — the closest operative text is Art. 11(e) (passport continuity when an operator ceases activity). Our handshake is an engineering choice that satisfies and exceeds that continuity duty; we say so rather than inventing a citation.
 
-**Article 13** — public access to passports. The resolver serves the public view, cached to stay fast under load.
+**Article 13** — the EU Central Registry: the Commission-run directory of registered passports (its API specification is still unpublished). Public access to the passport itself is served by the resolver — the public view, cached to stay fast under load.
 
-**Article 22** — the ban on destroying unsold consumer products, with the reporting obligations that flow through the passport. Odal carries a dedicated unsold-goods passport variant that records the disposal pathway as a verifiable record.
+**Articles 24 & 25** — the disclosure duty for discarded unsold consumer products (Art. 24) and the destruction ban for unsold textiles and footwear (Art. 25, Annex VII — in force for large companies since 19 July 2026). Odal carries a dedicated unsold-goods passport variant that records the disposal pathway as a verifiable record.
 
 <Aside type="tip" title="The implementation matrix">
 A row-by-row matrix mapping each ESPR article to where it is implemented is maintained in the `dpp-core` repository.
