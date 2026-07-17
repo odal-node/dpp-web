@@ -49,7 +49,7 @@ const steps = [
     eyebrow="EU Digital Product Passports"
     status
     title="Signed by you. Verified by anyone."
-    subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated and signed on your infrastructure, with your keys — only the signed proof is stored and served. Anyone can verify it."
+    subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated and signed on your infrastructure, with your keys — the raw import files are discarded, the signed passport is stored and served. Anyone can verify it."
     primaryHref="https://docs.odal-node.io/quick-start"
     primaryLabel="Self-host now"
     secondaryHref="https://docs.odal-node.io"
@@ -71,12 +71,14 @@ const steps = [
     </p>
   </Section>
 
-  <Section eyebrow="How it works" title="Proof-bound: the data stays yours. The proof is what travels." tone="tinted">
+  <Section eyebrow="How it works" title="Proof-bound: the data stays yours. Every field it publishes is bound to a proof." tone="tinted">
     <p>
       Manufacturers keep trade secrets. Regulators and customers need data they can
       trust. A proof-bound architecture serves both without asking either to
-      compromise: raw production data is validated and signed locally, then
-      discarded — only the signed passport is stored and served.
+      compromise: the raw import files are read once and discarded, while the signed
+      passport they produce — carrying the full product data, every field bound to a
+      proof — is what the node stores and serves, released to each audience by access
+      tier.
     </p>
     <div class="not-prose my-6">
       <ol class="grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-4">
@@ -97,10 +99,12 @@ const steps = [
       </ol>
     </div>
     <p>
-      Any consumer, authority, or recycler verifies the signature against your public
-      DID document — without Odal in the loop. What the node stores: the signed
-      passport, the audit trail, the signature. What it never stores: raw import
-      files, supply-chain detail beyond passport content, or your private keys.
+      Anyone verifies the signature against your public DID document — without Odal in
+      the loop. Public fields are readable by all; restricted tiers — for repairers,
+      recyclers, and market-surveillance authorities — are released only against a
+      verified credential. What the node stores: the signed passport with every tier,
+      the audit trail, the signature. What it never stores: raw import files,
+      supply-chain detail beyond passport content, or your private keys.
     </p>
   </Section>
 
@@ -109,7 +113,7 @@ const steps = [
       {[
         {
           k: "Proof-bound by architecture",
-          v: "Raw inputs are discarded after signing. A property of the software, not a policy promise.",
+          v: "The raw import files are discarded after signing; the signed passport is what's stored and served. A property of the software, not a policy promise.",
         },
         {
           k: "Standards-native",
@@ -144,9 +148,9 @@ const steps = [
   <Section eyebrow="Data and trust" title="What Odal Node can and cannot see." tone="tinted" wide>
     <p>
       Proof-bound is not a promise about our conduct; it is a property of the
-      software. The node validates and signs locally, then discards the raw
-      input — so there is no data for us to access, by construction. Stated
-      precisely:
+      software. The node reads your import files once and discards them — so the raw
+      production data behind a passport is never ours to access, by construction.
+      Stated precisely:
     </p>
     <div class="not-prose mt-8 grid gap-6 md:grid-cols-3">
       <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">

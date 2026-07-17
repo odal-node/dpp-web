@@ -32,9 +32,17 @@ A signing key is generated from the operating system's own randomness — never 
 
 The practical guarantee is simple: the encrypted key file on its own is useless without the passphrase. Where that store lives and how a running node guards it is covered in [Operating a node securely](/engine/security).
 
+## Sector logic is isolated by construction
+
+The rules that decide whether a product's data is compliant change sector by sector and regulation by regulation — so they are deliberately *not* part of the trusted core. Each sector's compliance logic is compiled to WebAssembly and runs inside a sandbox with no ambient capabilities: no filesystem, no network, no way to reach the host. Product data goes in as plain memory, a validation verdict comes out, and nothing else crosses the boundary. Execution is bounded too — a fixed memory cap and a metered CPU budget — so a plugin that misbehaves is stopped, not obeyed. And a plugin is signature-verified before it is ever loaded.
+
+What this buys is a hard separation between *judging* data and *vouching for* it: a buggy or even hostile sector rule can fail a validation, but it can never touch the signing key, alter a passport, or forge a proof. New regulations arrive as new sandboxed plugins — the cryptographic guarantees on this page never depend on trusting them. The concrete runtime limits are described in [Operating a node securely](/engine/security).
+
 ## Binding the proof to the physical product
 
-The QR code printed on a product points to its passport, and carries a short fingerprint of the passport's signature alongside the link. That fingerprint ties the printed label to one specific signed passport — a counterfeit label that points at a real passport but was never signed for that print does not match. It is an anti-counterfeiting layer that does not require the entire signature to be squeezed onto a small or damaged label.
+The QR code printed on a product is a GS1 Digital Link, and the node builds it from the signed passport's own verified fields at the moment it is served — never from a stored, editable link. If the passport's signature does not verify, no QR code is produced at all: the label path fails closed rather than print a code for data that cannot prove itself.
+
+The serial number carried on the label is derived from the passport's identity — fixed-length, GS1-conformant, and non-sequential, so a public label reveals nothing about production volumes. The result is that everything printed on the product traces back to the proof: a tampered passport cannot get a fresh label, and the label carries nothing a verifier cannot check.
 
 Suspected vulnerabilities go to **security@odal-node.io** under coordinated disclosure — never a public issue first.
 

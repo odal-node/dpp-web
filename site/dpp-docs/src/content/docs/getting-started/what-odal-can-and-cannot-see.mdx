@@ -3,13 +3,13 @@ title: What Odal can and cannot see
 description: A precise statement of data access by deployment model — the proof-bound architecture, stated as verifiable facts.
 ---
 
-The proof-bound architecture means that raw production data is validated and signed locally on the operator's infrastructure, then discarded. Only the signed proof is stored and served. This page states precisely what Odal can see, cannot see, and could see but does not — by deployment model.
+The proof-bound architecture means the raw import files are read once on the operator's infrastructure — validated, used to sign the passport, then discarded. The signed passport itself, carrying the full product data across its access tiers, is what is stored and served. This page states precisely what Odal can see, cannot see, and could see but does not — by deployment model.
 
 ## By deployment
 
 | Property | Self-hosted | Managed (Future) |
 |---|---|---|
-| Node discards raw inputs; stores only the signed proof | Yes — architectural invariant | Yes — architectural invariant |
+| Node discards raw import files; retains the signed passport (all tiers) | Yes — architectural invariant | Yes — architectural invariant |
 | Odal (the entity) can access stored data | No — not present in the deployment | Constrained by access controls, audit logging, and contract |
 | Odal can sign on the operator's behalf | No | No — the operator holds the signing keys |
 
@@ -36,7 +36,7 @@ The contents of your import files. The software reads them once, validates the d
 1. **Import** — product data arrives at your node (CSV, Excel, ERP export) on infrastructure you control.
 2. **Validate** — locally against versioned sector schemas. Validation is a pure function — no network calls.
 3. **Sign** — your Ed25519 private key, generated and held in-process, signs the validated passport into a JWS bound to your `did:web` identity.
-4. **Publish** — only the signed passport becomes resolvable. The raw input is discarded.
+4. **Publish** — the signed passport becomes resolvable; the raw import files are discarded. Public fields are served to anyone, restricted tiers only against a verified credential.
 5. **Verify** — anyone verifies against your public DID Document. Odal is not in the verify loop.
 
 ## Read next

@@ -7,6 +7,8 @@ ESPR Article 9 makes a published passport a long-lived obligation, not a transie
 
 A node is built so those guarantees hold by construction, not by good behaviour. Permanence is not a policy an operator opts into; it is a property of how the software works.
 
+Retention has two directions that are easy to conflate, so state them plainly: the raw *import files* fed into a node are discarded after signing and never retained (see [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see)); the signed *passport* they produce is retained permanently and can never be deleted. This page is about the second direction — the permanence of a published passport.
+
 ## Publishing locks a passport
 
 The moment a passport is published, a retention lock is set on it — and it is never cleared. A locked passport can still change *state*: it can be suspended during a recall, or archived at end-of-life. But its *content* can no longer be edited. Only a draft is mutable; once a passport becomes a signed, published proof, it is fixed.

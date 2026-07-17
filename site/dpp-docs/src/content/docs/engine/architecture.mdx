@@ -10,8 +10,8 @@ The engine is the service that runs the core's rules in production. In its simpl
 A node does four things, in order:
 
 1. **Take data in** — product data arrives from a file or an existing system.
-2. **Validate and sign** — the node checks the data against the sector's rules and signs the result with the operator's own key. This is where the proof-bound guarantee lives: the raw input is used to produce the proof, then discarded.
-3. **Keep only the proof** — the signed passport and its history are stored; the raw production data is not.
+2. **Validate and sign** — the node checks the data against the sector's rules and signs the result with the operator's own key. This is where the proof-bound guarantee lives: the raw import files are used to produce the signed passport, then discarded.
+3. **Keep the signed passport** — the passport and its history are stored in full; the raw import files behind it are not.
 4. **Serve it** — the passport is made resolvable, so a scan or a lookup returns the right view to the right audience.
 
 ## The pieces
