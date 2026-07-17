@@ -5,6 +5,7 @@
  */
 
 @import "@odal/brand-tokens/tokens.css";
+@import "./banner.css";
 
 :root {
   /* Dark theme defaults (Starlight uses :root for dark mode). */
@@ -16,11 +17,18 @@
   --sl-font-mono: var(--odal-font-mono);
 }
 
-[data-theme="light"] {
+/*
+ * Starlight's own light-mode rule is `:root[data-theme=light]` (specificity
+ * 0,2,0). A plain `[data-theme="light"]` selector (0,1,0) here always loses
+ * to it regardless of load order, so brand colors silently fall back to
+ * Starlight's stock accent in light mode. Matching the compound selector
+ * fixes that without needing !important anywhere in this block.
+ */
+:root[data-theme="light"] {
   --sl-color-accent-low: var(--odal-primary-50);
   --sl-color-accent: var(--odal-primary-500);
   --sl-color-accent-high: var(--odal-primary-700);
-  --sl-color-text-accent: var(--odal-primary-800)!important;
+  --sl-color-text-accent: var(--odal-primary-800);
 }
 
 /*
@@ -33,19 +41,83 @@
 }
 
 /*
- * Alpha / in-development banner — match the landing's status badge (the
- * regulatory amber token family). Calm attention, not alarm. The token values
- * are static so the banner reads identically in light and dark themes.
+ * "OpenAPI" (note) badge — use the brand accent (navy/ice blue) so it matches
+ * the section accents and flips light/dark with the theme, instead of
+ * Starlight's generic note-blue. accent-low/-high are already theme-mapped
+ * above, so this needs no per-theme rule of its own.
  */
-.sl-banner {
-  --sl-color-banner-bg: #fff7ed; /* regulatory-bg */
-  background: var(--sl-color-banner-bg);
-  color: #9a3412; /* regulatory-text */
-  border-bottom: 1px solid #fdba74; /* regulatory-border */
-  font-size: var(--sl-text-xs);
-  font-weight: 500;
-  text-wrap: balance;
+.sl-badge.note {
+  border-color: var(--sl-color-accent);
+  background-color: var(--sl-color-accent-low);
+  color: var(--sl-color-accent-high);
 }
-.sl-banner a {
-  color: #9a3412;
+
+/*
+ * Sidebar parity with the Scalar API reference (/api).
+ * scalar-api-reference.css themes Scalar's sidebar from the docs palette; this
+ * block closes the loop from the other side so the two sidebars are visually
+ * identical and navigating between /api and the docs shows no seam. Each value
+ * mirrors the Scalar token that produces it on /api:
+ *
+ *   text color        --scalar-sidebar-color-1/-2/-active → pure #000 / #fff
+ *                     (that file sets all three, incl. group headers)
+ *   item font size    --scalar-small (14px) — Scalar's sidebar is uniform,
+ *                     no larger top-level tier like Starlight's default
+ *   hover             --scalar-sidebar-item-hover-background →
+ *                     --scalar-background-2, on a --scalar-radius (3px) pill
+ *   active            --scalar-sidebar-item-active-background → the same
+ *                     --scalar-background-2 pill (NOT an accent fill — this
+ *                     deliberately replaces Starlight's accent-filled pill),
+ *                     weight 600 (--scalar-sidebar-font-weight-active =
+ *                     --scalar-bold)
+ */
+:root {
+  /* = --scalar-background-2 / -3 (dark) in scalar-api-reference.css */
+  --odal-sidebar-text: #ffffff;
+  --odal-sidebar-item-bg: hsl(224, 14%, 16%);
+}
+:root[data-theme="light"] {
+  /* = --scalar-background-2 / -3 (light) in scalar-api-reference.css */
+  --odal-sidebar-text: #000000;
+  --odal-sidebar-item-bg: hsl(224, 19%, 97%);
+}
+
+/* Uniform 14px for every entry — top-level links, group labels, and nested
+   items alike — instead of Starlight's larger bold top tier. */
+.sidebar-content a,
+.sidebar-content a.large,
+.sidebar-content .group-label .large,
+.sidebar-content summary .group-label span {
+  font-size: var(--sl-text-sm);
+  color: var(--odal-sidebar-text);
+}
+.sidebar-content a {
+  border-radius: 3px; /* = --scalar-radius */
+  font-weight: 400;
+}
+.sidebar-content .group-label .large {
+  font-weight: 600; /* group headers keep Scalar's bold group weight */
+}
+
+.sidebar-content a:hover,
+.sidebar-content a:focus {
+  background-color: var(--odal-sidebar-item-bg);
+  color: var(--odal-sidebar-text);
+}
+
+/* Active page: same subtle pill as hover (Scalar's active bg token resolves
+   to the same background-2), text stays black/white, weight 600. Hover/focus
+   variants included so Starlight's own accent-filled active style loses in
+   every state. */
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus {
+  background-color: var(--odal-sidebar-item-bg);
+  color: var(--odal-sidebar-text);
+  font-weight: 600;
+}
+
+/* The collapse caret inherits the same text color in both themes. */
+.sidebar-content summary .caret {
+  color: var(--odal-sidebar-text);
 }

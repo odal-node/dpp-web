@@ -1,0 +1,40 @@
+/*
+ * Odal Node — Alpha / in-development banner.
+ * `.sl-banner` is Starlight's own banner class (custom.css just overrides its
+ * colors below) — it already gets correct font/line-height/shadow from
+ * Starlight's own Banner.astro component, so those aren't touched here.
+ * `.odal-banner` is api.astro's hand-built equivalent, since that page skips
+ * the Starlight layout and gets NONE of Banner.astro's styling for free —
+ * every property below is copied from Banner.astro's own <style> block
+ * (padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x), line-height:
+ * var(--sl-line-height-headings), box-shadow: var(--sl-shadow-sm)) with the
+ * values resolved directly, since none of those Starlight variables exist
+ * on this page. Colors match the landing's status badge (the regulatory
+ * amber token family): calm attention, not alarm. Colors/font-size/weight
+ * are static values, not theme tokens, so they read the same in both modes.
+ */
+.odal-banner {
+  font-family: var(--scalar-font);
+  line-height: 1.2; /* = --sl-line-height-headings */
+  padding: 12px 16px; /* = --sl-nav-pad-y --sl-nav-pad-x, below 50em */
+  box-shadow: var(--odal-banner-shadow);
+  text-align: center;
+  text-wrap: balance;
+}
+@media (min-width: 50em) {
+  .odal-banner {
+    padding: 12px 24px; /* --sl-nav-pad-x at/above 50em */
+  }
+}
+.sl-banner,
+.odal-banner {
+  background: #fff7ed; /* regulatory-bg */
+  color: #9a3412; /* regulatory-text */
+  border-bottom: 1px solid #fdba74; /* regulatory-border */
+  font-size: 13px; /* = --sl-text-xs at the default root size */
+  font-weight: 500;
+}
+.sl-banner a,
+.odal-banner a {
+  color: #9a3412;
+}

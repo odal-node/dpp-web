@@ -94,6 +94,11 @@ export default defineConfig({
             { label: 'EU Central Registry', link: '/regulatory/central-registry' },
           ],
         },
+        {
+          label: 'API Reference',
+          link: '/api',
+          badge: { text: 'OpenAPI', variant: 'note' },
+        },
       ],
       customCss: ['./src/styles/custom.css'],
     }),

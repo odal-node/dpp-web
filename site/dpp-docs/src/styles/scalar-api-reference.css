@@ -1,0 +1,147 @@
+/*
+ * Odal Node — Scalar API reference theming.
+ * Scalar exposes every color/type/radius token as a `--scalar-*` custom
+ * property, scoped under `.light-mode` / `.dark-mode` and loaded inside the
+ * `scalar-base` / `scalar-theme` CSS layers. Unlayered CSS always wins over
+ * layered CSS regardless of source order, so these plain (non-@layer)
+ * overrides replace Scalar's default theme without needing !important.
+ *
+ * We pass `theme: 'none'` to createApiReference (api.astro) so no built-in
+ * preset's colors compete with these.
+ *
+ * Values are copied from what the docs shell (Starlight) actually renders,
+ * not re-derived from @odal/brand-tokens directly, so this page's light/dark
+ * looks identical to the rest of docs.odal-node.io instead of merely
+ * "on-brand": base grays are Starlight's own hue-224 scale
+ * (@astrojs/starlight/style/props.css), and the accent triplet is the exact
+ * odal-primary override ../styles/custom.css applies to Starlight's
+ * `--sl-color-accent*`.
+ *
+ * HTTP-method / status colors (green/red/yellow/blue/orange/purple) are left
+ * untouched — those are semantic (GET/POST/DELETE...), not brand, matching
+ * the same split @odal/brand-tokens draws between `--odal-status-*` and the
+ * `--odal-primary-*` brand scale.
+ */
+
+@import "@odal/brand-tokens/tokens.css";
+
+.light-mode {
+  /* = --sl-color-text / -gray-3 / -gray-4 (light) */
+  --scalar-color-1: hsl(224, 10%, 23%);
+  --scalar-color-2: hsl(224, 7%, 36%);
+  --scalar-color-3: hsl(224, 6%, 56%);
+  /* = --sl-color-accent (light), i.e. odal-primary-500 */
+  --scalar-color-accent: var(--odal-primary-500);
+
+  /* = --sl-color-bg / -bg-nav / -bg-inline-code (light) */
+  --scalar-background-1: #ffffff;
+  --scalar-background-2: hsl(224, 19%, 97%);
+  --scalar-background-3: hsl(224, 20%, 94%);
+  --scalar-background-accent: #2563a81f;
+
+  /* = --sl-color-hairline-light / -hairline-shade (light) */
+  --scalar-border-color: hsl(224, 20%, 94%);
+
+  /* Starlight's <header> does NOT use --sl-color-bg/-text like the rest of
+     the page — it's a distinct raised bar. Verified against the docs site's
+     actual computed styles, not derived: bg = --sl-color-bg-nav (gray-7),
+     border = --sl-color-hairline-shade (gray-6, light), title text =
+     --sl-color-text-accent (odal-primary-800, NOT the -500 accent above). */
+  --odal-header-bg: hsl(224, 19%, 97%);
+  --odal-header-border: hsl(224, 20%, 94%);
+  --odal-header-title-color: var(--odal-primary-800);
+
+  /* = --sl-shadow-sm (light), used by Starlight's Banner.astro */
+  --odal-banner-shadow: 0px 1px 1px rgba(0, 0, 0, 0.06), 0px 2px 1px rgba(0, 0, 0, 0.06);
+
+  /* Sidebar text (light mode): every entry is black, including group
+     headers (those render with -color-2, Scalar's secondary sidebar text
+     token, not -color-1). */
+  --scalar-sidebar-color-1: #000000;
+  --scalar-sidebar-color-2: #000000;
+  --scalar-sidebar-color-active: #000000;
+}
+
+.dark-mode {
+  /* = --sl-color-text / -gray-3 / -gray-4 (dark) */
+  --scalar-color-1: hsl(224, 6%, 77%);
+  --scalar-color-2: hsl(224, 6%, 56%);
+  --scalar-color-3: hsl(224, 7%, 36%);
+  /* = --sl-color-text-accent (dark), i.e. odal-primary-300 */
+  --scalar-color-accent: var(--odal-primary-300);
+
+  /* = --sl-color-bg / -bg-nav / -bg-inline-code (dark) */
+  --scalar-background-1: hsl(224, 10%, 10%);
+  --scalar-background-2: hsl(224, 14%, 16%);
+  --scalar-background-3: hsl(224, 10%, 23%);
+  --scalar-background-accent: #b7d4f01f;
+
+  /* = --sl-color-hairline (dark) */
+  --scalar-border-color: hsl(224, 14%, 16%);
+
+  /* Same header-bar exception as light-mode above. Dark mode's
+     --sl-color-hairline-shade resolves to --sl-color-black (the page bg),
+     not gray-6 — Starlight's own asymmetry between themes, not a typo. */
+  --odal-header-bg: hsl(224, 14%, 16%);
+  --odal-header-border: hsl(224, 10%, 10%);
+  --odal-header-title-color: var(--odal-primary-300);
+
+  /* = --sl-shadow-sm (dark), used by Starlight's Banner.astro */
+  --odal-banner-shadow: 0px 1px 1px rgba(0, 0, 0, 0.12), 0px 2px 1px rgba(0, 0, 0, 0.24);
+
+  /* Sidebar text (dark mode): every entry is white, including group headers
+     (those render with -color-2, Scalar's secondary sidebar text token, not
+     -color-1). */
+  --scalar-sidebar-color-1: #ffffff;
+  --scalar-sidebar-color-2: #ffffff;
+  --scalar-sidebar-color-active: #ffffff;
+}
+
+.light-mode,
+.dark-mode {
+  --scalar-font: var(--odal-font-sans);
+  --scalar-font-code: var(--odal-font-mono);
+
+  /* Starlight's active sidebar link is font-weight 600. Scalar's own
+     --scalar-sidebar-font-weight-active defaults to --scalar-semibold, which
+     is 500, not 600 — visibly lighter than the docs sidebar. --scalar-bold
+     is the token that's actually 600, so point at that instead of a raw
+     number to stay in step if Scalar's weight scale ever changes. */
+  --scalar-sidebar-font-weight-active: var(--scalar-bold);
+}
+
+/*
+ * Layout parity with the Starlight shell (mode-agnostic, so a plain :root
+ * block rather than repeated in both mode blocks above).
+ */
+/*
+ * Scalar's "Developer Tools / Configure / Share / Deploy" promo toolbar has
+ * no config switch in the bundled version, and it stacked a third bar under
+ * our header + alpha banner. Hiding it keeps the page to the same two-bar
+ * chrome as every Starlight docs page — and lets the alpha banner be a plain
+ * static element in api.astro instead of a MutationObserver injecting into
+ * Scalar's Vue tree (the previous approach, deleted with this rule).
+ */
+.narrow-references-container > .api-reference-toolbar {
+  display: none;
+}
+
+:root {
+  /* Scalar's sidebar defaults to 288px (--refs-sidebar-width falls back to
+     this); Starlight's --sl-sidebar-width is 300px (18.75rem). Match it so
+     the column doesn't visibly jump when navigating between /api and docs. */
+  --scalar-sidebar-width: 300px;
+
+  /* Reserves space for the custom header in api.astro (api.astro#L34) so
+     Scalar's own sticky sidebar/content starts below it instead of under
+     it. Scalar sums this with its own --scalar-header-height (50px) via
+     --refs-header-height internally — this variable exists for exactly
+     this purpose, no override needed. Height matches Starlight's
+     --sl-nav-height breakpoint (props.css: 3.5rem below 50em, 4rem above). */
+  --scalar-custom-header-height: 3.5rem;
+}
+@media (min-width: 50em) {
+  :root {
+    --scalar-custom-header-height: 4rem;
+  }
+}

@@ -1,0 +1,182 @@
+---
+// Scalar's stylesheet ships as a separate export and `createApiReference` does
+// not inject it — without this import the reference renders as unstyled HTML.
+// Importing it here makes Astro bundle + link it into the page.
+import '@scalar/api-reference/style.css';
+
+// Odal brand tokens mapped onto Scalar's `--scalar-*` variables (unlayered,
+// so it overrides Scalar's default theme without !important — see the file
+// for why). Paired with `theme: 'none'` below so no built-in preset competes.
+// Also sets --scalar-sidebar-width / --scalar-custom-header-height so this
+// page's chrome lines up with the Starlight shell below.
+import '../styles/scalar-api-reference.css';
+
+// Scalar has no logo/header config of its own, so the brand mark below is
+// hand-built to match Starlight's header (same assets, same height) rather
+// than left blank — see props.css's --sl-nav-height for the source values.
+import logoLight from '../assets/logo-light.svg';
+import logoDark from '../assets/logo-dark.svg';
+
+// Same alpha banner Starlight renders on every docs page (content.config.ts
+// schema default) and the same shared CSS (banner.css) — this page skips the
+// Starlight layout entirely so neither comes for free here.
+import '../styles/banner.css';
+
+// Full-page OpenAPI reference, mounted client-side from the **bundled**
+// @scalar/api-reference — no CDN, no third-party runtime dependency, so the
+// docs stay self-contained and sovereign. Mount logic lives in
+// ../scripts/mount-api-reference.ts, bundled in by the module script below.
+//
+// The spec is served from /openapi.yaml, vendored from dpp-engine's
+// api/openapi.yaml (refresh with `pnpm run sync:openapi`). This page lives
+// outside the Starlight shell so Scalar gets the full viewport; the docs
+// sidebar links to it.
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Odal Node — API Reference</title>
+    <link rel="icon" href="/favicon.svg" />
+    <meta
+      name="description"
+      content="OpenAPI reference for the self-hosted Odal Node — the EU Digital Product Passport engine."
+    />
+  </head>
+  <body>
+    <script is:inline>
+      // Scalar has its own dark-mode toggle (localStorage 'colorMode') and
+      // Starlight has its own (localStorage 'starlight-theme', a
+      // dark/light/auto tri-state, set by @astrojs/starlight/components/
+      // ThemeSelect.astro) — two independent controls that don't agree.
+      // 'starlight-theme' is the canonical source everywhere on this site
+      // now: this page reads it (same resolve logic as Starlight's
+      // ThemeProvider.astro) and writes the resolved value into 'colorMode'
+      // too, so Scalar's own internal state — which we no longer expose a
+      // toggle for (hideDarkModeToggle, below) — agrees with it from the
+      // first paint instead of racing/flipping once Scalar's JS mounts.
+      (function () {
+        try {
+          var stored = localStorage.getItem('starlight-theme');
+          var mode =
+            stored === 'dark' || stored === 'light'
+              ? stored
+              : window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark';
+          document.body.classList.add(mode + '-mode');
+          localStorage.setItem('colorMode', mode);
+        } catch (e) {}
+      })();
+    </script>
+    <header class="odal-header">
+      <a href="/" class="odal-header-brand" aria-label="Odal Node home">
+        <img src={logoDark.src} alt="" class="odal-header-logo odal-header-logo--dark" />
+        <img src={logoLight.src} alt="" class="odal-header-logo odal-header-logo--light" />
+        <span class="odal-header-title">Odal Node</span>
+      </a>
+      <div class="odal-header-right"></div>
+    </header>
+    <!-- Scalar renders the alpha banner through its supported plugin-view
+         slot, which keeps it inside the docs content area without relying on
+         brittle DOM mutation. -->
+    <div id="scalar-api-reference"></div>
+    <script>
+      import '../scripts/mount-api-reference';
+    </script>
+    <style>
+      /*
+       * Sized to match Starlight's own header exactly (props.css
+       * --sl-nav-height: 3.5rem below 50em, 4rem at/above it) so the seam
+       * between this page and the docs shell is invisible. Colors come from
+       * the same --scalar-* custom properties scalar-api-reference.css
+       * already wires to the docs' light/dark palette — this header lives
+       * outside #scalar-api-reference but inherits them fine since Scalar
+       * puts the .light-mode/.dark-mode class on <body>, an ancestor of
+       * both.
+       */
+      .odal-header {
+        height: 3.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0 1rem;
+        background: var(--odal-header-bg);
+        border-bottom: 1px solid var(--odal-header-border);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+      @media (min-width: 50em) {
+        .odal-header {
+          height: 4rem;
+          padding: 0 1.5rem;
+        }
+      }
+
+      /* Mirrors Starlight's SiteTitle.astro exactly: color/size/weight from
+         .site-title, logo height from calc(--sl-nav-height - 2 * --sl-nav-pad-y),
+         line-height from the global --sl-line-height (1.75). */
+      .odal-header-brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-decoration: none;
+        color: var(--odal-header-title-color);
+        font-family: var(--scalar-font);
+        font-weight: 600;
+        font-size: 1.25rem;
+        line-height: 1.75;
+        white-space: nowrap;
+      }
+      @media (min-width: 50em) {
+        .odal-header-brand {
+          font-size: 1.5rem;
+        }
+      }
+      @media (min-width: 72em) {
+        .odal-header-brand {
+          gap: 1.5rem;
+        }
+      }
+      .odal-header-logo {
+        height: 2rem;
+        width: auto;
+      }
+      @media (min-width: 50em) {
+        .odal-header-logo {
+          height: 2.5rem;
+        }
+      }
+      .odal-header-logo--light {
+        display: none;
+      }
+      body.light-mode .odal-header-logo--dark {
+        display: none;
+      }
+      body.light-mode .odal-header-logo--light {
+        display: block;
+      }
+
+      .odal-header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .odal-header-back {
+        color: var(--scalar-color-2);
+        font-family: var(--scalar-font);
+        font-size: var(--scalar-small, 14px);
+        line-height: 1.75;
+        text-decoration: none;
+      }
+      .odal-header-back:hover {
+        color: var(--scalar-color-accent);
+      }
+    </style>
+  </body>
+</html>

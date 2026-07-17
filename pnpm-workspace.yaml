@@ -5,3 +5,8 @@ packages:
 allowBuilds:
   esbuild: true
   sharp: true
+  vue-demi: true
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - vue-demi

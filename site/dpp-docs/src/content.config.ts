@@ -1,6 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { docsLoader } from '@astrojs/starlight/loaders';
 import { docsSchema } from '@astrojs/starlight/schema';
+import { ALPHA_BANNER_TEXT } from './site-meta';
 
 // Site-wide "alpha / in development" banner.
 // Starlight has no global `banner` config option (only per-page frontmatter),
@@ -13,10 +14,7 @@ export const collections = {
       extend: z.object({
         banner: z
           .object({ content: z.string() })
-          .default({
-            content:
-              'Alpha — Odal Node is in active development. APIs, schemas, and docs may and will change before 1.0.',
-          }),
+          .default({ content: ALPHA_BANNER_TEXT }),
       }),
     }),
   }),
