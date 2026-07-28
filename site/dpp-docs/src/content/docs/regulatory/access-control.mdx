@@ -1,32 +1,64 @@
 ---
-title: Access Control (Art. 10)
-description: ESPR Article 10's three-tier access model — public, restricted, and private information — and how Odal enforces the boundaries.
+title: Access Control
+description: Who may read which parts of a Digital Product Passport — what ESPR actually says, what the Battery Regulation adds, and how Odal enforces it.
 ---
 
-ESPR Article 10 establishes that a Digital Product Passport carries three categories of information with different access rules. The categories are not advisory — they are part of the regulation's substantive requirements, and an implementation that does not enforce them is not compliant.
+Access to a Digital Product Passport is differentiated: not every reader sees every field. But the rules are not where they are commonly assumed to be, and getting that wrong produces confident, incorrect compliance claims.
 
-## The three tiers
+## What ESPR actually says
 
-**Public information** is available to anyone who scans the QR code. It includes the product identity, the manufacturer, the basic compliance summary, and the information needed for a consumer to make informed sustainability decisions.
+ESPR (Regulation (EU) 2024/1781) **does not itself define access tiers.** Article 11(b) requires that
 
-**Restricted information** is available to authorised actors — recyclers, repair operators, dismantlers, customs and market-surveillance authorities. It includes the detailed material composition needed for end-of-life processing, the technical specifications needed for repair, and the compliance evidence needed for authority verification.
+> customers, manufacturers, importers, distributors, dealers, professional repairers, independent operators, refurbishers, remanufacturers, recyclers, market surveillance authorities and customs authorities, civil society organisations, trade unions and other relevant actors shall have **free of charge** and easy access to the digital product passport **based on their respective access rights set out in the applicable delegated act adopted pursuant to Article 4**
 
-**Private information** is available only to the economic operator. It includes anything that the operator legitimately considers commercial confidential — supplier identities, formulation details, manufacturing recipes — that does not need to be disclosed for the public-good purposes Article 10 protects.
+Two things follow. First, ESPR names a broad **list of actors** — some fourteen classes — and assigns them nothing. Second, the actor-to-data mapping is delegated: Article 9(2)(f) requires each product-group delegated act to specify "the actors that are to have access to data in the digital product passport and to what data they are to have access".
+
+**No such delegated act has been adopted for any ESPR product group yet.** For textiles, furniture, steel, aluminium and tyres, the access mapping is not merely unimplemented — it does not yet legally exist.
+
+Article 10, sometimes cited as the source of a three-tier model, is titled "Requirements for the digital product passport" and establishes no access categories.
+
+## Where a specified model does exist: batteries
+
+The Battery Regulation (EU) 2023/1542, Article 77(2), is currently the only fully specified access model. It assigns three audiences to four Annex XIII data sets:
+
+| Audience | Annex XIII points |
+|---|---|
+| General public | 1 |
+| Notified bodies, market surveillance authorities, the Commission | 2 and 3 |
+| Persons with a legitimate interest | 2 and 4 |
+
+**This is a lattice, not a ranking.** Point 3 (conformity test reports) is authority-only; point 4 (individual-battery data — cycle counts, state of health, use history) is legitimate-interest-only. Neither audience contains the other, so no ordered "public → restricted → private" scale can express it: any such ordering necessarily either hands authorities data the regulation withholds, or hides data from someone entitled to it.
+
+Odal models this directly — audiences and disclosure classes as separate vocabularies, with an explicit table of which audience may see which class — rather than as a tier number.
+
+One detail is still pending: the delegated act under Article 77(9), which fixes the access rights for Annex XIII points 2 and 4, has not been adopted.
+
+## Constraints that apply everywhere
+
+Read from the primary texts of ESPR, the Battery Regulation, the Toy Safety Regulation (EU) 2025/2509, the Detergents Regulation (EU) 2026/405 and the Construction Products Regulation (EU) 2024/3110:
+
+- **Access is free of charge.** Every one of these instruments requires it. Charging a reader for passport access is not a lawful model.
+- **Consumers must not be required to register or supply a password.** The toy and detergent regulations state this outright. The public view stays frictionless — no account, no sign-up, no gate.
+- **Passports must remain available for years, surviving the operator.** Ten years after placing on the market under the toy, detergent and construction rules, "including in cases of insolvency, liquidation or cessation of activity"; ESPR ties the period to at least the product's expected lifetime.
 
 ## How Odal enforces the boundaries
 
-Every field in a passport carries a tier marker, and every access request arrives with a credential — a Verifiable Credential issued by a trusted authority (a national body, a sector association) that asserts which actor category the requester belongs to. Odal evaluates the request against the passport's access policy: does the credential authorise the requested tier, is it signed by a trusted issuer, has it expired.
+Every field carries a disclosure classification drawn from the sector's own definition rather than hard-coded. A request arrives with a credential — a W3C Verifiable Credential asserting the holder's role — and the node resolves that role to an audience, then filters the passport to the disclosure classes that audience may see.
 
-That evaluation is a **pure function** — no network, no database — so it runs inside the resolver at the edge, deciding each request in microseconds without reaching back into the node. The answer is simply allow or deny.
+The filtering step is a **pure function**: no network, no database. The credential check verifies the signature, the expiry, the issuer's trust status and the revocation list.
 
-## Why credential-based access and not API keys
+Durable artefacts — stored signatures, audit records — are keyed by the **disclosure classes** they cover, never by an audience name. That is deliberate: ESPR's eventual actor vocabulary differs from the Battery Regulation's, and anything keyed to today's audience names would need migrating when the first ESPR delegated act lands.
 
-The natural alternative — handing out API keys to recyclers and authorities — fails on three properties. API keys are bearer secrets that get reused, leaked, or sold. API keys do not carry a verifiable identity assertion — possession is proof of access, but not proof of who the holder is. API keys are bound to a single issuer's authentication system, which means every regulator has to integrate with every platform separately.
+## Why credentials and not API keys
 
-Verifiable Credentials solve all three. They are non-bearer (the holder proves possession of the credential's bound private key), they carry a verifiable identity assertion (the issuer is signed into the credential), and they integrate uniformly with any platform that knows how to verify them.
+The natural alternative — issuing API keys to recyclers and authorities — fails on three counts. API keys are bearer secrets that get reused, leaked or sold. They carry no verifiable identity assertion: possession is proof of access, not proof of who holds it. And they bind to a single issuer's authentication system, so every regulator would have to integrate with every platform separately.
+
+Verifiable Credentials address all three. They are non-bearer, they carry a signed issuer assertion, and any platform that can verify them can accept them.
+
+This is also where the regulation is heading. ESPR Article 11 empowers the Commission to adopt implementing acts on procedures to issue and verify "the digital credentials of economic operators and other relevant actors that have access rights", and the toy and detergent regulations both defer their credential procedures to that same provision. Those implementing acts are not yet adopted, so no conformance claim is available — but the direction is legislated rather than speculative.
 
 ## Read next
 
 [What the core does](/core/overview) — how passports are signed and verified.
-[ESPR Overview](/regulatory/espr) — the framework regulation Article 10 sits inside.
-[How the node works](/engine/architecture) — the public read path that enforces these access boundaries on every request.
+[ESPR Overview](/regulatory/espr) — the framework regulation these provisions sit inside.
+[How the node works](/engine/architecture) — the public read path.
