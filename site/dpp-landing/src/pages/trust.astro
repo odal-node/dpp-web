@@ -1,0 +1,34 @@
+---
+// trust.astro — deliberately a short landing-styled statement, not a mirror
+// of the docs page. The full data-boundary table and signing mechanism used
+// to be independently retyped here (and had already drifted from the docs
+// wording — a table header disagreed: "Managed" vs "Managed (Future)"); this
+// page now states the guarantee in brief and links to the single canonical,
+// full-depth version instead of maintaining a second copy of it.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+
+const title = "Trust — Odal Node";
+const description =
+  "What Odal can see, cannot see, and could see but does not. The proof-bound architecture, stated precisely.";
+
+const DOCS_BREAKDOWN_URL =
+  "https://docs.odal-node.io/getting-started/what-odal-can-and-cannot-see";
+---
+
+<Base title={title} description={description}>
+  <Section eyebrow="Data and trust" title="What Odal Node can and cannot see.">
+    <p>
+      Odal Node is built on a proof-bound architecture: the manufacturer's
+      raw production data is validated and signed locally, on infrastructure
+      the manufacturer controls, then discarded. Only the signed proof is
+      stored and served. This is a property of the software, not a policy
+      promise — it holds regardless of who operates the node.
+    </p>
+    <p class="mt-4 text-sm">
+      <a href={DOCS_BREAKDOWN_URL} class="font-medium">
+        Read the full breakdown, by deployment model →
+      </a>
+    </p>
+  </Section>
+</Base>

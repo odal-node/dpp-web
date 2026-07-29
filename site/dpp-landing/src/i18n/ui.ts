@@ -9,6 +9,7 @@ import type { Locale } from "./config";
 export interface UIStrings {
   nav: {
     docs: string;
+    trust: string;
     github: string;
     joinWaitlist: string;
     openMenu: string;
@@ -36,6 +37,7 @@ export const ui = {
   en: {
     nav: {
       docs: "Docs",
+      trust: "Trust",
       github: "GitHub",
       joinWaitlist: "Join the waitlist",
       openMenu: "Open menu",
