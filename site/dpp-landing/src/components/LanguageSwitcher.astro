@@ -1,0 +1,33 @@
+---
+// LanguageSwitcher.astro — inline list of locale links, current page
+// preserved via getRelativeLocaleUrl. Five locales doesn't need a dropdown;
+// plain links keep this JS-free like the rest of the shared shell.
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { locales, resolveLocale, stripLocalePrefix } from "../i18n/config";
+import { useTranslations } from "../i18n/ui";
+
+interface Props {
+  class?: string;
+}
+const { class: extra = "" } = Astro.props;
+
+const lang = resolveLocale(Astro.currentLocale);
+const t = useTranslations(lang);
+const unprefixedPath = stripLocalePrefix(Astro.url.pathname, lang);
+---
+
+<nav aria-label={t.nav.language} class={`flex items-center gap-1 ${extra}`}>
+  {locales.map((l) => (
+    <a
+      href={getRelativeLocaleUrl(l, unprefixedPath)}
+      aria-current={l === lang ? "true" : undefined}
+      class={`rounded px-1.5 py-1 text-xs font-medium uppercase no-underline ${
+        l === lang
+          ? "text-primary-900 underline decoration-2 underline-offset-4"
+          : "text-neutral-500 hover:text-neutral-900"
+      }`}
+    >
+      {l}
+    </a>
+  ))}
+</nav>

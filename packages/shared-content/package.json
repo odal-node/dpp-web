@@ -1,0 +1,17 @@
+{
+  "name": "@odal/shared-content",
+  "description": "Single-sourced regulatory-fact content (the data boundary, the signing pipeline) shared between odal-node.io and docs.odal-node.io.",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./data-boundary": "./src/data-boundary.ts",
+    "./mechanism": "./src/mechanism.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

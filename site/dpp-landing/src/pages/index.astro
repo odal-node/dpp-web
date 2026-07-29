@@ -8,6 +8,7 @@ import Hero from "../components/Hero.astro";
 import Section from "../components/Section.astro";
 import StandardsRow from "../components/StandardsRow.astro";
 import Base from "../layouts/Base.astro";
+import { canSee, cannotSee, couldSeeButDoNot, mechanismSteps } from "@odal/shared-content";
 
 const title = "Odal Node — EU Digital Product Passport Infrastructure | ESPR Compliance";
 const description =
@@ -36,12 +37,9 @@ const softwareAppLd = {
 // The end-to-end process as one timeline. On the landing the underlying
 // services (integrator, validation, vault + in-process signing, resolver) are
 // deliberately merged into a single flow; the docs keep them as separate pages.
-const steps = [
-  { label: "Import", body: "Product data from CSV, Excel, or your ERP into your own node." },
-  { label: "Validate", body: "Against versioned sector schemas tracking the regulation, locally." },
-  { label: "Sign", body: "With your own key, generated and held on your infrastructure." },
-  { label: "Publish", body: "Only the signed passport becomes resolvable, via QR and GS1 Digital Link." },
-];
+// Sourced from @odal/shared-content — the "Verify" step is consumer-side, not
+// part of this producer-flow timeline, so only the first four render here.
+const steps = mechanismSteps.slice(0, 4);
 ---
 
 <Base title={title} description={description} jsonLd={[softwareAppLd]}>
@@ -93,7 +91,7 @@ const steps = [
               )}
             </div>
             <h3 class="mb-1 mt-4 text-base font-semibold text-neutral-900">{s.label}</h3>
-            <p class="m-0 text-sm leading-body text-neutral-600">{s.body}</p>
+            <p class="m-0 text-sm leading-body text-neutral-600">{s.summary}</p>
           </li>
         ))}
       </ol>
@@ -156,27 +154,24 @@ const steps = [
       <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
         <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We can see</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
-          The signed passport you publish to a resolver we operate, and the
-          metadata required to serve it.
+          {canSee.summary}
         </p>
       </div>
       <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
         <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We cannot see</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
-          Your private keys (held in-process on your infrastructure), your raw
-          production data, your supply-chain detail.
+          {cannotSee.summary}
         </p>
       </div>
       <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
         <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We could see but do not</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
-          The contents of your import files, which the node discards after
-          validation.
+          {couldSeeButDoNot.summary}
         </p>
       </div>
     </div>
     <p class="mt-8 text-sm">
-      <!-- <a href="/trust" class="font-medium">Read the full breakdown →</a> -->
+      <a href="/trust" class="font-medium">Read the full breakdown →</a>
     </p>
   </Section>
 

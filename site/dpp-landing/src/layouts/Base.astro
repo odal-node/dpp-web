@@ -4,6 +4,8 @@
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { defaultLocale, localeMeta, locales, resolveLocale, type Locale } from "../i18n/config";
 
 interface Props {
   title: string;
@@ -17,8 +19,21 @@ interface Props {
 }
 
 const { title, description, canonical, jsonLd = [], noindex = false } = Astro.props;
+const lang = resolveLocale(Astro.currentLocale);
 const canonicalHref = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
 const ogImage = new URL("/og-image.png", Astro.site).toString();
+// Self-referencing today (only "en" exists) — becomes real once a second
+// locale is registered in src/i18n/config.ts. Kept live now rather than
+// added later so the URL-building logic is exercised by every build.
+const hreflangAlternates = locales.map((l) => ({
+  hreflang: localeMeta[l].htmlLang,
+  href: new URL(getRelativeLocaleUrl(l, Astro.url.pathname), Astro.site).toString(),
+}));
+// Explicitly typed (rather than inferred from `.filter`) — with today's
+// single-locale tuple, TS narrows the filtered element type to `never`
+// since it can prove `l !== lang` is always false. This annotation is what
+// keeps that a today-only observation instead of a real constraint.
+const alternateLocales: Locale[] = locales.filter((l) => l !== lang);
 
 // Base structured data — present on every page.
 const organizationLd = {
@@ -41,7 +56,7 @@ const websiteLd = {
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -49,6 +64,14 @@ const websiteLd = {
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonicalHref} />
+    {hreflangAlternates.map((alt) => (
+      <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+    ))}
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL(getRelativeLocaleUrl(defaultLocale, Astro.url.pathname), Astro.site).toString()}
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="theme-color" content="#080C2C" />
@@ -62,7 +85,10 @@ const websiteLd = {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Odal Node" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content={localeMeta[lang].ogLocale} />
+    {alternateLocales.map((l) => (
+      <meta property="og:locale:alternate" content={localeMeta[l].ogLocale} />
+    ))}
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />

@@ -4,6 +4,11 @@
 // one-line trust row. Copy source: docs/WEB_CONTENT_STRATEGY.md §4.1.
 import Watermark from "../assets/favicon.svg";
 import StatusBadge from "./StatusBadge.astro";
+import { resolveLocale } from "../i18n/config";
+import { useTranslations } from "../i18n/ui";
+
+const lang = resolveLocale(Astro.currentLocale);
+const t = useTranslations(lang);
 interface Props {
   eyebrow?: string;
   title: string;
@@ -67,7 +72,7 @@ const {
               {eyebrow}
             </p>
           )}
-          {status && <StatusBadge tone="navy" label="Alpha · Active development" />}
+          {status && <StatusBadge tone="navy" label={t.status.alphaLabel} />}
         </div>
       )}
       <h1 class="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl">

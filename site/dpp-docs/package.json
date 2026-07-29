@@ -15,6 +15,7 @@
   "dependencies": {
     "@astrojs/starlight": "^0.30.6",
     "@odal/brand-tokens": "workspace:*",
+    "@odal/shared-content": "workspace:*",
     "@scalar/api-reference": "^1.62.5",
     "astro": "^5",
     "vue": "^3.5.39"
