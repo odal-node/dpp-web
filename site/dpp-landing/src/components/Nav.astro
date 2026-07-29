@@ -3,11 +3,12 @@
 // Lockup matches the docs (Starlight) site-title for cross-site parity:
 // navy mark + accent wordmark at --sl-text-h4 scale, weight 600.
 import StatusBadge from "./StatusBadge.astro";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
 // Use the real brand mark (currentColor variant of odal-mark) rather than a
 // hand-rolled inline SVG, so the nav stays in sync with the brand asset and the
 // mark inherits the wordmark's colour. Astro 5 imports .svg as a component.
 import OdalMark from "../assets/favicon.svg";
-import { resolveLocale } from "../i18n/config";
+import { resolveLocale, stripLocalePrefix } from "../i18n/config";
 import { useTranslations } from "../i18n/ui";
 
 const lang = resolveLocale(Astro.currentLocale);
@@ -20,7 +21,9 @@ const links = [
   // { href: "/about", label: "About", external: false },
   { href: "https://github.com/odal-node", label: t.nav.github, external: true },
 ];
-const current = Astro.url.pathname;
+// Compared against each link's unprefixed href, so "current page" still
+// highlights correctly once a locale prefix (/de/trust) is in the URL.
+const current = stripLocalePrefix(Astro.url.pathname, lang);
 ---
 
 <header class="sticky top-0 z-50 border-b border-neutral-100 bg-gray-100">
@@ -53,6 +56,7 @@ const current = Astro.url.pathname;
           {l.label}
         </a>
       ))}
+      <LanguageSwitcher class="ml-2 border-l border-neutral-200 pl-2" />
       <a
         href="/waitlist"
         class="ml-2 rounded-md bg-primary-800 px-4 py-2 text-sm font-medium text-white no-underline hover:bg-primary-900 hover:no-underline"
@@ -90,6 +94,7 @@ const current = Astro.url.pathname;
         {l.label}
       </a>
     ))}
+    <LanguageSwitcher class="mt-2 border-t border-neutral-200 px-3 pt-3" />
     <a
       href="/waitlist"
       class="mt-2 block rounded-md bg-primary-800 px-3 py-2.5 text-center text-sm font-medium text-white no-underline hover:bg-primary-600"

@@ -12,26 +12,37 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   site: "https://odal-node.io",
-  // i18n foundation: only "en" is live. Adding a locale here plus a matching
-  // entry in src/i18n/ui.ts is the whole extension point — see src/i18n/config.ts.
-  //
-  // When a second locale is added, also add a `fallback` map so an
-  // untranslated page serves the English content under that locale's URL
-  // instead of 404ing, e.g.:
-  //   fallback: { de: "en" },
-  //   routing: { prefixDefaultLocale: false, fallbackType: "rewrite" },
+  // i18n: chrome (nav/footer/badges — src/i18n/ui.ts) is translated for all
+  // five locales. Page prose (Hero copy, deadline citations, the
+  // data-boundary facts) is not yet — `fallback` + `fallbackType: "rewrite"`
+  // serves the English page content under a locale's URL when no
+  // locale-specific page exists, so /de/, /it/, /fr/, /es/ resolve instead
+  // of 404ing while prose translation is still pending native review.
   i18n: {
     defaultLocale: "en",
-    locales: ["en"],
+    locales: ["en", "de", "it", "fr", "es"],
     routing: {
       prefixDefaultLocale: false,
+      fallbackType: "rewrite",
+    },
+    fallback: {
+      de: "en",
+      it: "en",
+      fr: "en",
+      es: "en",
     },
   },
   integrations: [
     sitemap({
       i18n: {
         defaultLocale: "en",
-        locales: { en: "en-US" },
+        locales: {
+          en: "en-US",
+          de: "de-DE",
+          it: "it-IT",
+          fr: "fr-FR",
+          es: "es-ES",
+        },
       },
     }),
   ],
