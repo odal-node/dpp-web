@@ -14,6 +14,12 @@ export default defineConfig({
   site: "https://odal-node.io",
   // i18n foundation: only "en" is live. Adding a locale here plus a matching
   // entry in src/i18n/ui.ts is the whole extension point — see src/i18n/config.ts.
+  //
+  // When a second locale is added, also add a `fallback` map so an
+  // untranslated page serves the English content under that locale's URL
+  // instead of 404ing, e.g.:
+  //   fallback: { de: "en" },
+  //   routing: { prefixDefaultLocale: false, fallbackType: "rewrite" },
   i18n: {
     defaultLocale: "en",
     locales: ["en"],
