@@ -34,6 +34,19 @@ export default defineConfig({
     starlight({
       title: 'Odal Node',
       description: 'EU Digital Product Passport infrastructure — open-source core, sovereign by design, built for ESPR compliance.',
+      // English stays unprefixed (root), matching odal-node.io's URL shape.
+      // No content has been translated — Starlight ships built-in UI-string
+      // translations for all four (sidebar chrome, search, "on this page",
+      // etc.), and its own fallback shows the English page with a visible
+      // "this page has not been translated yet" notice rather than a 404 —
+      // no per-locale content directories needed for that to work.
+      locales: {
+        root: { label: 'English', lang: 'en' },
+        de: { label: 'Deutsch', lang: 'de' },
+        it: { label: 'Italiano', lang: 'it' },
+        fr: { label: 'Français', lang: 'fr' },
+        es: { label: 'Español', lang: 'es' },
+      },
       logo: {
         light: './src/assets/logo-light.svg',
         dark: './src/assets/logo-dark.svg',
