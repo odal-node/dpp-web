@@ -12,7 +12,23 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   site: "https://odal-node.io",
-  integrations: [sitemap()],
+  // i18n foundation: only "en" is live. Adding a locale here plus a matching
+  // entry in src/i18n/ui.ts is the whole extension point — see src/i18n/config.ts.
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en"],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
+  integrations: [
+    sitemap({
+      i18n: {
+        defaultLocale: "en",
+        locales: { en: "en-US" },
+      },
+    }),
+  ],
   vite: {
     plugins: [
       tailwindcss(),

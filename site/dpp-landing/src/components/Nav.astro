@@ -7,13 +7,18 @@ import StatusBadge from "./StatusBadge.astro";
 // hand-rolled inline SVG, so the nav stays in sync with the brand asset and the
 // mark inherits the wordmark's colour. Astro 5 imports .svg as a component.
 import OdalMark from "../assets/favicon.svg";
+import { resolveLocale } from "../i18n/config";
+import { useTranslations } from "../i18n/ui";
+
+const lang = resolveLocale(Astro.currentLocale);
+const t = useTranslations(lang);
 
 const links = [
-  { href: "https://docs.odal-node.io", label: "Docs", external: true },
-  // { href: "/trust", label: "Trust", external: false },
+  { href: "https://docs.odal-node.io", label: t.nav.docs, external: true },
+  { href: "/trust", label: "Trust", external: false },
   // { href: "/roadmap", label: "Roadmap", external: false },
   // { href: "/about", label: "About", external: false },
-  { href: "https://github.com/odal-node", label: "GitHub", external: true },
+  { href: "https://github.com/odal-node", label: t.nav.github, external: true },
 ];
 const current = Astro.url.pathname;
 ---
@@ -52,7 +57,7 @@ const current = Astro.url.pathname;
         href="/waitlist"
         class="ml-2 rounded-md bg-primary-800 px-4 py-2 text-sm font-medium text-white no-underline hover:bg-primary-900 hover:no-underline"
       >
-        Join the waitlist
+        {t.nav.joinWaitlist}
       </a>
     </div>
 
@@ -63,7 +68,7 @@ const current = Astro.url.pathname;
       class="inline-flex items-center justify-center rounded-md p-2 text-neutral-700 hover:bg-neutral-100 md:hidden"
       aria-controls="nav-menu"
       aria-expanded="false"
-      aria-label="Open menu"
+      aria-label={t.nav.openMenu}
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
         <path d="M4 7h16M4 12h16M4 17h16" />
@@ -74,7 +79,7 @@ const current = Astro.url.pathname;
   <!-- mobile panel -->
   <div id="nav-menu" class="hidden border-t border-neutral-200 bg-white px-4 pb-4 pt-2 md:hidden">
     <div class="px-3 pb-2 pt-1">
-      <StatusBadge tone="light" label="Alpha · in active development" />
+      <StatusBadge tone="light" label={t.status.alphaLabel} />
     </div>
     {links.map((l) => (
       <a
@@ -89,17 +94,17 @@ const current = Astro.url.pathname;
       href="/waitlist"
       class="mt-2 block rounded-md bg-primary-800 px-3 py-2.5 text-center text-sm font-medium text-white no-underline hover:bg-primary-600"
     >
-      Join the waitlist
+      {t.nav.joinWaitlist}
     </a>
   </div>
 </header>
 
-<script>
+<script define:vars={{ openLabel: t.nav.openMenu, closeLabel: t.nav.closeMenu }}>
   const toggle = document.getElementById("nav-toggle");
   const menu = document.getElementById("nav-menu");
   toggle?.addEventListener("click", () => {
     const open = menu?.classList.toggle("hidden") === false;
     toggle.setAttribute("aria-expanded", String(open));
-    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    toggle.setAttribute("aria-label", open ? closeLabel : openLabel);
   });
 </script>
