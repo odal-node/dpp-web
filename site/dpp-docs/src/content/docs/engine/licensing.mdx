@@ -34,16 +34,19 @@ Each `dpp-engine` release ships with a specific change date in its licence heade
 
 ## Dependency licences
 
-`dpp-engine` builds on `dpp-core` (Apache-2.0) and other open-source dependencies. Each crate's `Cargo.toml` declares its full dependency tree. The key third-party licences are:
+`dpp-engine` builds on `dpp-core` (Apache-2.0) and a tree of open-source Rust crates.
 
-- **Axum / Tokio** — MIT (HTTP framework and async runtime).
-- **wasmtime** — Apache-2.0 (the sector-plugin sandbox).
-- **ed25519-dalek** — BSD 3-Clause (signing).
-- **PostgreSQL** — PostgreSQL Licence (liberal, BSD-style).
-- **Redis** — BSD 3-Clause (resolver cache).
-- **NATS** — Apache-2.0 (event bus).
+This page deliberately does **not** reproduce a table of those licences. A restated licence
+list is a claim that goes stale silently: the licence lives in the dependency's own metadata,
+changes on the dependency's schedule rather than ours, and a copy here would keep asserting the
+old terms long after they changed. That is not hypothetical — a previous version of this page
+carried a licence for one component that had been wrong since 2024.
 
-No dependency introduces a copyleft obligation that would propagate to `dpp-engine` users.
+The authoritative answer for any given build is the build itself. `cargo license` or
+`cargo deny` over the workspace enumerates every crate and its licence from the resolved
+dependency graph, and `Cargo.lock` is committed, so the result is reproducible for any tagged
+release. Anyone evaluating the engine for licence compatibility should run it against the
+version they intend to deploy rather than trust a list written against some earlier one.
 
 ## Read next
 

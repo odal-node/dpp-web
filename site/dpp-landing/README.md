@@ -47,7 +47,7 @@ site/dpp-landing/
 │       └── global.css         # Tailwind 4 layers + @odal/brand-tokens (CSS-first, no tailwind.config)
 ```
 
-Brand assets (mark SVGs, OG image, apple-touch-icon) are **not** stored here — they live in the workspace-root `../../public/` and are copied into the build by `viteStaticCopy` (see `astro.config.mjs`), so both sites stay in sync from one source.
+Brand assets (mark SVGs, OG image) live in this site’s own `public/` and `src/assets/`. Design tokens — the one thing that genuinely must not drift between the sites — are shared through the `@odal/brand-tokens` package instead.
 
 Pages prefixed with `_` are drafts: Astro does not build them into routes. They are intentionally excluded from launch and will ship in a future pass.
 

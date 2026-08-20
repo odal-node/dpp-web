@@ -8,7 +8,6 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   site: "https://odal-node.io",
@@ -16,7 +15,6 @@ export default defineConfig({
   vite: {
     plugins: [
       tailwindcss(),
-      viteStaticCopy({ targets: [{ src: '../../public/**/*', dest: '' }] }),
     ],
   },
   // Static output — deployed to Cloudflare Pages.
