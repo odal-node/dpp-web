@@ -8,7 +8,10 @@ export default defineConfig({
     // Design pages removed; redirect to the closest living equivalent.
     '/design/no-touch-data': '/getting-started/what-odal-can-and-cannot-see',
     '/design/proof-bound': '/getting-started/what-odal-can-and-cannot-see',
-    '/design/open-core': '/engine/licensing',
+    '/design/open-core': '/getting-started/licensing',
+    // Licensing moved out of the engine section; the open-core split describes
+    // both parts, so it belongs with orientation rather than with the service.
+    '/engine/licensing': '/getting-started/licensing',
     '/design/adr': '/core-concepts',
     '/design/why-no-capability-gating': '/core-concepts',
     // Core consolidated from per-crate/type pages into three concept pages.
@@ -56,6 +59,9 @@ export default defineConfig({
             { label: 'Quick Start', link: '/quick-start' },
             { label: 'Core Concepts', link: '/core-concepts' },
             { label: 'What Odal can and cannot see', link: '/getting-started/what-odal-can-and-cannot-see' },
+            // Last in orientation rather than under The Engine: the open-core
+            // split covers both parts, so it is not an engine-specific topic.
+            { label: 'Licensing', link: '/getting-started/licensing' },
           ],
         },
         {
@@ -63,7 +69,6 @@ export default defineConfig({
           collapsed: true,
           items: [
             { label: 'What the core does', link: '/core/overview' },
-            // { label: 'Verify a passport yourself', link: '/core/verify' },
             { label: 'Standards & interoperability', link: '/core/standards' },
             { label: 'Security & cryptography', link: '/core/security' },
             { label: 'Extending: sectors & plugins', link: '/core/sectors' },
@@ -78,7 +83,6 @@ export default defineConfig({
             { label: 'Operating securely', link: '/engine/security' },
             { label: 'Self-Hosting', link: '/engine/self-hosted' },
             { label: 'The CLI', link: '/engine/cli' },
-            { label: 'Licensing', link: '/engine/licensing' },
           ],
         },
         {

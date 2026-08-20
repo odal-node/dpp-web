@@ -31,6 +31,12 @@ The signed passport published to a resolver we operate, and the metadata require
 
 The contents of your import files. The software reads them once, validates the data, signs the passport, and discards the input. There is no setting, configuration, or internal code path that retains the uploaded file after signing — it is not a choice made per customer; it is how the software works. Be precise about what that covers: the *file* is not kept, while records *derived* from it during the import — the passport, and a job record carrying per-row validation findings — are.
 
+## What the node records about resolution
+
+One thing is recorded rather than discarded, and it belongs on this page for that reason: when a published passport is resolved, the node can count that it happened.
+
+That count is an aggregate — per passport, per day, per surface — and it is the whole of it. Nothing about the person who scanned is recorded: no IP address, no device, no location, no identity, no session. This is a property of the schema rather than a policy: there is no column in which any of it could be stored, so there is nothing to leak and nothing that could quietly grow into tracking. Producing a QR-code image is counted separately and is never added to the scan total — a render measures label production, not people.
+
 ## The mechanism
 
 1. **Import** — product data arrives at your node (CSV, Excel, ERP export) on infrastructure you control.
