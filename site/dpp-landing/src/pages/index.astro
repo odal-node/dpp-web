@@ -37,7 +37,7 @@ const softwareAppLd = {
 // services (integrator, validation, vault + in-process signing, resolver) are
 // deliberately merged into a single flow; the docs keep them as separate pages.
 const steps = [
-  { label: "Import", body: "Product data from CSV, Excel, or your ERP into your own node." },
+  { label: "Import", body: "Product data from CSV or Excel — including exports from your ERP — into your own node." },
   { label: "Validate", body: "Against versioned sector schemas tracking the regulation, locally." },
   { label: "Sign", body: "With your own key, generated and held on your infrastructure." },
   { label: "Publish", body: "Only the signed passport becomes resolvable, via QR and GS1 Digital Link." },
@@ -117,7 +117,7 @@ const steps = [
         },
         {
           k: "Standards-native",
-          v: "GS1 Digital Link 1.2 resolution, W3C VC 2.0 credentials, did:web identity, AAS submodel export.",
+          v: "GS1 Digital Link resolution, W3C VC 2.0 credentials, did:web identity, AAS submodel export.",
         },
         {
           k: "Sandboxed sector plugins",
@@ -133,7 +133,7 @@ const steps = [
         },
         {
           k: "Self-host in minutes",
-          v: "One compose file. No licence keys, no passport caps. Ever.",
+          v: "One command to a running node — it builds from source, so allow a few minutes. No licence keys, no passport caps. Ever.",
         },
       ].map((f) => (
         <article class="rounded-md border border-neutral-200 bg-neutral-0 p-6 transition-colors hover:border-primary-300">

@@ -14,7 +14,7 @@
         { "label": "End-to-end node", "detail": "Create, sign, publish, and resolve a passport end to end" },
         { "label": "Full lifecycle provenance", "detail": "Suspend, archive, typed end-of-life, and dual-signed transfer of responsibility — on a tamper-evident, hash-chained audit trail" },
         { "label": "Evidence dossiers + offline verification", "detail": "Export a signed dossier and verify it with zero network — no trust in Odal required" },
-        { "label": "Registry-ready outbox", "detail": "Registration intent survives crashes and drains with backoff; the live connector activates when the EU publishes its API" },
+        { "label": "Registry-ready outbox", "detail": "Registration intent survives crashes and drains with backoff; the live connector is not yet activated" },
         { "label": "Signed compliance-ruleset channel", "detail": "Rulesets arrive as Ed25519-signed bundles, verified fail-closed and hot-swapped; a production node refuses placeholder trust adapters" },
         { "label": "Bulk import", "detail": "CSV and Excel with dry-run validation and per-row errors" }
       ]
@@ -25,7 +25,7 @@
       "description": "Under active work with a defined target.",
       "items": [
         { "label": "Electronics sector", "detail": "Schema and plugin, prepared ahead of an electronics delegated act" },
-        { "label": "EU Central Registry connector", "detail": "Ready for the registry API; activates when the specification publishes" },
+        { "label": "EU Central Registry connector", "detail": "Interface modelled against the registry that went live in July 2026; activation still gated on upstream blockers" },
         { "label": "eIDAS qualified-seal path", "detail": "Qualified trust service provider selection in progress" },
         { "label": "Unsold-goods disclosure export", "detail": "Report artifact for the July 2026 textile obligation" },
         { "label": "Operator dashboard", "detail": "Passport management UI for managed and self-hosted nodes" }
@@ -39,7 +39,7 @@
         { "label": "Multi-operator hosting", "detail": "Isolated per-operator deployments at fleet scale" },
         { "label": "Edge-cached public resolver", "detail": "CDN-cached passport pages for global scan latency" },
         { "label": "Further sectors", "detail": "Construction, tyres, furniture, detergents — as delegated acts finalise" },
-        { "label": "Conformance services", "detail": "Verification badge against EN 18222/18223 once the standards are final" },
+        { "label": "Conformance services", "detail": "Verification badge against the CEN/CENELEC DPP standards, once those texts have been purchased and read" },
         { "label": "EBSI did:ebsi", "detail": "EU-operated DID method as an alternative issuer-identity path, if registry requirements call for it" }
       ]
     }
