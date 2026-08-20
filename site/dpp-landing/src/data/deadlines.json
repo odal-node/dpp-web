@@ -1,5 +1,5 @@
 {
-  "_comment": "Regulatory deadlines shown on the landing page. Every entry needs a citation. The _verify fields are internal notes — NOT rendered — and must be cleared by the compliance lead before launch (source: docs/WEB_CONTENT_STRATEGY.md §4.2).",
+  "_comment": "Regulatory deadlines shown on the landing page. Every entry needs a citation to a named instrument and article, verified against the Official Journal text — not against a secondary source. The _verify fields are working notes and are NOT rendered; a deadline whose _verify still records an open question has not been checked, and an unchecked deadline must not ship.",
   "deadlines": [
     {
       "date": "2026-07-19",

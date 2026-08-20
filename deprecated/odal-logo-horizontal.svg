@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 300" width="1040" height="300" role="img" aria-label="Odal Node">
+  <!-- Horizontal lockup for og-image exports, README headers, and decks — NOT for the
+       site nav (nav uses odal-mark-navy.svg + HTML wordmark; see DESIGN_SPEC §3).
+       Wordmark uses a system font stack: rasterise (PNG export) before using anywhere
+       font availability is not guaranteed. Dark-background variant: swap #0E1440 → #B7D4F0. -->
+  <g transform="translate(10 10) scale(0.5469)">
+    <g fill="none" stroke="#0E1440" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="256" cy="256" r="230" stroke-width="17"/>
+      <path stroke-width="8" d="M191 354 Q189 296 191 232 Q190 228 194 224 L250 174 Q256 169 262 174 L318 224 Q322 228 321 233 Q323 297 321 354"/>
+      <path stroke-width="3.5" opacity="0.9" d="M206 354 Q205 300 206 240 L256 196 L306 240 Q307 301 306 354"/>
+      <path stroke-width="4" d="M168 356 Q256 361 344 356"/>
+      <circle cx="172" cy="152" r="10" stroke-width="4"/>
+      <path stroke-width="1.8" opacity="0.7" d="M146 252 L154 198 L168 162 M180 146 L204 122 L256 98 L308 120 L348 150 L366 196 L372 250"/>
+    </g>
+    <g fill="#0E1440">
+      <circle cx="204" cy="122" r="5"/>
+      <circle cx="256" cy="98" r="5.5"/>
+      <circle cx="308" cy="120" r="5"/>
+      <circle cx="348" cy="150" r="4.5"/>
+      <circle cx="366" cy="196" r="4"/>
+      <circle cx="154" cy="198" r="4"/>
+    </g>
+  </g>
+  <text x="330" y="187" fill="#0E1440"
+        font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+        font-size="118" font-weight="800" letter-spacing="6">ODAL NODE</text>
+  <text x="334" y="238" fill="#0E1440" opacity="0.75"
+        font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+        font-size="34" font-weight="500" letter-spacing="2">Signed by you. Verified by anyone.</text>
+</svg>

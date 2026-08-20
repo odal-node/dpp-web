@@ -28,7 +28,7 @@
   }
 
   /* Light-first design with dark *sections* (hero, footer) rather than a
-     global dark mode — decision in docs/redesign/DESIGN_SPEC.md §1. */
+     global dark mode — decision recorded 2026-06-10. */
 
   h1, h2, h3, h4 {
     font-weight: 600;

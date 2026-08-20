@@ -1,7 +1,7 @@
 /**
  * Odal Node — typography tokens.
  *
- * System-stack-first. No web fonts. See BRAND.md section 4.2 for rationale.
+ * System-stack-first. No web fonts, so no page issues a third-party font request.
  */
 
 export const fontFamily = {

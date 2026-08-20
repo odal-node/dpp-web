@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dpp-docs",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "site/dpp-docs", "run", "dev"],
+      "port": 4321
+    },
+    {
+      "name": "dpp-landing",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "site/dpp-landing", "run", "dev", "--port", "4322"],
+      "port": 4322
+    }
+  ]
+}
