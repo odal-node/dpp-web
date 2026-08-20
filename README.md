@@ -21,7 +21,7 @@ Each Astro project has its own `package.json` and its own Cloudflare Pages proje
 
 ## Independent Deploys, Shared Brand
 
-The architectural commitment of this repository is *independence at the deployment layer, coherence at the brand layer*. Pushing to `main` with a change that only touches `site/dpp-docs/src/content/docs/quick-start.mdx` produces a single docs deploy and zero landing deploys. Pushing a change that touches `packages/brand-tokens/` produces two deploys, because a token change genuinely should re-render both surfaces. This is enforced via Cloudflare Pages [build watch paths](https://developers.cloudflare.com/pages/configuration/build-watch-paths/) rather than at the Git layer.
+The architectural commitment of this repository is *independence at the deployment layer, coherence at the brand layer*. A promotion into `main` that only touches `site/dpp-docs/src/content/docs/quick-start.mdx` produces a single docs deploy and zero landing deploys. One that touches `packages/brand-tokens/` produces two deploys, because a token change genuinely should re-render both surfaces. This is enforced via Cloudflare Pages [build watch paths](https://developers.cloudflare.com/pages/configuration/build-watch-paths/) rather than at the Git layer.
 
 ---
 
