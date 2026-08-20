@@ -34,7 +34,7 @@ dpp-web/
 ├── pnpm-lock.yaml                  # single lockfile for the whole workspace
 ├── README.md                       # this file
 │
-├── public/brand/                   # canonical brand assets (marks, favicon, og)
+├── scripts/                        # CI gates: link crawler, leakage scan
 │
 ├── packages/
 │   └── brand-tokens/               # @odal/brand-tokens — colour, type, spacing
@@ -66,9 +66,20 @@ pnpm dev:docs         # http://localhost:4321  → site/dpp-docs
 # Build for production (same command Cloudflare runs)
 pnpm -r build
 
-# Type-check + broken-link check
+# Type-check templates and content-collection references
 pnpm -r check
+
+# The gates CI runs. All four need a build first, except the leakage scan.
+pnpm run check:links      # crawl both dist trees for internal links that 404
+pnpm run check:leakage    # internal vocabulary / private-repo paths, incl. public/
+pnpm run check:openapi    # vendored API spec still matches its pinned engine commit
+pnpm audit --audit-level critical
 ```
+
+`pnpm -r check` does **not** check links, and never did — a markdown link target is an opaque
+string to `astro check`. That is why `check:links` exists separately and reads the built output
+rather than the source: four `[Licensing](/engine/licensing)` links once passed `check` and
+404'd in production.
 
 Prerequisites: Node.js 22.13+ (LTS 24 recommended — pnpm 11 requires `node:sqlite`, unavailable before 22.13) and pnpm (managed via [corepack](https://nodejs.org/api/corepack.html) — the exact version is pinned in `package.json` `packageManager`).
 
@@ -88,7 +99,21 @@ The relationship between the repositories — the open-core boundary, the depend
 
 ## Status
 
-The original phased build (workspace foundations → landing MVP → docs IA → polish) is complete through its first three phases, and the **June 2026 redesign** re-skinned both sites onto the navy/ice brand, replaced retired messaging with *"Signed by you. Verified by anyone."*, moved editable content into data files, and corrected stale claims. What remains before public launch: the Lighthouse/a11y pass and deployment. `LICENSE` is settled (Apache-2.0) and CI (`.github/workflows/ci.yml`, gating `pnpm -r build` + `pnpm -r check` on every push/PR) is in place.
+The original phased build (workspace foundations → landing MVP → docs IA → polish) is complete through its first three phases, and the **June 2026 redesign** re-skinned both sites onto the navy/ice brand, replaced retired messaging with *"Signed by you. Verified by anyone."*, and moved editable content into data files. `LICENSE` is settled (Apache-2.0).
+
+An **August 2026 audit** of both sites read every published page against primary regulatory text and against the engine's source. It found a delegated act that does not exist described as adopted, roughly twenty misattributed citations, four security-property claims the code contradicted, and a registry described as unbuilt eight months after it went live. Those are corrected; the findings register lives outside this repository.
+
+What remains before public launch: the Lighthouse/axe pass, a runtime check that the API reference does not relay requests through a third-party proxy, and a named data controller in the privacy policy — which is blocked on a registered entity existing, not on a copy edit.
+
+## How changes land
+
+`main` is what Cloudflare Pages publishes, so nothing lands on it directly.
+
+- **`staging`** is the integration branch. Work branches off it and merges back through a pull request.
+- Promotion is a second pull request, `staging` → `main`, reviewed on its own.
+- `main` carries a ruleset matching the other repositories: pull request required, squash-only, CI must pass, no force-push, no deletion, and **no bypass for anyone** — including the owner.
+
+CI (`.github/workflows/ci.yml`) runs build, type-check, and the four gates listed above on every push and pull request, with the workflow token scoped to `contents: read`.
 
 ---
 
