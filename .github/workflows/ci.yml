@@ -87,3 +87,11 @@ jobs:
             echo "::notice::The vendored API spec is pinned $BEHIND commit(s) behind changes to api/openapi.yaml on the engine's main. Run 'pnpm run sync:openapi' to bring it forward."
             git --no-pager log --oneline "$PIN"..origin/main -- api/openapi.yaml || true
           fi
+
+      # Fails on a high-severity advisory. The remaining advisories are all
+      # build-time or dev-server issues in transitive dependencies, which do not
+      # reach a static deploy — so this is set to fail on `critical` today and
+      # should be tightened to `high` once those clear. The point is that a new
+      # advisory becomes visible on the pull request that introduces it.
+      - name: Audit dependencies
+        run: pnpm audit --audit-level critical
