@@ -18,6 +18,18 @@ const description =
     </p>
   </Section>
 
+  <Section eyebrow="Scan telemetry" title="What a scan count is, and what it is not.">
+    <p>
+      When a passport is resolved, the node can record that it happened — an
+      aggregate count, per passport, per day. That is the whole of it. A scan
+      count records <strong>nothing about the person who scanned</strong>: no IP
+      address, no device, no location, no identity, no session. The software has
+      no field in which to store any of it, so there is nothing to leak and
+      nothing that could quietly become tracking. Producing a QR-code image is
+      counted separately — it measures label production, not people.
+    </p>
+  </Section>
+
   <!-- <Section eyebrow="The breakdown" title="Stated precisely." wide>
     <div class="grid gap-8 md:grid-cols-3">
       <div>
