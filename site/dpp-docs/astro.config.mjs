@@ -1,6 +1,5 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   site: 'https://docs.odal-node.io',
@@ -9,10 +8,7 @@ export default defineConfig({
     // Design pages removed; redirect to the closest living equivalent.
     '/design/no-touch-data': '/getting-started/what-odal-can-and-cannot-see',
     '/design/proof-bound': '/getting-started/what-odal-can-and-cannot-see',
-    // Points at the licence table rather than at /engine/licensing, whose
-    // source is underscore-prefixed and therefore never routed. Repoint it back
-    // when that page is published.
-    '/design/open-core': '/introduction',
+    '/design/open-core': '/engine/licensing',
     '/design/adr': '/core-concepts',
     '/design/why-no-capability-gating': '/core-concepts',
     // Core consolidated from per-crate/type pages into three concept pages.
@@ -82,7 +78,7 @@ export default defineConfig({
             { label: 'Operating securely', link: '/engine/security' },
             { label: 'Self-Hosting', link: '/engine/self-hosted' },
             { label: 'The CLI', link: '/engine/cli' },
-            // { label: 'Licensing', link: '/engine/licensing' },
+            { label: 'Licensing', link: '/engine/licensing' },
           ],
         },
         {
@@ -108,8 +104,5 @@ export default defineConfig({
       customCss: ['./src/styles/custom.css'],
     }),
   ],
-  vite: {
-    plugins: [viteStaticCopy({ targets: [{ src: '../../public/brand', dest: '' }] })],
-  },
   output: 'static',
 });

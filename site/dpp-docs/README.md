@@ -39,7 +39,7 @@ site/dpp-docs/
 │       └── custom.css                 # Starlight overrides via @odal/brand-tokens
 ```
 
-Brand assets shared with the landing site come from the workspace-root `../../public/brand/`, copied into the build by `viteStaticCopy` (see `astro.config.mjs`).
+Brand assets live in this site’s own `public/` and `src/assets/`. There is no shared asset directory — the two sites are deployed independently, and a cross-site copy step was removed because it published a duplicate favicon at a path nothing referenced.
 
 The sidebar structure is declared in `astro.config.mjs` and mirrored by the file-system layout under `src/content/docs/`. Renamed or removed slugs keep a redirect (e.g. `/design/proof-bound` → `/getting-started/what-odal-can-and-cannot-see`); the full redirect map is in `astro.config.mjs`, which is the source of truth for the information architecture.
 
