@@ -9,7 +9,7 @@ The proof-bound architecture means the raw import files are read once on the ope
 
 | Property | Self-hosted | Managed (Future) |
 |---|---|---|
-| Node discards raw import files; retains the signed passport (all tiers) | Yes — architectural invariant | Yes — architectural invariant |
+| Node discards raw import files; retains the whole signed passport | Yes — architectural invariant | Yes — architectural invariant |
 | Odal (the entity) can access stored data | No — not present in the deployment | Constrained by access controls, audit logging, and contract |
 | Odal can sign on the operator's behalf | No | No — the operator holds the signing keys |
 
@@ -29,14 +29,14 @@ The signed passport published to a resolver we operate, and the metadata require
 
 ## What we could see but do not
 
-The contents of your import files. The software reads them once, validates the data, signs the passport, and discards the input. There is no setting, configuration, or internal code path that retains the raw import after signing — it is not a choice made per customer; it is how the software works.
+The contents of your import files. The software reads them once, validates the data, signs the passport, and discards the input. There is no setting, configuration, or internal code path that retains the uploaded file after signing — it is not a choice made per customer; it is how the software works. Be precise about what that covers: the *file* is not kept, while records *derived* from it during the import — the passport, and a job record carrying per-row validation findings — are.
 
 ## The mechanism
 
 1. **Import** — product data arrives at your node (CSV, Excel, ERP export) on infrastructure you control.
 2. **Validate** — locally against versioned sector schemas. Validation is a pure function — no network calls.
 3. **Sign** — your Ed25519 private key, generated and held in-process, signs the validated passport into a JWS bound to your `did:web` identity.
-4. **Publish** — the signed passport becomes resolvable; the raw import files are discarded. Public fields are served to anyone, restricted tiers only against a verified credential.
+4. **Publish** — the signed passport becomes resolvable; the raw import files are discarded. Public fields are served to anyone; restricted fields only against a verified credential.
 5. **Verify** — anyone verifies against your public DID Document. Odal is not in the verify loop.
 
 ## Read next
