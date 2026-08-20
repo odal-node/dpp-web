@@ -92,7 +92,9 @@ export default defineConfig({
             { label: 'ESPR Overview', link: '/regulatory/espr' },
             { label: 'Battery DPP', link: '/regulatory/battery' },
             { label: 'Textile DPP', link: '/regulatory/textile' },
-            { label: 'Electronics DPP', link: '/regulatory/electronics' },
+            // Electronics DPP is withdrawn pending a rewrite — its source is
+            // `_electronics.mdx`, which the underscore keeps out of the content
+            // collection. Restore this entry with the page, not before it.
             { label: 'Access Control', link: '/regulatory/access-control' },
             { label: 'EU Central Registry', link: '/regulatory/central-registry' },
           ],
