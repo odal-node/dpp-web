@@ -62,3 +62,11 @@ jobs:
         run: pnpm run check:openapi
         env:
           DPP_ENGINE_DIR: ${{ github.workspace }}/.dpp-engine
+
+      # Fails on a high-severity advisory. The remaining advisories are all
+      # build-time or dev-server issues in transitive dependencies, which do not
+      # reach a static deploy — so this is set to fail on `critical` today and
+      # should be tightened to `high` once those clear. The point is that a new
+      # advisory becomes visible on the pull request that introduces it.
+      - name: Audit dependencies
+        run: pnpm audit --audit-level critical
