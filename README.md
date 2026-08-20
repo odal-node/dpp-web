@@ -93,7 +93,7 @@ The [`dpp-core`](https://github.com/odal-node/dpp-core) repository (Apache-2.0) 
 
 The [`dpp-engine`](https://github.com/odal-node/dpp-engine) repository (BSL-1.1, with a production self-host grant) holds the deployment layer — HTTP services, persistence, authentication, telemetry, the public resolver, the Wasm plugin sandbox. The docs site documents `dpp-engine`; it does not contain its source.
 
-The relationship between the repositories — the open-core boundary, the dependency direction, the licensing rationale — is covered on the docs site under [Design Principles](https://docs.odal-node.io/design/open-core) and in the parent project's strategy documents.
+The relationship between the repositories — the open-core boundary, the dependency direction, the licensing rationale — is covered on the docs site under [Core Concepts](https://docs.odal-node.io/core-concepts) and [Licensing](https://docs.odal-node.io/getting-started/licensing), and in the parent project's strategy documents.
 
 ---
 
