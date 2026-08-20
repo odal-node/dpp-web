@@ -4,12 +4,15 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   site: 'https://docs.odal-node.io',
-  // Renamed pages keep their old URLs working (WEB_CONTENT_STRATEGY.md §6).
+  // Renamed pages keep their old URLs working.
   redirects: {
     // Design pages removed; redirect to the closest living equivalent.
     '/design/no-touch-data': '/getting-started/what-odal-can-and-cannot-see',
     '/design/proof-bound': '/getting-started/what-odal-can-and-cannot-see',
-    '/design/open-core': '/engine/licensing',
+    // Points at the licence table rather than at /engine/licensing, whose
+    // source is underscore-prefixed and therefore never routed. Repoint it back
+    // when that page is published.
+    '/design/open-core': '/introduction',
     '/design/adr': '/core-concepts',
     '/design/why-no-capability-gating': '/core-concepts',
     // Core consolidated from per-crate/type pages into three concept pages.
@@ -89,7 +92,9 @@ export default defineConfig({
             { label: 'ESPR Overview', link: '/regulatory/espr' },
             { label: 'Battery DPP', link: '/regulatory/battery' },
             { label: 'Textile DPP', link: '/regulatory/textile' },
-            { label: 'Electronics DPP', link: '/regulatory/electronics' },
+            // Electronics DPP is withdrawn pending a rewrite — its source is
+            // `_electronics.mdx`, which the underscore keeps out of the content
+            // collection. Restore this entry with the page, not before it.
             { label: 'Access Control', link: '/regulatory/access-control' },
             { label: 'EU Central Registry', link: '/regulatory/central-registry' },
           ],

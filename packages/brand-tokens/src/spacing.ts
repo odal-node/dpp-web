@@ -1,7 +1,7 @@
 /**
  * Odal Node — spacing and radius tokens.
  *
- * 8-pixel base scale with a 12px outlier (see BRAND.md section 4.3).
+ * 8-pixel base scale with a 12px outlier.
  */
 
 export const spacing = {

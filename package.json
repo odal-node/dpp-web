@@ -15,6 +15,10 @@
     "build:docs": "pnpm --filter dpp-docs build",
     "build": "pnpm -r build",
     "check": "pnpm -r check",
+    "check:links": "node scripts/check-links.mjs",
+    "check:leakage": "node scripts/check-leakage.mjs",
+    "check:openapi": "pnpm --filter dpp-docs run check:openapi",
+    "sync:openapi": "pnpm --filter dpp-docs run sync:openapi",
     "preview:landing": "pnpm --filter dpp-landing preview",
     "preview:docs": "pnpm --filter dpp-docs preview",
     "clean": "pnpm -r exec rm -rf dist .astro node_modules && rm -rf node_modules"

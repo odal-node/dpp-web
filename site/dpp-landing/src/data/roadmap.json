@@ -1,5 +1,5 @@
 {
-  "_comment": "Roadmap data — the single editable source for the landing roadmap (WEB_CONTENT_STRATEGY.md §4.8). Status enum: shipped | in-build | horizon. Rule: every numeric claim cites where it is measured, or it is omitted. No project-milestone months — regulatory dates live in deadlines.json.",
+  "_comment": "Roadmap data — the single editable source for the landing roadmap, so editors change JSON rather than components. Status enum: shipped | in-build | horizon. Rule: every numeric claim cites where it is measured, or it is omitted. No project-milestone months — regulatory dates live in deadlines.json.",
   "columns": [
     {
       "status": "shipped",

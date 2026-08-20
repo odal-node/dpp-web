@@ -21,7 +21,7 @@ The public passport endpoint requires no credential at all — it only ever serv
 
 ## Least privilege in the database
 
-The node connects to PostgreSQL with an application role that cannot change the schema and cannot delete rows. Schema migrations run under a *separate*, privileged credential that is used only at startup and never kept in the live connection pool. On top of that, the database enforces the [permanence guarantees](/engine/retention) itself — a trigger rejects edits to a locked passport, and the audit trail is append-only at the database level — so those rules hold even if application code is wrong.
+The node connects to PostgreSQL with an application role that cannot change the schema, and that holds no DELETE grant anywhere except on the import-job table, where a cleanup sweep needs one. Schema migrations run under a *separate*, privileged credential that is used only at startup and never kept in the live connection pool. On top of that, the database enforces the [permanence guarantees](/engine/retention) itself — a trigger rejects edits to a locked passport, and the audit trail is append-only at the database level — so those rules hold even if application code is wrong.
 
 ## The node fails closed
 
@@ -29,7 +29,7 @@ A node refuses to start without its secrets — database credentials, the key-st
 
 ## Sector logic is sandboxed
 
-Each sector's compliance logic runs in a Wasm sandbox with no filesystem, no network, and no system clock or randomness, capped at 64 MiB of memory and a fixed CPU budget (fuel metering). A buggy or hostile plugin exhausts its budget and is stopped — it can never reach the signing key, the database, or the rest of the node. This is the host enforcing, with concrete limits, the sandbox model described in [Security & cryptography](/core/security).
+Each sector's compliance logic runs in a Wasm sandbox with no filesystem and no network, capped at 64 MiB of memory and a fixed CPU budget (fuel metering). It is not a vacuum: the plugin can read a clock and draw randomness. The clock is **pinned** to a single instant for the whole invocation, so a determination cannot vary with the time it ran; randomness is real OS entropy, deliberately not pinned, because a fixed seed would make a plugin's hash iteration order predictable without making any determination more reproducible. A buggy or hostile plugin exhausts its budget and is stopped — it can never reach the signing key, the database, or the rest of the node. This is the host enforcing, with concrete limits, the sandbox model described in [Security & cryptography](/core/security).
 
 ## The database is the source of truth
 
@@ -41,7 +41,7 @@ A node serves exactly one operator. Isolation is a property of the deployment �
 
 ## Reporting a vulnerability
 
-The engine implements no cryptography of its own — it delegates all of it to the core. Dependencies are scanned for known advisories on every change. Suspected vulnerabilities go to **security@odal-node.io** under coordinated disclosure, never to a public issue first.
+The signing path is the core's: the engine holds no signature or key-derivation code of its own. It does hash on its own account — SHA-256 for API-key and admin-password digests, compared in constant time — because those are node-operational concerns rather than passport ones. Dependencies are scanned for known advisories on every change. Suspected vulnerabilities go to **security@odal-node.io** under coordinated disclosure, never to a public issue first.
 
 ## Read next
 

@@ -1,7 +1,7 @@
 ---
 // odal-node.io — home page.
-// Section order and copy per docs/WEB_CONTENT_STRATEGY.md §4.
-// Terminology and claims rules: see §7 (no capability-tier language, no claims
+// Section order and copy are fixed deliberately; see each section component.
+// Terminology and claims rules: no capability-tier language, no claims
 // ahead of shipped code, "proof-bound" never "no-touch").
 import DeadlineCards from "../components/DeadlineCards.astro";
 import Hero from "../components/Hero.astro";
@@ -77,8 +77,8 @@ const steps = [
       trust. A proof-bound architecture serves both without asking either to
       compromise: the raw import files are read once and discarded, while the signed
       passport they produce — carrying the full product data, every field bound to a
-      proof — is what the node stores and serves, released to each audience by access
-      tier.
+      proof — is what the node stores and serves, released to each audience by that
+      audience's access rights.
     </p>
     <div class="not-prose my-6">
       <ol class="grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-4">
@@ -100,9 +100,9 @@ const steps = [
     </div>
     <p>
       Anyone verifies the signature against your public DID document — without Odal in
-      the loop. Public fields are readable by all; restricted tiers — for repairers,
+      the loop. Public fields are readable by all; restricted fields — for repairers,
       recyclers, and market-surveillance authorities — are released only against a
-      verified credential. What the node stores: the signed passport with every tier,
+      verified credential. What the node stores: the whole signed passport,
       the audit trail, the signature. What it never stores: raw import files,
       supply-chain detail beyond passport content, or your private keys.
     </p>

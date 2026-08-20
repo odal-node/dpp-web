@@ -15,12 +15,14 @@ This design is the right one because it lets the regulation centralise discovery
 
 ## What the registry requires of implementations
 
-The registry's API is being defined at the time of writing. The expected requirements are: every published passport must be registered with the registry, the registration carries the product identifier and the resolver endpoint, the issuing platform must keep the registration in sync as passports are suspended or archived, and the platform must respond to registry health checks.
+The registry went live on **20 July 2026**, meeting the Commission's own Art. 13 deadline, and the implementing act adopted under Art. 13(5) sets out how registration works. So the requirements are no longer expectations: a published passport is registered with its unique identifier, the registration carries the resolver endpoint, and the registering platform keeps it in sync as passports are suspended or archived.
 
-Odal has prepared for this beyond modelling the interface: **every published passport already commits its registration intent to a durable outbox, in the same database transaction as the publish itself.** A background worker drains that outbox with retry and backoff. The practical consequence: publishing never blocks on the registry, a crash never loses a registration, and the day the Commission's API goes live, the accumulated backlog registers without a single passport falling through. (For context: the Commission's own deadline to set up the registry was 19 July 2026; as of this writing, the API specification remains unpublished — so this durable-queue posture is not caution, it's the correct engineering for the actual situation.)
+Odal has prepared for this beyond modelling the interface: **every published passport already commits its registration intent to a durable outbox, in the same database transaction as the publish itself.** A background worker drains that outbox with retry and backoff. The practical consequence: publishing never blocks on the registry, a crash never loses a registration, and a backlog accumulated during an outage drains without a single passport falling through.
+
+Two things stand between that and a battery registration succeeding today, and neither is ours to fix. The semantic catalogue a battery registration must reference is not yet defined, which blocks the registration path for everyone rather than for us specifically. And the registry caps a unique product identifier at 50 characters where ours runs to 65, with the identifier required to be a URL conforming to standards that must be purchased before that constraint can even be read properly. We would rather name both than describe a clean drain we cannot yet demonstrate.
 
 <Aside type="note" title="Status">
-Activation of the registry integration is on the longer roadmap, [contingent on the registry API being published](https://odal-node.io/roadmap). The interface is already modelled, so the implementation can land in days rather than months once the upstream API stabilises.
+The registry integration is modelled and queued but **not activated**. What gates it now is not the registry's existence — that question is settled — but the two blockers above, plus an enrolment process whose evidentiary requirements we are still confirming with the Commission rather than inferring.
 </Aside>
 
 ## Why pre-investing in the bridge
