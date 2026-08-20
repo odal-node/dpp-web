@@ -16,6 +16,7 @@
 //
 // Usage: node scripts/check-leakage.mjs
 import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { join, relative, extname, basename } from 'node:path';
 
 const SKIP_DIRS = new Set([
@@ -25,6 +26,7 @@ const SKIP_DIRS = new Set([
   'dist',
   '.astro',
   '.pnpm-store',
+  '.dpp-engine',
   'deprecated',
 ]);
 // This file necessarily contains the patterns it searches for.
@@ -79,8 +81,25 @@ for (const file of files) {
   }
 }
 
+// The directories above are skipped because they are meant to be untracked.
+// That assumption is worth testing: a stray `git add -A` on a branch that
+// predates the .gitignore entry commits them to a public repository, and the
+// content scan would never look. Ask git what is actually tracked.
+const tracked = execSync('git ls-files', { encoding: 'utf8' })
+  .split('\n')
+  .filter((p) => p.startsWith('deprecated/') || p.startsWith('.claude/'));
+
+if (tracked.length > 0) {
+  console.error(`leakage check: ${tracked.length} local-only file(s) are tracked.\n`);
+  for (const p of tracked.slice(0, 10)) console.error(`  ${p}`);
+  if (tracked.length > 10) console.error(`  … and ${tracked.length - 10} more`);
+  console.error('\n  These directories are gitignored because they must not be published.');
+  console.error('  Untrack them with `git rm -r --cached <dir>` before committing.');
+  process.exit(1);
+}
+
 if (hits.length === 0) {
-  console.log(`leakage check: ${files.length} files scanned, clean.`);
+  console.log(`leakage check: ${files.length} files scanned, clean. No local-only files tracked.`);
   process.exit(0);
 }
 

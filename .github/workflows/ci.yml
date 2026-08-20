@@ -5,12 +5,28 @@ on:
     branches: [main]
   pull_request:
 
+# The job builds and inspects; it never writes to the repository. Without this
+# block it would inherit whatever the repository default happens to be, which is
+# the only privileged path in the file.
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # The vendored OpenAPI spec is a copy of the engine's. Without the source
+      # beside it there is nothing to compare against, and a drift check that
+      # cannot see the source is a check that always passes.
+      - name: Checkout dpp-engine (source of the vendored API spec)
+        uses: actions/checkout@v4
+        with:
+          repository: odal-node/dpp-engine
+          path: .dpp-engine
+          persist-credentials: false
 
       - name: Enable Corepack
         run: corepack enable
@@ -29,3 +45,20 @@ jobs:
 
       - name: Check
         run: pnpm -r check
+
+      # Markdown link targets are opaque strings to `astro check`. This reads
+      # the built output, so it sees what is actually published — including
+      # cross-site links, which neither site's own tooling can resolve.
+      - name: Check links
+        run: pnpm run check:links
+
+      # This repository is public. Internal decision-record numbers and paths
+      # into the private docs repo must not appear in it — including inside
+      # `public/`, which is served verbatim.
+      - name: Check for internal-vocabulary leakage
+        run: pnpm run check:leakage
+
+      - name: Check the vendored API spec against the engine
+        run: pnpm run check:openapi
+        env:
+          DPP_ENGINE_DIR: ${{ github.workspace }}/.dpp-engine

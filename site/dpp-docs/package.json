@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "sync:openapi": "node scripts/sync-openapi.mjs"
+    "sync:openapi": "node scripts/sync-openapi.mjs",
+    "check:openapi": "node scripts/sync-openapi.mjs --check"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.30.6",
