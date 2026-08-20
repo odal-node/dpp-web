@@ -38,9 +38,9 @@ export default defineConfig({
         dark: './src/assets/logo-dark.svg',
         replacesTitle: false,
       },
-      social: {
-        github: 'https://github.com/odal-node/dpp-core',
-      },
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/odal-node/dpp-core' },
+      ],
       favicon: '/favicon.svg',
       head: [
         { tag: 'meta', attrs: { property: 'og:image', content: 'https://docs.odal-node.io/favicon.svg' } },

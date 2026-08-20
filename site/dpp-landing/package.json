@@ -15,7 +15,7 @@
     "@astrojs/sitemap": "^3",
     "@odal/brand-tokens": "workspace:*",
     "@tailwindcss/vite": "^4",
-    "astro": "^5",
+    "astro": "^7.2.4",
     "tailwindcss": "^4"
   },
   "devDependencies": {

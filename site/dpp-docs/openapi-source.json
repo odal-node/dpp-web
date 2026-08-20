@@ -1,0 +1,6 @@
+{
+  "_comment": "Provenance for public/openapi.yaml, which is vendored from dpp-engine. The commit is what `pnpm run sync:openapi` last copied from, and what `check:openapi` verifies the vendored copy against. Pinning to a commit rather than to the engine's main branch keeps this repo's CI deterministic: an unrelated merge in the engine cannot turn a pull request here red, and a coordinated change across both repos can land without deadlocking on which merges first. Bumping the pin is a deliberate, reviewable line in a diff.",
+  "repository": "odal-node/dpp-engine",
+  "path": "api/openapi.yaml",
+  "commit": "45f8aa884da0535a1059e0e51467c6de37c471ed"
+}
