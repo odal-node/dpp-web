@@ -26,3 +26,7 @@ Thumbs.db
 # CI / deploy artefacts
 .wrangler/
 .cloudflare/
+
+# local-only assets (never publish, never commit — this repo is public)
+deprecated/
+.claude/

@@ -4,12 +4,15 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   site: 'https://docs.odal-node.io',
-  // Renamed pages keep their old URLs working (WEB_CONTENT_STRATEGY.md §6).
+  // Renamed pages keep their old URLs working.
   redirects: {
     // Design pages removed; redirect to the closest living equivalent.
     '/design/no-touch-data': '/getting-started/what-odal-can-and-cannot-see',
     '/design/proof-bound': '/getting-started/what-odal-can-and-cannot-see',
-    '/design/open-core': '/engine/licensing',
+    // Points at the licence table rather than at /engine/licensing, whose
+    // source is underscore-prefixed and therefore never routed. Repoint it back
+    // when that page is published.
+    '/design/open-core': '/introduction',
     '/design/adr': '/core-concepts',
     '/design/why-no-capability-gating': '/core-concepts',
     // Core consolidated from per-crate/type pages into three concept pages.

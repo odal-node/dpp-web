@@ -5,12 +5,33 @@ on:
     branches: [main]
   pull_request:
 
+# The job builds and inspects; it never writes to the repository. Without this
+# block it would inherit whatever the repository default happens to be, which is
+# the only privileged path in the file.
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # The vendored OpenAPI spec is a copy of the engine's. Without the source
+      # beside it there is nothing to compare against, and a drift check that
+      # cannot see the source is a check that always passes.
+      #
+      # Full history, because the check reads the spec at the commit recorded in
+      # openapi-source.json rather than at whatever is currently on main. See
+      # that script's header for why the pin exists.
+      - name: Checkout dpp-engine (source of the vendored API spec)
+        uses: actions/checkout@v4
+        with:
+          repository: odal-node/dpp-engine
+          path: .dpp-engine
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Enable Corepack
         run: corepack enable
@@ -29,3 +50,40 @@ jobs:
 
       - name: Check
         run: pnpm -r check
+
+      # Markdown link targets are opaque strings to `astro check`. This reads
+      # the built output, so it sees what is actually published — including
+      # cross-site links, which neither site's own tooling can resolve.
+      - name: Check links
+        run: pnpm run check:links
+
+      # This repository is public. Internal decision-record numbers and paths
+      # into the private docs repo must not appear in it — including inside
+      # `public/`, which is served verbatim.
+      - name: Check for internal-vocabulary leakage
+        run: pnpm run check:leakage
+
+      - name: Check the vendored API spec against the engine
+        run: pnpm run check:openapi
+        env:
+          DPP_ENGINE_DIR: ${{ github.workspace }}/.dpp-engine
+
+      # Reports, without failing, how far the pin is behind the engine's main.
+      # Deliberately not a gate: the pinned copy being *correct* is this repo's
+      # problem and is enforced above, but the pin being *old* is a release-
+      # cadence judgement, and failing on it would redden every pull request
+      # here every time the engine merges anything. The number is printed on
+      # every run so the drift that started this — a published spec fifteen
+      # endpoints behind, with nothing to reveal it — cannot go unnoticed again.
+      - name: Report how far the API-spec pin is behind
+        if: always()
+        run: |
+          PIN=$(node -p "require('./site/dpp-docs/openapi-source.json').commit")
+          cd .dpp-engine
+          BEHIND=$(git rev-list --count "$PIN"..origin/main -- api/openapi.yaml 2>/dev/null || echo "?")
+          if [ "$BEHIND" = "0" ]; then
+            echo "API spec pin is current with the engine's main branch."
+          else
+            echo "::notice::The vendored API spec is pinned $BEHIND commit(s) behind changes to api/openapi.yaml on the engine's main. Run 'pnpm run sync:openapi' to bring it forward."
+            git --no-pager log --oneline "$PIN"..origin/main -- api/openapi.yaml || true
+          fi

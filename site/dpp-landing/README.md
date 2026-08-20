@@ -53,7 +53,7 @@ Pages prefixed with `_` are drafts: Astro does not build them into routes. They 
 
 There is **no `tailwind.config.mjs`** — Tailwind 4 is configured CSS-first via the `@theme` block in `@odal/brand-tokens/tokens.css`.
 
-The section structure and copy follow [`../../docs/WEB_CONTENT_STRATEGY.md`](../../docs/WEB_CONTENT_STRATEGY.md) (§4 landing structure, §7 voice); the visual treatment of those sections follows [`../../docs/redesign/DESIGN_SPEC.md`](../../docs/redesign/DESIGN_SPEC.md) §5; the voice baseline is [`../../docs/BRAND.md`](../../docs/BRAND.md).
+Section order, copy and visual treatment are all deliberate rather than incidental: each section component carries its own rule in a header comment, and the tone across both sites is plain, unenthusiastic and claim-checkable. The originating decisions are held in an internal design record dated 2026-06-10.
 
 
 ## Deployment
