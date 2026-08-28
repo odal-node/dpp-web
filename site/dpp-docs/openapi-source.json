@@ -1,6 +1,7 @@
 {
   "_comment": "Provenance for public/openapi.yaml, which is vendored from dpp-engine. The commit is what `pnpm run sync:openapi` last copied from, and what `check:openapi` verifies the vendored copy against. Pinning to a commit rather than to the engine's main branch keeps this repo's CI deterministic: an unrelated merge in the engine cannot turn a pull request here red, and a coordinated change across both repos can land without deadlocking on which merges first. Bumping the pin is a deliberate, reviewable line in a diff.",
+  "_path_comment": "MUST be the bundled single-file spec, never api/openapi.yaml. The engine authors its description as a tree (a root of $refs plus paths/ and components/) and commits api/openapi.bundled.yaml as the single-file form every consumer reads — committed precisely so this vendoring step can read one blob out of git history. This pin still named the root after that split, so a sync would have copied 278 lines of relative `$ref: paths/...` pointers over the vendored spec; nothing here resolves them, and the rendered docs would have lost every endpoint and schema.",
   "repository": "odal-node/dpp-engine",
-  "path": "api/openapi.yaml",
-  "commit": "45f8aa884da0535a1059e0e51467c6de37c471ed"
+  "path": "api/openapi.bundled.yaml",
+  "commit": "db2d8317b98b1c04e41ff4179c8b1237528eda49"
 }
