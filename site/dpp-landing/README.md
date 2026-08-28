@@ -47,13 +47,13 @@ site/dpp-landing/
 │       └── global.css         # Tailwind 4 layers + @odal/brand-tokens (CSS-first, no tailwind.config)
 ```
 
-Brand assets (mark SVGs, OG image, apple-touch-icon) are **not** stored here — they live in the workspace-root `../../public/` and are copied into the build by `viteStaticCopy` (see `astro.config.mjs`), so both sites stay in sync from one source.
+Brand assets (mark SVGs, OG image) live in this site’s own `public/` and `src/assets/`. Design tokens — the one thing that genuinely must not drift between the sites — are shared through the `@odal/brand-tokens` package instead.
 
 Pages prefixed with `_` are drafts: Astro does not build them into routes. They are intentionally excluded from launch and will ship in a future pass.
 
 There is **no `tailwind.config.mjs`** — Tailwind 4 is configured CSS-first via the `@theme` block in `@odal/brand-tokens/tokens.css`.
 
-The section structure and copy follow [`../../docs/WEB_CONTENT_STRATEGY.md`](../../docs/WEB_CONTENT_STRATEGY.md) (§4 landing structure, §7 voice); the visual treatment of those sections follows [`../../docs/redesign/DESIGN_SPEC.md`](../../docs/redesign/DESIGN_SPEC.md) §5; the voice baseline is [`../../docs/BRAND.md`](../../docs/BRAND.md).
+Section order, copy and visual treatment are all deliberate rather than incidental: each section component carries its own rule in a header comment, and the tone across both sites is plain, unenthusiastic and claim-checkable. The originating decisions are held in an internal design record dated 2026-06-10.
 
 
 ## Deployment

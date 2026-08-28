@@ -1,7 +1,7 @@
 ---
 // odal-node.io — home page.
-// Section order and copy per docs/WEB_CONTENT_STRATEGY.md §4.
-// Terminology and claims rules: see §7 (no capability-tier language, no claims
+// Section order and copy are fixed deliberately; see each section component.
+// Terminology and claims rules: no capability-tier language, no claims
 // ahead of shipped code, "proof-bound" never "no-touch").
 import DeadlineCards from "../components/DeadlineCards.astro";
 import Hero from "../components/Hero.astro";
@@ -37,7 +37,7 @@ const softwareAppLd = {
 // services (integrator, validation, vault + in-process signing, resolver) are
 // deliberately merged into a single flow; the docs keep them as separate pages.
 const steps = [
-  { label: "Import", body: "Product data from CSV, Excel, or your ERP into your own node." },
+  { label: "Import", body: "Product data from CSV or Excel — including exports from your ERP — into your own node." },
   { label: "Validate", body: "Against versioned sector schemas tracking the regulation, locally." },
   { label: "Sign", body: "With your own key, generated and held on your infrastructure." },
   { label: "Publish", body: "Only the signed passport becomes resolvable, via QR and GS1 Digital Link." },
@@ -77,8 +77,8 @@ const steps = [
       trust. A proof-bound architecture serves both without asking either to
       compromise: the raw import files are read once and discarded, while the signed
       passport they produce — carrying the full product data, every field bound to a
-      proof — is what the node stores and serves, released to each audience by access
-      tier.
+      proof — is what the node stores and serves, released to each audience by that
+      audience's access rights.
     </p>
     <div class="not-prose my-6">
       <ol class="grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-4">
@@ -100,9 +100,9 @@ const steps = [
     </div>
     <p>
       Anyone verifies the signature against your public DID document — without Odal in
-      the loop. Public fields are readable by all; restricted tiers — for repairers,
+      the loop. Public fields are readable by all; restricted fields — for repairers,
       recyclers, and market-surveillance authorities — are released only against a
-      verified credential. What the node stores: the signed passport with every tier,
+      verified credential. What the node stores: the whole signed passport,
       the audit trail, the signature. What it never stores: raw import files,
       supply-chain detail beyond passport content, or your private keys.
     </p>
@@ -117,7 +117,7 @@ const steps = [
         },
         {
           k: "Standards-native",
-          v: "GS1 Digital Link 1.2 resolution, W3C VC 2.0 credentials, did:web identity, AAS submodel export.",
+          v: "GS1 Digital Link resolution, W3C VC 2.0 credentials, did:web identity, AAS submodel export.",
         },
         {
           k: "Sandboxed sector plugins",
@@ -133,7 +133,7 @@ const steps = [
         },
         {
           k: "Self-host in minutes",
-          v: "One compose file. No licence keys, no passport caps. Ever.",
+          v: "One command to a running node — it builds from source, so allow a few minutes. No licence keys, no passport caps. Ever.",
         },
       ].map((f) => (
         <article class="rounded-md border border-neutral-200 bg-neutral-0 p-6 transition-colors hover:border-primary-300">

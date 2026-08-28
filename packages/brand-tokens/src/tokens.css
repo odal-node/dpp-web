@@ -8,7 +8,7 @@
  *      that does `@import "tailwindcss"; @import "@odal/brand-tokens/tokens.css";`
  *      gets utility classes for the full brand palette without further config.
  *
- * Palette decision 2026-06-10 (docs/redesign/DESIGN_SPEC.md §1): the brand
+ * Palette decision 2026-06-10: the brand
  * colour system follows the logo — navy field (#080C2C) + ice-blue strokes
  * (#B7D4F0) — with a darkened action blue for interactive elements so links
  * and buttons hold AA contrast on white. The former green scale is retired.

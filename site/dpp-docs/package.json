@@ -10,13 +10,14 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "sync:openapi": "node scripts/sync-openapi.mjs"
+    "sync:openapi": "node scripts/sync-openapi.mjs",
+    "check:openapi": "node scripts/sync-openapi.mjs --check"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.30.6",
+    "@astrojs/starlight": "^0.41.7",
     "@odal/brand-tokens": "workspace:*",
     "@scalar/api-reference": "^1.62.5",
-    "astro": "^5",
+    "astro": "^7.2.4",
     "vue": "^3.5.39"
   },
   "devDependencies": {

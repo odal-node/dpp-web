@@ -2,25 +2,8 @@
 // like any other module script — see api.astro for why the page needs a
 // script at all (full-page Scalar reference, mounted outside Starlight).
 import { createApiReference } from '@scalar/api-reference';
-// import { h } from 'vue';
-// import { ALPHA_BANNER_TEXT } from '../site-meta';
 
-// const AlphaBannerView = (props: { text: string }) => h('div', { class: 'odal-banner' }, props.text);
 
-// const alphaBannerPlugin = () => ({
-//   name: 'odal-alpha-banner',
-//   extensions: [],
-//   views: {
-//     'content.start': [
-//       {
-//         component: AlphaBannerView,
-//         props: {
-//           text: ALPHA_BANNER_TEXT,
-//         },
-//       },
-//     ],
-//   },
-// }) as any;
 
 createApiReference('#scalar-api-reference', {
   url: '/openapi.yaml',
@@ -34,8 +17,15 @@ createApiReference('#scalar-api-reference', {
   // The page has no theme toggle of its own: Starlight's setting (written by
   // the docs shell's ThemeSelect) is the single source of truth, applied
   // before first paint by the inline script in api.astro and kept live below.
+  // Scalar's request client defaults to relaying through proxy.scalar.com. A
+  // reader trying an endpoint against their own node would send the request —
+  // and any API key they typed in — through a third party. No proxy: requests
+  // go direct or not at all.
+  // Empty string, not undefined: the bundle resolves this with a `?? ""`
+  // fallback, so an undefined value falls through to the library default
+  // rather than overriding it.
+  proxyUrl: '',
   hideDarkModeToggle: true,
-  // plugins: [alphaBannerPlugin],
 });
 
 // Keep the resolved theme live after first paint, mirroring exactly what

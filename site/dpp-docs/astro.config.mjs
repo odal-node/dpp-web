@@ -1,10 +1,9 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   site: 'https://docs.odal-node.io',
-  // Renamed pages keep their old URLs working (WEB_CONTENT_STRATEGY.md §6).
+  // Renamed pages keep their old URLs working.
   redirects: {
     // Design pages removed; redirect to the closest living equivalent.
     '/design/no-touch-data': '/getting-started/what-odal-can-and-cannot-see',
@@ -39,9 +38,9 @@ export default defineConfig({
         dark: './src/assets/logo-dark.svg',
         replacesTitle: false,
       },
-      social: {
-        github: 'https://github.com/odal-node/dpp-core',
-      },
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/odal-node/dpp-core' },
+      ],
       favicon: '/favicon.svg',
       head: [
         { tag: 'meta', attrs: { property: 'og:image', content: 'https://docs.odal-node.io/favicon.svg' } },
@@ -79,7 +78,7 @@ export default defineConfig({
             { label: 'Operating securely', link: '/engine/security' },
             { label: 'Self-Hosting', link: '/engine/self-hosted' },
             { label: 'The CLI', link: '/engine/cli' },
-            // { label: 'Licensing', link: '/engine/licensing' },
+            { label: 'Licensing', link: '/engine/licensing' },
           ],
         },
         {
@@ -89,7 +88,9 @@ export default defineConfig({
             { label: 'ESPR Overview', link: '/regulatory/espr' },
             { label: 'Battery DPP', link: '/regulatory/battery' },
             { label: 'Textile DPP', link: '/regulatory/textile' },
-            { label: 'Electronics DPP', link: '/regulatory/electronics' },
+            // Electronics DPP is withdrawn pending a rewrite — its source is
+            // `_electronics.mdx`, which the underscore keeps out of the content
+            // collection. Restore this entry with the page, not before it.
             { label: 'Access Control', link: '/regulatory/access-control' },
             { label: 'EU Central Registry', link: '/regulatory/central-registry' },
           ],
@@ -103,8 +104,5 @@ export default defineConfig({
       customCss: ['./src/styles/custom.css'],
     }),
   ],
-  vite: {
-    plugins: [viteStaticCopy({ targets: [{ src: '../../public/brand', dest: '' }] })],
-  },
   output: 'static',
 });

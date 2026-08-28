@@ -1,13 +1,13 @@
 ---
 // GetStarted.astro — navy terminal block with the quick-start commands.
-// RULE (WEB_CONTENT_STRATEGY.md §4.7): whatever is printed here must be the
+// RULE: whatever is printed here must be the
 // tested self-host path. If the quick-start changes, this component changes
 // in the same PR. Entrypoint = dpp-engine/docker/docker-compose.yml
 // (node internal port 8000, mapped to host 8001 by default).
 const commands = [
   "git clone https://github.com/odal-node/dpp-engine",
-  "cd dpp-engine/docker && docker compose up -d",
-  "curl localhost:8001/health",
+  "cargo build -p dpp-cli --release",
+  "./target/release/odal up",
 ];
 ---
 
@@ -16,7 +16,7 @@ const commands = [
     <p class="mb-3 text-xs font-semibold uppercase tracking-widest text-primary-300">
       Get started
     </p>
-    <h2 class="mb-6 text-3xl font-bold text-white">Three commands to a running node.</h2>
+    <h2 class="mb-6 text-3xl font-bold text-white">Three commands to a running node — the first build takes a few minutes.</h2>
     <div class="max-w-2xl rounded-md border border-primary-800 bg-primary-800/60 p-5 font-mono text-sm leading-7 text-primary-100">
       {commands.map((c) => (
         <p class="m-0 whitespace-pre-wrap break-all">
