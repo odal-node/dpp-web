@@ -1,0 +1,161 @@
+name: Sync API spec pin
+
+# Proposes a bump of the vendored OpenAPI spec. It opens a pull request; it
+# never pushes to main, and it never turns an unrelated pull request red.
+#
+# WHY A PULL REQUEST AND NOT A GATE
+#
+# site/dpp-docs/scripts/sync-openapi.mjs compares the vendored copy against the
+# spec at the commit recorded in openapi-source.json — deliberately not against
+# whatever is currently on the engine's main. Pinning is what keeps this repo's
+# CI deterministic: an unrelated merge in the engine cannot redden a pull
+# request here, and a correction that must land in both repos does not deadlock
+# on which one merges first. See that script's header.
+#
+# This job does not change that. The pinned-commit check in ci.yml is untouched
+# and remains the gate. All this does is notice the pin has fallen behind and
+# put the bump in front of a human as a reviewable diff — which is what the
+# "reviewable line in a diff" in openapi-source.json's comment describes, done
+# on a schedule instead of from memory.
+
+on:
+  schedule:
+    # 03:17 UTC — off the hour, so this is not queued behind everything else
+    # that runs at midnight.
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+# Scoped on the job, not the workflow, and this is the only workflow in the repo
+# that writes anything.
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Bump the vendored API spec
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      # Full history: the sync script reads the spec out of the engine's git
+      # objects, and records the commit it copied from.
+      - name: Checkout dpp-engine (source of the vendored API spec)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: odal-node/dpp-engine
+          path: .dpp-engine
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sync the vendored spec and its pin
+        run: pnpm run sync:openapi
+        env:
+          DPP_ENGINE_DIR: ${{ github.workspace }}/.dpp-engine
+
+      - name: Is there anything to propose?
+        id: diff
+        run: |
+          if git diff --quiet -- site/dpp-docs/public/openapi.yaml site/dpp-docs/openapi-source.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "The pin is already current. Nothing to propose."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git --no-pager diff --stat -- site/dpp-docs/public/openapi.yaml site/dpp-docs/openapi-source.json
+          fi
+
+      # The same checks ci.yml runs, executed here rather than trusted to run
+      # later. A pull request opened with GITHUB_TOKEN does not trigger workflow
+      # runs — GitHub blocks that to stop workflows recursing — so without this
+      # the bump would arrive with no evidence attached. If SYNC_PAT is
+      # configured the pull request does get a normal CI run as well, and this
+      # step is then belt and braces.
+      - name: Verify the bumped copy builds and passes its own checks
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          pnpm run check:openapi
+          pnpm -r build
+          pnpm -r check
+          pnpm run check:links
+          pnpm run check:leakage
+        env:
+          DPP_ENGINE_DIR: ${{ github.workspace }}/.dpp-engine
+
+      # A PAT makes the pull request trigger CI like a human's would, which
+      # matters because main requires passing checks and GITHUB_TOKEN pull
+      # requests never get them. Without the secret this still works — the
+      # request is opened, and a reviewer closing and reopening it starts CI.
+      - name: Choose a token
+        if: steps.diff.outputs.changed == 'true'
+        id: token
+        env:
+          SYNC_PAT: ${{ secrets.SYNC_PAT }}
+        run: |
+          if [ -n "$SYNC_PAT" ]; then
+            echo "ci_runs=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ci_runs=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::SYNC_PAT is not configured. The pull request will open but CI will not run on it automatically; close and reopen it to start a run."
+          fi
+
+      # A fixed branch, force-updated. A second night's bump supersedes the
+      # first rather than opening a second request against the same file.
+      - name: Open or update the pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_PAT || github.token }}
+          CI_RUNS: ${{ steps.token.outputs.ci_runs }}
+        run: |
+          set -euo pipefail
+          BRANCH=chore/sync-openapi-pin
+          PIN=$(node -p "require('./site/dpp-docs/openapi-source.json').commit")
+          SHORT=${PIN:0:9}
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add site/dpp-docs/public/openapi.yaml site/dpp-docs/openapi-source.json
+          git commit -m "chore(docs): bump the vendored API spec to ${SHORT}"
+          git push --force origin "$BRANCH"
+
+          if gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
+            echo "Pull request already open for $BRANCH; the force-push updated it."
+            exit 0
+          fi
+
+          cat > /tmp/pr-body.md <<EOF
+          The vendored \`public/openapi.yaml\` and its pin now point at
+          \`odal-node/dpp-engine@${SHORT}\`.
+
+          Opened automatically because the pin had fallen behind. The
+          pinned-commit drift check in CI is unchanged — this only moves the
+          pin, deliberately and reviewably.
+
+          Build, checks, links, leakage and the spec drift check were all run
+          against this content in the sync job before this request was opened.
+          EOF
+
+          if [ "$CI_RUNS" != "true" ]; then
+            printf '\n> CI does not run automatically on a pull request opened with the default token. Close and reopen this request to start a run.\n' >> /tmp/pr-body.md
+          fi
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore(docs): bump the vendored API spec to ${SHORT}" \
+            --body-file /tmp/pr-body.md
