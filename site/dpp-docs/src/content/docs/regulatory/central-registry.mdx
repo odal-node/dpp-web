@@ -15,7 +15,7 @@ This design is the right one because it lets the regulation centralise discovery
 
 ## What the registry requires of implementations
 
-The registry went live on **20 July 2026**, meeting the Commission's own Art. 13 deadline, and the implementing act adopted under Art. 13(5) sets out how registration works. So the requirements are no longer expectations: a published passport is registered with its unique identifier, the registration carries the resolver endpoint, and the registering platform keeps it in sync as passports are suspended or archived.
+The registry went live on **20 July 2026**, meeting the Commission's own Art. 13 deadline, and the implementing act adopted under Art. 13(5) sets out how registration works. So the requirements are no longer expectations: a published passport is registered with its unique identifier, the registration carries the resolver endpoint, and the registering platform keeps it in sync as passports are suspended or retired.
 
 Odal has prepared for this beyond modelling the interface: **every published passport already commits its registration intent to a durable outbox, in the same database transaction as the publish itself.** A background worker drains that outbox with retry and backoff. The practical consequence: publishing never blocks on the registry, a crash never loses a registration, and a backlog accumulated during an outage drains without a single passport falling through.
 
