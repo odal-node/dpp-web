@@ -29,3 +29,9 @@ jobs:
 
       - name: Check
         run: pnpm -r check
+      # llms.txt is a hand-written index of pages worth reading, and nothing
+      # else parses it — it is a static file in public/, so no build step and
+      # no link checker reaches it. Runs after the build because it compares
+      # each URL against dist/, which is the artifact actually deployed.
+      - name: llms.txt points only at pages that were built
+        run: pnpm run check:llms

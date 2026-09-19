@@ -19,7 +19,6 @@ Status: pre-1.0, in active development, no production deployments.
 ## Pages
 
 - [Home](https://odal-node.io/): what Odal Node is and who it is for.
-- [Trust](https://odal-node.io/trust/): what the node can and cannot see, and what is signed.
 - [Privacy](https://odal-node.io/privacy/): how this website handles data — no cookies, no analytics, no trackers.
 - [Waitlist](https://odal-node.io/waitlist/): deliberately backend-free; joining means sending an email, nothing is stored by the site.
 
