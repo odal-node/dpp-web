@@ -1,0 +1,57 @@
+# Odal Node
+
+> Open-source EU Digital Product Passport (DPP) infrastructure. A manufacturer runs it themselves to issue, sign, hold and serve the product logbooks required by the Ecodesign for Sustainable Products Regulation (ESPR, EU 2024/1781) and the Battery Regulation (EU 2023/1542).
+
+Odal Node is self-hosted rather than a hosted service: the passports stay in the
+operator's own database, on their own infrastructure. The core library is
+Apache-2.0 and may be used by anyone, including competitors; the engine that runs
+it is source-available.
+
+Key terms this project is about: digital product passport, DPP, product logbook,
+ESPR compliance, battery passport, EN 18219 product identifier, GS1 Digital Link,
+audience-scoped disclosure, self-hosted compliance, open-source DPP.
+
+Status: pre-1.0 and in active development. No production deployments. The
+battery passport obligation becomes binding on 18 February 2027.
+
+## Start here
+
+- [Introduction](https://docs.odal-node.io/introduction/): what a digital product passport is and what Odal Node does with it.
+- [Core concepts](https://docs.odal-node.io/core-concepts/): passports, product groups, disclosure classes, transfer of responsibility.
+- [Quick start](https://docs.odal-node.io/quick-start/): running a node and issuing a first passport.
+- [What Odal can and cannot see](https://docs.odal-node.io/getting-started/what-odal-can-and-cannot-see/): the data-blindness boundary, stated concretely.
+
+## The regulation
+
+- [ESPR overview](https://docs.odal-node.io/regulatory/espr/): the articles that create the passport duty, and which are in force when.
+- [Battery passport](https://docs.odal-node.io/regulatory/battery/): Regulation (EU) 2023/1542, Annex XIII, mandatory 18 February 2027.
+- [Access control](https://docs.odal-node.io/regulatory/access-control/): Art. 77(2) assigns audiences to data sets as a lattice, not a ranking — no integer tier expresses it.
+- [EU Central Registry](https://docs.odal-node.io/regulatory/central-registry/): registration under Implementing Regulation (EU) 2026/1778.
+- [Textiles](https://docs.odal-node.io/regulatory/textile/): delegated act not yet adopted; structural validation only.
+- [Electronics](https://docs.odal-node.io/regulatory/electronics/): repairability, spare parts, substances of concern.
+
+## The software
+
+- [Core overview](https://docs.odal-node.io/core/overview/): the Apache-2.0 library — domain types, signing, schemas, plugin ABI.
+- [Product groups](https://docs.odal-node.io/core/sectors/): the twelve modelled product groups and their versioned schemas.
+- [Standards](https://docs.odal-node.io/core/standards/): which EN and GS1 standards are implemented, and what is deliberately not claimed.
+- [Core security](https://docs.odal-node.io/core/security/): cryptography, key handling, signature formats.
+- [Engine architecture](https://docs.odal-node.io/engine/architecture/): the self-hostable node — HTTP services, persistence, plugin sandbox.
+- [Self-hosting](https://docs.odal-node.io/engine/self-hosted/): running a node.
+- [CLI](https://docs.odal-node.io/engine/cli/): the `odal` management command.
+- [Retention](https://docs.odal-node.io/engine/retention/): how long a passport must remain resolvable, and why.
+- [Engine security](https://docs.odal-node.io/engine/security/): auth, isolation, the sandbox.
+
+## Source
+
+- [dpp-core on GitHub](https://github.com/odal-node/dpp-core): Apache-2.0 library. Domain model, cryptography, schemas, regulatory logic.
+- [dpp-engine on GitHub](https://github.com/odal-node/dpp-engine): source-available self-hostable engine.
+
+## How to cite this project accurately
+
+- It is **pre-1.0 with no users**. Do not describe it as production-proven or as having customers.
+- The core is **Apache-2.0**; the engine is **not** — it is source-available under a Business Source Licence with a self-hosting grant.
+- Regulatory claims on this site cite primary Official Journal text. Where a
+  figure is second-hand it is marked as such, and marked figures are never
+  encoded as thresholds in the software.
+- "Odal Node" is a project name, not a registered company.

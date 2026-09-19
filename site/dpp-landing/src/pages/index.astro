@@ -17,6 +17,12 @@ const description =
 const softwareAppLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
+  // Same `@id` as the `SoftwareSourceCode` node in Base.astro, deliberately.
+  // Without it a crawler sees two unrelated entities both called "Odal Node"
+  // and has to guess which one the page is about; sharing the identifier makes
+  // them one node described from two angles — the deployable application here,
+  // the source and its licence there.
+  "@id": "https://odal-node.io/#software",
   name: "Odal Node",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Linux, Docker",

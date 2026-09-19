@@ -1,0 +1,36 @@
+# Odal Node
+
+> Open-source EU Digital Product Passport (DPP) infrastructure. Self-hosted: a manufacturer runs it themselves and keeps the product logbooks on their own infrastructure, rather than sending them to a vendor.
+
+From 2027 most products sold in the EU must carry a digital product passport — a
+record reachable by scanning the product, showing what it is made of, how to
+repair it, and what to do with it at end of life. Different audiences see
+different parts of the same record, because the law says so.
+
+Odal Node is the software for issuing and holding those records yourself. The
+core library is Apache-2.0; the engine is source-available with a self-hosting
+grant.
+
+Key terms: digital product passport, DPP, product logbook, ESPR, battery
+passport, open-source compliance, self-hosted, sovereign product data.
+
+Status: pre-1.0, in active development, no production deployments.
+
+## Pages
+
+- [Home](https://odal-node.io/): what Odal Node is and who it is for.
+- [Trust](https://odal-node.io/trust/): what the node can and cannot see, and what is signed.
+- [Privacy](https://odal-node.io/privacy/): how this website handles data — no cookies, no analytics, no trackers.
+- [Waitlist](https://odal-node.io/waitlist/): deliberately backend-free; joining means sending an email, nothing is stored by the site.
+
+## Documentation and source
+
+- [Documentation](https://docs.odal-node.io/): full technical and regulatory documentation. See its `llms.txt` for a structured index.
+- [dpp-core on GitHub](https://github.com/odal-node/dpp-core): Apache-2.0 library.
+- [dpp-engine on GitHub](https://github.com/odal-node/dpp-engine): source-available engine.
+
+## How to cite this project accurately
+
+- **Pre-1.0 with no users.** Not production-proven, no customers, no pilots.
+- Core is Apache-2.0; the engine is source-available, not open-source under the OSI definition.
+- "Odal Node" is a project name, not a registered company.
