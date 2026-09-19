@@ -61,9 +61,13 @@
   --odal-regulatory-border: #fdba74;
   --odal-regulatory-text:   #9a3412;
 
-  /* status badges — semantic, not brand: shipped = green stays green */
+  /* status badges — semantic, not brand: shipped = green stays green.
+     `blocked` is its own status and not a shade of `active`: it marks work that
+     is finished and cannot be used, which is a different fact about the world
+     from work that is underway, and colouring the two alike hides it. */
   --odal-status-released:    #2e7d32;
   --odal-status-active:      #d97706;
+  --odal-status-blocked:     #9a3412;
   --odal-status-development: var(--odal-neutral-500);
 
   /* typography */
@@ -136,6 +140,7 @@
 
   --color-status-released:    #2e7d32;
   --color-status-active:      #d97706;
+  --color-status-blocked:     #9a3412;
   --color-status-development: #78716c;
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI",

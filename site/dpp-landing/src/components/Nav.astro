@@ -8,12 +8,13 @@ import StatusBadge from "./StatusBadge.astro";
 // mark inherits the wordmark's colour. Astro 5 imports .svg as a component.
 import OdalMark from "../assets/favicon.svg";
 
+// The nav stays at two destinations plus the CTA. Roadmap, Lifecycle, Who sees
+// what and the product groups are reached from the footer instead: they are
+// pages a reader goes looking for once, not places to move between, and a nav
+// bar that lists everything stops telling anyone where to start.
 const links = [
   { href: "https://docs.odal-node.io", label: "Docs", external: true },
   // { href: "/trust", label: "Trust", external: false },
-  { href: "/roadmap", label: "Roadmap", external: false },
-  { href: "/lifecycle", label: "Lifecycle", external: false },
-  { href: "/who-sees-what", label: "Who sees what", external: false },
   // { href: "/about", label: "About", external: false },
   { href: "https://github.com/odal-node", label: "GitHub", external: true },
 ];

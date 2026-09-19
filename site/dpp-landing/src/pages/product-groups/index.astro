@@ -1,0 +1,151 @@
+---
+// /product-groups — the index for the twelve generated product-group pages.
+//
+// This exists so the footer carries one link rather than twelve, and so there
+// is a single page that answers "which product groups does this cover?" —
+// a question asked far more often than any individual group's schema version.
+//
+// Like the detail pages, everything here is read from the manifests vendored
+// out of dpp-core at a pinned commit. Nothing is written by hand, so the count
+// cannot drift from the software.
+import Base from "../../layouts/Base.astro";
+import Section from "../../components/Section.astro";
+import pin from "../../../product-groups-source.json";
+
+type Manifest = {
+  key: string;
+  title: string;
+  schemaVersions: string[];
+  currentSchemaVersion: string;
+  productCategories?: string[];
+  disclosure?: Record<string, string>;
+  plugin?: string;
+  notes?: string;
+};
+
+const modules = import.meta.glob("../../data/product-groups/*.json", { eager: true });
+const groups = Object.values(modules)
+  .map((m: any) => (m.default ?? m) as Manifest)
+  .sort((a, b) => a.title.localeCompare(b.title));
+
+// Distinct plugins, not manifests naming one: two groups share a plugin, so
+// counting manifests reports one more than exists. The roadmap page counts the
+// distinct set, and two pages on one site disagreeing about a number is worse
+// than either number being slightly less flattering.
+const boundToPlugin = groups.filter((g) => g.plugin).length;
+const withPlugin = new Set(groups.filter((g) => g.plugin).map((g) => g.plugin)).size;
+const withDisclosure = groups.filter((g) => Object.keys(g.disclosure ?? {}).length > 0).length;
+const schemaVersions = groups.reduce((n, g) => n + (g.schemaVersions?.length ?? 0), 0);
+
+const title = "Product groups — what Odal Node models | Odal Node";
+const description = `The ${groups.length} product groups Odal Node models, with their current schema version, compliance plugin and disclosure classes. Generated from the manifests the software reads.`;
+
+// An ItemList is the one structured-data type that genuinely describes this
+// page. It is a list of pages, and saying so is neither a rating nor a claim.
+const itemListLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Product groups modelled by Odal Node",
+  numberOfItems: groups.length,
+  itemListElement: groups.map((g, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: g.title,
+    url: `https://odal-node.io/product-groups/${g.key}`,
+  })),
+};
+---
+
+<Base title={title} description={description} jsonLd={[itemListLd]}>
+  <Section eyebrow="Product groups" title={`${groups.length} product groups, generated from the software.`} wide>
+    <p>
+      A product group decides which schema a passport is validated against and
+      which rules run over it. Each page below is generated from the manifest
+      the software itself reads, so a page cannot claim a schema version the
+      code does not serve.
+    </p>
+    <p>
+      <strong>Modelled is not the same as mandated.</strong> Most of these have
+      no delegated act yet. Modelling one early means the schema, the rules and
+      the disclosure split exist to be argued with now, rather than written in a
+      hurry once a date is fixed — and every page says plainly where its fields
+      are a best reading rather than a requirement.
+    </p>
+
+    <div class="not-prose mt-8 grid gap-4 sm:grid-cols-3">
+      <div class="rounded-lg border border-neutral-200 p-5">
+        <p class="text-xs uppercase tracking-widest text-neutral-500">Schema versions</p>
+        <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{schemaVersions}</p>
+        <p class="mt-1 text-sm text-neutral-600">across {groups.length} groups, all still served</p>
+      </div>
+      <div class="rounded-lg border border-neutral-200 p-5">
+        <p class="text-xs uppercase tracking-widest text-neutral-500">Compliance plugins</p>
+        <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{withPlugin}</p>
+        <p class="mt-1 text-sm text-neutral-600">sandboxed WebAssembly, bound to {boundToPlugin} of the {groups.length} groups</p>
+      </div>
+      <div class="rounded-lg border border-neutral-200 p-5">
+        <p class="text-xs uppercase tracking-widest text-neutral-500">With a disclosure split</p>
+        <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{withDisclosure}</p>
+        <p class="mt-1 text-sm text-neutral-600">the rest await a delegated act</p>
+      </div>
+    </div>
+  </Section>
+
+  <Section eyebrow="The list" title="Every product group modelled today." tone="muted" wide>
+    <div class="not-prose grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {groups.map((g) => {
+        const classes = new Set(Object.values(g.disclosure ?? {}));
+        return (
+          <a
+            href={`/product-groups/${g.key}`}
+            class="flex flex-col rounded-lg border border-neutral-200 bg-white p-5 no-underline transition hover:border-primary-400"
+          >
+            <div class="flex items-baseline justify-between gap-3">
+              <h3 class="m-0 text-lg font-semibold text-neutral-900">{g.title}</h3>
+              <span class="shrink-0 font-mono text-sm text-neutral-500">
+                v{g.currentSchemaVersion}
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-neutral-600">
+              {g.schemaVersions.length} schema version{g.schemaVersions.length === 1 ? "" : "s"}
+              {g.productCategories?.length ? ` · ${g.productCategories.length} categories` : ""}
+            </p>
+            <div class="mt-3 flex flex-wrap gap-1.5">
+              {g.plugin ? (
+                <span class="rounded bg-primary-50 px-2 py-0.5 font-mono text-[11px] text-primary-800">
+                  plugin
+                </span>
+              ) : (
+                <span class="rounded bg-neutral-100 px-2 py-0.5 font-mono text-[11px] text-neutral-500">
+                  no plugin
+                </span>
+              )}
+              {[...classes].sort().map((c) => (
+                <span class="rounded bg-neutral-100 px-2 py-0.5 font-mono text-[11px] text-neutral-600">
+                  {c}
+                </span>
+              ))}
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </Section>
+
+  <Section eyebrow="Provenance" title="Where this list comes from." tone="tinted">
+    <p>
+      Every figure above is counted from <code>{pin.path}</code> in{" "}
+      <a href={`https://github.com/${pin.repository}`}>{pin.repository}</a>,
+      vendored at commit <code>{pin.commit.slice(0, 8)}</code>. A build here
+      fails if the vendored copies drift from that commit, so this page cannot
+      quietly fall behind the library.
+    </p>
+    <p>
+      <strong>No act numbers or dates appear on these pages deliberately.</strong>{" "}
+      The manifests carry no law — obligations and effective dates live in
+      separate instrument manifests that are not vendored here. A regulatory
+      date published on a marketing site is a claim that has to be kept current,
+      and a stale one is worse than none.
+    </p>
+  </Section>
+</Base>

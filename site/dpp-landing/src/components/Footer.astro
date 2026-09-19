@@ -7,8 +7,8 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="bg-primary-900 text-primary-200">
-  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 text-sm sm:px-6 md:grid-cols-3 lg:px-8">
-    <div>
+  <div class="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 text-sm sm:grid-cols-2 sm:px-6 lg:grid-cols-12 lg:px-8">
+    <div class="lg:col-span-4">
       <p class="mb-2 flex items-center gap-2 font-semibold text-white">
         <OdalMark aria-hidden="true" class="h-6 w-6 shrink-0 text-primary-300" />
         Odal Node
@@ -24,23 +24,36 @@ const year = new Date().getFullYear();
       </p> -->
     </div>
 
-    <div>
+    <!-- The pages the nav deliberately does not carry. Each is read once and
+         then referred back to, which is a footer job rather than a nav one. -->
+    <div class="lg:col-span-3">
+      <p class="mb-2 font-semibold text-white">Explore</p>
+      <ul class="m-0 list-none space-y-1 p-0">
+        <li><a class="text-primary-200 hover:text-white" href="/lifecycle">The chain of custody</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="/who-sees-what">Who sees what</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="/roadmap">Roadmap</a></li>
+      </ul>
+    </div>
+
+    <!-- One route, not twelve links. The index page counts and lists them from
+         the same vendored manifests the pages themselves are generated from. -->
+    <div class="lg:col-span-2">
+      <p class="mb-2 font-semibold text-white">Product groups</p>
+      <ul class="m-0 list-none space-y-1 p-0">
+        <li><a class="text-primary-200 hover:text-white" href="/product-groups">All product groups</a></li>
+      </ul>
+    </div>
+
+    <div class="lg:col-span-3">
       <p class="mb-2 font-semibold text-white">Project</p>
       <ul class="m-0 list-none space-y-1 p-0">
         <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-core">dpp-core on GitHub</a></li>
         <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-engine">dpp-engine on GitHub</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="/privacy">Privacy policy</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-engine/blob/main/SECURITY.md">Security policy</a></li>
       </ul>
     </div>
 
-    <div>
-      <p class="mb-2 font-semibold text-white">Privacy &amp; security</p>
-      <ul class="m-0 list-none space-y-1 p-0">
-        <!-- <li><a class="text-primary-200 hover:text-white" href="/contact">Contact</a></li> -->
-        <li><a class="text-primary-200 hover:text-white" href="/privacy">Privacy policy</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-engine/blob/main/SECURITY.md">Security policy</a></li>
-        <!-- <li><a class="text-primary-200 hover:text-white" href="mailto:contact@odal-node.io">contact@odal-node.io</a></li> -->
-      </ul>
-    </div>
   </div>
 
   <div class="border-t border-primary-800">

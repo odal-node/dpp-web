@@ -28,6 +28,7 @@ type Manifest = {
   productCategories?: string[];
   disclosure?: Record<string, string>;
   plugin?: string;
+  notes?: string;
 };
 
 export function getStaticPaths() {
@@ -91,6 +92,20 @@ const description = `What Odal Node models for ${manifest.title.toLowerCase()}: 
       </div>
     </div>
   </Section>
+
+  {manifest.notes ? (
+    <Section eyebrow="Caveats" title="What the maintainers record about this group.">
+      <p>
+        This is the manifest's own <code>notes</code> field, reproduced verbatim.
+        It is where a group says which of its fields are a best reading rather
+        than a requirement, and it is written for the people maintaining the
+        schema rather than for this page.
+      </p>
+      <blockquote class="border-l-4 border-primary-300 pl-4 text-neutral-700">
+        {manifest.notes}
+      </blockquote>
+    </Section>
+  ) : null}
 
   {manifest.productCategories?.length ? (
     <Section eyebrow="Categories" title="Categories this product group distinguishes." tone="muted">

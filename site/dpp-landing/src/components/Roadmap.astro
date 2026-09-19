@@ -1,42 +1,109 @@
 ---
-// Roadmap.astro — three-column status display. Data lives in src/data/roadmap.json
-// so editors change JSON, not components.
-// Status enum: shipped | in-build | horizon — the "honest status" framing.
+// Roadmap.astro — the four registers, each grouped by capability area.
+// Data lives in src/data/roadmap.json so editors change JSON, not components.
+//
+// WHY FOUR AND NOT THREE
+//
+// The previous version had Shipped / In build / Horizon, and the seal and
+// registry work sat under "in build" with the words "in progress" and "gated on
+// upstream blockers". Both are finished. Neither can be used, because an
+// electronic seal may only be created by a legal person and there is no company
+// — which is not an engineering schedule and does not belong in a column that
+// reads like one. `blocked` says the true thing: built, and legally inert.
+//
+// WHY EVERY ITEM CARRIES EVIDENCE
+//
+// A roadmap is the easiest page on a site to write optimistically, because
+// nothing on it is checkable. Each item here names a crate, a command, a route
+// or a page, so a reader who doubts a line can go and settle it. An item that
+// cannot name one is an item we should not be making a claim about.
 import data from "../data/roadmap.json";
 
-type Status = "shipped" | "in-build" | "horizon";
-const { columns } = data as {
-  columns: {
-    status: Status;
-    title: string;
-    description: string;
-    items: { label: string; detail: string }[];
-  }[];
+type Status = "shipped" | "blocked" | "in-build" | "horizon";
+type Item = { label: string; detail: string; evidence?: string };
+type Area = { area: string; items: Item[] };
+
+const { registers } = data as unknown as {
+  registers: { status: Status; title: string; description: string; areas: Area[] }[];
 };
 
-const dotClass: Record<Status, string> = {
+const dot: Record<Status, string> = {
   shipped: "bg-status-released",
+  blocked: "bg-status-blocked",
   "in-build": "bg-status-active",
   horizon: "bg-status-development",
 };
+
+const rule: Record<Status, string> = {
+  shipped: "border-status-released/30",
+  blocked: "border-status-blocked/40",
+  "in-build": "border-status-active/30",
+  horizon: "border-neutral-200",
+};
+
+// An evidence string is rendered as a link when we can resolve it to one, and
+// as plain text otherwise. A command is not a URL, and a citation of the
+// Official Journal is deliberately not linked to a page that may move.
+//
+// An HTTP route is not a link either, however much it looks like one. A path
+// with a `{param}` in it names an endpoint on someone's node, not a page on
+// this site — linking `/01/{gtin}/21/{serial}` produced the one broken link
+// the link checker found on this page.
+const href = (e: string): string | null => {
+  if (e.startsWith("/")) return e.includes("{") ? null : e;
+  if (e.startsWith("crates.io/")) return `https://${e}`;
+  if (e.startsWith("github.com/")) return `https://${e}`;
+  if (e.startsWith("docs.odal-node.io/")) return `https://${e}`;
+  return null;
+};
 ---
 
-<div class="grid gap-8 md:grid-cols-3">
-  {columns.map((col) => (
-    <article class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
-      <header class="mb-4 flex items-center gap-2">
-        <span class={`inline-block h-2.5 w-2.5 rounded-full ${dotClass[col.status]}`}></span>
-        <h3 class="m-0 text-lg font-semibold text-neutral-900">{col.title}</h3>
+<div class="space-y-14">
+  {registers.map((reg) => (
+    <section aria-labelledby={`reg-${reg.status}`}>
+      <header class={`border-b pb-4 ${rule[reg.status]}`}>
+        <h3 id={`reg-${reg.status}`} class="m-0 flex items-center gap-2.5 text-xl font-bold text-neutral-900">
+          <span class={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${dot[reg.status]}`}></span>
+          {reg.title}
+        </h3>
+        <p class="m-0 mt-2 max-w-3xl text-sm leading-relaxed text-neutral-600">
+          {reg.description}
+        </p>
       </header>
-      <p class="mb-4 text-sm text-neutral-600">{col.description}</p>
-      <ul class="m-0 list-none space-y-3 p-0">
-        {col.items.map((it) => (
-          <li>
-            <p class="m-0 text-sm font-medium text-neutral-900">{it.label}</p>
-            <p class="m-0 text-xs leading-relaxed text-neutral-500">{it.detail}</p>
-          </li>
+
+      <div class="mt-6 space-y-8">
+        {reg.areas.map((area) => (
+          <div class="grid gap-x-8 gap-y-3 md:grid-cols-[13rem_1fr]">
+            <p class="m-0 text-sm font-semibold text-neutral-900 md:pt-1">
+              {/* One area repeated per register would be noise, so a register
+                  with a single catch-all area prints no heading at all. */}
+              {reg.areas.length > 1 ? area.area : ""}
+            </p>
+            <ul class="m-0 list-none space-y-5 p-0">
+              {area.items.map((it) => (
+                <li>
+                  <p class="m-0 font-medium text-neutral-900">{it.label}</p>
+                  <p class="m-0 mt-1 text-sm leading-relaxed text-neutral-600">{it.detail}</p>
+                  {it.evidence && (
+                    <p class="m-0 mt-1.5">
+                      {href(it.evidence) ? (
+                        <a
+                          href={href(it.evidence)}
+                          class="font-mono text-xs text-primary-700 no-underline hover:underline"
+                        >
+                          {it.evidence}
+                        </a>
+                      ) : (
+                        <span class="font-mono text-xs text-neutral-500">{it.evidence}</span>
+                      )}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
-    </article>
+      </div>
+    </section>
   ))}
 </div>
