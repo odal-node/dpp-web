@@ -1,0 +1,32 @@
+---
+// ExternalArrow.astro — the mark on a link that takes you off this site.
+//
+// Used by the nav (Docs) and the footer (GitHub, the security policy). The
+// point is that a reader can tell, before clicking, which links leave — the
+// nav and footer otherwise look identical whether a destination is a page here
+// or someone else's domain.
+//
+// Decorative on purpose: `aria-hidden`, with no "opens in a new tab" label,
+// because these links do not open a new tab. Announcing one would be a claim
+// about behaviour that does not happen.
+interface Props {
+  /** Extra classes, for tuning size or colour at the call site. */
+  class?: string;
+}
+const { class: extra = "" } = Astro.props;
+---
+
+<svg
+  width="12"
+  height="12"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  class={`inline-block shrink-0 translate-y-[-1px] opacity-70 ${extra}`}
+>
+  <path d="M7 17 17 7M9 7h8v8" />
+</svg>

@@ -3,6 +3,7 @@
 // Uses the shared brand mark (currentColor variant) tinted ice for the dark band,
 // so it stays in sync with the asset instead of a hand-rolled inline copy.
 import OdalMark from "../assets/favicon.svg";
+import ExternalArrow from "./ExternalArrow.astro";
 const year = new Date().getFullYear();
 ---
 
@@ -17,7 +18,7 @@ const year = new Date().getFullYear();
         Signed by you. Verified by anyone.
       </p>
       <p class="mt-2 leading-body text-primary-300/80">
-        Sovereign Digital Product Passport infrastructure for EU ESPR.
+        Sovereign Digital Product Passport infrastructure
       </p>
       <!-- <p class="mt-3 leading-body text-primary-300/80">
         Apache-2.0 core — anyone may build on it.
@@ -28,7 +29,7 @@ const year = new Date().getFullYear();
          then referred back to, which is a footer job rather than a nav one. -->
     <div class="lg:col-span-3">
       <p class="mb-2 font-semibold text-white">Explore</p>
-      <ul class="m-0 list-none space-y-1 p-0">
+      <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/lifecycle">The chain of custody</a></li>
         <li><a class="text-primary-200 hover:text-white" href="/who-sees-what">Who sees what</a></li>
         <li><a class="text-primary-200 hover:text-white" href="/roadmap">Roadmap</a></li>
@@ -39,18 +40,20 @@ const year = new Date().getFullYear();
          the same vendored manifests the pages themselves are generated from. -->
     <div class="lg:col-span-2">
       <p class="mb-2 font-semibold text-white">Product groups</p>
-      <ul class="m-0 list-none space-y-1 p-0">
+      <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/product-groups">All product groups</a></li>
       </ul>
     </div>
 
     <div class="lg:col-span-3">
-      <p class="mb-2 font-semibold text-white">Project</p>
-      <ul class="m-0 list-none space-y-1 p-0">
-        <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-core">dpp-core on GitHub</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-engine">dpp-engine on GitHub</a></li>
+      <p class="mb-2 font-semibold text-white">Privacy &amp; security</p>
+      <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/privacy">Privacy policy</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-engine/blob/main/SECURITY.md">Security policy</a></li>
+        <li>
+          <a class="text-primary-200 hover:text-white" href="https://github.com/odal-node/dpp-engine/blob/main/SECURITY.md" rel="noopener">
+            Security policy<ExternalArrow class="ml-1" />
+          </a>
+        </li>
       </ul>
     </div>
 
@@ -62,7 +65,7 @@ const year = new Date().getFullYear();
         &copy; {year} Odal Node
       </p>
       <p class="m-0">
-        <a class="text-primary-300/70 hover:text-primary-200" href="https://github.com/odal-node">github.com/odal-node</a>
+        <a class="text-primary-300/70 hover:text-primary-200" href="https://github.com/odal-node" rel="noopener">github.com/odal-node<ExternalArrow class="ml-1" /></a>
       </p>
     </div>
   </div>
