@@ -1,0 +1,81 @@
+{
+  "_comment": "The chain of custody as eight stations — the spine shared by /lifecycle and /main. Endpoints are the engine's real routes. Stations 6, 7 and 8 are the ones the live home page never reaches, and they are the three with no competitor equivalent. Every 'who' is an actor named in law, not an invented persona.",
+  "stations": [
+    {
+      "n": 1,
+      "key": "declare",
+      "title": "Declare",
+      "who": "Manufacturer, importer",
+      "endpoint": "/integrator/api/v1/import/{productGroup}",
+      "lead": "The data arrives the way it actually exists: spreadsheets.",
+      "body": "CSV and Excel, with a dry run that reports errors per row rather than rejecting the file. Nobody's product data starts life in a schema, and a tool that insists otherwise is a tool nobody can start using."
+    },
+    {
+      "n": 2,
+      "key": "evidence",
+      "title": "Evidence",
+      "who": "Supplier, test laboratory",
+      "endpoint": "/api/v1/dpp/{id}/evidence",
+      "lead": "A document a supplier has not sent is visible as a gap, not as a blank.",
+      "body": "Evidence is a first-class object with its own address and its own verification, rather than a field someone filled in. The difference matters when an auditor asks where a number came from."
+    },
+    {
+      "n": 3,
+      "key": "check",
+      "title": "Check",
+      "who": "Compliance lead",
+      "endpoint": "/api/v1/dpp/{id}/lint",
+      "lead": "Checked against the product group's signed ruleset, before anything is signed.",
+      "body": "Rules arrive as signed bundles and are verified fail-closed. When a threshold changes, the ruleset changes — not the software, and not a redeploy."
+    },
+    {
+      "n": 4,
+      "key": "seal",
+      "title": "Seal",
+      "who": "The operator, alone",
+      "endpoint": "/api/v1/dpp/{id}/publish",
+      "lead": "Signed with the operator's own key, on their own infrastructure. Claims freeze here.",
+      "body": "The identity is a did:web in a domain they control. Nothing is sent anywhere to be signed, which is the difference between holding a record and renting access to it."
+    },
+    {
+      "n": 5,
+      "key": "resolve",
+      "title": "Resolve",
+      "who": "Consumer, retailer",
+      "endpoint": "/01/{gtin}/21/{serial}",
+      "lead": "Scan the code, get the public view. No login, no fee — because the regulation says so.",
+      "body": "A GS1 Digital Link when the product is identified by a GTIN, and a plain passport URL when it is not. Requiring the barcode would mean requiring GS1 membership."
+    },
+    {
+      "n": 6,
+      "key": "disclose",
+      "title": "Disclose",
+      "who": "Repairer, recycler, authority",
+      "endpoint": "/credential/dpp/{id}",
+      "lead": "Depth proven by credential, not by a header the caller sets.",
+      "body": "The same record answers differently depending on who is asking, enforced per field. For batteries this is a lattice rather than a ladder: an authority sees less than a recycler in one specific respect.",
+      "unmatched": true,
+      "link": "/who-sees-what"
+    },
+    {
+      "n": 7,
+      "key": "handover",
+      "title": "Hand over",
+      "who": "Two legal entities",
+      "endpoint": "/api/v1/dpp/{id}/transfer/initiate · /accept",
+      "lead": "Responsibility changes hands with both parties' signatures on the record.",
+      "body": "Remanufacture, repurposing, a sold product line. The chain of custody is part of the passport rather than an email thread, and either side can refuse or withdraw.",
+      "unmatched": true
+    },
+    {
+      "n": 8,
+      "key": "end",
+      "title": "End",
+      "who": "Recycler, auditor",
+      "endpoint": "/api/v1/dpp/{id}/eol · /evidence",
+      "lead": "A typed end of life, and a dossier that verifies with no network and no trust in us.",
+      "body": "Passport, signatures, identity documents and the full hash-chained history in one signed file. Someone who has never heard of Odal Node can check it offline.",
+      "unmatched": true
+    }
+  ]
+}

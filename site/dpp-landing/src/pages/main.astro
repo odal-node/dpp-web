@@ -1,0 +1,115 @@
+---
+// /main — the PROPOSED home page, published beside the live one for comparison.
+//
+// Not a replacement. `/` still leads with four steps; this leads with the eight
+// stations. Both are live so they can be read one after the other and the
+// difference argued about with something concrete rather than in the abstract.
+//
+// 🚨 noindex: two pages competing for the same queries is the one certain way to
+// rank for neither, and this one is a draft for an internal decision.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import Hero from "../components/Hero.astro";
+import DeadlineCards from "../components/DeadlineCards.astro";
+import StandardsRow from "../components/StandardsRow.astro";
+import stations from "../data/stations.json";
+
+const title = "Odal Node — the record layer for EU product passports (proposed home)";
+const description =
+  "Proposed home page: leads with the eight-station chain of custody rather than the four publishing steps. Published beside the live home page for comparison.";
+---
+
+<Base title={title} description={description} noindex>
+  <div class="bg-amber-50 border-b border-amber-200">
+    <div class="mx-auto max-w-5xl px-4 py-3 sm:px-6 lg:px-8">
+      <p class="text-sm text-amber-900">
+        <strong>Draft.</strong> This is a proposed replacement for the home page,
+        published beside it so the two can be compared. The live page is{" "}
+        <a href="/" class="font-semibold underline">here</a>. This page is
+        excluded from search engines.
+      </p>
+    </div>
+  </div>
+
+  <Hero
+    eyebrow="EU Digital Product Passports"
+    status
+    title="One record. Eight stations. A decade."
+    subtitle="A product passport is not a document you publish — it is a record that outlives the sale. Odal Node is the layer that holds it: declared from your spreadsheets, signed with your keys, on your infrastructure, answering repairers, recyclers and regulators differently for as long as the product exists."
+    primaryHref="https://docs.odal-node.io/quick-start"
+    primaryLabel="Self-host now"
+    secondaryHref="/lifecycle"
+    secondaryLabel="Follow the record through all eight"
+  />
+
+  <Section eyebrow="The chain of custody" title="Most tools stop at station five." wide>
+    <p>
+      Import, validate, sign, publish, resolve. That is a passport generator, and
+      it is where the difficult half begins — because the product is then
+      repaired, resold, remanufactured and recycled, and the record has to
+      survive all of it.
+    </p>
+
+    <div class="not-prose mt-8 grid gap-3 sm:grid-cols-2">
+      {stations.stations.map((s) => (
+        <a
+          href={`/lifecycle#${s.key}`}
+          class={`block rounded-lg border p-4 no-underline transition hover:border-primary-400 ${
+            s.unmatched ? "border-primary-300 bg-primary-50" : "border-neutral-200 bg-white"
+          }`}
+        >
+          <div class="flex items-baseline gap-3">
+            <span class="font-mono text-xs text-neutral-400">
+              {String(s.n).padStart(2, "0")}
+            </span>
+            <span class="font-semibold text-neutral-900">{s.title}</span>
+            {s.unmatched && (
+              <span class="ml-auto rounded bg-primary-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-800">
+                Unmatched
+              </span>
+            )}
+          </div>
+          <p class="mt-1 text-sm text-neutral-600">{s.who}</p>
+        </a>
+      ))}
+    </div>
+
+    <p class="mt-8">
+      <a href="/lifecycle" class="font-semibold">Read the eight in full →</a>
+    </p>
+  </Section>
+
+  <Section eyebrow="Operate it yourself" title="An authority sees less than a recycler." tone="muted">
+    <p>
+      That is not a slogan — it is Regulation (EU) 2023/1542 Art. 77(2), and it
+      is the part most implementations get wrong by modelling access as a ladder
+      with the regulator on top.
+    </p>
+    <p>
+      Rather than claim we handle it, the page below lets you pick an audience
+      and watch the fields appear and vanish.
+    </p>
+    <p>
+      <a href="/who-sees-what" class="font-semibold">Try it →</a>
+    </p>
+  </Section>
+
+  <Section eyebrow="Why now" title="The deadlines are set." wide>
+    <DeadlineCards />
+  </Section>
+
+  <Section eyebrow="Standards" title="What this is built against." tone="muted" wide>
+    <StandardsRow />
+  </Section>
+
+  <Section eyebrow="Status" title="Nobody is running this in production.">
+    <p>
+      No customers, no pilots, no live deployments. The battery passport
+      obligation begins on 18 February 2027, and we would rather be correct when
+      it arrives than early and wrong.
+    </p>
+    <p>
+      <a href="/roadmap" class="font-semibold">The roadmap says which is which →</a>
+    </p>
+  </Section>
+</Base>

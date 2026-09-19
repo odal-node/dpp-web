@@ -1,0 +1,7 @@
+{
+  "_comment": "Provenance for src/data/product-groups/*.json, vendored from dpp-core. The commit is what `pnpm run sync:product-groups` last copied from, and what `check:product-groups` verifies the vendored copies against. Same reasoning as the docs site's openapi-source.json: pinning to a commit rather than to core's main keeps this repo's CI deterministic — an unrelated merge in core cannot turn a pull request here red, and a coordinated change across both repos can land without deadlocking on which merges first. Bumping the pin is a deliberate, reviewable line in a diff.",
+  "_path_comment": "The product-group manifests carry NO law — act numbers, dates and passport obligations live in the instrument manifests, which are deliberately not vendored here. These files carry identity, schema versions, product categories, the disclosure map and the plugin binding. A page built from them can therefore state what the software models without making a regulatory claim it would have to keep current.",
+  "repository": "odal-node/dpp-core",
+  "path": "crates/dpp-domain/product-groups",
+  "commit": "81f70871481e97d50a584c4a8d6c32aefd616b20"
+}
