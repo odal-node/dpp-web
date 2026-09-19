@@ -74,17 +74,17 @@ const description = `What Odal Node models for ${manifest.title.toLowerCase()}: 
     </p>
 
     <div class="not-prose mt-8 grid gap-4 sm:grid-cols-3">
-      <div class="rounded-lg border border-neutral-200 p-5">
+      <div class="card p-5">
         <p class="text-xs uppercase tracking-widest text-neutral-500">Current schema</p>
         <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">
           v{manifest.currentSchemaVersion}
         </p>
       </div>
-      <div class="rounded-lg border border-neutral-200 p-5">
+      <div class="card p-5">
         <p class="text-xs uppercase tracking-widest text-neutral-500">Versions modelled</p>
         <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{versionCount}</p>
       </div>
-      <div class="rounded-lg border border-neutral-200 p-5">
+      <div class="card p-5">
         <p class="text-xs uppercase tracking-widest text-neutral-500">Compliance plugin</p>
         <p class="mt-1 font-mono text-sm text-neutral-900">
           {manifest.plugin ?? "none"}
@@ -146,7 +146,7 @@ const description = `What Odal Node models for ${manifest.title.toLowerCase()}: 
         </p>
         <div class="not-prose mt-6 space-y-6">
           {classes.map(([cls, fields]) => (
-            <div class="rounded-lg border border-neutral-200 p-5">
+            <div class="card p-5">
               <div class="flex items-baseline justify-between gap-4">
                 <h3 class="font-mono text-sm font-semibold text-primary-800">{cls}</h3>
                 <span class="text-xs text-neutral-500">{fields.length} field(s)</span>

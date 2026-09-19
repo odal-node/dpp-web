@@ -54,8 +54,8 @@ const description =
       {stations.stations.map((s) => (
         <a
           href={`/lifecycle#${s.key}`}
-          class={`block rounded-lg border p-4 no-underline transition hover:border-primary-400 ${
-            s.unmatched ? "border-primary-300 bg-primary-50" : "border-neutral-200 bg-white"
+          class={`card block p-4 no-underline ${
+            s.unmatched ? "bg-primary-50" : ""
           }`}
         >
           <div class="flex items-baseline gap-3">
@@ -75,7 +75,7 @@ const description =
     </div>
 
     <p class="mt-8">
-      <a href="/lifecycle" class="font-semibold">Read the eight in full →</a>
+      <a href="/lifecycle" class="link-arrow">Read the eight in full</a>
     </p>
   </Section>
 
@@ -90,7 +90,7 @@ const description =
       and watch the fields appear and vanish.
     </p>
     <p>
-      <a href="/who-sees-what" class="font-semibold">Try it →</a>
+      <a href="/who-sees-what" class="link-arrow">Try it</a>
     </p>
   </Section>
 
@@ -109,7 +109,7 @@ const description =
       it arrives than early and wrong.
     </p>
     <p>
-      <a href="/roadmap" class="font-semibold">The roadmap says which is which →</a>
+      <a href="/roadmap" class="link-arrow">The roadmap says which is which</a>
     </p>
   </Section>
 </Base>

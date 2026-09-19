@@ -51,13 +51,13 @@ const description =
 
     <div class="not-prose my-8 grid gap-4 sm:grid-cols-3">
       {Object.values(versions).map((v) => (
-        <div class="rounded-lg border border-neutral-200 p-5">
+        <div class="card p-5">
           <p class="font-mono text-xs uppercase tracking-widest text-neutral-500">{v.repo}</p>
           <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">v{v.version}</p>
           <p class="mt-1 text-sm text-neutral-600">{v.note}</p>
         </div>
       ))}
-      <div class="rounded-lg border border-neutral-200 p-5">
+      <div class="card p-5">
         <p class="font-mono text-xs uppercase tracking-widest text-neutral-500">product groups</p>
         <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{groupCount}</p>
         <p class="mt-1 text-sm text-neutral-600">

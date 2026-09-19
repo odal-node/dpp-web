@@ -4,6 +4,7 @@
 // one-line trust row.
 import Watermark from "../assets/favicon.svg";
 import StatusBadge from "./StatusBadge.astro";
+import Button from "./Button.astro";
 interface Props {
   eyebrow?: string;
   title: string;
@@ -86,12 +87,13 @@ const {
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>
         </a> -->
-        <a
-          href={secondaryHref}
-          class="inline-flex items-center justify-center rounded-md border border-primary-300/40 px-6 py-3 font-medium text-primary-100 no-underline transition-colors hover:border-primary-300 hover:bg-primary-300/5 hover:no-underline"
-        >
+        <!-- The primary above is commented out, so this is the hero's only
+             action and is styled as the primary one. A lone outline button on
+             a navy band reads as a secondary choice with nothing to be
+             secondary to. -->
+        <Button href={secondaryHref} tone="dark" variant="primary" size="lg" arrow>
           {secondaryLabel}
-        </a>
+        </Button>
       </div>
       {trustRow.length > 0 && (
         <ul class="not-prose mt-10 flex flex-wrap items-center gap-x-3 gap-y-2 p-0 text-sm text-primary-300/80">

@@ -136,7 +136,7 @@ const steps = [
           v: "One command to a running node — it builds from source, so allow a few minutes. No licence keys, no passport caps. Ever.",
         },
       ].map((f) => (
-        <article class="rounded-md border border-neutral-200 bg-neutral-0 p-6 transition-colors hover:border-primary-300">
+        <article class="card p-6">
           <h3 class="mb-2 mt-0 text-base font-semibold text-neutral-900">{f.k}</h3>
           <p class="m-0 text-sm leading-body text-neutral-600">{f.v}</p>
         </article>
@@ -153,21 +153,21 @@ const steps = [
       Stated precisely:
     </p>
     <div class="not-prose mt-8 grid gap-6 md:grid-cols-3">
-      <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
+      <div class="card p-6">
         <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We can see</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
           The signed passport you publish to a resolver we operate, and the
           metadata required to serve it.
         </p>
       </div>
-      <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
+      <div class="card p-6">
         <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We cannot see</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
           Your private keys (held in-process on your infrastructure), your raw
           production data, your supply-chain detail.
         </p>
       </div>
-      <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
+      <div class="card p-6">
         <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We could see but do not</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
           The contents of your import files, which the node discards after

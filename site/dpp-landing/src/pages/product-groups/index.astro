@@ -73,17 +73,17 @@ const itemListLd = {
     </p>
 
     <div class="not-prose mt-8 grid gap-4 sm:grid-cols-3">
-      <div class="rounded-lg border border-neutral-200 p-5">
+      <div class="card p-5">
         <p class="text-xs uppercase tracking-widest text-neutral-500">Schema versions</p>
         <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{schemaVersions}</p>
         <p class="mt-1 text-sm text-neutral-600">across {groups.length} groups, all still served</p>
       </div>
-      <div class="rounded-lg border border-neutral-200 p-5">
+      <div class="card p-5">
         <p class="text-xs uppercase tracking-widest text-neutral-500">Compliance plugins</p>
         <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{withPlugin}</p>
         <p class="mt-1 text-sm text-neutral-600">sandboxed WebAssembly, bound to {boundToPlugin} of the {groups.length} groups</p>
       </div>
-      <div class="rounded-lg border border-neutral-200 p-5">
+      <div class="card p-5">
         <p class="text-xs uppercase tracking-widest text-neutral-500">With a disclosure split</p>
         <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{withDisclosure}</p>
         <p class="mt-1 text-sm text-neutral-600">the rest await a delegated act</p>
@@ -98,7 +98,7 @@ const itemListLd = {
         return (
           <a
             href={`/product-groups/${g.key}`}
-            class="flex flex-col rounded-lg border border-neutral-200 bg-white p-5 no-underline transition hover:border-primary-400"
+            class="card flex flex-col p-5 no-underline"
           >
             <div class="flex items-baseline justify-between gap-3">
               <h3 class="m-0 text-lg font-semibold text-neutral-900">{g.title}</h3>

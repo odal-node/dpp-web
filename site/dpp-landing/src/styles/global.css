@@ -12,7 +12,9 @@
  *
  * Below the imports we set the few page-wide defaults that benefit from being
  * applied in @layer base — fonts, colour, line-height, focus-ring style,
- * smooth-scroll preference.
+ * smooth-scroll preference — and then, in @layer components, the three
+ * repeated shapes the pages are built from: body links, the measure of a
+ * column of text, and the card.
  */
 
 @import "tailwindcss";
@@ -25,6 +27,7 @@
     color: var(--odal-neutral-900);
     background: var(--odal-neutral-0);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   /* Light-first design with dark *sections* (hero, footer) rather than a
@@ -36,16 +39,167 @@
     letter-spacing: -0.01em;
   }
 
+  /* Large display type wants tighter tracking than small headings; at h1 size
+     the default spacing reads as gappy. */
+  h1 { letter-spacing: -0.025em; }
+  h2 { letter-spacing: -0.02em; }
+
   a {
     color: var(--odal-action-600);
     text-decoration: none;
+    transition: color 120ms ease, text-decoration-color 120ms ease,
+                background-color 120ms ease, border-color 120ms ease;
   }
   a:hover { text-decoration: underline; }
-  a:focus-visible {
+
+  /* One focus treatment for everything that takes focus. Keyboard users get
+     the same ring on a link, a button and a summary rather than three
+     different ones, and it is never removed — only styled. */
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  [tabindex]:focus-visible {
     outline: 2px solid var(--odal-action-600);
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: 4px;
   }
+
+  /* On the navy bands the action blue has too little contrast to serve as a
+     focus ring, so the ice tint takes over. */
+  .bg-primary-900 a:focus-visible,
+  .bg-primary-900 button:focus-visible {
+    outline-color: var(--odal-primary-300);
+  }
+}
+
+@layer components {
+  /*
+   * BODY LINKS
+   *
+   * Underlined before hover, not on it. The base rule above leaves links
+   * undecorated so that navigation, cards and buttons can style themselves,
+   * but inside a paragraph that makes a link invisible until a pointer lands
+   * on it — which a keyboard reader never does, and a touch reader cannot.
+   *
+   * The underline sits low and light so it reads as typography rather than as
+   * decoration, and thickens on hover instead of appearing from nothing.
+   *
+   * Anything carrying the `no-underline` utility (cards, nav, buttons) wins,
+   * because utilities sort after components.
+   */
+  .prose a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: color-mix(in srgb, var(--odal-action-600) 35%, transparent);
+  }
+  .prose a:hover {
+    color: var(--odal-action-700);
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--odal-action-600);
+  }
+
+  /*
+   * MEASURE
+   *
+   * A `wide` section widens its container so grids and card rows can breathe.
+   * Body copy must not widen with it: past roughly 75 characters the eye loses
+   * the start of the next line, and /lifecycle and /roadmap are long enough
+   * pages for that to matter. Grids, cards and anything in `not-prose` are
+   * untouched, because only direct text children are constrained.
+   */
+  .prose > p,
+  .prose > ul,
+  .prose > ol,
+  .prose > blockquote {
+    max-width: 68ch;
+  }
+
+  /*
+   * CARD
+   *
+   * One shape, used by every grid on the site. A ring rather than a border, so
+   * the outline does not take part in layout and cards do not shift by a pixel
+   * when they gain emphasis. The hover state lifts rather than recolours,
+   * which reads as interactive without a second colour to account for.
+   */
+  .card {
+    border-radius: 0.75rem;
+    background: var(--odal-neutral-0);
+    box-shadow:
+      0 0 0 1px var(--odal-neutral-200),
+      0 1px 2px rgb(8 12 44 / 0.04);
+    transition: box-shadow 160ms ease, transform 160ms ease;
+  }
+
+  /* Only cards that are themselves links respond to the pointer. A static
+     card that lifts on hover promises a click that never happens. */
+  a.card:hover {
+    box-shadow:
+      0 0 0 1px var(--odal-primary-400),
+      0 6px 20px -6px rgb(8 12 44 / 0.18);
+    transform: translateY(-2px);
+  }
+
+  /*
+   * CARD STATES
+   *
+   * Driven by the attribute that already carries the state, not by a class the
+   * script toggles in parallel. `aria-pressed` is what a screen reader is told;
+   * deriving the ring from it means the two cannot drift apart, which is how
+   * the audience selector ended up announcing one thing and showing another.
+   *
+   * These are box-shadow rather than Tailwind's `ring-*`, because a `ring`
+   * utility replaces `box-shadow` outright and would take the card's own
+   * shadow with it.
+   */
+  .card[aria-pressed="true"] {
+    box-shadow:
+      0 0 0 2px var(--odal-primary-500),
+      0 4px 14px -4px rgb(8 12 44 / 0.15);
+    background: var(--odal-primary-50);
+  }
+
+  .card[data-visible="true"],
+  .card-emphasis {
+    box-shadow:
+      0 0 0 1px var(--odal-primary-300),
+      0 2px 8px -2px rgb(8 12 44 / 0.1);
+  }
+
+  /* A selectable card is a control, so it says so under the pointer. */
+  button.card { cursor: pointer; text-align: left; }
+  button.card:hover:not([aria-pressed="true"]) {
+    box-shadow:
+      0 0 0 1px var(--odal-primary-400),
+      0 4px 14px -4px rgb(8 12 44 / 0.15);
+  }
+
+  /* The "→" link that closes a section. The arrow moves, the text does not,
+     so the line does not reflow under the pointer. */
+  .link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .link-arrow::after {
+    content: "→";
+    transition: transform 160ms ease;
+  }
+  .link-arrow:hover {
+    text-decoration: none;
+  }
+  .link-arrow:hover::after {
+    transform: translateX(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Nothing here is load-bearing, so it all stops rather than degrading. */
+  a.card:hover { transform: none; }
+  .link-arrow:hover::after { transform: none; }
 }
 
 @media (prefers-reduced-motion: no-preference) {

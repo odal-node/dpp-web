@@ -1,0 +1,101 @@
+---
+// Button.astro — the one button on this site.
+//
+// Before this there were five: the hero's two, the nav CTA, the mobile CTA and
+// whatever a page reached for. They disagreed about radius, padding, weight
+// and hover, which is the kind of thing nobody names but everybody sees.
+//
+// Two axes, because the site has two grounds:
+//
+//   variant — `primary` carries the page's one main action; `secondary` sits
+//             beside it; `ghost` is a text action with no box.
+//   tone    — `light` for the white and grey sections, `dark` for the navy
+//             hero and footer bands, where the same colours would vanish.
+//
+// Renders an <a> when `href` is given and a <button> otherwise, so a link is
+// never a button with a click handler pretending to navigate.
+import ExternalArrow from "./ExternalArrow.astro";
+
+interface Props {
+  href?: string;
+  variant?: "primary" | "secondary" | "ghost";
+  tone?: "light" | "dark";
+  size?: "md" | "lg";
+  /** Trailing arrow that nudges on hover — for "go on" actions. */
+  arrow?: boolean;
+  /** Marks a destination off this site: adds the corner arrow and rel. */
+  external?: boolean;
+  type?: "button" | "submit";
+  class?: string;
+}
+
+const {
+  href,
+  variant = "primary",
+  tone = "light",
+  size = "md",
+  arrow = false,
+  external = false,
+  type = "button",
+  class: extra = "",
+} = Astro.props;
+
+const base =
+  "group inline-flex items-center justify-center gap-2 rounded-lg font-medium " +
+  "no-underline transition-all duration-150 hover:no-underline " +
+  "active:translate-y-px disabled:pointer-events-none disabled:opacity-50";
+
+const sizes = {
+  md: "px-5 py-2.5 text-sm",
+  lg: "px-6 py-3 text-base",
+};
+
+// `shadow-sm` plus a one-pixel lift is the whole of the press affordance. It
+// reads at a glance and costs nothing on a slow device.
+const styles = {
+  light: {
+    primary:
+      "bg-primary-500 text-white shadow-sm hover:bg-primary-600 hover:shadow-md hover:-translate-y-0.5",
+    secondary:
+      "border border-neutral-300 bg-white text-neutral-800 hover:border-neutral-400 hover:bg-neutral-50",
+    ghost: "text-primary-600 hover:bg-primary-50 hover:text-primary-700",
+  },
+  dark: {
+    primary:
+      "bg-primary-300 text-primary-900 shadow-sm hover:bg-white hover:shadow-md hover:-translate-y-0.5",
+    secondary:
+      "border border-primary-300/40 text-primary-100 hover:border-primary-300 hover:bg-primary-300/10",
+    ghost: "text-primary-200 hover:bg-primary-300/10 hover:text-white",
+  },
+};
+
+const cls = `${base} ${sizes[size]} ${styles[tone][variant]} ${extra}`;
+const rel = external ? "noopener" : undefined;
+---
+
+{href ? (
+  <a href={href} class={cls} rel={rel}>
+    <slot />
+    {external && <ExternalArrow />}
+    {arrow && !external && (
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        class="transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+      >
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    )}
+  </a>
+) : (
+  <button type={type} class={cls}>
+    <slot />
+  </button>
+)}
