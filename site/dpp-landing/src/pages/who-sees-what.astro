@@ -1,0 +1,166 @@
+---
+// /who-sees-what — the Art. 77(2) access lattice, operated rather than asserted.
+//
+// The point of this page is that a visitor changes the audience and watches
+// fields appear and vanish. A table of the same information is a claim; a
+// mechanism someone drives is an argument.
+//
+// SCOPE: batteries only, and the page says so in three places. ESPR Art. 11(b)
+// defers access rights to each product group's delegated act, and none is
+// adopted for the other eleven — so a general "authorities see less" claim
+// would assert a rule that exists for one product group.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import access from "../data/access.json";
+
+const title = "Who sees what — Art. 77(2) access, operable | Odal Node";
+const description =
+  "The battery passport's access rules are a lattice, not a ladder: an authority sees less than a recycler in one specific respect. Pick an audience and watch the fields change.";
+---
+
+<Base title={title} description={description}>
+  <Section
+    eyebrow="Access control"
+    title="An authority sees less than a recycler."
+    wide
+  >
+    <p>
+      That sentence surprises people, so here is the mechanism rather than the
+      claim. Pick an audience below and watch which parts of the record appear.
+    </p>
+    <p>
+      Everything on this page is <strong>Regulation (EU) 2023/1542 Art. 77(2)</strong> and{" "}
+      <strong>Annex XIII</strong>, quoted from the consolidated text. It is
+      the <em>battery</em> passport — see the note at the foot of the page for why
+      that matters.
+    </p>
+
+    <div class="not-prose mt-10">
+      <div role="group" aria-label="Choose an audience" class="flex flex-wrap gap-3">
+        {access.audiences.map((a, i) => (
+          <button
+            type="button"
+            data-audience={a.key}
+            aria-pressed={i === 0 ? "true" : "false"}
+            class="audience-btn rounded-lg border px-4 py-3 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          >
+            <span class="block text-sm font-semibold">{a.label}</span>
+            <span class="block text-xs opacity-70">{a.sub}</span>
+          </button>
+        ))}
+      </div>
+
+      <p class="mt-4 text-sm text-neutral-600">
+        Basis: <span id="basis" class="font-mono">{access.audiences[0].basis}</span>
+      </p>
+
+      <ul class="mt-8 space-y-4">
+        {access.points.map((p) => (
+          <li
+            data-point={p.id}
+            class="point rounded-lg border border-neutral-200 p-5 transition"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <h3 class="text-base font-semibold text-neutral-900">{p.title}</h3>
+              <span class="state shrink-0 rounded px-2 py-1 text-xs font-semibold"></span>
+            </div>
+            <p class="mt-2 text-sm text-neutral-700">{p.note}</p>
+            {p.only === "authority" && (
+              <p class="mt-2 text-xs font-semibold text-primary-700">
+                Authority only — not visible to a recycler.
+              </p>
+            )}
+            {p.only === "legitimate" && (
+              <p class="mt-2 text-xs font-semibold text-primary-700">
+                Legitimate interest only — not visible to an authority.
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Section>
+
+  <Section eyebrow="Why it is not a ladder" title="Neither audience contains the other." tone="muted">
+    <p>
+      Art. 77(2) assigns <strong>points 2 and 3</strong> to notified bodies,
+      market surveillance authorities and the Commission, and{" "}
+      <strong>points 2 and 4</strong> to holders of a legitimate interest.
+    </p>
+    <p>
+      Point 3 is absent from the second list. Point 4 is absent from the first.
+      No ordering can express that, so no integer "tier" can either — which is
+      why an implementation that models access as a ladder with the regulator on
+      top produces the wrong answer for point 4.
+    </p>
+    <p>
+      Point 4 is the individual battery's own use history: charge cycles,
+      accidents, temperature, state of charge. For an electric vehicle that is a
+      usage record of an identifiable vehicle. Handing it to an audience the law
+      does not grant it to is a personal-data disclosure, not a display bug.
+    </p>
+  </Section>
+
+  <Section eyebrow="Scope" title="This is the battery passport, and only the battery passport.">
+    <p>
+      ESPR does not impose this lattice. <strong>Art. 11(b)</strong> gives actors
+      access <em>"based on their respective access rights set out in the
+      applicable delegated act adopted pursuant to Article 4"</em> — so the split
+      belongs to each product group's own act.
+    </p>
+    <p>
+      For batteries that act exists and is quoted above. For textiles,
+      electronics, furniture and the rest, <strong>no delegated act has been
+      adopted</strong>, so there is no authority/legitimate-interest split to
+      show. We model that as absence rather than guessing, and the product group
+      manifests carry only the classes their own law defines.
+    </p>
+    <p>
+      A fixed three-tier access model, applied everywhere, would be encoding one
+      product group's rule as if it were the regulation's.
+    </p>
+  </Section>
+</Base>
+
+<script is:inline define:vars={{ audiences: access.audiences }}>
+  (function () {
+    const buttons = Array.from(document.querySelectorAll(".audience-btn"));
+    const points = Array.from(document.querySelectorAll(".point"));
+    const basisEl = document.getElementById("basis");
+    if (!buttons.length || !points.length) return;
+
+    function apply(key) {
+      const audience = audiences.find((a) => a.key === key) || audiences[0];
+      const visible = new Set(audience.sees);
+
+      for (const b of buttons) {
+        const on = b.dataset.audience === audience.key;
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+        b.classList.toggle("border-primary-500", on);
+        b.classList.toggle("bg-primary-50", on);
+        b.classList.toggle("border-neutral-200", !on);
+      }
+
+      if (basisEl) basisEl.textContent = audience.basis;
+
+      for (const p of points) {
+        const shown = visible.has(p.dataset.point);
+        p.classList.toggle("opacity-40", !shown);
+        p.classList.toggle("border-primary-300", shown);
+        p.classList.toggle("border-neutral-200", !shown);
+        const state = p.querySelector(".state");
+        if (state) {
+          state.textContent = shown ? "Visible" : "Withheld";
+          state.className =
+            "state shrink-0 rounded px-2 py-1 text-xs font-semibold " +
+            (shown ? "bg-primary-100 text-primary-800" : "bg-neutral-100 text-neutral-500");
+        }
+      }
+    }
+
+    for (const b of buttons) {
+      b.addEventListener("click", () => apply(b.dataset.audience));
+    }
+    apply(audiences[0].key);
+  })();
+</script>
