@@ -33,6 +33,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # Same reasoning as the engine checkout above, for the vendored
+      # product-group manifests the landing site's pages are generated from.
+      - name: Checkout dpp-core (source of the vendored product groups)
+        uses: actions/checkout@v4
+        with:
+          repository: odal-node/dpp-core
+          path: .dpp-core
+          fetch-depth: 0
+          persist-credentials: false
+
       - name: Enable Corepack
         run: corepack enable
 
@@ -62,6 +72,22 @@ jobs:
       # `public/`, which is served verbatim.
       - name: Check for internal-vocabulary leakage
         run: pnpm run check:leakage
+
+      # Astro trims whitespace where a text node meets an element, so prose
+      # that reads correctly in the source can publish as "Seethe project
+      # board". Valid HTML, resolving links, clean type-check — invisible to
+      # every other gate here.
+      - name: Check inline spacing
+        run: pnpm run check:spacing
+
+      # The product-group pages are generated from manifests vendored out of
+      # dpp-core. This fails if a vendored copy no longer matches the commit
+      # recorded in product-groups-source.json, so a page cannot claim a schema
+      # version the software does not serve.
+      - name: Check the vendored product groups against core
+        run: pnpm --filter dpp-landing run check:product-groups
+        env:
+          DPP_CORE_DIR: ${{ github.workspace }}/.dpp-core
 
       - name: Check the vendored API spec against the engine
         run: pnpm run check:openapi
