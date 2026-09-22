@@ -14,5 +14,5 @@ Preferred-Languages: en
 Canonical: https://odal-node.io/.well-known/security.txt
 Canonical: https://docs.odal-node.io/.well-known/security.txt
 
-# Repointed to the organisation-wide policy once that is published.
-Policy: https://github.com/odal-node/dpp-core/blob/main/SECURITY.md
+# The organisation-wide policy, so it covers every repository rather than one.
+Policy: https://github.com/odal-node/.github/blob/main/SECURITY.md
