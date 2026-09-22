@@ -1,0 +1,18 @@
+# security.txt — RFC 9116
+#
+# Policy is shared with docs.odal-node.io. If you change one, change both:
+# site/dpp-docs/public/.well-known/security.txt
+#
+# 🚨 Expires is mandatory and enforced by parsers. A lapsed security.txt is
+# read as an abandoned contact — worse than not publishing one. Renewing it is
+# a calendar task, not a commit task, so it needs a reminder that is not this
+# file.
+
+Contact: mailto:security@odal-node.io
+Expires: 2027-09-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://odal-node.io/.well-known/security.txt
+Canonical: https://docs.odal-node.io/.well-known/security.txt
+
+# Repointed to the organisation-wide policy once that is published.
+Policy: https://github.com/odal-node/dpp-core/blob/main/SECURITY.md
