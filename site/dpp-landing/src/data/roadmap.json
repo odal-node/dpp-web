@@ -26,12 +26,19 @@
             {
               "title": "Spreadsheets in, passports out",
               "line": "Import your product data with a trial run first. The node reports what is wrong row by row instead of rejecting the whole file.",
-              "variants": ["CSV", "Excel"]
+              "variants": [
+                "CSV",
+                "Excel"
+              ]
             },
             {
               "title": "Checked before anything is signed",
               "line": "Each product group's rules run before signing, alongside warnings for values that look implausible. Rule updates arrive signed and apply without reinstalling anything.",
-              "variants": ["Blocking checks", "Advisory warnings", "Signed rule updates"]
+              "variants": [
+                "Blocking checks",
+                "Advisory warnings",
+                "Signed rule updates"
+              ]
             }
           ]
         },
@@ -41,13 +48,23 @@
             {
               "title": "Scan to read",
               "line": "The code on the product opens its public passport. No login and no fee.",
-              "variants": ["With a GS1 barcode", "Without a barcode"]
+              "variants": [
+                "With a GS1 barcode",
+                "Without a barcode"
+              ]
             },
             {
               "title": "Each reader sees what they are entitled to",
               "line": "Repairers, recyclers and authorities see more than the public, field by field, proven by a credential they hold rather than a setting they choose.",
-              "variants": ["Public", "Legitimate interest", "Authorities"],
-              "link": { "href": "/visibility", "label": "How visibility works" }
+              "variants": [
+                "Public",
+                "Legitimate interest",
+                "Authorities"
+              ],
+              "link": {
+                "href": "/visibility",
+                "label": "How visibility works"
+              }
             },
             {
               "title": "Export for industrial systems",
@@ -61,7 +78,16 @@
             {
               "title": "Changes without losing history",
               "line": "Correct a passport, replace it with a newer one, suspend it or retire it. Every earlier version stays readable, and every change is written to a tamper-evident trail.",
-              "variants": ["Correct", "Replace", "Suspend", "Retire"]
+              "variants": [
+                "Correct",
+                "Replace",
+                "Suspend",
+                "Retire"
+              ]
+            },
+            {
+              "title": "Passports keep working when the rules change",
+              "line": "A new version of a product group's schema never breaks the passports issued under an older one. They keep resolving exactly as they were issued."
             },
             {
               "title": "A handover between companies",
@@ -74,7 +100,10 @@
             {
               "title": "A recorded end of life",
               "line": "The end of a product's life is recorded on its passport, including the handover to a waste operator.",
-              "link": { "href": "/lifecycle", "label": "Follow the whole lifecycle" }
+              "link": {
+                "href": "/lifecycle",
+                "label": "Follow the whole lifecycle"
+              }
             }
           ]
         },
@@ -97,7 +126,10 @@
             {
               "title": "One tool to run it all",
               "line": "Set up, onboard, import, publish, issue credentials and check status from a single tool.",
-              "variants": ["Command line", "Interactive console"]
+              "variants": [
+                "Command line",
+                "Interactive console"
+              ]
             },
             {
               "title": "Your systems stay informed",
@@ -114,6 +146,10 @@
             {
               "title": "The unsold-goods disclosure",
               "line": "Record what was discarded, why and where it went, line by line, ready for the yearly disclosure."
+            },
+            {
+              "title": "Safe by default in production",
+              "line": "A node set up for production refuses to start with placeholder security settings, instead of accepting them quietly."
             }
           ]
         }
