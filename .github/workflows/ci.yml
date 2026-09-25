@@ -89,6 +89,12 @@ jobs:
         env:
           DPP_CORE_DIR: ${{ github.workspace }}/.dpp-core
 
+      # /verify re-implements the node's dossier verifier in the browser. This
+      # holds it to the engine's own verdicts on engine-built dossiers, check
+      # by check, so the two cannot drift apart unnoticed.
+      - name: Test the browser verifier against the engine's verdicts
+        run: pnpm --filter dpp-landing run test:verify
+
       - name: Check the vendored API spec against the engine
         run: pnpm run check:openapi
         env:

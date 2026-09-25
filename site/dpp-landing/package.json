@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "sync:core": "node scripts/sync-from-core.mjs",
-    "check:core": "node scripts/sync-from-core.mjs --check"
+    "check:core": "node scripts/sync-from-core.mjs --check",
+    "test:verify": "node --test tests/verify.test.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3",
