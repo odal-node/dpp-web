@@ -27,7 +27,7 @@ const softwareAppLd = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Linux, Docker",
   description:
-    "Self-hosted infrastructure for EU Digital Product Passports (DPP) under the Ecodesign for Sustainable Products Regulation (ESPR). Validates product data against sector schemas, signs with your keys, and publishes verifiable passports via GS1 Digital Link.",
+    "Self-hosted infrastructure for EU Digital Product Passports (DPP) under the Ecodesign for Sustainable Products Regulation (ESPR). Validates product data against each product group's rules, signs with your keys, and publishes verifiable passports via GS1 Digital Link.",
   url: "https://odal-node.io",
   offers: {
     "@type": "Offer",
@@ -45,7 +45,7 @@ const softwareAppLd = {
 // deliberately merged into a single flow; the docs keep them as separate pages.
 const steps = [
   { label: "Import", body: "Product data from CSV or Excel, including exports from your ERP, into your own node." },
-  { label: "Validate", body: "Against versioned sector schemas tracking the regulation, locally." },
+  { label: "Validate", body: "Against each product group's rules, on your own node." },
   { label: "Sign", body: "With your own key, generated and held on your infrastructure." },
   { label: "Publish", body: "Only the signed passport becomes resolvable, via QR and GS1 Digital Link." },
 ];
@@ -63,7 +63,7 @@ const steps = [
 
   <Section eyebrow="Why now" title="The deadlines are set. The infrastructure mostly isn't." wide>
     <p>
-      Compliance arrives sector by sector, date by date, not "everything by 2027."{" "}
+      Compliance arrives one product group at a time, date by date, not "everything by 2027."{" "}
       {lead}
     </p>
     <div class="not-prose mt-8">
@@ -81,8 +81,8 @@ const steps = [
     </p>
     <p>
       The question is whether the infrastructure you adopt now still fits the next
-      sector's act. Odal Node is built so that it does: new sectors arrive as schema
-      and plugin updates, not as new systems.
+      product group's act. Odal Node is built so that it does: a new product group
+      arrives as an update to its rules, not as a new system.
     </p>
   </Section>
 
@@ -114,12 +114,16 @@ const steps = [
       </ol>
     </div>
     <p>
-      Anyone verifies the signature against your public DID document, without Odal in
-      the loop. Public fields are readable by all; restricted fields (for repairers,
-      recyclers, and market-surveillance authorities) are released only against a
-      verified credential. What the node stores: the whole signed passport,
-      the audit trail, the signature. What it never stores: raw import files,
-      supply-chain detail beyond passport content, or your private keys.
+      Anyone can check the signature against the identity published on your web
+      domain, without Odal in the loop. Public fields are readable by all;
+      restricted fields (for repairers, recyclers, and market-surveillance
+      authorities) are released only against a verified credential. What the node
+      stores: the whole signed passport, the audit trail, the signature. What it
+      never stores: raw import files, supply-chain detail beyond passport content,
+      or your private keys.
+    </p>
+    <p>
+      <a href="/verify" class="link-arrow">Try it: verify a proof file</a>
     </p>
   </Section>
 
@@ -132,7 +136,7 @@ const steps = [
         },
         {
           k: "Standards-native",
-          v: "GS1 Digital Link resolution, W3C VC 2.0 credentials, did:web identity, AAS submodel export.",
+          v: "GS1 Digital Link resolution, W3C VC 2.0 credentials, did:web identity, Asset Administration Shell export.",
         },
         {
           k: "Sandboxed product-group rules",
@@ -148,7 +152,7 @@ const steps = [
         },
         {
           k: "Self-host in minutes",
-          v: "One command to a running node. It builds from source, so allow a few minutes. No licence keys, no passport caps. Ever.",
+          v: "One command starts a node from the published images. No licence keys, no passport caps. Ever.",
         },
       ].map((f) => (
         <article class="card p-6">
