@@ -29,23 +29,23 @@
   "points": [
     {
       "id": "1",
-      "title": "Point 1 — public battery model information",
+      "title": "Point 1: public information about the battery model",
       "note": "Material composition, carbon footprint, recycled content, rated capacity, expected lifetime, declaration of conformity, waste management information."
     },
     {
       "id": "2",
-      "title": "Point 2 — model information for legitimate interest and the Commission",
+      "title": "Point 2: model information for readers with a legitimate interest, and the Commission",
       "note": "Detailed composition, dismantling instructions and the safety measures dismantling requires."
     },
     {
       "id": "3",
-      "title": "Point 3 — conformity evidence",
+      "title": "Point 3: evidence of conformity",
       "note": "\"Results of test reports proving compliance with the requirements laid down in this Regulation\".",
       "only": "authority"
     },
     {
       "id": "4",
-      "title": "Point 4 — the individual battery's own history",
+      "title": "Point 4: the individual battery's own history",
       "note": "State of health, battery status, and \"data resulting from its use, including the number of charging and discharging cycles and negative events, such as accidents, as well as periodically recorded information on the operating environmental conditions, including temperature, and on the state of charge\".",
       "only": "legitimate"
     }

@@ -5,34 +5,39 @@
 // fields appear and vanish. A table of the same information is a claim; a
 // mechanism someone drives is an argument.
 //
+// The headline says the two audiences see *different* things, never that one
+// sees less: authorities get point 3 and not point 4, legitimate interest gets
+// point 4 and not point 3. "An authority sees less than a recycler" was the
+// earlier headline, and it is false without the qualifier.
+//
 // SCOPE: batteries only, and the page says so in three places. ESPR Art. 11(b)
-// defers access rights to each product group's delegated act, and none is
-// adopted for the other eleven — so a general "authorities see less" claim
-// would assert a rule that exists for one product group.
+// defers access rights to each product group's own delegated act, so a general
+// claim would assert a rule that exists for one product group.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import access from "../data/access.json";
 
-const title = "Who sees what — Art. 77(2) access, operable | Odal Node";
+const title = "Visibility: who sees which part of a battery passport | Odal Node";
 const description =
-  "The battery passport's access rules are a lattice, not a ladder: an authority sees less than a recycler in one specific respect. Pick an audience and watch the fields change.";
+  "The battery passport's access rules are not a ladder: an authority and a recycler each see something the other cannot. Pick a reader and watch the parts of the passport change.";
 ---
 
 <Base title={title} description={description}>
   <Section
-    eyebrow="Access control"
-    title="An authority sees less than a recycler."
+    eyebrow="Visibility"
+    title="An authority and a recycler see different things."
     wide
   >
     <p>
-      That sentence surprises people, so here is the mechanism rather than the
-      claim. Pick an audience below and watch which parts of the record appear.
+      Each can see something the other cannot. That surprises people, so here
+      is the mechanism rather than the claim: pick a reader below and watch
+      which parts of the passport appear.
     </p>
     <p>
-      Everything on this page is <strong>Regulation (EU) 2023/1542 Art. 77(2)</strong> and{" "}
-      <strong>Annex XIII</strong>, quoted from the consolidated text. It is
-      the <em>battery</em> passport — see the note at the foot of the page for why
-      that matters.
+      Everything on this page comes from <strong>Regulation (EU) 2023/1542,
+      Art. 77(2)</strong> and <strong>Annex XIII</strong>, quoted from the
+      consolidated text. It covers the <em>battery</em> passport only; the note
+      at the foot of the page explains why that matters.
     </p>
 
     <div class="not-prose mt-10">
@@ -54,7 +59,7 @@ const description =
       </div>
 
       <p class="mt-4 text-sm text-neutral-600">
-        Basis: <span id="basis" class="font-mono">{access.audiences[0].basis}</span>
+        Legal basis: <span id="basis">{access.audiences[0].basis}</span>
       </p>
 
       <ul class="mt-8 space-y-4">
@@ -71,12 +76,12 @@ const description =
             <p class="mt-2 text-sm text-neutral-700">{p.note}</p>
             {p.only === "authority" && (
               <p class="mt-2 text-xs font-semibold text-primary-700">
-                Authority only — not visible to a recycler.
+                Authorities only. Not shown to a recycler.
               </p>
             )}
             {p.only === "legitimate" && (
               <p class="mt-2 text-xs font-semibold text-primary-700">
-                Legitimate interest only — not visible to an authority.
+                Legitimate interest only. Not shown to an authority.
               </p>
             )}
           </li>
@@ -85,43 +90,44 @@ const description =
     </div>
   </Section>
 
-  <Section eyebrow="Why it is not a ladder" title="Neither audience contains the other." tone="muted">
+  <Section eyebrow="Why it is not a ladder" title="Neither reader sees everything the other sees." tone="muted" wide>
     <p>
-      Art. 77(2) assigns <strong>points 2 and 3</strong> to notified bodies,
+      Art. 77(2) gives <strong>points 2 and 3</strong> to notified bodies,
       market surveillance authorities and the Commission, and{" "}
-      <strong>points 2 and 4</strong> to holders of a legitimate interest.
+      <strong>points 2 and 4</strong> to readers with a legitimate interest.
     </p>
     <p>
-      Point 3 is absent from the second list. Point 4 is absent from the first.
-      No ordering can express that, so no integer "tier" can either — which is
-      why an implementation that models access as a ladder with the regulator on
-      top produces the wrong answer for point 4.
+      Point 3 is missing from the second list. Point 4 is missing from the
+      first. No ranking can express that, so no simple access level can either.
+      Software that puts the regulator at the top of a ladder gives the wrong
+      answer for point 4.
     </p>
     <p>
       Point 4 is the individual battery's own use history: charge cycles,
       accidents, temperature, state of charge. For an electric vehicle that is a
-      usage record of an identifiable vehicle. Handing it to an audience the law
+      usage record of an identifiable vehicle. Showing it to a reader the law
       does not grant it to is a personal-data disclosure, not a display bug.
     </p>
   </Section>
 
-  <Section eyebrow="Scope" title="This is the battery passport, and only the battery passport.">
+  <Section eyebrow="Scope" title="This is the battery passport, and only the battery passport." wide>
     <p>
-      ESPR does not impose this lattice. <strong>Art. 11(b)</strong> gives actors
-      access <em>"based on their respective access rights set out in the
-      applicable delegated act adopted pursuant to Article 4"</em> — so the split
-      belongs to each product group's own act.
+      ESPR does not impose this split. <strong>Art. 11(b)</strong> gives each
+      reader access <em>"based on their respective access rights set out in the
+      applicable delegated act adopted pursuant to Article 4"</em>, so who sees
+      what belongs to each product group's own rules.
     </p>
     <p>
-      For batteries that act exists and is quoted above. For textiles,
-      electronics, furniture and the rest, <strong>no delegated act has been
-      adopted</strong>, so there is no authority/legitimate-interest split to
-      show. We model that as absence rather than guessing, and the product group
-      manifests carry only the classes their own law defines.
+      For batteries, the Battery Regulation sets the split itself, and it is
+      quoted above. For textiles, electronics, furniture and most other groups,{" "}
+      <strong>no such rules have been adopted</strong>, so there is no split
+      between authorities and legitimate interest to show. We model that as
+      absence rather than guessing: each product group carries only the access
+      rules its own law defines.
     </p>
     <p>
-      A fixed three-tier access model, applied everywhere, would be encoding one
-      product group's rule as if it were the regulation's.
+      One fixed set of access levels, applied everywhere, would treat one
+      product group's rule as if it were the whole regulation's.
     </p>
   </Section>
 </Base>
