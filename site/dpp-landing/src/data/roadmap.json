@@ -77,7 +77,7 @@
             {
               "label": "Depth proven by credential, enforced per field",
               "detail": "The same record answers a repairer, a recycler and an authority differently, and which fields each sees is decided by the credential they present rather than by a header they set. For batteries this is a lattice and not a ladder — an authority sees less than a recycler in one specific respect, and modelling it as a ranking would be wrong.",
-              "evidence": "/who-sees-what"
+              "evidence": "/visibility"
             }
           ]
         },

@@ -12,15 +12,7 @@ import sitemap from "@astrojs/sitemap";
 export default defineConfig({
   site: "https://odal-node.io",
   integrations: [
-    sitemap({
-      // A page carrying `noindex` must not also be advertised in the
-      // sitemap: the two instructions contradict each other, and a
-      // crawler that follows the sitemap first has been told to index
-      // something the page then refuses. /main is a draft published
-      // beside the live home page for comparison, not a second entry
-      // point competing for the same queries.
-      filter: (page) => !/\/main\/?$/.test(page),
-    }),
+    sitemap(),
   ],
   vite: {
     plugins: [

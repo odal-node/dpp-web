@@ -1,5 +1,5 @@
 {
-  "_comment": "The chain of custody as eight stations — the spine shared by /lifecycle and /main. Endpoints are the engine's real routes. Stations 6, 7 and 8 are the ones the live home page never reaches, and they are the three with no competitor equivalent. Every 'who' is an actor named in law, not an invented persona.",
+  "_comment": "The chain of custody as eight stations — the spine shared by /lifecycle and the unpublished draft home page. Endpoints are the engine's real routes. Stations 6, 7 and 8 are the ones the live home page never reaches, and they are the three with no competitor equivalent. Every 'who' is an actor named in law, not an invented persona.",
   "stations": [
     {
       "n": 1,
@@ -55,7 +55,7 @@
       "lead": "Depth proven by credential, not by a header the caller sets.",
       "body": "The same record answers differently depending on who is asking, enforced per field. For batteries this is a lattice rather than a ladder: an authority sees less than a recycler in one specific respect.",
       "unmatched": true,
-      "link": "/who-sees-what"
+      "link": "/visibility"
     },
     {
       "n": 7,

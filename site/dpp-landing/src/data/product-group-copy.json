@@ -1,0 +1,66 @@
+{
+  "_comment": "Landing-owned wording for the product groups: the short name and one plain line each page, menu and card uses. The manifests beside it are vendored from dpp-core and gated against drift, so they are never edited here; this file is the only place the site words a group for a general reader. Each line describes what the passport carries, taken from the fields of that group's current schema, and never states a legal obligation or a date. 'order' is the order every list on the site shows them in. 'unsold-goods' is kept out of 'order' on purpose: its own manifest says it is not a product group and imposes no passport, so it is listed separately wherever it appears.",
+  "order": [
+    "battery",
+    "textile",
+    "steel",
+    "aluminium",
+    "tyre",
+    "furniture",
+    "mattress",
+    "electronics",
+    "toy",
+    "detergent",
+    "construction"
+  ],
+  "groups": {
+    "battery": {
+      "name": "Batteries",
+      "line": "Composition, carbon footprint and state of health"
+    },
+    "textile": {
+      "name": "Textiles",
+      "line": "Fibre composition, origin, care and repair"
+    },
+    "steel": {
+      "name": "Iron and steel",
+      "line": "Production route, scrap content and carbon per tonne"
+    },
+    "aluminium": {
+      "name": "Aluminium",
+      "line": "Alloy, production route and recycled content"
+    },
+    "tyre": {
+      "name": "Tyres",
+      "line": "Fuel efficiency, wet grip and rolling noise"
+    },
+    "furniture": {
+      "name": "Furniture",
+      "line": "Materials, repairability and end of life"
+    },
+    "mattress": {
+      "name": "Mattresses",
+      "line": "Materials, recycled content and end of life"
+    },
+    "electronics": {
+      "name": "Phones and tablets",
+      "line": "Repairability, spare parts and energy class"
+    },
+    "toy": {
+      "name": "Toys",
+      "line": "Age group, materials and substances of concern"
+    },
+    "detergent": {
+      "name": "Detergents",
+      "line": "Surfactants, dosage and biodegradability"
+    },
+    "construction": {
+      "name": "Construction products",
+      "line": "Cement, concrete, structural steel and glass"
+    },
+    "unsold-goods": {
+      "name": "Unsold goods disclosure",
+      "line": "What was discarded, and why. A report, not a passport"
+    }
+  }
+}

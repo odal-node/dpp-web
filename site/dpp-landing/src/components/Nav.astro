@@ -1,58 +1,171 @@
 ---
-// Nav.astro — top navigation. Mark + wordmark left; links + CTA right.
-// Lockup matches the docs (Starlight) site-title for cross-site parity:
-// navy mark + accent wordmark at --sl-text-h4 scale, weight 600.
+// Nav.astro — top navigation. Mark + wordmark left; two menus, Docs and the
+// CTA right.
+//
+// Two menus, each a disclosure (a button that shows and hides a panel), not an
+// ARIA menu: the panels hold ordinary links, and a screen reader should read
+// them as links. "Explore" is a small panel anchored under its button. "Product
+// groups" is a full-width panel, because eleven groups with a line each do not
+// fit under a button that sits at the right-hand end of the bar.
+//
+// Both open on hover for a mouse and on click or Enter for everyone else, close
+// on Escape and on a click outside, and only one is ever open.
+//
+// The product-group wording comes from product-group-copy.json, never from the
+// vendored manifests, so the menu reads the same as every other list of groups
+// on the site.
 import StatusBadge from "./StatusBadge.astro";
-// Use the real brand mark (currentColor variant of odal-mark) rather than a
-// hand-rolled inline SVG, so the nav stays in sync with the brand asset and the
-// mark inherits the wordmark's colour. Astro 5 imports .svg as a component.
+// The real brand mark (currentColor variant of odal-mark), so the nav stays in
+// sync with the brand asset and the mark inherits the wordmark's colour.
 import OdalMark from "../assets/favicon.svg";
 import ExternalArrow from "./ExternalArrow.astro";
 import Button from "./Button.astro";
+import ProductGroupIcon from "./ProductGroupIcon.astro";
+import copy from "../data/product-group-copy.json";
 
-// The nav is one destination plus the CTA. Roadmap, Lifecycle, Who sees what,
-// the product groups and the repositories are all reached from the footer
-// instead: they are pages a reader goes looking for once, not places to move
-// between, and a nav bar that lists everything stops telling anyone where to
-// start. `external` earns an arrow, so a reader can see which link leaves.
-const links = [
-  { href: "https://docs.odal-node.io", label: "Docs", external: true },
-  // { href: "/trust", label: "Trust", external: false },
-  // { href: "/about", label: "About", external: false },
+const groups = copy.order.map((key) => ({
+  key,
+  ...(copy.groups as Record<string, { name: string; line: string }>)[key],
+}));
+const unsold = copy.groups["unsold-goods"];
+
+const explore = [
+  {
+    href: "/lifecycle",
+    label: "Lifecycle",
+    line: "Follow one passport from the factory to the end of its life",
+    icon: '<path d="M4 12a8 8 0 0 1 13.66-5.66L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.66 5.66L4 15.5"/><path d="M4 20v-4.5h4.5"/>',
+  },
+  {
+    href: "/visibility",
+    label: "Visibility",
+    line: "Who can read which part of a passport, and why",
+    icon: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>',
+  },
+  {
+    href: "/roadmap",
+    label: "Roadmap",
+    line: "What is built, what is blocked and what comes next",
+    icon: '<path d="M5 21V4"/><path d="M5 4.5h11l-2 3.5 2 3.5H5"/>',
+  },
 ];
-const current = Astro.url.pathname;
+
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const inExplore = explore.some((e) => path === e.href);
+const inGroups = path.startsWith("/product-groups");
 ---
 
 <header class="sticky top-0 z-50 border-b border-neutral-100 bg-gray-100">
   <nav class="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-6" aria-label="Main">
-    <div class="flex items-center gap-3">
-      <a href="/" class="site-title flex items-center gap-6 font-semibold tracking-tight text-primary-800 no-underline hover:no-underline">
-        <OdalMark aria-hidden="true" class="h-8 w-8 shrink-0 md:h-10 md:w-10" />
-         <!-- <img src={OdalMark2.src} alt="Odal Node" class="h-8 w-8 shrink-0 md:h-9 md:w-9 rounded-full" /> -->
-        <span class="text-xl md:text-2xl tracking-normal">Odal Node</span>
-      </a>
-      <!-- Honest project status — pre-1.0, alpha. Kept next to the wordmark so
-           it is the first thing read, not buried. Hidden on the narrowest
-           screens to protect the hamburger layout; shown again in the mobile panel. -->
-      <!-- <StatusBadge tone="light" class="hidden sm:inline-flex" label="Alpha" /> -->
-    </div>
+    <a href="/" class="site-title flex items-center gap-6 font-semibold tracking-tight text-primary-800 no-underline hover:no-underline">
+      <OdalMark aria-hidden="true" class="h-8 w-8 shrink-0 md:h-10 md:w-10" />
+      <span class="text-xl md:text-2xl tracking-normal">Odal Node</span>
+    </a>
 
-    <!-- desktop links -->
+    <!-- desktop -->
     <div class="hidden items-center gap-1 md:flex">
-      {links.map((l) => (
-        <a
-          href={l.href}
-          aria-current={!l.external && current === l.href ? "page" : undefined}
-          class={`rounded-md px-3 py-2 text-sm font-medium no-underline hover:bg-neutral-100 ${
-            !l.external && current === l.href
-              ? "text-primary-900 underline decoration-2 underline-offset-8"
-              : "text-neutral-600 hover:text-neutral-900"
-          }`}
-          {...(l.external ? { rel: "noopener" } : {})}
+      <div class="dd relative" data-dd>
+        <button
+          type="button"
+          class:list={["dd-trigger", { "is-current": inExplore }]}
+          aria-expanded="false"
+          aria-controls="dd-explore"
         >
-          {l.label}{l.external && <ExternalArrow class="ml-1" />}
-        </a>
-      ))}
+          Explore
+          <svg class="dd-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+        </button>
+        <div id="dd-explore" class="dd-panel absolute left-0 top-full mt-3 w-88 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl shadow-primary-900/10">
+          <ul class="m-0 list-none p-0">
+            {explore.map((e) => (
+              <li class="m-0">
+                <a
+                  href={e.href}
+                  aria-current={path === e.href ? "page" : undefined}
+                  class="dd-item group flex items-start gap-3 rounded-lg p-3 no-underline hover:no-underline"
+                >
+                  <span class="dd-tile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-5 w-5" set:html={e.icon} />
+                  </span>
+                  <span class="min-w-0">
+                    <span class="block text-sm font-semibold text-neutral-900">{e.label}</span>
+                    <span class="mt-0.5 block text-xs leading-snug text-neutral-500">{e.line}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Not `relative`: the panel positions against the header, full width. -->
+      <div class="dd" data-dd>
+        <button
+          type="button"
+          class:list={["dd-trigger", { "is-current": inGroups }]}
+          aria-expanded="false"
+          aria-controls="dd-groups"
+        >
+          Product groups
+          <svg class="dd-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+        </button>
+        <div id="dd-groups" class="dd-panel dd-mega absolute inset-x-0 top-full border-y border-neutral-200 bg-white shadow-xl shadow-primary-900/10">
+          <div class="mx-auto grid max-w-6xl gap-6 px-6 py-6 lg:grid-cols-[1fr_17rem]">
+            <div>
+              <p class="m-0 mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-primary-700">Product groups</p>
+              <ul class="m-0 grid list-none gap-1 p-0 sm:grid-cols-2 lg:grid-cols-3">
+                {groups.map((g) => (
+                  <li class="m-0">
+                    <a
+                      href={`/product-groups/${g.key}`}
+                      aria-current={path === `/product-groups/${g.key}` ? "page" : undefined}
+                      class="dd-item group flex items-start gap-3 rounded-lg p-3 no-underline hover:no-underline"
+                    >
+                      <span class="dd-tile">
+                        <ProductGroupIcon group={g.key} class="h-5 w-5" />
+                      </span>
+                      <span class="min-w-0">
+                        <span class="block text-sm font-semibold text-neutral-900">{g.name}</span>
+                        <span class="mt-0.5 block text-xs leading-snug text-neutral-500">{g.line}</span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <aside class="flex flex-col rounded-xl bg-primary-900 p-5 text-primary-200">
+              <p class="m-0 text-xs font-semibold uppercase tracking-widest text-primary-300">Also covered</p>
+              <a
+                href="/product-groups/unsold-goods"
+                class="group mt-3 flex items-start gap-3 rounded-lg p-2 -mx-2 no-underline hover:bg-white/5 hover:no-underline"
+              >
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white/10 text-primary-200 transition-colors group-hover:bg-primary-300 group-hover:text-primary-900">
+                  <ProductGroupIcon group="unsold-goods" class="h-5 w-5" />
+                </span>
+                <span class="min-w-0">
+                  <span class="block text-sm font-semibold text-white">{unsold.name}</span>
+                  <span class="mt-0.5 block text-xs leading-snug text-primary-300">{unsold.line}</span>
+                </span>
+              </a>
+              <p class="m-0 mt-4 text-xs leading-relaxed text-primary-300/90">
+                Pick a group to see what its passport carries and who may read
+                each part of it.
+              </p>
+              <a href="/product-groups" class="link-arrow mt-auto pt-4 text-sm font-semibold text-white">
+                All product groups
+              </a>
+            </aside>
+          </div>
+        </div>
+      </div>
+
+      <a
+        href="https://docs.odal-node.io"
+        rel="noopener"
+        class="rounded-md px-3 py-2 text-sm font-medium text-neutral-600 no-underline hover:bg-neutral-200/60 hover:text-neutral-900"
+      >
+        Docs<ExternalArrow class="ml-1" />
+      </a>
       <Button href="/waitlist" class="ml-2">Join the waitlist</Button>
     </div>
 
@@ -71,30 +184,244 @@ const current = Astro.url.pathname;
     </button>
   </nav>
 
-  <!-- mobile panel -->
-  <div id="nav-menu" class="hidden border-t border-neutral-200 bg-white px-4 pb-4 pt-2 md:hidden">
+  <!-- mobile panel: the two menus become collapsible sections -->
+  <div id="nav-menu" class="hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-neutral-200 bg-white px-4 pb-4 pt-2 md:hidden">
     <div class="px-3 pb-2 pt-1">
       <StatusBadge tone="light" label="Alpha · in active development" />
     </div>
-    {links.map((l) => (
-      <a
-        href={l.href}
-        class="block rounded-md px-3 py-2.5 text-sm font-medium text-neutral-700 no-underline hover:bg-neutral-100"
-        {...(l.external ? { rel: "noopener" } : {})}
-      >
-        {l.label}{l.external && <ExternalArrow class="ml-1" />}
-      </a>
-    ))}
+
+    <details class="m-section" open={inExplore}>
+      <summary>Explore</summary>
+      <ul class="m-0 list-none p-0 pb-2">
+        {explore.map((e) => (
+          <li class="m-0">
+            <a href={e.href} class="block rounded-md px-3 py-2 text-sm text-neutral-700 no-underline hover:bg-neutral-100">
+              <span class="font-medium text-neutral-900">{e.label}</span>
+              <span class="block text-xs text-neutral-500">{e.line}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+
+    <details class="m-section" open={inGroups}>
+      <summary>Product groups</summary>
+      <ul class="m-0 grid list-none grid-cols-2 gap-1 p-0 pb-2">
+        {groups.map((g) => (
+          <li class="m-0">
+            <a href={`/product-groups/${g.key}`} class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-800 no-underline hover:bg-neutral-100">
+              <ProductGroupIcon group={g.key} class="h-4 w-4 shrink-0 text-primary-700" />
+              {g.name}
+            </a>
+          </li>
+        ))}
+        <li class="col-span-2 m-0">
+          <a href="/product-groups/unsold-goods" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-800 no-underline hover:bg-neutral-100">
+            <ProductGroupIcon group="unsold-goods" class="h-4 w-4 shrink-0 text-primary-700" />
+            {unsold.name}
+          </a>
+        </li>
+        <li class="col-span-2 m-0 px-3 pt-1">
+          <a href="/product-groups" class="link-arrow text-sm font-semibold">All product groups</a>
+        </li>
+      </ul>
+    </details>
+
+    <a
+      href="https://docs.odal-node.io"
+      rel="noopener"
+      class="block rounded-md px-3 py-2.5 text-sm font-medium text-neutral-700 no-underline hover:bg-neutral-100"
+    >
+      Docs<ExternalArrow class="ml-1" />
+    </a>
     <Button href="/waitlist" class="mt-2 w-full">Join the waitlist</Button>
   </div>
 </header>
 
+<style>
+  .dd-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-neutral-600);
+    cursor: pointer;
+    transition: background-color 150ms, color 150ms;
+  }
+  .dd-trigger:hover,
+  .dd-trigger[aria-expanded="true"] {
+    background: color-mix(in srgb, var(--color-neutral-200) 60%, transparent);
+    color: var(--color-neutral-900);
+  }
+  .dd-trigger.is-current {
+    color: var(--color-primary-900);
+  }
+  .dd-chevron {
+    width: 0.9rem;
+    height: 0.9rem;
+    opacity: 0.6;
+    transition: transform 200ms ease;
+  }
+  .dd-trigger[aria-expanded="true"] .dd-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Closed panels stay in the layout so they can fade, but take no pointer
+     and are skipped by assistive technology (visibility: hidden). */
+  .dd-panel {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 160ms ease, transform 160ms ease, visibility 0s linear 160ms;
+  }
+  .dd[data-open="true"] > .dd-panel {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition: opacity 160ms ease, transform 160ms ease, visibility 0s;
+  }
+  .dd-mega {
+    transform: translateY(-4px);
+  }
+
+  .dd-item {
+    transition: background-color 150ms;
+  }
+  .dd-item:hover,
+  .dd-item:focus-visible,
+  .dd-item[aria-current="page"] {
+    background: var(--color-primary-50);
+  }
+  .dd-tile {
+    display: flex;
+    height: 2.25rem;
+    width: 2.25rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    background: var(--color-primary-50);
+    color: var(--color-primary-700);
+    box-shadow: inset 0 0 0 1px var(--color-primary-100);
+    transition: background-color 150ms, color 150ms, box-shadow 150ms;
+  }
+  .dd-item:hover .dd-tile,
+  .dd-item:focus-visible .dd-tile,
+  .dd-item[aria-current="page"] .dd-tile {
+    background: var(--color-primary-700);
+    color: #fff;
+    box-shadow: none;
+  }
+
+  .m-section {
+    border-bottom: 1px solid var(--color-neutral-100);
+  }
+  .m-section > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-neutral-900);
+    cursor: pointer;
+    list-style: none;
+  }
+  .m-section > summary::-webkit-details-marker {
+    display: none;
+  }
+  .m-section > summary::after {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg) translate(-2px, -2px);
+    opacity: 0.5;
+    transition: transform 200ms ease;
+  }
+  .m-section[open] > summary::after {
+    transform: rotate(225deg) translate(-2px, -2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dd-panel,
+    .dd[data-open="true"] > .dd-panel,
+    .dd-chevron {
+      transition: none;
+    }
+  }
+</style>
+
 <script>
+  // Mobile panel.
   const toggle = document.getElementById("nav-toggle");
   const menu = document.getElementById("nav-menu");
   toggle?.addEventListener("click", () => {
     const open = menu?.classList.toggle("hidden") === false;
     toggle.setAttribute("aria-expanded", String(open));
     toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  });
+
+  // Desktop menus.
+  const menus = Array.from(document.querySelectorAll<HTMLElement>("[data-dd]"));
+  const hoverable = window.matchMedia("(hover: hover) and (pointer: fine)");
+  const timers = new WeakMap<HTMLElement, number>();
+  const hoverOpenedAt = new WeakMap<HTMLElement, number>();
+
+  function setOpen(dd: HTMLElement, open: boolean) {
+    dd.dataset.open = String(open);
+    dd.querySelector(".dd-trigger")?.setAttribute("aria-expanded", String(open));
+  }
+  function closeAll(except?: HTMLElement) {
+    for (const dd of menus) if (dd !== except) setOpen(dd, false);
+  }
+
+  for (const dd of menus) {
+    const trigger = dd.querySelector<HTMLButtonElement>(".dd-trigger");
+    trigger?.addEventListener("click", () => {
+      // A mouse reaches the button by hovering it, which has already opened
+      // the panel. The click that follows must not read as "close".
+      const justHovered = Date.now() - (hoverOpenedAt.get(dd) ?? 0) < 600;
+      const open = justHovered || dd.dataset.open !== "true";
+      closeAll(dd);
+      setOpen(dd, open);
+    });
+
+    // A short delay on leave, so crossing the gap between the button and its
+    // panel does not close the panel.
+    dd.addEventListener("mouseenter", () => {
+      if (!hoverable.matches) return;
+      window.clearTimeout(timers.get(dd));
+      closeAll(dd);
+      if (dd.dataset.open !== "true") hoverOpenedAt.set(dd, Date.now());
+      setOpen(dd, true);
+    });
+    dd.addEventListener("mouseleave", () => {
+      if (!hoverable.matches) return;
+      timers.set(dd, window.setTimeout(() => setOpen(dd, false), 160));
+    });
+
+    // Tabbing out of a menu closes it.
+    dd.addEventListener("focusout", (e) => {
+      const next = (e as FocusEvent).relatedTarget as Node | null;
+      if (next && !dd.contains(next)) setOpen(dd, false);
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    const open = menus.find((dd) => dd.dataset.open === "true");
+    if (!open) return;
+    setOpen(open, false);
+    open.querySelector<HTMLButtonElement>(".dd-trigger")?.focus();
+  });
+  document.addEventListener("click", (e) => {
+    if (!menus.some((dd) => dd.contains(e.target as Node))) closeAll();
   });
 </script>
