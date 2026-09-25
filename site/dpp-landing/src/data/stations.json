@@ -1,5 +1,5 @@
 {
-  "_comment": "The chain of custody as eight stations, the spine of /lifecycle. Written for a general reader: no routes, commands or field names, which belong on the docs site. Every station describes something the software does today; checked against the engine's routes on 2026-09-25. No competitive claims: nobody here has seen what other tools ship past publishing, so the page does not say.",
+  "_comment": "The chain of custody as eight stations, the spine of /lifecycle. Written for a general reader: no routes, commands or field names, which belong on the docs site. Every station describes something the software does today; checked against the engine's routes and handlers on 2026-09-25. No competitive claims: nobody here has seen what other tools ship past publishing, so the page does not say.",
   "stations": [
     {
       "n": 1,
@@ -11,11 +11,11 @@
     },
     {
       "n": 2,
-      "key": "evidence",
-      "title": "Evidence",
-      "who": "Supplier, test laboratory",
-      "lead": "Supporting documents sit on the record they support.",
-      "body": "Test reports and supplier declarations are attached to the passport and can be checked on their own. When an auditor asks where a number came from, the answer is on the record."
+      "key": "components",
+      "title": "Link",
+      "who": "Component maker",
+      "lead": "A product made of parts points to the passports of its parts.",
+      "body": "A passport can reference the passports of its components, such as the battery inside a scooter, and the whole chain is verified in one check. A component passport that changed after it was referenced shows up as a break, at the exact point it happened."
     },
     {
       "n": 3,
@@ -27,8 +27,8 @@
     },
     {
       "n": 4,
-      "key": "seal",
-      "title": "Seal",
+      "key": "sign",
+      "title": "Sign",
       "who": "The operator",
       "lead": "Signed with your own key, on your own servers.",
       "body": "The signature is tied to an identity on a web domain you control, and nothing is sent anywhere to be signed. That is the difference between holding a record and renting access to it."
@@ -55,8 +55,8 @@
       "key": "handover",
       "title": "Hand over",
       "who": "Two companies",
-      "lead": "Responsibility changes hands with both parties' signatures on the record.",
-      "body": "Remanufacturing, repurposing or selling a product line: the handover is part of the passport rather than an email thread, and either side can decline or withdraw before it completes."
+      "lead": "Responsibility changes hands on the record, with the handover signed.",
+      "body": "Remanufacturing, repurposing or selling a product line: the outgoing company signs the handover and the node signs its acceptance, so the change of hands is part of the passport rather than an email thread. Either side can decline or withdraw before it completes."
     },
     {
       "n": 8,
@@ -64,7 +64,8 @@
       "title": "End",
       "who": "Recycler, auditor",
       "lead": "A recorded end of life, and a file anyone can check offline.",
-      "body": "The passport, its signatures and its full history export as one signed file. Someone who has never heard of Odal Node can verify it without a network connection and without trusting us."
+      "body": "The passport, its signatures and its full history export as one signed file. Someone who has never heard of Odal Node can verify it without a network connection and without trusting us.",
+      "link": "/verify"
     }
   ]
 }
