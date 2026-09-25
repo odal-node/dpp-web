@@ -9,9 +9,9 @@ import Section from "../components/Section.astro";
 import StandardsRow from "../components/StandardsRow.astro";
 import Base from "../layouts/Base.astro";
 
-const title = "Odal Node — EU Digital Product Passport Infrastructure | ESPR Compliance";
+const title = "Odal Node: EU Digital Product Passport Infrastructure | ESPR Compliance";
 const description =
-  "Open-source infrastructure for EU Digital Product Passports (DPP) under ESPR. Self-hosted, sovereign compliance — your product data is validated and signed with your keys. Battery, textile, and electronics passports.";
+  "Open-source infrastructure for EU Digital Product Passports (DPP) under ESPR. Self-hosted, sovereign compliance: your product data is validated and signed with your keys. Battery, textile, and electronics passports.";
 
 // Page-specific structured data.
 const softwareAppLd = {
@@ -37,7 +37,7 @@ const softwareAppLd = {
 // services (integrator, validation, vault + in-process signing, resolver) are
 // deliberately merged into a single flow; the docs keep them as separate pages.
 const steps = [
-  { label: "Import", body: "Product data from CSV or Excel — including exports from your ERP — into your own node." },
+  { label: "Import", body: "Product data from CSV or Excel, including exports from your ERP, into your own node." },
   { label: "Validate", body: "Against versioned sector schemas tracking the regulation, locally." },
   { label: "Sign", body: "With your own key, generated and held on your infrastructure." },
   { label: "Publish", body: "Only the signed passport becomes resolvable, via QR and GS1 Digital Link." },
@@ -49,7 +49,7 @@ const steps = [
     eyebrow="EU Digital Product Passports"
     status
     title="Signed by you. Verified by anyone."
-    subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated and signed on your infrastructure, with your keys — the raw import files are discarded, the signed passport is stored and served. Anyone can verify it."
+    subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated and signed on your infrastructure, with your keys. The raw import files are discarded; the signed passport is stored and served. Anyone can verify it."
     primaryHref="https://docs.odal-node.io/quick-start"
     primaryLabel="Self-host now"
     secondaryHref="https://docs.odal-node.io"
@@ -58,7 +58,7 @@ const steps = [
 
   <Section eyebrow="Why now" title="The deadlines are set. The infrastructure mostly isn't." wide>
     <p>
-      Compliance arrives sector by sector, date by date — not "everything by 2027."
+      Compliance arrives sector by sector, date by date, not "everything by 2027."
       Three dated obligations are already in law:
     </p>
     <div class="not-prose mt-8">
@@ -76,8 +76,8 @@ const steps = [
       Manufacturers keep trade secrets. Regulators and customers need data they can
       trust. A proof-bound architecture serves both without asking either to
       compromise: the raw import files are read once and discarded, while the signed
-      passport they produce — carrying the full product data, every field bound to a
-      proof — is what the node stores and serves, released to each audience by that
+      passport they produce (carrying the full product data, every field bound to a
+      proof) is what the node stores and serves, released to each audience by that
       audience's access rights.
     </p>
     <div class="not-prose my-6">
@@ -99,9 +99,9 @@ const steps = [
       </ol>
     </div>
     <p>
-      Anyone verifies the signature against your public DID document — without Odal in
-      the loop. Public fields are readable by all; restricted fields — for repairers,
-      recyclers, and market-surveillance authorities — are released only against a
+      Anyone verifies the signature against your public DID document, without Odal in
+      the loop. Public fields are readable by all; restricted fields (for repairers,
+      recyclers, and market-surveillance authorities) are released only against a
       verified credential. What the node stores: the whole signed passport,
       the audit trail, the signature. What it never stores: raw import files,
       supply-chain detail beyond passport content, or your private keys.
@@ -125,7 +125,7 @@ const steps = [
         },
         {
           k: "Honest open-core",
-          v: "dpp-core (the regulatory standard in Rust) is Apache-2.0, full capability, forever. dpp-engine is BSL-1.1 with a real self-host grant — production self-hosting is free.",
+          v: "dpp-core (the regulatory standard in Rust) is Apache-2.0, full capability, forever. dpp-engine is BSL-1.1 with a real self-host grant: production self-hosting is free.",
         },
         {
           k: "No vendor lock-in",
@@ -133,7 +133,7 @@ const steps = [
         },
         {
           k: "Self-host in minutes",
-          v: "One command to a running node — it builds from source, so allow a few minutes. No licence keys, no passport caps. Ever.",
+          v: "One command to a running node. It builds from source, so allow a few minutes. No licence keys, no passport caps. Ever.",
         },
       ].map((f) => (
         <article class="card p-6">
@@ -148,7 +148,7 @@ const steps = [
   <Section eyebrow="Data and trust" title="What Odal Node can and cannot see." tone="tinted" wide>
     <p>
       Proof-bound is not a promise about our conduct; it is a property of the
-      software. The node reads your import files once and discards them — so the raw
+      software. The node reads your import files once and discards them, so the raw
       production data behind a passport is never ours to access, by construction.
       Stated precisely:
     </p>

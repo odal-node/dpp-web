@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 
-const title = "Trust — Odal Node";
+const title = "Trust | Odal Node";
 const description =
   "What Odal can see, cannot see, and could see but does not. The proof-bound architecture, stated precisely.";
 ---
@@ -14,19 +14,19 @@ const description =
       raw production data is validated and signed locally, on infrastructure
       the manufacturer controls, then discarded. Only the signed proof is
       stored and served. This is a property of the software, not a policy
-      promise — it holds regardless of who operates the node.
+      promise: it holds regardless of who operates the node.
     </p>
   </Section>
 
   <Section eyebrow="Scan telemetry" title="What a scan count is, and what it is not.">
     <p>
-      When a passport is resolved, the node can record that it happened — an
+      When a passport is resolved, the node can record that it happened: an
       aggregate count, per passport, per day. That is the whole of it. A scan
       count records <strong>nothing about the person who scanned</strong>: no IP
       address, no device, no location, no identity, no session. The software has
       no field in which to store any of it, so there is nothing to leak and
       nothing that could quietly become tracking. Producing a QR-code image is
-      counted separately — it measures label production, not people.
+      counted separately; it measures label production, not people.
     </p>
   </Section>
 
@@ -76,18 +76,18 @@ const description =
       <tbody class="text-neutral-600">
         <tr class="border-b border-neutral-100">
           <td class="py-3 pr-4">Node discards raw inputs; stores only the signed proof</td>
-          <td class="py-3 pr-4">Yes — architectural invariant</td>
-          <td class="py-3">Yes — architectural invariant</td>
+          <td class="py-3 pr-4">Yes, by design</td>
+          <td class="py-3">Yes, by design</td>
         </tr>
         <tr class="border-b border-neutral-100">
           <td class="py-3 pr-4">Odal can access stored data</td>
-          <td class="py-3 pr-4">No — not present in the deployment</td>
+          <td class="py-3 pr-4">No. We are not part of the deployment</td>
           <td class="py-3">Constrained by access controls, audit logging, and contract</td>
         </tr>
         <tr>
           <td class="py-3 pr-4">Odal can sign on the operator's behalf</td>
           <td class="py-3 pr-4">No</td>
-          <td class="py-3">No — the operator holds the signing keys</td>
+          <td class="py-3">No. The operator holds the signing keys</td>
         </tr>
       </tbody>
     </table>
@@ -96,19 +96,17 @@ const description =
   <Section eyebrow="How it works" title="The mechanism, not the promise.">
     <ol>
       <li>
-        <strong>Import.</strong> Product data arrives at your node — CSV, Excel,
+        <strong>Import.</strong> Product data arrives at your node as CSV, Excel
         or an ERP export. This happens on infrastructure you control.
       </li>
       <li>
-        <strong>Validate.</strong> The node validates locally against versioned
-        sector schemas. Validation is a pure function — no network calls, no
-        third-party API.
+        <strong>Validate.</strong> The node checks the data locally against the
+        product group's rules. Nothing is sent to a third party to be checked.
       </li>
       <li>
-        <strong>Sign.</strong> Your private signing key — generated and held
-        in-process on your infrastructure — signs the validated passport.
-        The result is a signature cryptographically bound to your published{" "}
-        <code>did:web</code> identity.
+        <strong>Sign.</strong> Your private signing key, generated and held on
+        your own infrastructure, signs the validated passport. The signature is
+        tied to an identity on a web domain you control.
       </li>
       <li>
         <strong>Publish.</strong> Only the signed passport becomes publicly
