@@ -1,0 +1,110 @@
+---
+// /build-on-odal — how someone other than us builds on the software.
+//
+// Every route described here exists in the code today: the Apache-2.0 core
+// library, signed product-group plugins, signed rule updates and the Asset
+// Administration Shell export. The page says plainly that nobody has built on
+// it yet, because an ecosystem page is the easiest place on a site to imply
+// one that does not exist. Technical detail lives on the docs site; this page
+// links to it rather than repeating it.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import ExternalArrow from "../components/ExternalArrow.astro";
+
+const title = "Build on Odal | Odal Node";
+const description =
+  "Four ways to build on Odal Node: embed the open library, write product-group rules, publish rule updates, and connect industrial systems. Trusted by signatures, not by us.";
+
+const ways = [
+  {
+    title: "Embed the open library",
+    body: "The regulatory core is a set of Apache-2.0 libraries anyone can use, including a competitor: the passport model, signing, credentials, GS1 Digital Link, the industrial export and the regulatory rules.",
+    href: "https://docs.odal-node.io/core/overview",
+    cta: "What the core does",
+    icon: '<path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/>',
+  },
+  {
+    title: "Write product-group rules",
+    body: "A product group's checks can ship as a plugin that runs in an isolated sandbox. In production, a node runs a plugin only when it is signed by a key its operator trusts.",
+    href: "https://docs.odal-node.io/core/sectors",
+    cta: "Extending it with plugins",
+    icon: '<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M9 9h6v6H9z"/>',
+  },
+  {
+    title: "Publish rule updates",
+    body: "Rule updates travel as signed bundles. A node accepts one only when it is signed by a key its operator has chosen to trust, and swaps it in without reinstalling anything.",
+    href: "https://docs.odal-node.io/engine/architecture",
+    cta: "How the node works",
+    icon: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
+  },
+  {
+    title: "Connect industrial systems",
+    body: "Passports export in the Asset Administration Shell format, so Industry 4.0 systems can read them without a custom integration.",
+    href: "https://docs.odal-node.io/core/standards",
+    cta: "The standards it uses",
+    icon: '<rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="13" width="7" height="7" rx="1.5"/><path d="M10 7.5h4a2 2 0 0 1 2 2V13"/>',
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <Section eyebrow="Build on Odal" title="Other people's compliance work, on nodes we do not run." wide>
+    <p>
+      Odal Node is built so that rules, plugins and integrations written by
+      someone else can run on it, on infrastructure we never touch. They are
+      trusted because of signatures a node's operator chooses to accept, not
+      because of us.
+    </p>
+    <p>
+      <strong>Nobody has built on it yet.</strong> This page describes what is
+      possible today, not an ecosystem that already exists.
+    </p>
+  </Section>
+
+  <Section eyebrow="Four ways in" title="What you can build today." tone="muted" wide>
+    <ul class="not-prose m-0 grid list-none gap-5 p-0 md:grid-cols-2">
+      {ways.map((w) => (
+        <li class="card m-0 flex flex-col p-6">
+          <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-50 text-primary-700 ring-1 ring-primary-100">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-6 w-6" set:html={w.icon} />
+          </span>
+          <h3 class="m-0 mt-4 text-lg font-semibold text-neutral-900">{w.title}</h3>
+          <p class="m-0 mt-2 text-sm leading-relaxed text-neutral-600">{w.body}</p>
+          <p class="m-0 mt-auto pt-4 text-sm">
+            <a href={w.href} rel="noopener" class="font-medium">{w.cta}<ExternalArrow class="ml-1" /></a>
+          </p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section eyebrow="The licence line" title="What is free, and where the line is." wide>
+    <p>
+      <strong>The core library is Apache-2.0.</strong> Use it for anything,
+      including a product that competes with ours.
+    </p>
+    <p>
+      <strong>The node is source-available under BSL-1.1.</strong> Running it
+      for your own organisation's passports is free. Offering it to others as a
+      hosted service, or shipping it inside a competing product, needs a
+      commercial licence. Each release converts to Apache-2.0 four years after
+      it is published.
+    </p>
+    <p>
+      <a href="https://docs.odal-node.io/engine/licensing" rel="noopener">The licensing page</a>{" "}
+      has the detail, and the licence texts in each repository are the ones
+      that bind.
+    </p>
+  </Section>
+
+  <Section eyebrow="Why it matters" title="A platform you can leave is one you can build on." tone="tinted" wide>
+    <p>
+      Every node belongs to its operator, and every passport verifies without
+      us. There is no central service here for a builder to depend on, or to be
+      captured by, which is the point.
+    </p>
+    <p>
+      <a href="https://github.com/odal-node" rel="noopener">The code is public on GitHub</a>.
+    </p>
+  </Section>
+</Base>

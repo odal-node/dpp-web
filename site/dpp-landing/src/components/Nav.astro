@@ -37,6 +37,18 @@ const explore = [
     icon: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>',
   },
   {
+    href: "/regulations",
+    label: "Regulations",
+    line: "The EU acts behind the passports, and when each applies",
+    icon: '<path d="M12 3v18M5 21h14"/><path d="M5 7h14"/><path d="m5 7-2.5 6a2.5 2.5 0 0 0 5 0L5 7ZM19 7l-2.5 6a2.5 2.5 0 0 0 5 0L19 7Z"/>',
+  },
+  {
+    href: "/build-on-odal",
+    label: "Build on Odal",
+    line: "Embed the library, write rules, connect your systems",
+    icon: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M13.5 5l-3 14"/>',
+  },
+  {
     href: "/roadmap",
     label: "Roadmap",
     line: "What is built, what is blocked and what comes next",
@@ -45,7 +57,7 @@ const explore = [
 ];
 
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
-const inExplore = explore.some((e) => path === e.href);
+const inExplore = explore.some((e) => path === e.href || path.startsWith(`${e.href}/`));
 const inGroups = path.startsWith("/product-groups");
 ---
 
