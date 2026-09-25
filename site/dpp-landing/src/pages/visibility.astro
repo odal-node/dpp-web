@@ -5,10 +5,15 @@
 // fields appear and vanish. A table of the same information is a claim; a
 // mechanism someone drives is an argument.
 //
-// The headline says the two audiences see *different* things, never that one
-// sees less: authorities get point 3 and not point 4, legitimate interest gets
-// point 4 and not point 3. "An authority sees less than a recycler" was the
-// earlier headline, and it is false without the qualifier.
+// The copy compares the authority with the legitimate-interest CLASS, never
+// with a trade: authorities get point 3 and not point 4, legitimate interest
+// gets point 4 and not point 3. Art. 77(2)(c) grants legitimate interest for
+// two purposes only (dismantling and composition work; or, for an individual
+// battery, its buyer dealing with energy markets), and point 4 is plainly
+// individual-battery data, so "a recycler sees the history" is a reading the
+// text does not clearly support. Two earlier headlines ("An authority sees
+// less than a recycler", then "An authority and a recycler see different
+// things") both leaned on it.
 //
 // SCOPE: batteries only, and the page says so in three places. ESPR Art. 11(b)
 // defers access rights to each product group's own delegated act, so a general
@@ -19,19 +24,21 @@ import access from "../data/access.json";
 
 const title = "Visibility: who sees which part of a battery passport | Odal Node";
 const description =
-  "The battery passport's access rules are not a ladder: an authority and a recycler each see something the other cannot. Pick a reader and watch the parts of the passport change.";
+  "The battery passport's access rules are not a ladder: authorities see test reports nobody else does, and only a reader with a legitimate interest sees the battery's own history. Pick a reader and watch the parts of the passport change.";
 ---
 
 <Base title={title} description={description}>
   <Section
     eyebrow="Visibility"
-    title="An authority and a recycler see different things."
+    title="The regulator does not see everything."
     wide
   >
     <p>
-      Each can see something the other cannot. That surprises people, so here
-      is the mechanism rather than the claim: pick a reader below and watch
-      which parts of the passport appear.
+      An authority sees test reports that nobody else does. A reader with a
+      legitimate interest sees the individual battery's own history, which the
+      authority does not. That surprises people, so here is the mechanism
+      rather than the claim: pick a reader below and watch which parts of the
+      passport appear.
     </p>
     <p>
       Everything on this page comes from <strong>Regulation (EU) 2023/1542,
@@ -83,12 +90,12 @@ const description =
             <p class="mt-2 text-sm text-neutral-700">{p.note}</p>
             {p.only === "authority" && (
               <p class="mt-2 text-xs font-semibold text-primary-700">
-                Authorities only. Not shown to a recycler.
+                Authorities only. Not shown to readers with a legitimate interest.
               </p>
             )}
             {p.only === "legitimate" && (
               <p class="mt-2 text-xs font-semibold text-primary-700">
-                Legitimate interest only. Not shown to an authority.
+                Legitimate interest only. Not shown to authorities.
               </p>
             )}
           </li>
@@ -103,6 +110,14 @@ const description =
       Art. 77(2) gives <strong>points 2 and 3</strong> to notified bodies,
       market surveillance authorities and the Commission, and{" "}
       <strong>points 2 and 4</strong> to readers with a legitimate interest.
+    </p>
+    <p>
+      A legitimate interest is not a blank cheque. The Regulation grants it for
+      two purposes only: dismantling and composition work by repairers,
+      remanufacturers, second-life operators and recyclers; or, for an
+      individual battery, its buyer (or someone acting for them) making it
+      available to independent energy aggregators or energy market
+      participants.
     </p>
     <p>
       Point 3 is missing from the second list. Point 4 is missing from the
