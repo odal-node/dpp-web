@@ -114,6 +114,43 @@
   }
 
   /*
+   * PROSE
+   *
+   * Every Section wraps its body in `.prose`, a class from the
+   * @tailwindcss/typography plugin. That plugin was never installed, so the
+   * class did nothing and Tailwind's reset left every paragraph with no
+   * spacing and every list with no bullets or numbers. This is the small,
+   * owned version: flow spacing and list markers, nothing else. Anything
+   * inside `not-prose` keeps exactly what its utilities say, and all of it
+   * sits in :where() so a utility class always wins.
+   */
+  :where(.prose > * + *) {
+    margin-top: 1.1em;
+  }
+  :where(.prose) :where(ul, ol):not(:where(.not-prose, .not-prose *)) {
+    padding-left: 1.4em;
+  }
+  :where(.prose) :where(ul):not(:where(.not-prose, .not-prose *)) {
+    list-style: disc;
+  }
+  :where(.prose) :where(ol):not(:where(.not-prose, .not-prose *)) {
+    list-style: decimal;
+  }
+  :where(.prose) :where(li + li):not(:where(.not-prose *)) {
+    margin-top: 0.5em;
+  }
+  :where(.prose) :where(li):not(:where(.not-prose *))::marker {
+    color: var(--odal-primary-400);
+  }
+  :where(.prose) :where(code):not(:where(.not-prose *)) {
+    font-family: var(--odal-font-mono, ui-monospace, monospace);
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--odal-neutral-100);
+  }
+
+  /*
    * CARD
    *
    * One shape, used by every grid on the site. A ring rather than a border, so

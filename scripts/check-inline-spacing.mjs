@@ -48,6 +48,24 @@ const OPENS = new RegExp(String.raw`[A-Za-z0-9,;:.’—-][ \t]*\n[ \t]*<(?:${IN
 // An inline element closing at the end of a line, then prose on the next.
 const CLOSES = new RegExp(String.raw`</(?:${INLINE})>[ \t]*\n[ \t]*[A-Za-z0-9“]`, 'g');
 
+// The same trim happens where prose meets a `{…}` expression, which is how
+// "by 2027."Four passport obligations" reached staging on 2026-09-25: a
+// sentence ending one line and a computed sentence `{lead}` opening the next.
+// Checked in the template only (frontmatter and <script>/<style> blocks are
+// blanked first), because braces in code are code. Only a value expression
+// standing alone in prose counts (`{lead}`, `{group.name}`, `{n}`): an
+// attribute (`href={x}`, preceded by `=`), the `{" "}` fix itself, and the
+// braces of a `.map(…)` block are not prose and never lose a space.
+const VALUE = String.raw`\{[A-Za-z_$][\w$.?]*(?:\([^(){}\n]*\))?\}`;
+const EXPR_OPENS = new RegExp(String.raw`[A-Za-z0-9,;:.!?’”"')][ \t]*\n[ \t]*${VALUE}`, 'g');
+const EXPR_CLOSES = new RegExp(String.raw`(?<![=\w])${VALUE}[ \t]*\n[ \t]*[A-Za-z0-9“]`, 'g');
+
+/** Blank everything that is not template, keeping line numbers intact. */
+const templateOnly = (src) =>
+  src
+    .replace(/^---\n[\s\S]*?\n---\n/, (m) => m.replace(/[^\n]/g, ' '))
+    .replace(/<(script|style)\b[\s\S]*?<\/\1>/g, (m) => m.replace(/[^\n]/g, ' '));
+
 const walk = (dir, out = []) => {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
@@ -67,8 +85,14 @@ for (const root of ROOTS) {
     continue; // a site that does not exist is not a failure
   }
   for (const file of files) {
-    const src = readFileSync(file, 'utf8');
-    for (const [side, pattern] of [['before', OPENS], ['after', CLOSES]]) {
+    const raw = readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+    const template = templateOnly(raw);
+    for (const [side, pattern, src] of [
+      ['before', OPENS, raw],
+      ['after', CLOSES, raw],
+      ['before', EXPR_OPENS, template],
+      ['after', EXPR_CLOSES, template],
+    ]) {
       pattern.lastIndex = 0;
       let m;
       while ((m = pattern.exec(src)) !== null) {
