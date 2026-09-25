@@ -1,190 +1,155 @@
 ---
 // /product-groups/[key] — one page per modelled product group, generated from
-// the manifests vendored out of dpp-core at a pinned commit.
+// the manifests vendored out of dpp-core and worded by product-group-copy.json.
 //
-// WHY GENERATED RATHER THAN WRITTEN
-//
-// Twelve hand-written pages are twelve things to forget when a schema version
-// moves. These render from the same manifests the software reads, so a page
-// cannot claim a version the code does not serve. `check:product-groups` fails
-// the build when the vendored copies drift from the pin.
+// Written for a general reader: no schema versions, plugin names, field keys
+// or commit hashes. Those belong on the docs site. A page cannot claim a group
+// the software does not model, because it is generated from the same
+// definitions the software reads.
 //
 // WHAT THESE PAGES DELIBERATELY DO NOT SAY
 //
 // No act numbers, no dates, no "mandatory from". The product-group manifests
-// carry no law — that lives in core's instrument manifests, which are not
-// vendored here. A page that stated an obligation would be a regulatory claim
-// this repository would then have to keep current, and the one thing worse than
-// no date is a stale one.
+// carry no law, and a regulatory date published here would be a claim this
+// repository then has to keep current. The one thing worse than no date is a
+// stale one.
 import Base from "../../layouts/Base.astro";
 import Section from "../../components/Section.astro";
-import pin from "../../../product-groups-source.json";
-
-type Manifest = {
-  key: string;
-  title: string;
-  schemaVersions: string[];
-  currentSchemaVersion: string;
-  productCategories?: string[];
-  disclosure?: Record<string, string>;
-  plugin?: string;
-  notes?: string;
-};
+import ProductGroupIcon from "../../components/ProductGroupIcon.astro";
+import { allPages, categoryLabel, fieldLabel, type Group } from "../../lib/product-groups";
 
 export function getStaticPaths() {
-  const all = import.meta.glob("../../data/product-groups/*.json", { eager: true });
-  return Object.values(all).map((m: any) => {
-    const d = (m.default ?? m) as Manifest;
-    return { params: { key: d.key }, props: { manifest: d } };
-  });
+  return allPages.map((g) => ({ params: { key: g.key }, props: { group: g } }));
 }
 
-const { manifest } = Astro.props as { manifest: Manifest };
+const { group } = Astro.props as { group: Group };
+const isUnsold = group.key === "unsold-goods";
 
-// The disclosure map is field -> class. Invert it: a reader wants to know which
-// fields share a class, not to scan a field list for the one they care about.
+// The disclosure map is field -> class. Invert it: a reader wants to know who
+// sees what, not to scan a field list for the one they care about.
 const byClass = new Map<string, string[]>();
-for (const [field, cls] of Object.entries(manifest.disclosure ?? {})) {
+for (const [field, cls] of Object.entries(group.disclosure ?? {})) {
   if (!byClass.has(cls)) byClass.set(cls, []);
-  byClass.get(cls)!.push(field);
+  byClass.get(cls)!.push(fieldLabel(field));
 }
-const classes = [...byClass.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
-// What each class means. `conformity` and `individual` appear for batteries
-// only, because Art. 77(2) is the only place that split is currently law.
-const CLASS_NOTE: Record<string, string> = {
-  restricted: "Not public. Shown to a reader holding a credential for this product group.",
-  conformity: "Conformity evidence. Battery Annex XIII point 3 — notified bodies, market surveillance and the Commission.",
-  individual: "The individual item's own history. Battery Annex XIII point 4 — legitimate interest only, and explicitly not authorities.",
+// Who each class is for, in plain words. `conformity` and `individual` appear
+// for batteries only, because that is the one product group whose own law
+// splits access this way.
+const CLASS: Record<string, { title: string; note: string }> = {
+  restricted: {
+    title: "For readers with a credential",
+    note: "Not public. Shown only to a reader who holds a credential for this product group.",
+  },
+  conformity: {
+    title: "For authorities only",
+    note: "Evidence that the product meets the rules. Shown to notified bodies, market surveillance authorities and the Commission.",
+  },
+  individual: {
+    title: "For readers with a legitimate interest only",
+    note: "The individual item's own history. Shown only to readers with a legitimate interest in it, and not to authorities.",
+  },
 };
+const ORDER = ["restricted", "conformity", "individual"];
+const classes = [...byClass.entries()].sort(
+  (a, b) => ORDER.indexOf(a[0]) - ORDER.indexOf(b[0]),
+);
 
-const versionCount = manifest.schemaVersions?.length ?? 0;
-const title = `${manifest.title} — product group | Odal Node`;
-const description = `What Odal Node models for ${manifest.title.toLowerCase()}: ${versionCount} schema version(s), currently ${manifest.currentSchemaVersion}, with its disclosure classes and plugin binding.`;
+const title = `${group.name}: product group | Odal Node`;
+const description = isUnsold
+  ? "How Odal Node records the disclosure of discarded unsold products: a yearly report by the operator, not a product passport."
+  : `What an Odal Node passport for ${group.name.toLowerCase()} carries, and who may read each part of it.`;
 ---
 
 <Base title={title} description={description}>
-  <Section eyebrow="Product group" title={manifest.title} wide>
-    <p>
-      Everything on this page is generated from the product-group manifest the
-      software itself reads, vendored from{" "}
-      <a href={`https://github.com/${pin.repository}`}>{pin.repository}</a> at a
-      pinned commit. It describes <strong>what is modelled</strong>, not what the
-      law requires — see the note at the foot.
-    </p>
-
-    <div class="not-prose mt-8 grid gap-4 sm:grid-cols-3">
-      <div class="card p-5">
-        <p class="text-xs uppercase tracking-widest text-neutral-500">Current schema</p>
-        <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">
-          v{manifest.currentSchemaVersion}
-        </p>
-      </div>
-      <div class="card p-5">
-        <p class="text-xs uppercase tracking-widest text-neutral-500">Versions modelled</p>
-        <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{versionCount}</p>
-      </div>
-      <div class="card p-5">
-        <p class="text-xs uppercase tracking-widest text-neutral-500">Compliance plugin</p>
-        <p class="mt-1 font-mono text-sm text-neutral-900">
-          {manifest.plugin ?? "none"}
-        </p>
-      </div>
+  <Section eyebrow={isUnsold ? "Also covered" : "Product group"} title={group.name} wide>
+    <div class="not-prose mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-primary-50 text-primary-700 ring-1 ring-primary-100">
+      <ProductGroupIcon group={group.key} class="h-7 w-7" />
     </div>
+    <p class="text-lg text-neutral-800">{group.line}.</p>
+    {isUnsold ? (
+      <p>
+        This is not a product group, and it carries no passport. Companies
+        that discard unsold consumer products must publish, each year, how
+        many they discarded, why, and what happened to them; the smallest
+        companies are exempt. Odal Node records that disclosure line by line,
+        per type of product, reason and destination, for the company rather
+        than for any single product.
+      </p>
+    ) : (
+      <p>
+        This page is generated from the same product definition the software
+        uses to build and check a passport. It describes{" "}
+        <strong>what is modelled</strong>, not what the law requires.
+      </p>
+    )}
   </Section>
 
-  {manifest.notes ? (
-    <Section eyebrow="Caveats" title="What the maintainers record about this group.">
+  {group.productCategories?.length ? (
+    <Section eyebrow="Categories" title="The kinds of product it tells apart." tone="muted" wide>
       <p>
-        This is the manifest's own <code>notes</code> field, reproduced verbatim.
-        It is where a group says which of its fields are a best reading rather
-        than a requirement, and it is written for the people maintaining the
-        schema rather than for this page.
-      </p>
-      <blockquote class="border-l-4 border-primary-300 pl-4 text-neutral-700">
-        {manifest.notes}
-      </blockquote>
-    </Section>
-  ) : null}
-
-  {manifest.productCategories?.length ? (
-    <Section eyebrow="Categories" title="Categories this product group distinguishes." tone="muted">
-      <p>
-        A category changes which rules apply. These are the values the schema
-        accepts, not a marketing segmentation.
+        A category can change which rules apply to a passport, so the software
+        asks for one.
       </p>
       <div class="not-prose mt-6 flex flex-wrap gap-2">
-        {manifest.productCategories.map((c) => (
-          <span class="rounded border border-neutral-300 bg-white px-3 py-1 font-mono text-sm">
-            {c}
+        {group.productCategories.map((c) => (
+          <span class="rounded-full border border-neutral-300 bg-white px-3.5 py-1.5 text-sm text-neutral-800">
+            {categoryLabel(c)}
           </span>
         ))}
       </div>
     </Section>
   ) : null}
 
-  <Section eyebrow="Disclosure" title="Which fields are not public.">
-    {classes.length === 0 ? (
-      <>
-        <p>
-          <strong>This product group declares no disclosure classes.</strong> That
-          is not an omission — it is the absence of a delegated act.
-        </p>
-        <p>
-          ESPR Art. 11(b) gives each actor access <em>"based on their respective
-          access rights set out in the applicable delegated act adopted pursuant
-          to Article 4"</em>. Until that act exists for
-          {" "}{manifest.title.toLowerCase()}, there is no split to model, and
-          inventing one would be asserting a rule nobody has written.
-        </p>
-      </>
-    ) : (
-      <>
-        <p>
-          Every field below is withheld from the public view. The class decides
-          who may see it.
-        </p>
-        <div class="not-prose mt-6 space-y-6">
-          {classes.map(([cls, fields]) => (
-            <div class="card p-5">
-              <div class="flex items-baseline justify-between gap-4">
-                <h3 class="font-mono text-sm font-semibold text-primary-800">{cls}</h3>
-                <span class="text-xs text-neutral-500">{fields.length} field(s)</span>
-              </div>
-              {CLASS_NOTE[cls] && (
-                <p class="mt-2 text-sm text-neutral-700">{CLASS_NOTE[cls]}</p>
-              )}
-              <p class="mt-3 font-mono text-xs leading-relaxed text-neutral-600">
-                {fields.sort().join(" · ")}
-              </p>
-            </div>
-          ))}
-        </div>
-        {byClass.has("conformity") && byClass.has("individual") && (
-          <p class="mt-6">
-            <strong>Note the two classes above are not ordered.</strong> Conformity
-            evidence goes to authorities and not to recyclers; the individual
-            item's history goes to recyclers and not to authorities. See{" "}
-            <a href="/visibility">visibility</a>.
+  {!isUnsold && (
+    <Section eyebrow="Visibility" title="Which parts are not public." wide>
+      {classes.length === 0 ? (
+        <>
+          <p>
+            <strong>Everything in this passport is public for now.</strong>{" "}
+            That is not an oversight. Under ESPR, who may see which part of a
+            passport is set by each product group's own rules, and none have
+            been adopted for {group.name.toLowerCase()} yet. Inventing a split
+            would mean asserting a rule nobody has written.
           </p>
-        )}
-      </>
-    )}
-  </Section>
+        </>
+      ) : (
+        <>
+          <p>
+            The public sees the rest of the passport. These parts are shown only
+            to the readers named.
+          </p>
+          <div class="not-prose mt-6 space-y-4">
+            {classes.map(([cls, fields]) => (
+              <div class="card p-5">
+                <h3 class="m-0 text-base font-semibold text-neutral-900">
+                  {CLASS[cls]?.title ?? "Not public"}
+                </h3>
+                {CLASS[cls] && <p class="mt-1 text-sm text-neutral-600">{CLASS[cls].note}</p>}
+                <ul class="m-0 mt-4 flex list-none flex-wrap gap-2 p-0">
+                  {fields.sort().map((f) => (
+                    <li class="m-0 rounded-md bg-primary-50 px-2.5 py-1 text-sm text-primary-900">{f}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          {byClass.has("conformity") && byClass.has("individual") && (
+            <p class="mt-6">
+              <strong>These are not ranked.</strong> Authorities see the
+              conformity evidence and not the item's own history; readers with a
+              legitimate interest see the history and not the evidence. See{" "}
+              <a href="/visibility">how visibility works</a>.
+            </p>
+          )}
+        </>
+      )}
+    </Section>
+  )}
 
-  <Section eyebrow="Provenance" title="Where this page's facts come from." tone="tinted">
+  <Section eyebrow="Other groups" title="Every product group." tone="tinted" wide>
     <p>
-      Generated from <code>{pin.path}/{manifest.key}.json</code> in
-      {" "}<a href={`https://github.com/${pin.repository}`}>{pin.repository}</a>,
-      vendored at commit <code>{pin.commit.slice(0, 8)}</code>. A build fails if
-      the vendored copy drifts from that commit.
-    </p>
-    <p>
-      <strong>No dates or act numbers appear on this page deliberately.</strong>{" "}
-      Product-group manifests carry no law. Obligations, effective dates and
-      passport requirements live in separate instrument manifests that are not
-      vendored here — because a regulatory date published on a marketing site is
-      a claim that has to be kept current, and a stale one is worse than none.
+      <a href="/product-groups" class="link-arrow">See all product groups</a>
     </p>
   </Section>
 </Base>

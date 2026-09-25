@@ -21,13 +21,7 @@ import OdalMark from "../assets/favicon.svg";
 import ExternalArrow from "./ExternalArrow.astro";
 import Button from "./Button.astro";
 import ProductGroupIcon from "./ProductGroupIcon.astro";
-import copy from "../data/product-group-copy.json";
-
-const groups = copy.order.map((key) => ({
-  key,
-  ...(copy.groups as Record<string, { name: string; line: string }>)[key],
-}));
-const unsold = copy.groups["unsold-goods"];
+import { groups, unsoldGoods as unsold } from "../lib/product-groups";
 
 const explore = [
   {
