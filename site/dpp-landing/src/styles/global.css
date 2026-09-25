@@ -105,13 +105,11 @@
    * A `wide` section widens its container so grids and card rows can breathe.
    * Body copy must not widen with it: past roughly 75 characters the eye loses
    * the start of the next line, and /lifecycle and /roadmap are long enough
-   * pages for that to matter. Grids, cards and anything in `not-prose` are
-   * untouched, because only direct text children are constrained.
+   * pages for that to matter. Grids, cards and anything marked `not-prose` are
+   * untouched: only direct text children are constrained, and a list that is
+   * really a grid of cards opts out with `not-prose`.
    */
-  .prose > p,
-  .prose > ul,
-  .prose > ol,
-  .prose > blockquote {
+  .prose > :is(p, ul, ol, blockquote):not(.not-prose) {
     max-width: 68ch;
   }
 
