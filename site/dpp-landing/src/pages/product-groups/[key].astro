@@ -17,6 +17,7 @@ import Base from "../../layouts/Base.astro";
 import Section from "../../components/Section.astro";
 import ProductGroupIcon from "../../components/ProductGroupIcon.astro";
 import { allPages, categoryLabel, fieldLabel, type Group } from "../../lib/product-groups";
+import { actsFor, displayTitle, kindLabel, bindingLabel } from "../../lib/regulations";
 
 export function getStaticPaths() {
   return allPages.map((g) => ({ params: { key: g.key }, props: { group: g } }));
@@ -24,6 +25,10 @@ export function getStaticPaths() {
 
 const { group } = Astro.props as { group: Group };
 const isUnsold = group.key === "unsold-goods";
+
+// The acts recorded as reaching this group. Dates stay on the regulation pages,
+// so there is one place on the site a date can be wrong.
+const acts = actsFor(group.key);
 
 // The disclosure map is field -> class. Invert it: a reader wants to know who
 // sees what, not to scan a field list for the one they care about.
@@ -107,10 +112,10 @@ const description = isUnsold
         <>
           <p>
             <strong>Everything in this passport is public for now.</strong>{" "}
-            That is not an oversight. Under ESPR, who may see which part of a
-            passport is set by each product group's own rules, and none have
-            been adopted for {group.name.toLowerCase()} yet. Inventing a split
-            would mean asserting a rule nobody has written.
+            That is not an oversight. Who may see which part of a passport is
+            set by each product group's own rules, and the software models no
+            such split for {group.name.toLowerCase()} yet. Inventing one would
+            mean asserting a rule nobody has written.
           </p>
         </>
       ) : (
@@ -146,6 +151,32 @@ const description = isUnsold
       )}
     </Section>
   )}
+
+  <Section eyebrow="The law" title="The acts that reach it." tone="muted" wide>
+    {acts.length === 0 ? (
+      <p>No act recorded in the software's library reaches this group yet.</p>
+    ) : (
+      <ul class="not-prose m-0 grid list-none gap-3 p-0 md:grid-cols-2">
+        {acts.map(({ instrument, binding }) => (
+          <li class="m-0">
+            <a href={`/regulations/${instrument.id}`} class="card flex h-full flex-col p-5 no-underline">
+              <span class="text-xs font-medium uppercase tracking-wide text-neutral-500">{kindLabel(instrument)}</span>
+              <span class="mt-1 font-semibold text-neutral-900">{displayTitle(instrument)}</span>
+              <span class:list={[
+                "mt-3 self-start rounded-md px-2 py-0.5 text-xs font-semibold",
+                binding.status === "in_force" ? "bg-primary-100 text-primary-800" : "bg-neutral-100 text-neutral-600",
+              ]}>
+                {bindingLabel(binding.status)}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+    <p class="mt-6 text-sm text-neutral-600">
+      Dates, and where each one comes from, are on each act's page.
+    </p>
+  </Section>
 
   <Section eyebrow="Other groups" title="Every product group." tone="tinted" wide>
     <p>

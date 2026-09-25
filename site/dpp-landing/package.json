@@ -10,8 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "sync:product-groups": "node scripts/sync-product-groups.mjs",
-    "check:product-groups": "node scripts/sync-product-groups.mjs --check"
+    "sync:core": "node scripts/sync-from-core.mjs",
+    "check:core": "node scripts/sync-from-core.mjs --check"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3",

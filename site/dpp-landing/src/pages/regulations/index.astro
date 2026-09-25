@@ -1,0 +1,78 @@
+---
+// /regulations — the EU acts behind the passports, generated from the
+// instrument records vendored out of dpp-core. Nothing here is hand-written
+// law: every date, status and product group comes from those records, which
+// the software itself runs on. See lib/regulations.ts for the one rule the
+// wording enforces.
+import Base from "../../layouts/Base.astro";
+import Section from "../../components/Section.astro";
+import ActCard from "../../components/ActCard.astro";
+import BasisMark from "../../components/BasisMark.astro";
+import { creatingPassports, shapingPassports, instruments, displayTitle } from "../../lib/regulations";
+
+const title = "Regulations: the EU acts behind the passports | Odal Node";
+const description =
+  "The EU acts that create or shape Digital Product Passports, with the date each one applies and where that date comes from. Generated from the same records the software runs on.";
+
+const itemListLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "EU acts modelled by Odal Node",
+  itemListElement: instruments.map((i, n) => ({
+    "@type": "ListItem",
+    position: n + 1,
+    name: displayTitle(i),
+    url: `https://odal-node.io/regulations/${i.id}`,
+  })),
+};
+---
+
+<Base title={title} description={description} jsonLd={[itemListLd]}>
+  <Section eyebrow="Regulations" title="The EU acts behind the passports." wide>
+    <p>
+      Each act below is a record in the software's own library, and every
+      adopted one has been checked against its official text. This page is
+      generated from those records, so the site cannot state a date the
+      software does not hold.
+    </p>
+    <p>Every date says where it comes from:</p>
+    <ul class="not-prose m-0 flex list-none flex-wrap gap-x-6 gap-y-2 p-0 text-sm text-neutral-700">
+      <li class="m-0 flex items-center gap-2">
+        <BasisMark basis="sourced" label="From the text" /> quoted from the Official Journal
+      </li>
+      <li class="m-0 flex items-center gap-2">
+        <BasisMark basis="assumed" label="Our assumption" /> our reading, with no text that states it
+      </li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="Passports" title="Acts that create a passport." tone="muted" wide>
+    <ul class="not-prose m-0 grid list-none gap-4 p-0 md:grid-cols-2 lg:grid-cols-3">
+      {creatingPassports.map((act) => (
+        <li class="m-0"><ActCard act={act} /></li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section eyebrow="Related acts" title="Acts that shape a passport without creating one." wide>
+    <ul class="not-prose m-0 grid list-none gap-4 p-0 md:grid-cols-2 lg:grid-cols-3">
+      {shapingPassports.map((act) => (
+        <li class="m-0"><ActCard act={act} /></li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section eyebrow="Read this first" title="What this list is, and what it is not." tone="tinted" wide>
+    <p>
+      <strong>It is not legal advice</strong>, and it is not a complete list of
+      what applies to your product. It is the set of acts the software models.
+      An act can reach products that were never modelled as a product group, so
+      the absence of an act here is not evidence that none applies.
+    </p>
+    <p>
+      Where an act requires a passport but the rules it depends on have not been
+      adopted, the page says the obligation is not yet operable rather than
+      printing a date that has already passed.
+    </p>
+  </Section>
+</Base>

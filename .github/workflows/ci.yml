@@ -80,12 +80,12 @@ jobs:
       - name: Check inline spacing
         run: pnpm run check:spacing
 
-      # The product-group pages are generated from manifests vendored out of
-      # dpp-core. This fails if a vendored copy no longer matches the commit
-      # recorded in product-groups-source.json, so a page cannot claim a schema
-      # version the software does not serve.
-      - name: Check the vendored product groups against core
-        run: pnpm --filter dpp-landing run check:product-groups
+      # The product-group and regulation pages are generated from data vendored
+      # out of dpp-core. This fails if a vendored copy no longer matches the
+      # commit recorded in core-source.json, so a page cannot describe a product
+      # group or a legal act differently from the library.
+      - name: Check the vendored product groups and regulations against core
+        run: pnpm --filter dpp-landing run check:core
         env:
           DPP_CORE_DIR: ${{ github.workspace }}/.dpp-core
 

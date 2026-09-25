@@ -1,0 +1,136 @@
+---
+// /regulations/[id] — one legal act, generated from its instrument record.
+//
+// Shows the facts the record holds, worded for a general reader: status, the
+// passport line, the date and where it comes from, the framework it sits
+// under, when it was last checked against the official text, and the product
+// groups it reaches with the articles each reach rests on. The record's own
+// maintainer notes are not reproduced; they are written for the people keeping
+// the library, not for this page.
+import Base from "../../layouts/Base.astro";
+import Section from "../../components/Section.astro";
+import BasisMark from "../../components/BasisMark.astro";
+import ExternalArrow from "../../components/ExternalArrow.astro";
+import {
+  type Instrument,
+  instruments,
+  displayTitle,
+  kindLabel,
+  statusLabel,
+  passportView,
+  basisLabel,
+  bindingLabel,
+  groupRef,
+  parentOf,
+  eurLex,
+  formatDate,
+} from "../../lib/regulations";
+
+export function getStaticPaths() {
+  return instruments.map((act) => ({ params: { id: act.id }, props: { act } }));
+}
+
+const { act } = Astro.props as { act: Instrument };
+const name = displayTitle(act);
+const passport = passportView(act);
+const parent = parentOf(act);
+const bindings = act.productGroups ?? [];
+
+const title = `${name} | Odal Node`;
+const description = `${kindLabel(act)}: ${passport.label.toLowerCase()}. What it requires of a passport, and the product groups it reaches, as recorded in the Odal Node library.`;
+---
+
+<Base title={title} description={description}>
+  <Section eyebrow={kindLabel(act)} title={name} wide>
+    <!-- The facts vary per act (three or four). An odd last fact spans the row,
+         so the grid never shows an empty cell. -->
+    <dl class="not-prose m-0 grid gap-px overflow-hidden rounded-xl border border-neutral-200 bg-neutral-200 sm:grid-cols-2 sm:[&>div:last-child:nth-child(odd)]:col-span-2">
+      <div class="bg-white p-5">
+        <dt class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Passport</dt>
+        <dd class="m-0 mt-1 text-base font-semibold text-neutral-900">{passport.label}</dd>
+        <dd class="m-0 mt-1 text-sm text-neutral-600">{passport.detail}</dd>
+        {passport.date && (
+          <dd class="m-0 mt-2"><BasisMark basis={passport.date.basis} label={basisLabel(passport.date.basis)} /></dd>
+        )}
+      </div>
+      <div class="bg-white p-5">
+        <dt class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Status</dt>
+        <dd class="m-0 mt-1 text-base font-semibold text-neutral-900">{statusLabel(act)}</dd>
+        <dd class="m-0 mt-1 text-sm text-neutral-600">
+          {act.currency?.checkedOn
+            ? `Last checked against the official text on ${formatDate(act.currency.checkedOn)}.`
+            : "Not adopted, so there is no official text to check yet."}
+        </dd>
+      </div>
+      {parent && (
+        <div class="bg-white p-5">
+          <dt class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Adopted under</dt>
+          <dd class="m-0 mt-1 text-sm">
+            <a href={`/regulations/${parent.id}`}>{displayTitle(parent)}</a>
+          </dd>
+        </div>
+      )}
+      {act.celex && (
+        <div class="bg-white p-5">
+          <dt class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Official text</dt>
+          <dd class="m-0 mt-1 text-sm">
+            <a href={eurLex(act.celex)} rel="noopener">Read it on EUR-Lex<ExternalArrow class="ml-1" /></a>
+          </dd>
+        </div>
+      )}
+    </dl>
+  </Section>
+
+  <Section eyebrow="Reach" title="The product groups it reaches." tone="muted" wide>
+    {bindings.length === 0 ? (
+      <p>
+        None that the software models as a product group yet. The act still
+        applies to the products it covers; they have not been modelled here.
+      </p>
+    ) : (
+      <ul class="not-prose m-0 grid list-none gap-4 p-0 md:grid-cols-2">
+        {bindings.map((b) => {
+          const g = groupRef(b.productGroup);
+          return (
+            <li class="card m-0 p-5">
+              <div class="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 class="m-0 text-base font-semibold text-neutral-900">
+                  {g.href ? <a href={g.href}>{g.name}</a> : g.name}
+                </h3>
+                <span class:list={[
+                  "rounded-md px-2 py-0.5 text-xs font-semibold",
+                  b.status === "in_force" ? "bg-primary-100 text-primary-800" : "bg-neutral-100 text-neutral-600",
+                ]}>
+                  {bindingLabel(b.status)}
+                </span>
+              </div>
+              {b.legalBasis && b.legalBasis.length > 0 && (
+                <>
+                  <p class="m-0 mt-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">Rests on</p>
+                  <ul class="m-0 mt-1.5 list-none space-y-1 p-0 text-sm text-neutral-700">
+                    {b.legalBasis.map((l) => <li class="m-0">{l}</li>)}
+                  </ul>
+                </>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    )}
+    <p class="mt-6 text-sm text-neutral-600">
+      <strong>Binding now</strong> means something about the group can be
+      determined under this act today. <strong>Not yet determinable</strong>{" "}
+      means the act exists or is expected, but the rules a determination needs
+      have not been adopted.
+    </p>
+  </Section>
+
+  <Section eyebrow="Read this first" title="Not legal advice." tone="tinted" wide>
+    <p>
+      This page describes how the act is recorded in the software's library. It
+      is not a complete statement of the act, and it does not tell you whether
+      the act applies to your product. The official text does.
+    </p>
+    <p><a href="/regulations" class="link-arrow">All regulations</a></p>
+  </Section>
+</Base>

@@ -1,0 +1,63 @@
+---
+// ActCard.astro — one legal act as a card on /regulations. Everything shown is
+// read from the vendored instrument record through lib/regulations.ts.
+import {
+  type Instrument,
+  displayTitle,
+  kindLabel,
+  statusLabel,
+  passportView,
+  basisLabel,
+  groupRef,
+} from "../lib/regulations";
+import BasisMark from "./BasisMark.astro";
+
+interface Props {
+  act: Instrument;
+}
+const { act } = Astro.props;
+const passport = passportView(act);
+const reached = (act.productGroups ?? []).map((b) => groupRef(b.productGroup));
+
+const tone: Record<string, string> = {
+  required: "bg-regulatory-bg text-regulatory-text ring-regulatory-border",
+  "not-yet-operable": "bg-neutral-100 text-neutral-700 ring-neutral-200",
+  "per-act": "bg-primary-50 text-primary-800 ring-primary-100",
+  expected: "bg-neutral-100 text-neutral-600 ring-neutral-200",
+  none: "bg-neutral-100 text-neutral-600 ring-neutral-200",
+  elsewhere: "bg-neutral-100 text-neutral-600 ring-neutral-200",
+};
+---
+
+<article class="card flex h-full flex-col p-5">
+  <p class="m-0 flex flex-wrap gap-x-3 text-xs font-medium uppercase tracking-wide text-neutral-500">
+    <span>{kindLabel(act)}</span>
+    <span aria-hidden="true">·</span>
+    <span>{statusLabel(act)}</span>
+  </p>
+  <h3 class="m-0 mt-2 text-base font-semibold leading-snug text-neutral-900">
+    <a href={`/regulations/${act.id}`} class="text-neutral-900 no-underline hover:text-primary-700 hover:underline">
+      {displayTitle(act)}
+    </a>
+  </h3>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2">
+    <span class={`rounded-md px-2.5 py-1 text-sm font-semibold ring-1 ${tone[passport.state]}`}>
+      {passport.label}
+    </span>
+    {passport.date && <BasisMark basis={passport.date.basis} label={basisLabel(passport.date.basis)} />}
+  </div>
+  <p class="m-0 mt-2 text-sm leading-snug text-neutral-600">{passport.detail}</p>
+
+  {reached.length > 0 && (
+    <ul class="m-0 mt-4 flex list-none flex-wrap gap-1.5 p-0" aria-label="Product groups it reaches">
+      {reached.map((g) => (
+        <li class="m-0 rounded-full border border-neutral-200 px-2.5 py-0.5 text-xs text-neutral-700">{g.name}</li>
+      ))}
+    </ul>
+  )}
+
+  <p class="m-0 mt-auto pt-4 text-sm">
+    <a href={`/regulations/${act.id}`} class="link-arrow">Details</a>
+  </p>
+</article>
