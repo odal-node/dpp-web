@@ -1,134 +1,86 @@
 ---
-// /roadmap — development status across the two public repositories.
+// /roadmap — what the software does today, what is waiting, and what is next.
 //
-// Rewritten 2026-09-19 after auditing every item against the repositories
-// themselves rather than against the previous version of this page. What the
-// audit found is why the page now looks the way it does:
-//
-//   * Four items were understated. Twelve product groups were described as
-//     three; electronics and four "horizon" groups had already shipped.
-//   * Two were overstated. An operator dashboard was listed as in build and
-//     does not exist in any form, and the CLI — which is the actual control
-//     plane — was not mentioned at all.
-//   * Two were miscategorised in a way that mattered. The seal and registry
-//     work is finished and legally inert, which is not the same fact as
-//     "in progress", and a column reading "in build" said the wrong thing.
-//   * Two prose claims were false. This page said it was reviewed fortnightly,
-//     and linked to a public project board that does not exist.
-//
-// The rule the page now holds itself to: every item names something a reader
-// can check without asking us, and no item is written in the grammar of a
-// stronger claim than it can support.
+// Rewritten 2026-09-25 with the founder. The page lists capabilities, never
+// tasks: no issue links, commands, routes or version numbers. Every "available"
+// item was checked against the engine and core repositories that day. The rule
+// the page holds itself to: no item is written in the grammar of a stronger
+// claim than it can support, and nothing that is not built carries a date.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import OurRoadmap from "../components/Roadmap.astro";
 import data from "../data/roadmap.json";
 
-// Counted from the vendored manifests rather than written down, so the figure
-// cannot drift from the library the way "battery, textile and steel" did.
-const manifests = import.meta.glob("../data/product-groups/*.json", { eager: true });
-const groups = Object.values(manifests).map((m: any) => m.default ?? m);
-const groupCount = groups.length;
-const pluginCount = new Set(groups.filter((g) => g.plugin).map((g) => g.plugin)).size;
+const updated = new Date(`${data.updated}T00:00:00Z`).toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
 
-const { versions } = data as unknown as {
-  versions: Record<string, { repo: string; version: string; note: string }>;
-};
-
-const title = "Roadmap — what is built, blocked and not started | Odal Node";
+const title = "Roadmap: what is built, waiting and next | Odal Node";
 const description =
-  "Development status for the Odal Node EU Digital Product Passport software: what ships today in dpp-core and dpp-engine, what is built but legally inert, what is in build, and the gaps we have not closed.";
+  "What the Odal Node software does today, what is built and waiting on a legal step, what is in progress, and what is being considered. No dates on anything unbuilt.";
 ---
 
 <Base title={title} description={description}>
-  <Section eyebrow="Public roadmap" title="What is built, what is blocked, and what is not started." wide>
+  <Section eyebrow="Roadmap" title="What is built, what is waiting, and what comes next." wide>
     <p>
-      Two public repositories: <a href="https://github.com/odal-node/dpp-core">dpp-core</a>,
-      the regulatory library, and <a href="https://github.com/odal-node/dpp-engine">dpp-engine</a>,
-      the software that runs a node. This page is the status of both, audited
-      against the repositories rather than against the last version of this page.
+      This page lists capabilities, not tasks, and it is checked against the
+      software itself rather than against its own last version.
     </p>
-
-    <div class="not-prose my-8 grid gap-4 sm:grid-cols-3">
-      {Object.values(versions).map((v) => (
-        <div class="card p-5">
-          <p class="font-mono text-xs uppercase tracking-widest text-neutral-500">{v.repo}</p>
-          <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">v{v.version}</p>
-          <p class="mt-1 text-sm text-neutral-600">{v.note}</p>
-        </div>
-      ))}
-      <div class="card p-5">
-        <p class="font-mono text-xs uppercase tracking-widest text-neutral-500">product groups</p>
-        <p class="mt-1 font-mono text-2xl font-semibold text-neutral-900">{groupCount}</p>
-        <p class="mt-1 text-sm text-neutral-600">
-          {pluginCount} sandboxed rule plugins ·{" "}
-          <a href="/product-groups" class="text-primary-700">see them all</a>
-        </p>
-      </div>
-    </div>
-
     <p>
       <strong>Nobody is running this in production.</strong> No customers, no
-      pilots, no live deployments, and nothing on this page should be read as
-      evidence of any. The battery passport obligation begins on 18 February
-      2027, and we would rather be correct when it arrives than early and wrong.
+      pilots, no live deployments, and nothing below should be read as evidence
+      of any. The battery passport obligation begins on 18 February 2027, and we
+      would rather be correct when it arrives than early and wrong.
     </p>
     <p>
-      There are no dates below. Timing on regulatory infrastructure depends on
-      delegated acts, standards-body votes and registry availability — none of
-      which we control — so the category is the commitment and a quarter would
-      be a guess dressed as one.
+      There are no dates on anything unbuilt. Timing depends on EU acts,
+      standards votes and registry access, none of which we control, so the
+      status is the commitment and a quarter would be a guess.
+    </p>
+    <p class="text-sm text-neutral-500">
+      Last updated <time datetime={data.updated}>{updated}</time>.
     </p>
   </Section>
 
-  <Section eyebrow="Status" title="Four registers, never mixed." tone="muted" wide>
+  <Section eyebrow="Status" title="Four statuses, never mixed." tone="muted" wide>
     <div class="not-prose">
       <OurRoadmap />
     </div>
   </Section>
 
-  <Section eyebrow="How this is maintained" title="What moves a feature between registers.">
+  <Section eyebrow="How items move" title="What it takes to change status." wide>
     <p>
-      An item is <strong>shipped</strong> when it is in a tagged release of the
-      relevant repository and a test exercises it through the running system.
-      Merged is not shipped, and neither is demonstrated — "shipped" here means
-      there is something that fails if it stops working.
+      An item is <strong>available</strong> when it is in a released version
+      and a test exercises it through the running system. Merged is not
+      available, and neither is demonstrated.
     </p>
     <p>
-      An item is <strong>in build</strong> only with a named condition attached,
-      so that a reader can tell what would have to be true for it to move. An
-      item on the <strong>horizon</strong> is an option under consideration, and
-      is written in the grammar of an option: it carries no date, and no promise.
+      An item is <strong>waiting on a legal step</strong> when it is built and
+      tested but cannot yet do the thing it exists for, for a legal reason
+      rather than an engineering one.
     </p>
     <p>
-      The fourth register is the one most roadmaps do not have.{" "}
-      <strong>Built and legally inert</strong> covers work that is finished,
-      tested and running, and that cannot be used for the thing it exists to do.
-      The sealing subsystem is the example: it works end to end and every seal it
-      produces reports itself as self-issued and of no legal effect, because
-      under eIDAS only a legal person may create an electronic seal. Filing that
-      under "in build" would turn a legal fact into an engineering timeline.
+      An item is <strong>in progress</strong> only while someone is building
+      it. An item <strong>being considered</strong> is an option: it carries no
+      date and no promise.
     </p>
     <p>
-      Items move backwards. Discovering while building something that it needs
-      more foundational work is an ordinary outcome of building it, and that work
-      returns to the horizon with a note about what was learned. A reversal
-      recorded is better than an item quietly drifting for six months.
+      Items can move backwards. Finding out while building something that it
+      needs more groundwork is an ordinary outcome, and a reversal recorded here
+      is better than an item quietly drifting.
     </p>
   </Section>
 
-  <Section eyebrow="Honesty" title="What this page is not." tone="tinted">
+  <Section eyebrow="More detail" title="Where the technical detail lives." tone="tinted" wide>
     <p>
-      It is not a schedule, and it is not exhaustive. The open issues in both
-      repositories are public and carry the detail this page compresses —
-      including the defects. If something you need is absent here, the useful
-      assumption is that it does not exist rather than that it was forgotten,
-      and the issue trackers are the place to say so.
-    </p>
-    <p>
-      <a href="https://github.com/odal-node/dpp-core/issues">dpp-core issues</a>{" "}
-      ·{" "}
-      <a href="https://github.com/odal-node/dpp-engine/issues">dpp-engine issues</a>
+      This page is written for everyone. How each capability works, and how to
+      run it, is in the{" "}
+      <a href="https://docs.odal-node.io" rel="noopener">documentation</a>, and
+      the code itself is{" "}
+      <a href="https://github.com/odal-node" rel="noopener">public on GitHub</a>.
     </p>
   </Section>
 </Base>

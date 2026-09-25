@@ -1,101 +1,101 @@
 ---
-// Roadmap.astro — the four registers, each grouped by capability area.
-// Data lives in src/data/roadmap.json so editors change JSON, not components.
+// Roadmap.astro — the four registers, each grouped into themes.
+// Data lives in src/data/roadmap.json, so editors change JSON, not markup.
 //
-// WHY FOUR AND NOT THREE
+// WHY FOUR REGISTERS AND NOT THREE
 //
-// The previous version had Shipped / In build / Horizon, and the seal and
-// registry work sat under "in build" with the words "in progress" and "gated on
-// upstream blockers". Both are finished. Neither can be used, because an
-// electronic seal may only be created by a legal person and there is no company
-// — which is not an engineering schedule and does not belong in a column that
-// reads like one. `blocked` says the true thing: built, and legally inert.
+// "Waiting on a legal step" is kept apart from "In progress" on purpose. The
+// seal and registry work is finished; what holds it back is that only a legal
+// person may create an electronic seal. Filing that under "in progress" would
+// turn a legal fact into an engineering schedule.
 //
-// WHY EVERY ITEM CARRIES EVIDENCE
-//
-// A roadmap is the easiest page on a site to write optimistically, because
-// nothing on it is checkable. Each item here names a crate, a command, a route
-// or a page, so a reader who doubts a line can go and settle it. An item that
-// cannot name one is an item we should not be making a claim about.
+// Items describe capabilities in plain words. Routes, commands and version
+// numbers belong on the docs site, never here.
 import data from "../data/roadmap.json";
 
-type Status = "shipped" | "blocked" | "in-build" | "horizon";
-type Item = { label: string; detail: string; evidence?: string };
-type Area = { area: string; items: Item[] };
+type Status = "available" | "waiting" | "in-progress" | "considered";
+type Item = {
+  title: string;
+  line: string;
+  variants?: string[];
+  link?: { href: string; label: string };
+};
+type Theme = { theme: string; items: Item[] };
+type Register = { status: Status; title: string; description: string; themes: Theme[] };
 
-const { registers } = data as unknown as {
-  registers: { status: Status; title: string; description: string; areas: Area[] }[];
+const { registers } = data as unknown as { registers: Register[] };
+
+const tone: Record<Status, { dot: string; rule: string; chip: string }> = {
+  available: {
+    dot: "bg-status-released",
+    rule: "border-status-released/30",
+    chip: "bg-primary-50 text-primary-800",
+  },
+  waiting: {
+    dot: "bg-status-blocked",
+    rule: "border-status-blocked/40",
+    chip: "bg-neutral-100 text-neutral-700",
+  },
+  "in-progress": {
+    dot: "bg-status-active",
+    rule: "border-status-active/30",
+    chip: "bg-neutral-100 text-neutral-700",
+  },
+  considered: {
+    dot: "bg-status-development",
+    rule: "border-neutral-200",
+    chip: "bg-neutral-100 text-neutral-700",
+  },
 };
 
-const dot: Record<Status, string> = {
-  shipped: "bg-status-released",
-  blocked: "bg-status-blocked",
-  "in-build": "bg-status-active",
-  horizon: "bg-status-development",
-};
-
-const rule: Record<Status, string> = {
-  shipped: "border-status-released/30",
-  blocked: "border-status-blocked/40",
-  "in-build": "border-status-active/30",
-  horizon: "border-neutral-200",
-};
-
-// An evidence string is rendered as a link when we can resolve it to one, and
-// as plain text otherwise. A command is not a URL, and a citation of the
-// Official Journal is deliberately not linked to a page that may move.
-//
-// An HTTP route is not a link either, however much it looks like one. A path
-// with a `{param}` in it names an endpoint on someone's node, not a page on
-// this site — linking `/01/{gtin}/21/{serial}` produced the one broken link
-// the link checker found on this page.
-const href = (e: string): string | null => {
-  if (e.startsWith("/")) return e.includes("{") ? null : e;
-  if (e.startsWith("crates.io/")) return `https://${e}`;
-  if (e.startsWith("github.com/")) return `https://${e}`;
-  if (e.startsWith("docs.odal-node.io/")) return `https://${e}`;
-  return null;
-};
+const count = (r: Register) => r.themes.reduce((n, t) => n + t.items.length, 0);
 ---
 
-<div class="space-y-14">
+<nav aria-label="Roadmap sections" class="mb-12 flex flex-wrap gap-2">
   {registers.map((reg) => (
-    <section aria-labelledby={`reg-${reg.status}`}>
-      <header class={`border-b pb-4 ${rule[reg.status]}`}>
+    <a
+      href={`#${reg.status}`}
+      class="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 text-sm font-medium text-neutral-800 no-underline transition-colors hover:border-primary-300 hover:no-underline"
+    >
+      <span class={`h-2 w-2 rounded-full ${tone[reg.status].dot}`} aria-hidden="true"></span>
+      {reg.title}
+      <span class="text-neutral-500">{count(reg)}</span>
+    </a>
+  ))}
+</nav>
+
+<div class="space-y-16">
+  {registers.map((reg) => (
+    <section id={reg.status} aria-labelledby={`reg-${reg.status}`} class="scroll-mt-24">
+      <header class={`border-b pb-4 ${tone[reg.status].rule}`}>
         <h3 id={`reg-${reg.status}`} class="m-0 flex items-center gap-2.5 text-xl font-bold text-neutral-900">
-          <span class={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${dot[reg.status]}`}></span>
+          <span class={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${tone[reg.status].dot}`} aria-hidden="true"></span>
           {reg.title}
         </h3>
-        <p class="m-0 mt-2 max-w-3xl text-sm leading-relaxed text-neutral-600">
-          {reg.description}
-        </p>
+        <p class="m-0 mt-2 max-w-3xl text-sm leading-relaxed text-neutral-600">{reg.description}</p>
       </header>
 
-      <div class="mt-6 space-y-8">
-        {reg.areas.map((area) => (
-          <div class="grid gap-x-8 gap-y-3 md:grid-cols-[13rem_1fr]">
-            <p class="m-0 text-sm font-semibold text-neutral-900 md:pt-1">
-              {/* One area repeated per register would be noise, so a register
-                  with a single catch-all area prints no heading at all. */}
-              {reg.areas.length > 1 ? area.area : ""}
-            </p>
-            <ul class="m-0 list-none space-y-5 p-0">
-              {area.items.map((it) => (
-                <li>
-                  <p class="m-0 font-medium text-neutral-900">{it.label}</p>
-                  <p class="m-0 mt-1 text-sm leading-relaxed text-neutral-600">{it.detail}</p>
-                  {it.evidence && (
-                    <p class="m-0 mt-1.5">
-                      {href(it.evidence) ? (
-                        <a
-                          href={href(it.evidence)}
-                          class="font-mono text-xs text-primary-700 no-underline hover:underline"
-                        >
-                          {it.evidence}
-                        </a>
-                      ) : (
-                        <span class="font-mono text-xs text-neutral-500">{it.evidence}</span>
-                      )}
+      <div class="mt-8 space-y-10">
+        {reg.themes.map((theme) => (
+          <div class:list={["grid gap-x-8 gap-y-4", { "md:grid-cols-[12rem_1fr]": reg.themes.length > 1 }]}>
+            {reg.themes.length > 1 && (
+              <h4 class="m-0 text-sm font-semibold text-neutral-900 md:pt-5">{theme.theme}</h4>
+            )}
+            <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2">
+              {theme.items.map((it) => (
+                <li class="card m-0 flex flex-col p-5">
+                  <p class="m-0 font-semibold text-neutral-900">{it.title}</p>
+                  <p class="m-0 mt-1.5 text-sm leading-relaxed text-neutral-600">{it.line}</p>
+                  {it.variants && (
+                    <ul class="m-0 mt-3 flex list-none flex-wrap gap-1.5 p-0" aria-label="Variants">
+                      {it.variants.map((v) => (
+                        <li class={`m-0 rounded-md px-2 py-0.5 text-xs font-medium ${tone[reg.status].chip}`}>{v}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {it.link && (
+                    <p class="m-0 mt-auto pt-3 text-sm">
+                      <a href={it.link.href} class="link-arrow">{it.link.label}</a>
                     </p>
                   )}
                 </li>

@@ -1,312 +1,203 @@
 {
-  "_comment": "Roadmap data — the single editable source for the roadmap page. Rewritten 2026-09-19 after auditing every item against the two repositories: released tags, crates.io versions, the schema and plugin inventory, the CLI's own command list, and the open issue trackers. Eleven of the previous twenty-one items were wrong in a way that flattered us or, twice, understated us.",
-
-  "_registers": "Four registers, never mixed. 'shipped' is a verified fact. 'blocked' is also a fact — the machinery runs and the status it can claim is nil — and it is separated out because folding it into 'in build' is how a legal blocker gets read as an engineering schedule. 'in-build' is a commitment with a named condition. 'horizon' is an option under consideration, with no date attached to it. Never write an option in the grammar of a fact.",
-
-  "_evidence_rule": "Every item names something a reader can check without asking us: a crate on crates.io, a CLI command, an HTTP route, or a page on this site. An item that cannot name one does not belong on this page.",
-
-  "versions": {
-    "core": { "repo": "dpp-core", "version": "0.20.0", "note": "Apache-2.0, published to crates.io" },
-    "engine": { "repo": "dpp-engine", "version": "0.13.0", "note": "BSL-1.1 with a free self-host grant" }
-  },
-
+  "_comment": "The public roadmap, the single editable source for /roadmap. Locked with the founder on 2026-09-25 and checked against dpp-engine main (v0.14.0) and dpp-core main that day. Rules: features and outcomes only, written for a general reader. No issue links, commands, routes, crate names, version numbers or decision-record numbers; technical detail belongs on the docs site. No dates on anything that is not built. 'variants' lists the main forms a capability takes, in plain words. Update 'updated' whenever an item moves.",
+  "updated": "2026-09-25",
   "registers": [
     {
-      "status": "shipped",
-      "title": "Shipped",
-      "description": "In a tagged release, with a test that exercises it through the running system. Verified fact.",
-      "areas": [
+      "status": "available",
+      "title": "Available now",
+      "description": "In the software today and exercised by its tests. Available is not the same as in use: nobody runs this in production yet.",
+      "themes": [
         {
-          "area": "The open library",
+          "theme": "Your node, your keys",
           "items": [
             {
-              "label": "Eleven crates on crates.io",
-              "detail": "The domain model, cryptography, credentials, GS1 Digital Link, the Asset Administration Shell projection, the plugin contract and the regulatory rules — all Apache-2.0, all readable and reusable by anyone, including a competitor.",
-              "evidence": "crates.io/crates/dpp-domain"
+              "title": "Runs on your own infrastructure",
+              "line": "One self-contained node on servers you choose, brought up with a single command. Self-hosting for your own compliance is free."
             },
             {
-              "label": "Regulatory rules as a dependency-free crate",
-              "detail": "The cross-field rules that change when a regulation changes are a pure no_std crate with zero dependencies, so they can be audited on their own terms rather than read through a framework.",
-              "evidence": "crates.io/crates/dpp-rules"
+              "title": "Signed with your own key",
+              "line": "Every passport is signed on your servers, with a key that never leaves them, under an identity on a web domain you control. The key can be rotated without invalidating anything it already signed."
             }
           ]
         },
         {
-          "area": "Product groups",
+          "theme": "Getting data in",
           "items": [
             {
-              "label": "Every product group modelled, with its full version history",
-              "detail": "Each carries its schema versions, its categories, its disclosure split and its own note saying which of its fields are a best reading rather than a requirement. Older schema versions stay served — a passport published against one does not stop resolving when a newer one lands.",
-              "evidence": "/product-groups"
+              "title": "Spreadsheets in, passports out",
+              "line": "Import your product data with a trial run first. The node reports what is wrong row by row instead of rejecting the whole file.",
+              "variants": ["CSV", "Excel"]
             },
             {
-              "label": "Compliance rules run sandboxed, and are swapped without a redeploy",
-              "detail": "Each product group's rules compile to WebAssembly and run isolated from the node. The host verifies a plugin's signature and its declared schema range before dispatching to it.",
-              "evidence": "odal plugin install"
+              "title": "Checked before anything is signed",
+              "line": "Each product group's rules run before signing, alongside warnings for values that look implausible. Rule updates arrive signed and apply without reinstalling anything.",
+              "variants": ["Blocking checks", "Advisory warnings", "Signed rule updates"]
             }
           ]
         },
         {
-          "area": "Identity and signing",
+          "theme": "Reading a passport",
           "items": [
             {
-              "label": "Signed on the operator's own key, on the operator's own infrastructure",
-              "detail": "Ed25519, an encrypted keystore, and a did:web identity in a domain the operator controls. The signing key can be rotated without invalidating what it already signed. Nothing is sent anywhere to be signed.",
-              "evidence": "crates.io/crates/dpp-crypto"
+              "title": "Scan to read",
+              "line": "The code on the product opens its public passport. No login and no fee.",
+              "variants": ["With a GS1 barcode", "Without a barcode"]
+            },
+            {
+              "title": "Each reader sees what they are entitled to",
+              "line": "Repairers, recyclers and authorities see more than the public, field by field, proven by a credential they hold rather than a setting they choose.",
+              "variants": ["Public", "Legitimate interest", "Authorities"],
+              "link": { "href": "/visibility", "label": "How visibility works" }
+            },
+            {
+              "title": "Export for industrial systems",
+              "line": "Passports also export in the Asset Administration Shell format that Industry 4.0 systems already read."
             }
           ]
         },
         {
-          "area": "Publication and resolution",
+          "theme": "A record for the product's whole life",
           "items": [
             {
-              "label": "Scan the code, get the public view",
-              "detail": "GS1 Digital Link resolution when the product carries a GTIN, and a plain passport URL when it does not — because requiring the barcode would mean requiring GS1 membership. No login and no fee, because the regulation says so.",
-              "evidence": "/01/{gtin}/21/{serial}"
+              "title": "Changes without losing history",
+              "line": "Correct a passport, replace it with a newer one, suspend it or retire it. Every earlier version stays readable, and every change is written to a tamper-evident trail.",
+              "variants": ["Correct", "Replace", "Suspend", "Retire"]
             },
             {
-              "label": "Asset Administration Shell export",
-              "detail": "A shell plus per-product-group submodels, for the industrial systems that speak AAS rather than passports.",
-              "evidence": "crates.io/crates/dpp-aas"
+              "title": "A handover between companies",
+              "line": "Responsibility moves from one company to another with both signatures on the record. Either side can decline or withdraw before it completes."
+            },
+            {
+              "title": "Products made of products",
+              "line": "A passport can point to the passports of its components, and the whole chain is verified in one check."
+            },
+            {
+              "title": "A recorded end of life",
+              "line": "The end of a product's life is recorded on its passport, including the handover to a waste operator.",
+              "link": { "href": "/lifecycle", "label": "Follow the whole lifecycle" }
             }
           ]
         },
         {
-          "area": "Disclosure",
+          "theme": "Proof that stands on its own",
           "items": [
             {
-              "label": "Depth proven by credential, enforced per field",
-              "detail": "The same record answers a repairer, a recycler and an authority differently, and which fields each sees is decided by the credential they present rather than by a header they set. For batteries this is a lattice and not a ladder — an authority sees less than a recycler in one specific respect, and modelling it as a ranking would be wrong.",
-              "evidence": "/visibility"
+              "title": "A proof file anyone can check offline",
+              "line": "The passport, its signatures and its full history in one signed file. It verifies without a network connection and without trusting us."
+            },
+            {
+              "title": "Readable when your server is not",
+              "line": "A signed, pre-rendered copy of each public page can be kept outside the node, so a scan still works while the node is down."
             }
           ]
         },
         {
-          "area": "Lifecycle and custody",
+          "theme": "Running it day to day",
           "items": [
             {
-              "label": "A record that survives the sale",
-              "detail": "Suspension, retirement, a typed end of life, a recorded waste handover, and lineage that can name several predecessors rather than one.",
-              "evidence": "odal passport eol"
+              "title": "One tool to run it all",
+              "line": "Set up, onboard, import, publish, issue credentials and check status from a single tool.",
+              "variants": ["Command line", "Interactive console"]
             },
             {
-              "label": "Responsibility changes hands with both signatures on the record",
-              "detail": "Remanufacture, repurposing or a sold product line, between two legal entities — either side can refuse or withdraw, and the chain of custody is part of the passport rather than an email thread.",
-              "evidence": "odal passport transfer initiate"
+              "title": "Your systems stay informed",
+              "line": "Passport events are sent to your own systems, signed so a receiver can tell a real delivery from a replayed one."
             },
             {
-              "label": "A tamper-evident history",
-              "detail": "Every change is appended to a hash-chained audit trail, so a record that was edited cannot present itself as one that was not.",
-              "evidence": "odal passport history"
-            }
-          ]
-        },
-        {
-          "area": "Evidence and verification",
-          "items": [
-            {
-              "label": "A dossier that verifies with no network and no trust in us",
-              "detail": "Passport, signatures, identity documents and the full history in one signed file. Someone who has never heard of Odal Node can check it offline.",
-              "evidence": "odal verify"
+              "title": "Scan counts you own",
+              "line": "How often each passport was opened, counted on your own node. Nothing is recorded about the person who scanned."
             },
             {
-              "label": "The passport still resolves when the node does not",
-              "detail": "A pre-rendered static tier, signed and bounded, serving the same page the live resolver serves — through one renderer, so the two cannot drift.",
-              "evidence": "odal snapshot verify"
-            }
-          ]
-        },
-        {
-          "area": "Running a node",
-          "items": [
-            {
-              "label": "One command-line control plane",
-              "detail": "Twenty-six command groups: bring the node up, onboard the operator, mint scoped API keys, manage facilities and economic-operator identifiers, import, publish, issue credentials, inspect seals, read registry status and scan telemetry. There is no separate console to learn, and no operation that is only available in one.",
-              "evidence": "odal --help"
+              "title": "Company details, recorded once",
+              "line": "Your sites and company identifiers live on the node and are stamped onto every new passport."
             },
             {
-              "label": "Signed outbound webhooks",
-              "detail": "Passport events delivered to the operator's own systems, signed so a receiver can tell a real delivery from a replayed one.",
-              "evidence": "odal webhook list"
-            },
-            {
-              "label": "Compliance rulesets arrive signed, and are verified fail-closed",
-              "detail": "Rulesets ship as signed bundles and are hot-swapped. A node configured for production refuses a placeholder trust adapter rather than accepting one quietly.",
-              "evidence": "odal ruleset reload"
-            },
-            {
-              "label": "Scan telemetry the operator owns",
-              "detail": "How often a passport was resolved, operator-wide and per record, on the operator's own node rather than in someone else's analytics.",
-              "evidence": "odal stats"
-            },
-            {
-              "label": "The ESPR Article 24 unsold-goods disclosure",
-              "detail": "Recorded as many lines rather than one aggregate, because the article asks for figures differentiated per product type, per reason and per destination. A destruction recorded under an exemption must say which exemption.",
-              "evidence": "odal unsold-goods record"
-            },
-            {
-              "label": "Registration intent survives a crash",
-              "detail": "A durable outbox holds pending EU registry registrations and drains with backoff, so a registry that is slow, down or not yet reachable delays binding without ever losing custody.",
-              "evidence": "odal registry"
-            }
-          ]
-        },
-        {
-          "area": "Getting data in",
-          "items": [
-            {
-              "label": "Bulk import from spreadsheets, with per-row errors",
-              "detail": "CSV, TSV, Excel and JSON, with a dry-run mode that reports what is wrong row by row instead of rejecting the file. Coverage is partial and the gap is tracked below — not every product group has an import mapping, and fewer have a downloadable template.",
-              "evidence": "POST /api/v1/import/{productGroup}"
+              "title": "The unsold-goods disclosure",
+              "line": "Record what was discarded, why and where it went, line by line, ready for the yearly disclosure."
             }
           ]
         }
       ]
     },
-
     {
-      "status": "blocked",
-      "title": "Built, and legally inert",
-      "description": "The machinery is written, tested and running. What it cannot do is claim any legal status — and the reason is not an engineering one.",
-      "areas": [
+      "status": "waiting",
+      "title": "Built, waiting on a legal step",
+      "description": "Finished and tested. What holds these back is not engineering: under eIDAS only a legal person can create an electronic seal, and there is no registered company behind the project yet.",
+      "themes": [
         {
-          "area": "eIDAS qualified seal",
+          "theme": "Legal identity",
           "items": [
             {
-              "label": "The sealing subsystem runs end to end today",
-              "detail": "Seals are created, stored, audited and re-read across restarts. EU Trusted List verification walks the list-of-lists down to the national list. Each seal carries its own findings — issuer, binding, evidenced level, attested time, archival state, certificate validity and revocation — and an operator can re-run a repair.",
-              "evidence": "odal seal status"
+              "title": "Electronic seals with legal effect",
+              "line": "Sealing works end to end today. Until a company holds a qualified certificate, every seal it makes says plainly that it carries no legal effect, rather than rounding that up."
             },
             {
-              "label": "Every seal it issues reports itself as self-issued and of no legal effect",
-              "detail": "Under eIDAS an electronic seal may only be created by a legal person. There is no company behind this project, so there is no qualified certificate, so there is no qualified seal. The software says exactly that rather than rounding it up, and it refuses to present a qualified claim it cannot support. When a credential exists, what changes is the backend and the verdict — not the design.",
-              "evidence": "Regulation (EU) No 910/2014, Art. 3(24)"
-            }
-          ]
-        },
-        {
-          "area": "EU Central Registry",
-          "items": [
-            {
-              "label": "The registry is live; enrolment is not open to us",
-              "detail": "The EU Digital Product Passport registry became operational on 20 July 2026. Registration identity is proved by qualified electronic seal or attestation — the same blocker as above, one step further along.",
-              "evidence": "Commission Implementing Regulation (EU) 2026/1778"
-            },
-            {
-              "label": "Our own connector has a structural mismatch to correct first",
-              "detail": "It models a bearer-token exchange where the registry expects eIDAS-based identity. That is a wrong assumption rather than a wrong URL, and it is a breaking change we would rather make against the published specification than guess at. The connector is not pointed at real products.",
-              "evidence": "crates.io/crates/dpp-registry"
+              "title": "Registration in the EU registry",
+              "line": "Registering passports needs the same legal identity. Our connection to the registry will be finished against its official interface, not guessed at."
             }
           ]
         }
       ]
     },
-
     {
-      "status": "in-build",
-      "title": "In build",
-      "description": "Committed, each with a named condition. Nothing here is claimed as working.",
-      "areas": [
+      "status": "in-progress",
+      "title": "In progress",
+      "description": "Being built now. Nothing here is claimed as working.",
+      "themes": [
         {
-          "area": "In build",
+          "theme": "Next",
           "items": [
             {
-              "label": "Replacing the mandatory GTIN with the standard's identifier union",
-              "detail": "EN 18219 offers several identifier schemes as alternatives rather than a hierarchy, and requiring a GTIN meant requiring GS1 membership. The passport model and the plugins already take the union; the remaining work is the sweep through every rule, fixture and test that still assumes the old field. Condition: the next library release.",
-              "evidence": "github.com/odal-node/dpp-core/issues/328"
+              "title": "More ways to identify a product",
+              "line": "Every identifier scheme the European standard allows, not only a barcode number. It arrives with the next release of the open library."
             },
             {
-              "label": "Wiring the compliance calculators into the node",
-              "detail": "Cradle-to-gate CO2e and EN 45554 repairability are written and published as part of the open library, with the licensed emission-factor data injected rather than bundled. Nothing in the running node invokes them yet, so no passport carries a computed figure. Condition: the evidence-receipt path that records which ruleset version produced a number.",
-              "evidence": "crates.io/crates/dpp-calc"
+              "title": "Carbon and repairability figures in the passport",
+              "line": "The calculators are written and published in the open library. The node does not run them yet, so no passport carries a computed figure today."
             },
             {
-              "label": "Import coverage across every product group",
-              "detail": "Bulk import maps five of the twelve product groups, and downloadable CSV templates exist for two. The mechanism is shipped; the per-group mappings are not. Condition: one mapping and one template per modelled group.",
-              "evidence": "github.com/odal-node/dpp-engine/issues/192"
+              "title": "Spreadsheet import for every product group",
+              "line": "Import covers most product groups today. Phones and tablets, and detergents, are still to come."
             },
             {
-              "label": "The unsold-goods disclosure as a publishable artifact",
-              "detail": "The record is written and read today. What does not exist is the document an operator publishes on their own website, which is where Article 24 actually puts the obligation. Condition: the output format, which no implementing act prescribes.",
-              "evidence": "odal unsold-goods list"
-            },
-            {
-              "label": "Toy and detergent content completeness",
-              "detail": "Both schemas carry almost none of the content their annexes mandate — and that content is in the adopted acts, not in the implementing acts still pending. These two are modelled far more thinly than the rest and should be read as placeholders.",
-              "evidence": "github.com/odal-node/dpp-core/issues/262"
+              "title": "The unsold-goods report, ready to publish",
+              "line": "The records exist today. What is missing is the finished document a company publishes on its own website each year."
             }
           ]
         }
       ]
     },
-
     {
-      "status": "horizon",
-      "title": "Horizon",
-      "description": "Under consideration. Not started, not scheduled, and deliberately carrying no dates.",
-      "areas": [
+      "status": "considered",
+      "title": "Being considered",
+      "description": "Options, not promises. Not started, not scheduled, and deliberately without dates.",
+      "themes": [
         {
-          "area": "Known gaps in what is modelled",
+          "theme": "Later",
           "items": [
             {
-              "label": "The semantic repository",
-              "detail": "The framework requires passport data to be expressed against a published vocabulary held in a repository we do not yet read. It is mandatory and it is free, and not having read it is the largest single gap on this page.",
-              "evidence": "github.com/odal-node/dpp-core/issues/92"
+              "title": "Managed deployments",
+              "line": "A node run for you, for companies that would rather not operate one themselves. It would still be yours alone: one company, one node, nothing shared with anyone else."
             },
             {
-              "label": "Language",
-              "detail": "Toys and detergents must present the passport in the language or languages of the Member State where the product is placed. There is no language dimension anywhere in the model.",
-              "evidence": "github.com/odal-node/dpp-core/issues/264"
+              "title": "Passports in the reader's language",
+              "line": "Some product groups must be shown in the language of the country where the product is sold."
             },
             {
-              "label": "Images",
-              "detail": "The toy and detergent annexes both require a colour image of the product. There is no image concept in the passport at all.",
-              "evidence": "github.com/odal-node/dpp-core/issues/263"
+              "title": "Product images",
+              "line": "A picture of the product inside its passport, where the rules ask for one."
             },
             {
-              "label": "A position on personal data in a passport",
-              "detail": "One ESPR paragraph is unconditional about what a passport carries, and we have taken no position on what that means when the value identifies a customer. Deciding this badly is worse than deciding it late.",
-              "evidence": "github.com/odal-node/dpp-core/issues/261"
+              "title": "The EU's shared vocabulary",
+              "line": "Passport data expressed in the common vocabulary the EU maintains, so every system reads a field the same way."
             },
             {
-              "label": "Battery carbon footprint",
-              "detail": "Blocked upstream rather than by us: the calculation method has not been published, so there is nothing to implement. Guessing at it would produce a number that looks authoritative and is not.",
-              "evidence": "github.com/odal-node/dpp-core/issues/160"
-            }
-          ]
-        },
-        {
-          "area": "Options not yet taken",
-          "items": [
-            {
-              "label": "A public, genuinely offline conformance validator",
-              "detail": "Anyone could check a passport against the standards without sending it to us, or trusting us. Six European standards are cited by the framework; two have been read in full so far.",
-              "evidence": "github.com/odal-node/dpp-core/issues/81"
+              "title": "A public checker anyone can run",
+              "line": "Check any passport against the European standards on your own machine, without sending it anywhere."
             },
             {
-              "label": "A second credential format",
-              "detail": "The UN Transparency Protocol's passport credential as an alternative door into the same record, for supply chains that have standardised on it.",
-              "evidence": "github.com/odal-node/dpp-engine/issues/70"
-            },
-            {
-              "label": "A second signing curve",
-              "detail": "P-256 alongside Ed25519, if a hardware or registry requirement ever calls for it. An open question rather than a plan.",
-              "evidence": "github.com/odal-node/dpp-core/issues/78"
-            },
-            {
-              "label": "An EU-operated identity method",
-              "detail": "did:ebsi as an alternative issuer identity to did:web, if registry requirements call for it.",
-              "evidence": "crates.io/crates/dpp-vc"
-            },
-            {
-              "label": "Hosting several operators",
-              "detail": "One operator, one node, one database, one key, and no shared data paths at any layer — that invariant is settled and is not what is open. What is open is only how the machines are provisioned.",
-              "evidence": "docs.odal-node.io/engine/self-hosted"
-            },
-            {
-              "label": "An edge-cached public resolver",
-              "detail": "Cached passport pages for scan latency away from the node's own region.",
-              "evidence": "docs.odal-node.io/engine/architecture"
+              "title": "Battery carbon footprint",
+              "line": "Waiting on the EU to publish the calculation method. Guessing would produce a number that looks official and is not."
             }
           ]
         }
