@@ -33,7 +33,6 @@ const pinPath = `${root}product-groups-source.json`;
 const destDir = `${root}src/data/product-groups`;
 
 const pin = JSON.parse(readFileSync(pinPath, 'utf8'));
-const srcDir = `${coreDir}/${pin.path}`;
 
 const checkOnly = process.argv.includes('--check');
 

@@ -27,6 +27,9 @@ const SKIP_DIRS = new Set([
   '.astro',
   '.pnpm-store',
   '.dpp-engine',
+  // CI checks dpp-core out here for the product-group drift gate. It is
+  // another repository's content, not this one's, so it is not ours to scan.
+  '.dpp-core',
   'deprecated',
 ]);
 // This file necessarily contains the patterns it searches for.

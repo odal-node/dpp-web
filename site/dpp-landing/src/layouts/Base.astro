@@ -71,10 +71,10 @@ const websiteLd = {
     <meta name="twitter:image" content={ogImage} />
 
     <!-- Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
-    <script type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
     {jsonLd.map((block) => (
-      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(block)} />
     ))}
   </head>
   <body class="min-h-screen flex flex-col bg-neutral-0 text-neutral-900">
