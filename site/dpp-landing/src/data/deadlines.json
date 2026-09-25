@@ -1,32 +1,23 @@
 {
-  "_comment": "Regulatory deadlines shown on the landing page. Every entry needs a citation to a named instrument and article, verified against the Official Journal text — not against a secondary source. The _verify fields are working notes and are NOT rendered; a deadline whose _verify still records an open question has not been checked, and an unchecked deadline must not ship.",
+  "_comment": "Regulatory deadlines shown on the home page. Every entry needs a citation to a named instrument and article, verified against the Official Journal text, not a secondary source. The _verify fields are working notes and are NOT rendered; a deadline whose _verify records an open question has not been checked, and an unchecked deadline must not ship. Only obligations that are law belong here: a Commission working plan is not law and carries no date, so it is described in prose on the page instead (2026-09-25).",
   "deadlines": [
     {
       "date": "2026-07-19",
       "dateLabel": "19 July 2026",
       "title": "Unsold goods",
       "who": "Large companies",
-      "summary": "Destruction of unsold textiles and footwear is banned for large companies, and destruction practices must be disclosed.",
+      "summary": "Destroying unsold textiles and footwear is banned for large companies, and what they discard must be disclosed.",
       "citation": "ESPR (EU) 2024/1781, Art. 25",
-      "_verify": "Confirmed: Art. 25; large companies from 19 Jul 2026; medium-sized from 19 Jul 2030; micro/small exempt. Destruction exceptions in Delegated Regulation (EU) 2026/296."
+      "_verify": "Confirmed: Art. 25; large companies from 19 Jul 2026; medium-sized from 19 Jul 2030; micro/small exempt. Destruction exceptions in Delegated Regulation (EU) 2026/296. Disclosure is Art. 24."
     },
     {
       "date": "2027-02-18",
       "dateLabel": "18 February 2027",
       "title": "Battery passports",
       "who": "EV, industrial (>2 kWh), LMT",
-      "summary": "Every battery in scope placed on the EU market needs a digital battery passport, registered in the EU central registry.",
+      "summary": "Every battery in scope placed on the EU market or put into service needs a battery passport: an electronic record for that individual battery.",
       "citation": "Regulation (EU) 2023/1542, Art. 77",
-      "_verify": "Art. 77(1) verified verbatim against the OJ text: from 18 Feb 2027, each LMT battery, each industrial battery above 2 kWh and each EV battery. Registration modalities depend on the Art. 13(5) implementing act."
-    },
-    {
-      "date": "2026-12-31",
-      "dateLabel": "Next, from 2026",
-      "title": "Priority sectors next",
-      "who": "Textiles, iron & steel, furniture, tyres",
-      "summary": "The ESPR 2025–2030 working plan sets the order: textiles and iron & steel lead the first delegated acts, each fixing its own DPP application date when adopted. Electronics is not a priority sector in this plan.",
-      "citation": "ESPR 2025–2030 Working Plan, COM(2025) 187",
-      "_verify": "Secondary-sourced only — the working plan PDF has not been read here. Adoption 16 Apr 2025 and six priority groups (textiles, furniture, mattresses, tyres, iron & steel, aluminium) come from secondary reporting. Read COM(2025) 187 before treating any of it as verified, and update per-sector dates as each delegated act is adopted."
+      "_verify": "Art. 77(1) verified verbatim against the consolidated OJ text 02023R1542-20250731 on 2026-09-25: from 18 Feb 2027, each LMT battery, each industrial battery above 2 kWh and each EV battery placed on the market or put into service shall have an electronic record ('battery passport'). The earlier 'registered in the EU central registry' clause was removed: Art. 77 does not say it."
     }
   ]
 }

@@ -1,16 +1,22 @@
 ---
 // DeadlineCards.astro — the regulatory clock. Data: src/data/deadlines.json.
-// Uses the regulatory semantic tokens (amber family) — these are deadline
+// Uses the regulatory semantic tokens (amber family): these are deadline
 // callouts, not brand surfaces. Every card carries its legal citation.
+//
+// A date that has passed reads "In force since", not as something upcoming.
+// The comparison runs at build time, which is the only clock a static site
+// has; every deploy rebuilds, so a card is at most one deploy out of date.
 import data from "../data/deadlines.json";
 const { deadlines } = data;
+const today = new Date().toISOString().slice(0, 10);
+const cols = deadlines.length >= 3 ? "md:grid-cols-3" : "md:grid-cols-2";
 ---
 
-<div class="grid gap-6 md:grid-cols-3">
+<div class={`grid gap-6 ${cols}`}>
   {deadlines.map((d) => (
     <article class="rounded-md border border-regulatory-border bg-regulatory-bg p-6">
       <p class="m-0 text-sm font-semibold uppercase tracking-wide text-regulatory-text">
-        {d.dateLabel}
+        {d.date <= today ? "In force since " : "From "}{d.dateLabel}
       </p>
       <h3 class="mb-1 mt-2 text-xl font-semibold text-neutral-900">{d.title}</h3>
       <p class="m-0 mb-3 text-xs font-medium uppercase tracking-wide text-neutral-500">

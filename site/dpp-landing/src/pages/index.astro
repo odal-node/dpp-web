@@ -11,7 +11,7 @@ import Base from "../layouts/Base.astro";
 
 const title = "Odal Node: EU Digital Product Passport Infrastructure | ESPR Compliance";
 const description =
-  "Open-source infrastructure for EU Digital Product Passports (DPP) under ESPR. Self-hosted, sovereign compliance: your product data is validated and signed with your keys. Battery, textile, and electronics passports.";
+  "Self-hosted infrastructure for EU Digital Product Passports (DPP) under ESPR, built on an open-source core. Sovereign compliance: your product data is validated and signed with your keys. Passports for batteries, textiles, steel and more.";
 
 // Page-specific structured data.
 const softwareAppLd = {
@@ -27,10 +27,11 @@ const softwareAppLd = {
     "@type": "Offer",
     price: "0",
     priceCurrency: "EUR",
-    description: "Open-core: dpp-core is Apache-2.0; dpp-engine is BSL-1.1 with free self-host grant.",
+    description: "Free to self-host for your own compliance under the node's BSL-1.1 grant. The core library, dpp-core, is Apache-2.0.",
   },
-  license: "https://opensource.org/licenses/Apache-2.0",
-  codeRepository: "https://github.com/odal-node/dpp-core",
+  // The node is dpp-engine, licensed BSL-1.1; only the core library is Apache-2.0.
+  license: "https://github.com/odal-node/dpp-engine/blob/main/LICENSE",
+  codeRepository: "https://github.com/odal-node/dpp-engine",
 };
 
 // The end-to-end process as one timeline. On the landing the underlying
@@ -50,21 +51,29 @@ const steps = [
     status
     title="Signed by you. Verified by anyone."
     subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated and signed on your infrastructure, with your keys. The raw import files are discarded; the signed passport is stored and served. Anyone can verify it."
-    primaryHref="https://docs.odal-node.io/quick-start"
-    primaryLabel="Self-host now"
-    secondaryHref="https://docs.odal-node.io"
-    secondaryLabel="Read the docs"
+    ctaHref="https://docs.odal-node.io"
+    ctaLabel="Read the docs"
   />
 
   <Section eyebrow="Why now" title="The deadlines are set. The infrastructure mostly isn't." wide>
     <p>
       Compliance arrives sector by sector, date by date, not "everything by 2027."
-      Three dated obligations are already in law:
+      Two dated obligations are already in law:
     </p>
     <div class="not-prose mt-8">
       <DeadlineCards />
     </div>
+    {/* Source: COM(2025) 187 final, 16.4.2025, as verified in dpp-docs
+        reference/regulatory/DPP-SECTOR-INVENTORY-2026-07.md. These are
+        indicative adoption years for delegated acts, not passport dates. */}
     <p class="mt-8">
+      After these, passports arrive product group by product group. The
+      Commission's 2025–2030 working plan puts iron and steel first, then
+      textiles, tyres and aluminium, then furniture and mattresses, with
+      indicative adoption from 2026 to 2029. Each act will set its own passport
+      dates when it is adopted.
+    </p>
+    <p>
       The question is whether the infrastructure you adopt now still fits the next
       sector's act. Odal Node is built so that it does: new sectors arrive as schema
       and plugin updates, not as new systems.
@@ -120,12 +129,12 @@ const steps = [
           v: "GS1 Digital Link resolution, W3C VC 2.0 credentials, did:web identity, AAS submodel export.",
         },
         {
-          k: "Sandboxed sector plugins",
-          v: "Each sector's compliance logic runs in an isolated sandbox. New regulations land as plugins, not rewrites.",
+          k: "Sandboxed product-group rules",
+          v: "Product-group rules run in an isolated sandbox, and new rules arrive as signed updates rather than rewrites of the software.",
         },
         {
-          k: "Honest open-core",
-          v: "dpp-core (the regulatory standard in Rust) is Apache-2.0, full capability, forever. dpp-engine is BSL-1.1 with a real self-host grant: production self-hosting is free.",
+          k: "Open core",
+          v: "The regulatory library, dpp-core, is Apache-2.0 and complete. The node, dpp-engine, is BSL-1.1 with a grant that makes self-hosting for your own compliance free.",
         },
         {
           k: "No vendor lock-in",
@@ -156,33 +165,30 @@ const steps = [
       <div class="card p-6">
         <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We can see</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
-          The signed passport you publish to a resolver we operate, and the
-          metadata required to serve it.
+          What anyone can see: the public part of the passports you publish.
         </p>
       </div>
       <div class="card p-6">
         <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We cannot see</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
-          Your private keys (held in-process on your infrastructure), your raw
-          production data, your supply-chain detail.
+          Your private keys, your raw production data and your supply-chain
+          detail. They stay on your infrastructure, and we are not part of it.
         </p>
       </div>
       <div class="card p-6">
-        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We could see but do not</h3>
+        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">Nobody keeps</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
-          The contents of your import files, which the node discards after
-          validation.
+          The contents of your import files. The node reads them once and
+          discards them after validation.
         </p>
       </div>
     </div>
-    <p class="mt-8 text-sm">
-      <!-- <a href="/trust" class="font-medium">Read the full breakdown →</a> -->
+    <p class="mt-8">
+      <a href="/trust" class="link-arrow">How this holds by design</a>
     </p>
   </Section>
 
-  <!-- <GetStarted /> -->
-
-  <Section eyebrow="Standards" title="Built on the standards the regulation itself cites." tone="muted" wide>
+  <Section eyebrow="Standards" title="Built on open standards." tone="muted" wide>
     <div class="not-prose mt-2">
       <StandardsRow />
     </div>
