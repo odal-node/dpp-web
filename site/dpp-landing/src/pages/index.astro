@@ -7,7 +7,13 @@ import DeadlineCards from "../components/DeadlineCards.astro";
 import Hero from "../components/Hero.astro";
 import Section from "../components/Section.astro";
 import StandardsRow from "../components/StandardsRow.astro";
+import { datedPassports } from "../lib/regulations";
 import Base from "../layouts/Base.astro";
+
+// Counted from the registry, so the sentence cannot disagree with the cards.
+const WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+const n = datedPassports.length;
+const lead = `${WORDS[n] ?? n} passport obligation${n === 1 ? " already carries" : "s already carry"} a date in law:`;
 
 const title = "Odal Node: EU Digital Product Passport Infrastructure | ESPR Compliance";
 const description =
@@ -58,7 +64,7 @@ const steps = [
   <Section eyebrow="Why now" title="The deadlines are set. The infrastructure mostly isn't." wide>
     <p>
       Compliance arrives sector by sector, date by date, not "everything by 2027."
-      Two dated obligations are already in law:
+      {lead}
     </p>
     <div class="not-prose mt-8">
       <DeadlineCards />

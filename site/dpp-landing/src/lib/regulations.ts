@@ -49,6 +49,10 @@ const byId = new Map(all.map((i) => [i.id, i]));
 /** Vendored titles are verbatim from core; the site's copy uses no em dashes. */
 export const displayTitle = (i: Instrument) => i.title.replace(/\s+—\s+/g, ": ");
 
+/** "Batteries Regulation (EU) 2023/1542" → "Batteries Regulation", for cards. */
+export const shortTitle = (i: Instrument) =>
+  displayTitle(i).replace(/\s*\(EU\).*$/, "").replace(/:.*$/, "");
+
 const KIND: Record<string, string> = {
   framework: "Framework regulation",
   direct: "Regulation",
@@ -159,6 +163,16 @@ export const instruments: Instrument[] = [...all].sort((a, b) => {
 });
 
 export const creatingPassports = instruments.filter((i) => i.passport.obligation === "required");
+
+/**
+ * Every passport obligation that carries a date and can be met under its act:
+ * the home page's deadline cards. An act whose date has passed while nothing it
+ * depends on exists ("not yet operable") is left out on purpose; it is not a
+ * deadline anyone can act on.
+ */
+export const datedPassports = creatingPassports
+  .map((act) => ({ act, view: passportView(act) }))
+  .filter(({ view }) => view.state === "required" && view.date);
 export const shapingPassports = instruments.filter((i) => i.passport.obligation !== "required");
 
 /** The acts that reach one product group, with the binding for it. */
