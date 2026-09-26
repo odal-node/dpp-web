@@ -21,6 +21,12 @@ export const menus: Menu[] = [
     label: "How it works",
     items: [
       {
+        href: "/trust",
+        label: "What Odal can see",
+        line: "What stays on your node, and why that holds by design",
+        icon: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+      },
+      {
         href: "/lifecycle",
         label: "Lifecycle",
         line: "Follow one passport from the factory to the end of its life",
@@ -33,22 +39,16 @@ export const menus: Menu[] = [
         icon: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>',
       },
       {
-        href: "/example-passport",
-        label: "Example passport",
-        line: "A complete battery passport, sorted by who may read it",
-        icon: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>',
-      },
-      {
         href: "/verify",
         label: "Verify",
         line: "Check a passport's proof file in your browser",
         icon: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
       },
       {
-        href: "/trust",
-        label: "What Odal can see",
-        line: "What stays on your node, and why that holds by design",
-        icon: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+        href: "/example-passport",
+        label: "Example passport",
+        line: "A complete battery passport, sorted by who may read it",
+        icon: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>',
       },
     ],
   },
