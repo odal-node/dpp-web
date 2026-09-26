@@ -1,14 +1,23 @@
 ---
-// Nav.astro — top navigation. Mark + wordmark left; two menus, Docs and the
+// Nav.astro — top navigation. Mark + wordmark left; three menus, Docs and the
 // CTA right.
 //
-// Two menus, each a disclosure (a button that shows and hides a panel), not an
-// ARIA menu: the panels hold ordinary links, and a screen reader should read
-// them as links. "Explore" is a small panel anchored under its button. "Product
-// groups" is a full-width panel, because eleven groups with a line each do not
-// fit under a button that sits at the right-hand end of the bar.
+// Three menus, in this order: "How it works" (the software itself),
+// "Resources" (the reference pages) and "Product groups". Split this way
+// 2026-09-26, at the founder's choice, when the FAQ would have made one
+// "Explore" menu seven items long.
 //
-// Both open on hover for a mouse and on click or Enter for everyone else, close
+// Each is a disclosure (a button that shows and hides a panel), not an ARIA
+// menu: the panels hold ordinary links, and a screen reader should read them as
+// links. The first two are small panels under their buttons, rendered from one
+// template. "Product groups" is a full-width panel, because eleven groups with
+// a line each do not fit under a button.
+//
+// The bar appears from `lg` (1024px), not `md`: three menus, Docs and the CTA
+// beside the wordmark need about 760px, and at 768px every label wrapped onto
+// two lines. Below `lg` the hamburger panel carries the same three sections.
+//
+// All open on hover for a mouse and on click or Enter for everyone else, close
 // on Escape and on a click outside, and only one is ever open.
 //
 // The product-group wording comes from product-group-copy.json, never from the
@@ -23,7 +32,9 @@ import Button from "./Button.astro";
 import ProductGroupIcon from "./ProductGroupIcon.astro";
 import { groups, unsoldGoods as unsold } from "../lib/product-groups";
 
-const explore = [
+type Entry = { href: string; label: string; line: string; icon: string };
+
+const howItWorks: Entry[] = [
   {
     href: "/lifecycle",
     label: "Lifecycle",
@@ -37,34 +48,49 @@ const explore = [
     icon: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>',
   },
   {
+    href: "/verify",
+    label: "Verify",
+    line: "Check a passport's proof file in your browser",
+    icon: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+  },
+];
+
+const resources: Entry[] = [
+  {
+    href: "/build-on-odal",
+    label: "Build on Odal",
+    line: "Libraries, plugins and the licence line",
+    icon: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M13.5 5l-3 14"/>',
+  },
+  {
     href: "/regulations",
     label: "Regulations",
     line: "The EU acts behind the passports, and when each applies",
     icon: '<path d="M12 3v18M5 21h14"/><path d="M5 7h14"/><path d="m5 7-2.5 6a2.5 2.5 0 0 0 5 0L5 7ZM19 7l-2.5 6a2.5 2.5 0 0 0 5 0L19 7Z"/>',
   },
   {
-    href: "/verify",
-    label: "Verify",
-    line: "Check a passport's proof file in your browser",
-    icon: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
-  },
-  {
-    href: "/build-on-odal",
-    label: "Build on Odal",
-    line: "Embed the library, write rules, connect your systems",
-    icon: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M13.5 5l-3 14"/>',
-  },
-  {
     href: "/roadmap",
     label: "Roadmap",
-    line: "What is built, what is blocked and what comes next",
+    line: "What is built, what is waiting and what comes next",
     icon: '<path d="M5 21V4"/><path d="M5 4.5h11l-2 3.5 2 3.5H5"/>',
+  },
+  {
+    href: "/faq",
+    label: "FAQ",
+    line: "Short answers to the questions people ask first",
+    icon: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7"/><path d="M12 17h.01"/>',
   },
 ];
 
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
-const inExplore = explore.some((e) => path === e.href || path.startsWith(`${e.href}/`));
+const within = (list: Entry[]) => list.some((e) => path === e.href || path.startsWith(`${e.href}/`));
 const inGroups = path.startsWith("/product-groups");
+
+// The two small menus, in bar order; "Product groups" follows them.
+const small = {
+  how: { id: "dd-how", label: "How it works", items: howItWorks, current: within(howItWorks) },
+  resources: { id: "dd-resources", label: "Resources", items: resources, current: within(resources) },
+};
 ---
 
 <header class="sticky top-0 z-50 border-b border-neutral-100 bg-gray-100">
@@ -75,39 +101,41 @@ const inGroups = path.startsWith("/product-groups");
     </a>
 
     <!-- desktop -->
-    <div class="hidden items-center gap-1 md:flex">
-      <div class="dd relative" data-dd>
-        <button
-          type="button"
-          class:list={["dd-trigger", { "is-current": inExplore }]}
-          aria-expanded="false"
-          aria-controls="dd-explore"
-        >
-          Explore
-          <svg class="dd-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
-        </button>
-        <div id="dd-explore" class="dd-panel absolute left-0 top-full mt-3 w-88 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl shadow-primary-900/10">
-          <ul class="m-0 list-none p-0">
-            {explore.map((e) => (
-              <li class="m-0">
-                <a
-                  href={e.href}
-                  aria-current={path === e.href ? "page" : undefined}
-                  class="dd-item group flex items-start gap-3 rounded-lg p-3 no-underline hover:no-underline"
-                >
-                  <span class="dd-tile">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-5 w-5" set:html={e.icon} />
-                  </span>
-                  <span class="min-w-0">
-                    <span class="block text-sm font-semibold text-neutral-900">{e.label}</span>
-                    <span class="mt-0.5 block text-xs leading-snug text-neutral-500">{e.line}</span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
+    <div class="hidden items-center gap-1 lg:flex">
+      {[small.how, small.resources].map((m) => (
+        <div class="dd relative" data-dd>
+          <button
+            type="button"
+            class:list={["dd-trigger", { "is-current": m.current }]}
+            aria-expanded="false"
+            aria-controls={m.id}
+          >
+            {m.label}
+            <svg class="dd-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+          </button>
+          <div id={m.id} class={`dd-panel absolute left-0 top-full mt-3 w-88 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl shadow-primary-900/10`}>
+            <ul class="m-0 list-none p-0">
+              {m.items.map((e) => (
+                <li class="m-0">
+                  <a
+                    href={e.href}
+                    aria-current={path === e.href ? "page" : undefined}
+                    class="dd-item group flex items-start gap-3 rounded-lg p-3 no-underline hover:no-underline"
+                  >
+                    <span class="dd-tile">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-5 w-5" set:html={e.icon} />
+                    </span>
+                    <span class="min-w-0">
+                      <span class="block text-sm font-semibold text-neutral-900">{e.label}</span>
+                      <span class="mt-0.5 block text-xs leading-snug text-neutral-500">{e.line}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
+      ))}
 
       <!-- Not `relative`: the panel positions against the header, full width. -->
       <div class="dd" data-dd>
@@ -185,7 +213,7 @@ const inGroups = path.startsWith("/product-groups");
     <button
       id="nav-toggle"
       type="button"
-      class="inline-flex items-center justify-center rounded-md p-2 text-neutral-700 hover:bg-neutral-100 md:hidden"
+      class="inline-flex items-center justify-center rounded-md p-2 text-neutral-700 hover:bg-neutral-100 lg:hidden"
       aria-controls="nav-menu"
       aria-expanded="false"
       aria-label="Open menu"
@@ -196,25 +224,27 @@ const inGroups = path.startsWith("/product-groups");
     </button>
   </nav>
 
-  <!-- mobile panel: the two menus become collapsible sections -->
-  <div id="nav-menu" class="hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-neutral-200 bg-white px-4 pb-4 pt-2 md:hidden">
+  <!-- mobile panel: the three menus become collapsible sections -->
+  <div id="nav-menu" class="hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-neutral-200 bg-white px-4 pb-4 pt-2 lg:hidden">
     <div class="px-3 pb-2 pt-1">
       <StatusBadge tone="light" label="Alpha · in active development" />
     </div>
 
-    <details class="m-section" open={inExplore}>
-      <summary>Explore</summary>
-      <ul class="m-0 list-none p-0 pb-2">
-        {explore.map((e) => (
-          <li class="m-0">
-            <a href={e.href} class="block rounded-md px-3 py-2 text-sm text-neutral-700 no-underline hover:bg-neutral-100">
-              <span class="font-medium text-neutral-900">{e.label}</span>
-              <span class="block text-xs text-neutral-500">{e.line}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </details>
+    {[small.how, small.resources].map((m) => (
+      <details class="m-section" open={m.current}>
+        <summary>{m.label}</summary>
+        <ul class="m-0 list-none p-0 pb-2">
+          {m.items.map((e) => (
+            <li class="m-0">
+              <a href={e.href} class="block rounded-md px-3 py-2 text-sm text-neutral-700 no-underline hover:bg-neutral-100">
+                <span class="font-medium text-neutral-900">{e.label}</span>
+                <span class="block text-xs text-neutral-500">{e.line}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    ))}
 
     <details class="m-section" open={inGroups}>
       <summary>Product groups</summary>

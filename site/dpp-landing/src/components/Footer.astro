@@ -9,7 +9,7 @@ const year = new Date().getFullYear();
 
 <footer class="bg-primary-900 text-primary-200">
   <div class="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 text-sm sm:grid-cols-2 sm:px-6 lg:grid-cols-12 lg:px-8">
-    <div class="lg:col-span-4">
+    <div class="lg:col-span-3">
       <p class="mb-2 flex items-center gap-2 font-semibold text-white">
         <OdalMark aria-hidden="true" class="h-6 w-6 shrink-0 text-primary-300" />
         Odal Node
@@ -22,17 +22,24 @@ const year = new Date().getFullYear();
       </p>
     </div>
 
-    <!-- Mirrors the nav's Explore menu, so the same pages are reachable
-         from the foot of every page. -->
-    <div class="lg:col-span-3">
-      <p class="mb-2 font-semibold text-white">Explore</p>
+    <!-- Mirrors the nav's three menus, in the same order, so the same pages
+         are reachable from the foot of every page. -->
+    <div class="lg:col-span-2">
+      <p class="mb-2 font-semibold text-white">How it works</p>
       <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/lifecycle">Lifecycle</a></li>
         <li><a class="text-primary-200 hover:text-white" href="/visibility">Visibility</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/regulations">Regulations</a></li>
         <li><a class="text-primary-200 hover:text-white" href="/verify">Verify</a></li>
+      </ul>
+    </div>
+
+    <div class="lg:col-span-2">
+      <p class="mb-2 font-semibold text-white">Resources</p>
+      <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/build-on-odal">Build on Odal</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="/regulations">Regulations</a></li>
         <li><a class="text-primary-200 hover:text-white" href="/roadmap">Roadmap</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="/faq">FAQ</a></li>
       </ul>
     </div>
 
