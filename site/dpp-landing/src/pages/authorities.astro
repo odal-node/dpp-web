@@ -1,0 +1,133 @@
+---
+// /authorities — the passport from the side of market surveillance
+// authorities, notified bodies, customs and the Commission.
+//
+// What each reader may see is read from data/access.json (the battery
+// passport's Art. 77(2) access rules, the same file /visibility uses). Checked
+// 2026-09-26 against Regulation (EU) 2023/1542 Arts. 77-78, Regulation (EU)
+// 2024/1781 Arts. 11 and 13, and the released node: it refuses to issue
+// credentials for authority roles, and trusts an authority's credential only
+// from an issuer its operator has named.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import Button from "../components/Button.astro";
+import access from "../data/access.json";
+
+const title = "For authorities: checking a Digital Product Passport | Odal Node";
+const description =
+  "What market surveillance authorities, notified bodies and the Commission can read in a battery passport, how access is granted, and how to check a passport's signatures and history without asking the company that issued it.";
+
+const authority = access.audiences.find((a) => a.key === "authority")!;
+const points = authority.sees.map((id) => access.points.find((p) => p.id === id)!);
+
+const mailto = `mailto:contact@odal-node.io?subject=${encodeURIComponent("Authority access to passports")}`;
+---
+
+<Base title={title} description={description}>
+  <Section eyebrow="For authorities" title="Check a passport without taking anyone's word for it." wide>
+    <p>
+      Every passport served by Odal Node is signed by the company that issued
+      it, with an identity on that company's own web domain. You can check the
+      signatures and the full history yourself, without Odal and without the
+      file leaving your machine.
+    </p>
+  </Section>
+
+  <Section eyebrow="What you can read" title="The authority part of a battery passport." tone="muted" wide>
+    <p>
+      The Batteries Regulation gives notified bodies, market surveillance
+      authorities and the Commission these parts of the passport:
+    </p>
+    <ul class="not-prose m-0 mt-4 grid list-none gap-5 p-0 md:grid-cols-3">
+      {points.map((p) => (
+        <li class="card m-0 p-5">
+          <p class="m-0 text-base font-semibold text-neutral-900">{p.title}</p>
+          <p class="m-0 mt-1.5 text-sm leading-body text-neutral-700">{p.note}</p>
+        </li>
+      ))}
+    </ul>
+    <p class="mt-6">
+      The Regulation's annex heads point 2 with the Commission alone, but its
+      Article 77 gives point 2 to notified bodies and market surveillance
+      authorities as well. The test reports are for authorities only. The
+      individual battery's own
+      history goes to readers with a legitimate interest instead, such as
+      recyclers and the battery's buyer. <a href="/visibility">Visibility</a>{" "}
+      shows the split field by field. The toy and detergent passports name
+      customs authorities too; their details come in later acts.
+    </p>
+  </Section>
+
+  <Section eyebrow="How access works" title="A credential from an issuer the company trusts." wide>
+    <p>
+      The restricted parts open to a reader who presents a credential stating
+      their role, signed by an issuer the company running the passport has
+      chosen to trust. A company cannot vouch for an authority itself: its
+      node refuses to issue credentials for market surveillance, customs or
+      notified body roles, because that standing comes from a Member State.
+    </p>
+    <p>
+      There is no EU-wide issuer of authority credentials yet. The ecodesign
+      rules let the Commission set out how such credentials are issued and
+      checked, and none has been set out so far. Until then, access for an
+      authority is arranged with each company, which adds the authority's
+      credential issuer to the ones its node trusts.
+    </p>
+  </Section>
+
+  <Section eyebrow="Checking a passport" title="What you can confirm on your own." tone="muted" wide>
+    <ul class="not-prose m-0 grid list-none gap-5 p-0 md:grid-cols-3">
+      <li class="card m-0 p-5">
+        <p class="m-0 text-base font-semibold text-neutral-900">That nothing was changed</p>
+        <p class="m-0 mt-2 text-sm leading-body text-neutral-700">
+          The proof file carries every signature and the whole history. A
+          single changed character is caught where it happened.
+        </p>
+      </li>
+      <li class="card m-0 p-5">
+        <p class="m-0 text-base font-semibold text-neutral-900">What happened, in order</p>
+        <p class="m-0 mt-2 text-sm leading-body text-neutral-700">
+          Corrections, suspensions and handovers to another company are part
+          of the signed record, not notes kept beside it.
+        </p>
+      </li>
+      <li class="card m-0 p-5">
+        <p class="m-0 text-base font-semibold text-neutral-900">Who signed it</p>
+        <p class="m-0 mt-2 text-sm leading-body text-neutral-700">
+          Compare the identity in the file with the one the company publishes
+          on its own web domain. That step ties the keys to the company.
+        </p>
+      </li>
+    </ul>
+    <p class="mt-6">
+      <a href="/verify">Verify</a> runs these checks in your browser, and says
+      plainly what they do not prove.
+    </p>
+  </Section>
+
+  <Section eyebrow="Finding and keeping a passport" title="From the product, and for the long run." wide>
+    <p>
+      The code on a product leads to its passport's public page. The EU
+      registry of passports, which the Commission set up in July 2026, links a
+      product's identifier to where its passport is held.
+    </p>
+    <p>
+      A battery passport must stay available even after the company
+      responsible for it ceases to exist or leaves the EU market. Odal Node
+      exports a passport with its signatures and full history as one signed
+      file, which anyone can keep and check later.
+    </p>
+  </Section>
+
+  <Section eyebrow="Talk to us" title="Testing authority access." tone="tinted">
+    <p>
+      If you work for a market surveillance authority, a notified body or the
+      Commission and want to test reading a passport served by Odal Node,
+      write to us.
+    </p>
+    <div class="not-prose mt-6 flex flex-wrap gap-3">
+      <Button href={mailto}>Email contact@odal-node.io</Button>
+      <Button href="/verify" variant="secondary">Verify a proof file</Button>
+    </div>
+  </Section>
+</Base>
