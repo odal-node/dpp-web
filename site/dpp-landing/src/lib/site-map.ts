@@ -119,22 +119,16 @@ export const menus: Menu[] = [
     label: "Resources",
     items: [
       {
-        href: "/roadmap",
-        label: "Roadmap",
-        line: "What is built, what is waiting and what comes next",
-        icon: '<path d="M5 21V4"/><path d="M5 4.5h11l-2 3.5 2 3.5H5"/>',
-      },
-      {
-        href: "/faq",
-        label: "FAQ",
-        line: "Short answers to the questions people ask first",
-        icon: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7"/><path d="M12 17h.01"/>',
-      },
-      {
         href: "/glossary",
         label: "Glossary",
         line: "The words around a passport, explained",
         icon: '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5v-15Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/><path d="M9 8h6M9 11h4"/>',
+      },
+      {
+        href: "/roadmap",
+        label: "Roadmap",
+        line: "What is built, what is waiting and what comes next",
+        icon: '<path d="M5 21V4"/><path d="M5 4.5h11l-2 3.5 2 3.5H5"/>',
       },
       {
         href: "/security",
@@ -147,6 +141,12 @@ export const menus: Menu[] = [
         label: "Accessibility",
         line: "How this site was checked, and how to report a problem",
         icon: '<circle cx="12" cy="4.5" r="1.5"/><path d="M5 8.5c2.3.7 4.6 1 7 1s4.7-.3 7-1M12 9.5V14m0 0-3 7m3-7 3 7"/>',
+      },
+      {
+        href: "/faq",
+        label: "FAQ",
+        line: "Short answers to the questions people ask first",
+        icon: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7"/><path d="M12 17h.01"/>',
       },
     ],
   },

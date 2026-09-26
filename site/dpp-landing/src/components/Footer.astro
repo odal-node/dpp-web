@@ -15,7 +15,6 @@ import { groups, unsoldGoods } from "../lib/product-groups";
 
 const year = new Date().getFullYear();
 const link = (href: string) => footerLinks.find((e) => e.href === href)!;
-const waitlist = link("/waitlist");
 const bottom = [link("/privacy"), link("/sitemap")];
 ---
 
@@ -31,9 +30,6 @@ const bottom = [link("/privacy"), link("/sitemap")];
       </p>
       <p class="mt-2 leading-body text-primary-300/80">
         Sovereign Digital Product Passport infrastructure
-      </p>
-      <p class="mt-4">
-        <a class="font-semibold text-white hover:text-primary-200" href={waitlist.href}>{waitlist.label} &rarr;</a>
       </p>
     </div>
 
