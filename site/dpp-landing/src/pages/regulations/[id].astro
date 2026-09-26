@@ -3,7 +3,7 @@
 //
 // Shows the facts the record holds, worded for a general reader: status, the
 // passport line, the date and where it comes from, the framework it sits
-// under, when it was last checked against the official text, and the product
+// under, when it was last confirmed to be in force, and the product
 // groups it reaches with the articles each reach rests on. The record's own
 // maintainer notes are not reproduced; they are written for the people keeping
 // the library, not for this page.
@@ -23,7 +23,9 @@ import {
   groupRef,
   parentOf,
   eurLex,
-  formatDate,
+  currencyLine,
+  bindingRequiresPassport,
+  restsOnLaw,
 } from "../../lib/regulations";
 
 export function getStaticPaths() {
@@ -35,6 +37,7 @@ const name = displayTitle(act);
 const passport = passportView(act);
 const parent = parentOf(act);
 const bindings = act.productGroups ?? [];
+const expected = act.status === "anticipated";
 
 const title = `${name} | Odal Node`;
 const description = `${kindLabel(act)}: ${passport.label.toLowerCase()}. What it requires of a passport, and the product groups it reaches, as recorded in the Odal Node library.`;
@@ -56,15 +59,13 @@ const description = `${kindLabel(act)}: ${passport.label.toLowerCase()}. What it
       <div class="bg-white p-5">
         <dt class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Status</dt>
         <dd class="m-0 mt-1 text-base font-semibold text-neutral-900">{statusLabel(act)}</dd>
-        <dd class="m-0 mt-1 text-sm text-neutral-600">
-          {act.currency?.checkedOn
-            ? `Last checked against the official text on ${formatDate(act.currency.checkedOn)}.`
-            : "Not adopted, so there is no official text to check yet."}
-        </dd>
+        <dd class="m-0 mt-1 text-sm text-neutral-600">{currencyLine(act)}</dd>
       </div>
       {parent && (
         <div class="bg-white p-5">
-          <dt class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Adopted under</dt>
+          <dt class="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            {expected ? "To be adopted under" : "Adopted under"}
+          </dt>
           <dd class="m-0 mt-1 text-sm">
             <a href={`/regulations/${parent.id}`}>{displayTitle(parent)}</a>
           </dd>
@@ -81,16 +82,20 @@ const description = `${kindLabel(act)}: ${passport.label.toLowerCase()}. What it
     </dl>
   </Section>
 
-  <Section eyebrow="Reach" title="The product groups it reaches." tone="muted" wide>
+  <Section eyebrow="Reach" title={expected ? "The product groups it may reach." : "The product groups it reaches."} tone="muted" wide>
     {bindings.length === 0 ? (
       <p>
-        None that the software models as a product group yet. The act still
-        applies to the products it covers; they have not been modelled here.
+        {expected
+          ? "None recorded. The act has not been adopted, so what it will cover is not known yet."
+          : "None that the software models as a product group yet. The act still applies to the products it covers; they have not been modelled here."}
       </p>
     ) : (
       <ul class="not-prose m-0 grid list-none gap-4 p-0 md:grid-cols-2">
         {bindings.map((b) => {
           const g = groupRef(b.productGroup);
+          // Only worth saying where it differs from the act: a group that owes
+          // no passport under an act that otherwise creates them.
+          const noPassportHere = act.passport.obligation === "required" && !bindingRequiresPassport(act, b);
           return (
             <li class="card m-0 p-5">
               <div class="flex flex-wrap items-baseline justify-between gap-2">
@@ -104,13 +109,22 @@ const description = `${kindLabel(act)}: ${passport.label.toLowerCase()}. What it
                   {bindingLabel(b.status)}
                 </span>
               </div>
-              {b.legalBasis && b.legalBasis.length > 0 && (
-                <>
-                  <p class="m-0 mt-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">Rests on</p>
-                  <ul class="m-0 mt-1.5 list-none space-y-1 p-0 text-sm text-neutral-700">
-                    {b.legalBasis.map((l) => <li class="m-0">{l}</li>)}
-                  </ul>
-                </>
+              {noPassportHere && (
+                <p class="m-0 mt-2 text-sm text-neutral-700">
+                  <strong>No passport.</strong> The act sets other duties for this group, but no passport.
+                </p>
+              )}
+              <p class="m-0 mt-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">Rests on</p>
+              {restsOnLaw(b) ? (
+                <ul class="m-0 mt-1.5 list-none space-y-1 p-0 text-sm text-neutral-700">
+                  {b.legalBasis!.map((l) => <li class="m-0">{l}</li>)}
+                </ul>
+              ) : (
+                <p class="m-0 mt-1.5 text-sm text-neutral-700">
+                  {act.status === "anticipated"
+                    ? "No legal text. The act has not been adopted, and only preparatory work names this group."
+                    : "No article is recorded for this reach."}
+                </p>
               )}
             </li>
           );

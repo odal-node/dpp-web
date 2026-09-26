@@ -73,6 +73,32 @@ const SYSTEM: Record<string, string> = {
 export const bindingLabel = (status: string) =>
   status === "in_force" ? "Binding now" : status === "provisional" ? "Not yet determinable" : "Tracked only";
 
+/**
+ * What a status check found, for a general reader. The record's `checkedOn` is
+ * the date someone confirmed the act is still law (dpp-domain `CurrencyCheck`),
+ * not a date anyone re-read its content, so the words must not claim more.
+ */
+export const currencyLine = (i: Instrument) => {
+  const c = i.currency;
+  if (!c) return i.status === "anticipated" ? "Not adopted, so there is nothing to check yet." : "Not yet confirmed to be in force.";
+  const on = c.checkedOn ? ` Last confirmed on EUR-Lex on ${formatDate(c.checkedOn)}.` : "";
+  // "consolidated" is not read as "amended": ESPR's record is consolidated as
+  // of its own publication day and the act has never been amended.
+  return c.state === "repealed" ? `Repealed.${on}` : `In force.${on}`;
+};
+
+/**
+ * Whether the act asks for a passport for this group: the binding's own answer
+ * where it gives one, the act's otherwise (dpp-domain `requires_passport_for`).
+ * ESPR's unsold-goods binding is the case: the framework requires passports,
+ * its disclosure duty does not.
+ */
+export const bindingRequiresPassport = (i: Instrument, b: Binding) =>
+  (b.passport ?? i.passport).obligation === "required";
+
+/** A binding that cites no article rests on no legal text, only on preparatory work. */
+export const restsOnLaw = (b: Binding) => (b.legalBasis ?? []).length > 0;
+
 export const formatDate = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -85,7 +111,7 @@ export const formatDate = (iso: string) =>
 
 export type PassportView = {
   /** Short state, for a chip. */
-  state: "required" | "not-yet-operable" | "per-act" | "expected" | "none" | "elsewhere";
+  state: "required" | "not-yet-operable" | "undated" | "per-act" | "expected" | "none" | "elsewhere";
   label: string;
   /** One plain sentence expanding the label. */
   detail: string;
@@ -97,13 +123,13 @@ const today = new Date().toISOString().slice(0, 10);
 export function passportView(i: Instrument): PassportView {
   const p = i.passport;
   if (p.obligation === "notRequired") {
-    return { state: "none", label: "No passport", detail: "This act shapes what is recorded, but creates no passport of its own." };
+    return { state: "none", label: "No passport", detail: "It sets other rules, but creates no passport." };
   }
   if (p.obligation === "displacedBy") {
     return {
       state: "elsewhere",
       label: "Handled elsewhere",
-      detail: `Its product information is held in ${SYSTEM[p.system] ?? p.system} rather than in a passport.`,
+      detail: `Its product information goes into ${SYSTEM[p.system] ?? p.system}, instead of a passport.`,
     };
   }
   if (i.status === "anticipated") {
@@ -112,11 +138,23 @@ export function passportView(i: Instrument): PassportView {
 
   const live = (i.productGroups ?? []).some((b) => b.status === "in_force");
   const from = p.from;
-  if (!from) {
+  if (!from && i.kind === "framework") {
+    // ESPR Art. 9(1): a passport is owed "in accordance with the applicable
+    // delegated acts", so the framework alone requires one of nothing.
     return {
       state: "per-act",
       label: "Set act by act",
-      detail: "This framework requires passports, but each product group's own act sets the date.",
+      detail: "A product needs a passport only once a Commission act covers it, and that act sets the date.",
+    };
+  }
+  if (!from) {
+    // A direct act that requires a passport but fixes no date for it. The
+    // record leaves the date out rather than inventing one (dpp-domain
+    // `ObligationDate`), and so does the page.
+    return {
+      state: "undated",
+      label: "Date not set yet",
+      detail: "The act requires a passport, but leaves when to a later Commission act that has not been adopted yet.",
     };
   }
   const date = { iso: from.date, text: formatDate(from.date), basis: from.basis };
@@ -131,7 +169,11 @@ export function passportView(i: Instrument): PassportView {
   return {
     state: "required",
     label: from.date <= today ? `Required since ${date.text}` : `Required from ${date.text}`,
-    detail: "Products in scope need a passport from this date.",
+    // "Subject to any transition": the Detergents Regulation Art. 36(2) lets
+    // products that meet the old rules be placed on the market for a year
+    // after its date. The records carry no transition periods, so the page
+    // names the possibility rather than stating none exists.
+    detail: "Products in scope need a passport from this date, subject to any transition period the act allows.",
     date,
   };
 }

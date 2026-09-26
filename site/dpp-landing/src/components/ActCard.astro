@@ -9,6 +9,8 @@ import {
   passportView,
   basisLabel,
   groupRef,
+  bindingRequiresPassport,
+  restsOnLaw,
 } from "../lib/regulations";
 import BasisMark from "./BasisMark.astro";
 
@@ -17,11 +19,20 @@ interface Props {
 }
 const { act } = Astro.props;
 const passport = passportView(act);
-const reached = (act.productGroups ?? []).map((b) => groupRef(b.productGroup));
+// A card is too small for caveats, so it names only the groups it can name
+// plainly: ones a legal text reaches, and, under an act that creates passports,
+// ones that actually owe one. The act's own page lists every binding with its
+// caveat (ESPR's unsold-goods duty owes none; the expected electronics act's
+// light-means-of-transport reach comes from a preparatory study, not law).
+const createsPassports = act.passport.obligation === "required";
+const reached = (act.productGroups ?? [])
+  .filter((b) => restsOnLaw(b) && (!createsPassports || bindingRequiresPassport(act, b)))
+  .map((b) => groupRef(b.productGroup));
 
 const tone: Record<string, string> = {
   required: "bg-regulatory-bg text-regulatory-text ring-regulatory-border",
   "not-yet-operable": "bg-neutral-100 text-neutral-700 ring-neutral-200",
+  undated: "bg-neutral-100 text-neutral-700 ring-neutral-200",
   "per-act": "bg-primary-50 text-primary-800 ring-primary-100",
   expected: "bg-neutral-100 text-neutral-600 ring-neutral-200",
   none: "bg-neutral-100 text-neutral-600 ring-neutral-200",

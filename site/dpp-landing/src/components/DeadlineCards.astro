@@ -31,6 +31,7 @@ const cards = datedPassports.map(({ act, view }) => {
       bindings.find((b) => b.legalBasis?.length)?.legalBasis?.[0] ??
       `Regulation ${act.title.match(/\(EU\)\s*\d{4}\/\d+/)?.[0] ?? ""}`.trim(),
     date: view.date!,
+    detail: view.detail,
   };
 });
 ---
@@ -49,9 +50,7 @@ const cards = datedPassports.map(({ act, view }) => {
         {c.groups && (
           <span class="mt-1 text-xs font-medium uppercase tracking-wide text-neutral-500">{c.groups}</span>
         )}
-        <span class="mt-3 text-sm leading-body text-neutral-700">
-          Products in scope need a passport from this date.
-        </span>
+        <span class="mt-3 text-sm leading-body text-neutral-700">{c.detail}</span>
         <span class="mt-auto flex flex-wrap items-center gap-2 pt-4">
           <BasisMark basis={c.date.basis} label={basisLabel(c.date.basis)} />
           <span class="text-xs text-neutral-500">{c.citation}</span>
