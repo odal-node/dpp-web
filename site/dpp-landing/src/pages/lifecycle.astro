@@ -57,10 +57,11 @@ const afterSale = stations.stations.filter((s) => s.n >= 6);
     </div>
   </Section>
 
-  <Section eyebrow="After the sale" title="Publishing is only the first half." wide>
+  <Section eyebrow="After the sale" title="The record keeps working after the sale." wide>
     <p>
-      Import, check, sign, publish, resolve: that is a passport generator, and
-      it is useful. It is also where the harder half begins.
+      Import, check, sign, publish and resolve give a product its passport.
+      The stations after that keep the passport accurate for the rest of the
+      product's life.
     </p>
     <p>
       Stations {afterSale.map((s) => s.n).join(", ")} are what keep a record
@@ -91,8 +92,7 @@ const afterSale = stations.stations.filter((s) => s.n >= 6);
     <p>
       The core library is{" "}
       <a href="https://github.com/odal-node/dpp-core">open source</a> under
-      Apache-2.0, and anyone can read, audit or reuse it, including a
-      competitor.
+      Apache-2.0, and anyone can read, audit or reuse it.
     </p>
   </Section>
 </Base>
