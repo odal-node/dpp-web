@@ -1,0 +1,49 @@
+---
+title: Electronic seals
+description: How a node applies electronic seals to published passports, how it reports what each seal is worth, and why none carries legal effect yet.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+On top of the operator's own signature, a node can apply an **electronic seal** to each published passport: a signature by a trust service provider under the EU's eIDAS Regulation. A qualified seal from a qualified provider carries a legal presumption of integrity and origin that a plain signature does not.
+
+<Aside type="caution" title="No legal effect yet">
+Under eIDAS only a legal person can create an electronic seal, and there is no registered company behind this project yet. Sealing works end to end, but until an operator holds a qualified certificate, every seal a node makes says plainly that it carries no legal effect.
+</Aside>
+
+## Choosing a backend
+
+`SEAL_PROVIDER` selects how seals are made:
+
+| Value | Backend |
+|---|---|
+| `qtsp` | A hosted qualified trust service provider |
+| `local` | A local development sealer, for testing the whole path without a provider |
+| unset | No sealing; the node reports that sealing is not configured |
+
+A node started with the production profile refuses to run with a stand-in sealer. See [Operating a node securely](/engine/security#node-profiles).
+
+## How sealing runs
+
+Each published passport's seal is queued in the same transaction as the publish and applied in the background, so publishing never waits on the provider. Seals are made in the CAdES format (ETSI EN 319 122-1), one of the formats EU law lists, at the long-term-archival level where the provider supports it.
+
+## What a node reports about a seal
+
+```bash
+odal seal status            # how many published passports are unsealed
+odal seal status <id>       # one passport's seal, its certificate, and whether it still covers the current signature
+odal seal repair <id>       # queue a replacement for a seal that no longer verifies
+```
+
+A seal is checked the way EU law requires qualified seals to be validated: its certificate chain, validity window and revocation status, against the EU trusted lists. "Cannot be read" is reported as its own result, not as a failure. With `TRUSTED_LIST_REFRESH=on`, the node refreshes and verifies the trusted lists daily.
+
+`repair` costs a seal, so it is refused unless the stored seal is demonstrably broken at the moment you ask.
+
+## In a proof file
+
+An [evidence dossier](/guides/verification) carries the seal, who issued it and the level its bytes carry. The node's verifier checks it; the browser verifier reports it as not checked rather than guessing.
+
+## Read next
+
+- [Acts and standards](/regulatory/acts-and-standards): the seal acts the code relies on.
+- [Standards & interoperability](/core/standards): the seal formats and validation standards.

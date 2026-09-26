@@ -1,0 +1,67 @@
+---
+title: Integrations and statistics
+description: Signed webhooks to your own systems, privacy-preserving scan counts, and the machine-readable views and routes a node offers.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Webhooks
+
+A node can tell your own systems when something happens to a passport, such as a publish or a suspension:
+
+```bash
+odal webhook add https://erp.example.com/hooks/dpp --events dpp.passport.published,dpp.passport.suspended
+odal webhook test <id>
+odal webhook list
+```
+
+Receiver URLs must use HTTPS. Omit `--events` to receive every event. Deliveries are queued after the database write commits and retried with backoff, up to eight attempts, so a short outage on your side does not lose events.
+
+Each delivery carries its event type in `X-Odal-Event` and a signature in `X-Odal-Signature`:
+
+```text
+X-Odal-Signature: t=<unix-time>,v1=<hex HMAC-SHA256(secret, "<t>.<body>")>
+```
+
+Recompute the HMAC over the timestamp and the raw body with your subscription's secret, compare in constant time, and reject a timestamp that is too old. That is how a receiver tells a real delivery from a forged or replayed one.
+
+## Scan counts
+
+```bash
+odal stats --days 30            # operator-wide
+odal passport stats <id>        # one passport
+```
+
+A node counts how often each passport is opened: a daily counter per passport and per way it was opened, kept on your node. Nothing about the person who scanned is recorded (no IP address, device, location or session), because the storage has no field to hold it. Producing a QR code image is counted separately, so label printing is never mistaken for scans.
+
+## Machine-readable views
+
+The resolver serves the same published passport in several forms, by content negotiation on the passport's address:
+
+| Ask for | You get |
+|---|---|
+| `text/html` | The public passport page |
+| JSON (`application/json`, `application/ld+json`) | The public view as JSON, with a JSON-LD context |
+| `application/aas+json` | An Asset Administration Shell environment |
+
+A request that accepts none of these gets `406 Not Acceptable`.
+
+GS1 Digital Link routes resolve a product's barcode data to its passport, and the `linkset` link type returns an RFC 9264 link set. The node also serves each passport's QR code as a PNG.
+
+<Aside type="note" title="The shell is AAS-shaped, not IDTA-conformant">
+The Asset Administration Shell follows the IDTA metamodel's structure, but its semantic identifiers are in Odal's own namespace for now, so a receiving system still has to map them.
+</Aside>
+
+## Asking a node about the law
+
+Two public routes answer the first question an operator asks, with no key needed:
+
+- `GET /integrator/api/v1/product-groups`: every product group, whether a passport is required, from when, and under which acts, each date with where it comes from.
+- `GET /integrator/api/v1/schemas`: every product group's JSON Schema.
+
+The full HTTP interface is in the [API reference](/api).
+
+## Read next
+
+- [The CLI](/engine/cli): every command group.
+- [How the node works](/engine/architecture): where these queues and routes sit.

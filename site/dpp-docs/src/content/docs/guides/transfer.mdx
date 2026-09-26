@@ -1,0 +1,34 @@
+---
+title: Handing over responsibility
+description: Moving responsibility for a passport from one economic operator to another, on the passport's own signed record.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+When a product line is sold, or a product is remanufactured or repurposed, responsibility for its passport can move to another economic operator. The node records the handover on the passport itself, so the change of hands is part of the record rather than an email thread.
+
+## The four steps
+
+```bash
+odal passport transfer initiate <id> …   # the outgoing operator signs the handover
+odal passport transfer accept   <id>     # the node signs the acceptance and completes it
+odal passport transfer reject   <id>     # refused: ends the handover
+odal passport transfer cancel   <id>     # withdrawn: ends the handover
+```
+
+- **Initiate** records both parties (each one's DID, legal name, supply-chain role and country), the reason and an optional note, and signs the handover with the outgoing operator's key. Only a published passport can be handed over, and the outgoing DID must match the current head of the chain.
+- **Accept** completes it. The acceptance is signed by the hosting node's key, not by the incoming operator's.
+- **Reject** or **cancel** ends a pending handover and frees the chain for another.
+
+## What a verifier can check
+
+The transfer chain travels in the passport's [evidence dossier](/guides/verification). A verifier checks the outgoing operator's signature against that operator's DID, and the acceptance against the hosting node's DID. That proves the handover was recorded as stated; it does not claim a two-party signature, because the incoming operator does not sign.
+
+<Aside type="note" title="Who holds the obligations">
+ESPR has no single article setting out transfer mechanics. The record here is an engineering choice; who holds the obligations for a product is ultimately what the EU registry records. See [ESPR Overview](/regulatory/espr).
+</Aside>
+
+## Read next
+
+- [A passport's lifecycle](/guides/lifecycle): the other states a passport moves through.
+- [Proof files and verification](/guides/verification): how the chain is checked.

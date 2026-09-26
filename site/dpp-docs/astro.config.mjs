@@ -62,6 +62,20 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Using the node',
+          items: [
+            { label: 'Importing product data', link: '/guides/import' },
+            { label: "A passport's lifecycle", link: '/guides/lifecycle' },
+            { label: 'Handing over responsibility', link: '/guides/transfer' },
+            { label: 'Proof files and verification', link: '/guides/verification' },
+            { label: 'Access credentials', link: '/guides/credentials' },
+            { label: 'Your operator identity', link: '/guides/operator-identity' },
+            { label: 'Integrations and statistics', link: '/guides/integrations' },
+            { label: 'Electronic seals', link: '/guides/seals' },
+            { label: 'The unsold-goods disclosure', link: '/guides/unsold-goods' },
+          ],
+        },
+        {
           label: 'The Core',
           collapsed: true,
           items: [
@@ -69,7 +83,7 @@ export default defineConfig({
             // { label: 'Verify a passport yourself', link: '/core/verify' },
             { label: 'Standards & interoperability', link: '/core/standards' },
             { label: 'Security & cryptography', link: '/core/security' },
-            { label: 'Extending: sectors & plugins', link: '/core/sectors' },
+            { label: 'Product groups & plugins', link: '/core/sectors' },
           ],
         },
         {

@@ -1,0 +1,62 @@
+---
+title: A passport's lifecycle
+description: "What you can do with a passport after it is created: publish, correct, replace, suspend, retire, declare end of life, and read its history."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A passport starts as a draft and, once published, can never be edited or deleted. Everything that happens to it afterwards is a new, recorded state, so its history can be examined years later and trusted.
+
+## The states
+
+| State | How it gets there | What a reader sees |
+|---|---|---|
+| **Draft** | Import, or create | Nothing: drafts are not public, and the only editable state |
+| **Published** | `odal passport publish` signs it with your key | The passport, filtered by the reader's access rights |
+| **Suspended** | `odal passport suspend <id>`, for example during a recall | `410 Gone` |
+| **Superseded** | Replaced by a correction or by another passport | The earlier version, still readable |
+| **Archived** | `odal passport archive <id>` (terminal) | Read-only, still resolvable |
+| **End of life** | `odal passport eol <id> --reason …` (terminal) | Read-only, still resolvable |
+
+*Archived* is renamed *retired* on the core library's main branch, for its next release.
+
+## Correcting and replacing
+
+- **Correct a mistake**: `odal passport amend <id> --patch correction.json --reason "…"` issues a successor carrying the correction. The original moves to *superseded*, and the new record has a new ID. Only content can be corrected (product name, carbon and repairability figures, product-group data, component links); the product group, schema version, manufacturer and lineage are fixed when the passport is first issued.
+- **Replace with an existing passport**: `odal passport supersede <id> --superseded-by <new-id>` retires a passport in favour of one that is already published and already points back at it. Use it when the replacement was created on its own rather than as a correction.
+
+A code already printed on a product keeps resolving after its passport is corrected or replaced.
+
+## End of life
+
+`odal passport eol <id> --reason recycled` records how a product left service: `recycled`, `destroyed`, `exported` or `lost`, with an optional derogation and its citation where the law allows one. The passport is retained, never deleted; it outlives the product.
+
+<Aside type="note" title="Batteries">
+Battery Regulation Art. 77(8) says a battery passport ceases to exist once the battery has been recycled. The node records that end of life on the passport rather than deleting it.
+</Aside>
+
+## A second life
+
+When a product is repurposed or remanufactured, its new passport can record which passport, or passports, it was derived from and which operation produced it. For batteries this is Art. 77(7)'s link to the original battery's passport.
+
+## Products made of products
+
+A passport can point to the passports of its components, each pinned by a hash of its signed public view. `odal passport tree <id>` walks the whole tree and verifies every link.
+
+## History
+
+Every change is written to an append-only, hash-chained audit trail, and the database itself refuses edits to a published passport. `odal passport history <id>` shows the trail; an [evidence dossier](/guides/verification) carries it in a form anyone can check.
+
+## Finding and exporting
+
+```bash
+odal passport list --status published
+odal passport find --product-group battery --gtin 09506000134352
+odal passport export --format csv -o passports.csv
+```
+
+## Read next
+
+- [Handing over responsibility](/guides/transfer): moving a passport to another operator.
+- [Proof files and verification](/guides/verification): the history in a form anyone can check.
+- [Permanence & retention](/engine/retention): why nothing is ever deleted.

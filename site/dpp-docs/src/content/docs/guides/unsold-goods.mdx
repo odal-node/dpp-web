@@ -1,0 +1,39 @@
+---
+title: The unsold-goods disclosure
+description: How a node records the yearly disclosure of discarded unsold consumer products that ESPR Art. 24 requires. A report by the company, not a passport.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+ESPR Art. 24 requires companies that discard unsold consumer products to disclose, each year, how many they discarded, why, and what happened to them. It applies to large companies now, to medium-sized companies from 19 July 2030, and not to micro or small companies. Art. 25 separately prohibits destroying unsold apparel, clothing accessories and footwear, with derogations set out in Delegated Regulation (EU) 2026/296.
+
+<Aside type="note" title="Not a passport">
+The disclosure is about a company over a financial year, published on its own website, not about a product. No passport carries it, and it creates no passport obligation.
+</Aside>
+
+## Recording it
+
+The disclosure is many lines, not one figure: Art. 24(1) asks for the numbers per type or category of product, and separately per reason and destination.
+
+```bash
+odal unsold-goods record …    # record one line
+odal unsold-goods list        # recorded lines, newest first
+```
+
+Each line follows the format Implementing Regulation (EU) 2026/2 prescribes:
+
+- the product category, by customs (Combined Nomenclature) code;
+- the number of units and the weight discarded, each marked when it is an estimate, and whether packaging is included;
+- the reason, drawn from the derogations of Delegated Regulation (EU) 2026/296;
+- what happened to the products: the shares prepared for reuse, recycled, otherwise recovered, disposed of, or unknown, as the Waste Framework Directive defines them.
+
+The company is identified from the node's operator settings, by its European unique identifier (EUID) where it has one. The report also carries the measures taken and planned to prevent destruction.
+
+## Publishing it
+
+The finished document a company publishes each year is not produced yet; it is on the [roadmap](https://odal-node.io/roadmap). The recorded lines are what that document will be built from.
+
+## Read next
+
+- [Textile DPP](/regulatory/textile): how the unsold-goods duties differ from a passport.
+- [Acts and standards](/regulatory/acts-and-standards): the acts behind each field.
