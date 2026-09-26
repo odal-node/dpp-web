@@ -67,7 +67,7 @@
             },
             {
               "title": "Export for industrial systems",
-              "line": "Passports also export in the Asset Administration Shell format that Industry 4.0 systems already read."
+              "line": "Passports can also be served in the Asset Administration Shell format used by Industry 4.0 systems. The field meanings use Odal's own identifiers for now, so a receiving system still has to map them."
             }
           ]
         },
@@ -111,7 +111,11 @@
           "items": [
             {
               "title": "A proof file anyone can check offline",
-              "line": "The passport, its signatures and its full history in one signed file. It verifies without a network connection and without trusting us."
+              "line": "The passport, its signatures and its full history in one signed file. It verifies without a network connection and without trusting us.",
+              "link": {
+                "href": "/verify",
+                "label": "Check a proof file in your browser"
+              }
             },
             {
               "title": "Readable when your server is not",
@@ -147,8 +151,8 @@
               "line": "Record what was discarded, why and where it went, line by line, ready for the yearly disclosure."
             },
             {
-              "title": "Safe by default in production",
-              "line": "A node set up for production refuses to start with placeholder security settings, instead of accepting them quietly."
+              "title": "Safe by default",
+              "line": "A node will not start with the sample passwords and keys from its own setup files. One set up for production also will not start while a service it relies on, such as sealing or rule checking, is only a stand-in. Overrides exist for development, and they are logged as warnings."
             }
           ]
         }
@@ -197,6 +201,30 @@
             {
               "title": "The unsold-goods report, ready to publish",
               "line": "The records exist today. What is missing is the finished document a company publishes on its own website each year."
+            },
+            {
+              "title": "Show only part of a passport",
+              "line": "A passport can be issued as a digital credential its holder presents in part: they choose which fields to reveal, and the reader can still check those fields were signed. The open library has it; the node does not issue it yet."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "status": "planned",
+      "title": "Planned",
+      "description": "Committed to, and not yet being built. Both items wait on one decision first: how each node gets its own web address, because a client and a dashboard both need to know which node they are talking to.",
+      "themes": [
+        {
+          "theme": "Building on a node",
+          "items": [
+            {
+              "title": "JavaScript and TypeScript packages",
+              "line": "Packages for building on a node in JavaScript and TypeScript, starting with a client for the node's interface. Each is generated from the node's own interface description or compiled from the open library, never rewritten by hand, so it cannot say something the node does not."
+            },
+            {
+              "title": "A dashboard for running your node",
+              "line": "A web dashboard for the day-to-day work of running a node, built on those packages. It talks to your own node straight from your browser, so your data never passes through us."
             }
           ]
         }

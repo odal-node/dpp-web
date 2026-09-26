@@ -1,19 +1,24 @@
 ---
-// Roadmap.astro — the four registers, each grouped into themes.
+// Roadmap.astro — the five registers, each grouped into themes.
 // Data lives in src/data/roadmap.json, so editors change JSON, not markup.
 //
-// WHY FOUR REGISTERS AND NOT THREE
+// WHY FIVE REGISTERS AND NOT THREE
 //
 // "Waiting on a legal step" is kept apart from "In progress" on purpose. The
 // seal and registry work is finished; what holds it back is that only a legal
 // person may create an electronic seal. Filing that under "in progress" would
 // turn a legal fact into an engineering schedule.
 //
+// "Planned" is kept apart from both of its neighbours for the same reason in
+// the other direction. A committed item nobody is building yet is not "in
+// progress" (that would claim work that is not happening), and it is not
+// "being considered" (that would call a commitment an option).
+//
 // Items describe capabilities in plain words. Routes, commands and version
 // numbers belong on the docs site, never here.
 import data from "../data/roadmap.json";
 
-type Status = "available" | "waiting" | "in-progress" | "considered";
+type Status = "available" | "waiting" | "in-progress" | "planned" | "considered";
 type Item = {
   title: string;
   line: string;
@@ -39,6 +44,11 @@ const tone: Record<Status, { dot: string; rule: string; chip: string }> = {
   "in-progress": {
     dot: "bg-status-active",
     rule: "border-status-active/30",
+    chip: "bg-neutral-100 text-neutral-700",
+  },
+  planned: {
+    dot: "bg-primary-600",
+    rule: "border-primary-200",
     chip: "bg-neutral-100 text-neutral-700",
   },
   considered: {

@@ -1,7 +1,8 @@
 ---
 // /roadmap — what the software does today, what is waiting, and what is next.
 //
-// Rewritten 2026-09-25 with the founder. The page lists capabilities, never
+// Rewritten 2026-09-25 with the founder; a fifth status, "planned", added
+// 2026-09-26 for committed work nobody is building yet. The page lists capabilities, never
 // tasks: no issue links, commands, routes or version numbers. Every "available"
 // item was checked against the engine and core repositories that day. The rule
 // the page holds itself to: no item is written in the grammar of a stronger
@@ -20,7 +21,7 @@ const updated = new Date(`${data.updated}T00:00:00Z`).toLocaleDateString("en-GB"
 
 const title = "Roadmap: what is built, waiting and next | Odal Node";
 const description =
-  "What the Odal Node software does today, what is built and waiting on a legal step, what is in progress, and what is being considered. No dates on anything unbuilt.";
+  "What the Odal Node software does today, what is built and waiting on a legal step, what is in progress, what is planned, and what is being considered. No dates on anything unbuilt.";
 ---
 
 <Base title={title} description={description}>
@@ -45,7 +46,7 @@ const description =
     </p>
   </Section>
 
-  <Section eyebrow="Status" title="Four statuses, never mixed." tone="muted" wide>
+  <Section eyebrow="Status" title="Five statuses, never mixed." tone="muted" wide>
     <div class="not-prose">
       <OurRoadmap />
     </div>
@@ -64,8 +65,10 @@ const description =
     </p>
     <p>
       An item is <strong>in progress</strong> only while someone is building
-      it. An item <strong>being considered</strong> is an option: it carries no
-      date and no promise.
+      it. An item is <strong>planned</strong> when we have committed to it and
+      nobody is building it yet; it carries no date. An item{" "}
+      <strong>being considered</strong> is an option: it carries no date and
+      no promise.
     </p>
     <p>
       Items can move backwards. Finding out while building something that it
