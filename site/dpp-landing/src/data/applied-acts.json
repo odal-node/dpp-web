@@ -8,7 +8,7 @@
           "name": "eIDAS Regulation",
           "ref": "Regulation (EU) No 910/2014",
           "celex": "32014R0910",
-          "what": "The EU's rules for electronic seals and trust services. The node can seal passports through a qualified trust service provider, and it reports whether each seal carries legal effect."
+          "what": "The EU's rules for electronic seals and trust services. The node seals published passports in a format the EU recognises and reports whether each seal carries legal effect; legal effect needs a qualified certificate held by a company."
         },
         {
           "name": "Formats for electronic seals",

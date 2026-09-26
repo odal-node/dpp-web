@@ -14,7 +14,7 @@ Docker and the `odal` CLI. The node and resolver are published as container imag
 1. **Configure your secrets.** A node fails closed without them, by design: database credentials, a key-store passphrase and your admin login live in a local environment file you create.
 2. **Bring it up.** Running `odal` walks you through it: it starts the node, then onboards you and mints your first API key. Outside a clone, `odal up` pulls the published images; inside one, it builds from source, which takes a few minutes the first time.
 3. **Verify health.** `odal status` confirms the node is up and serving, and shows which of its services are real and which are stand-ins.
-4. **Choose a profile.** Set `NODE_PROFILE=production` on a node that serves real passports; see [Operating a node securely](/engine/security#node-profiles).
+4. **Go live carefully.** [Production deployment](/engine/deployment) covers TLS, the two public addresses and the checks to run first, and [Backup, restore and key custody](/engine/backup) what to protect.
 
 The [Quick Start](/quick-start) is the condensed version of this flow.
 

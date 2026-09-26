@@ -1,0 +1,144 @@
+---
+title: Configuration reference
+description: Every environment variable the node and the resolver read, what it does, its default, and which ones a production node must set.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A node is configured entirely through environment variables. The engine repository's `.env.example` is the template: copy it to `.env` and fill it in. This page lists every variable in engine v0.14.0, grouped by what it controls.
+
+<Aside type="caution" title="Two settings you cannot change later">
+- **`RESOLVER_BASE_URL`** is printed onto every product: it is signed into each passport's carrier URL at publication. Set it to your resolver's public address **before** publishing anything real; changing it afterwards means reissuing labels.
+- **`KEY_STORE_PASSPHRASE`** protects the key every passport is signed with. Lose it and you can no longer sign; leak it and passports can be forged. See [Backup, restore and key custody](/engine/backup).
+</Aside>
+
+## Required
+
+| Variable | What it is |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection for the node's application role. The node refuses to start if this connects as a superuser, because the append-only audit trigger cannot bind one |
+| `KEY_STORE_PATH` | Where the encrypted signing-key file is written (a path, not a secret) |
+| `KEY_STORE_PASSPHRASE` | Protects the key store. Generate it (`openssl rand -base64 32`); an empty value or the old template value stops the node |
+| `DID_WEB_BASE_URL` | The public origin your `did:web` identity is served from |
+| `RESOLVER_BASE_URL` | The resolver's public origin, printed onto products. Required by the node and the resolver since v0.14.0, with no default |
+
+With the bundled compose file, `DATABASE_POSTGRES_PASS` (superuser, used for container setup and migrations) and `DATABASE_APP_PASS` (the node's role) are set once and the connection URLs are built from them.
+
+## Profile and development overrides
+
+| Variable | Default | What it does |
+|---|---|---|
+| `NODE_PROFILE` | development | `sandbox` or `production`: how strict the node is about the services it depends on for trust. See [Node profiles](/engine/security#node-profiles) |
+| `ALLOW_DEV_CREDENTIALS` | `false` | `true` accepts the old sample passwords. Development only; logs a warning |
+| `ALLOW_UNSIGNED_PLUGINS` | `false` | `true` loads plugins without a signature. Development only; logs a warning |
+
+## First-time setup
+
+| Variable | What it does |
+|---|---|
+| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | A full-admin Basic login, used by `odal bootstrap` to mint the first API key and as the lock-out recovery path. Leave both unset in normal running; with either unset, the node accepts no Basic login at all. `admin`/`admin` stops the node |
+
+## Database, listener and logging
+
+| Variable | Default | What it does |
+|---|---|---|
+| `DATABASE_MIGRATE_URL` | unset | A privileged connection; if set, the node runs migrations at start-up and never keeps this connection open |
+| `NODE_PORT` | `8001` | The node's port, serving `/vault`, `/identity` and `/integrator` |
+| `LOG_LEVEL` | `info` | Log filter |
+| `LOG_FORMAT` | JSON | `pretty` for human-readable logs |
+| `METRICS_ADDR` | `127.0.0.1:9100` | Private Prometheus endpoint, off the public port. Empty disables it |
+| `CORS_ALLOWED_ORIGINS` | empty | Comma-separated browser origins allowed to call the API. Empty means server-side access only |
+| `NATS_URL` | empty | Optional event bus. Empty discards events; if set, the node fails fast when it cannot connect |
+| `BATCH_CONCURRENCY` | `20` | Rows processed concurrently during bulk import |
+
+## Product-group rules
+
+| Variable | Default | What it does |
+|---|---|---|
+| `PLUGINS_DIR` | `./plugins` | Where plugins are loaded from |
+| `PLUGIN_SIGNING_KEY` | unset | Hex-encoded Ed25519 public key plugins must be signed with. Required when plugins are present, unless the development override is on |
+| `RULESET_BUNDLE_PATH`, `RULESET_PUBLISHER_PUBKEY` | unset | The signed ruleset channel. Set both or neither; unset runs the built-in baseline |
+| `RULESET_POLL_INTERVAL_SECS` | `300` | How often the channel is re-read; `0` leaves `odal ruleset reload` as the only trigger |
+
+## Access credentials
+
+A node trusts no credential issuer until you name one. See [Access credentials](/guides/credentials).
+
+| Variable | What it does |
+|---|---|
+| `CREDENTIAL_ISSUERS_LEGITIMATE_INTEREST` | Comma-separated issuer DIDs trusted to attest a legitimate interest |
+| `CREDENTIAL_ISSUERS_AUTHORITY` | Comma-separated issuer DIDs trusted to attest an authority |
+| `CREDENTIAL_ISSUERS_SELF` | `true` trusts the node's own operator DID for a legitimate interest, and nothing above it. Needed for credentials the node issues itself |
+
+## Webhooks
+
+| Variable | Default | What it does |
+|---|---|---|
+| `WEBHOOK_ALLOW_PRIVATE_TARGETS` | `false` | Allow deliveries to private or loopback addresses. Off, only public HTTPS receivers are accepted |
+
+## Electronic seals
+
+See [Electronic seals](/guides/seals).
+
+| Variable | Default | What it does |
+|---|---|---|
+| `SEAL_PROVIDER` | unset | `local` for the node's own sealer, or unset/`none` for no sealing. An unrecognised value stops the node |
+| `SEAL_CONFORMANCE_LEVEL` | `LTA` | `B`, `T`, `LT` or `LTA`. An unrecognised value stops the node |
+| `SEAL_LOCAL_KEY_PATH` | `./.seal-local` | Where the local sealer keeps its key and certificate |
+| `SEAL_AUDIT_BATCH`, `SEAL_AUDIT_INTERVAL_SECS` | `200`, `60` | How many stored seals the background check opens per pass, and how often |
+| `TRUSTED_LIST_REFRESH` | off | `on` makes the node fetch and verify the EU trusted lists daily (around thirty hosts, tens of megabytes). Anything else is off |
+
+## EU registry
+
+| Variable | Default | What it does |
+|---|---|---|
+| `EU_REGISTRY_CLIENT_ID`, `EU_REGISTRY_CLIENT_SECRET` | unset | Unset, registrations are queued but not submitted. Both set activates the registry's sandbox adapter |
+| `EU_REGISTRY_ALLOW_INVALID_PAYLOADS` | `false` | Submit registrations that fail the node's own checks. For false positives only |
+| `SNAPSHOT_PUBLIC_BASE_URL` | unset | Where your continuity snapshots are publicly served; declared to the registry as each passport's back-up link |
+
+The operator's legal name and country for a registration come from `odal operator`, not from here.
+
+## Storage
+
+The published image includes object-storage support; any S3-compatible service works.
+
+| Variable | What it does |
+|---|---|
+| `ARCHIVE_S3_BUCKET`, `ARCHIVE_S3_ACCESS_KEY_ID`, `ARCHIVE_S3_SECRET_ACCESS_KEY` | A private archive of every passport version. Unset, archiving is off and the trust posture says so |
+| `ARCHIVE_S3_ENDPOINT`, `ARCHIVE_S3_REGION` | Optional; default AWS and `us-east-1` |
+| `SNAPSHOT_S3_BUCKET`, `SNAPSHOT_S3_ACCESS_KEY_ID`, `SNAPSHOT_S3_SECRET_ACCESS_KEY` | A separate, public-read bucket for continuity snapshots. Never the archive bucket |
+| `SNAPSHOT_S3_ENDPOINT`, `SNAPSHOT_S3_REGION` | Optional; default AWS and `us-east-1` |
+
+## Internal endpoints (mTLS)
+
+The node's internal routes (scan-count ingest, and signing when identity runs on its own) require mutual TLS, terminated at a proxy.
+
+| Variable | What it does |
+|---|---|
+| `MTLS_PROXY_SHARED_SECRET` | Binds the client-certificate headers to your terminating proxy |
+| `MTLS_REQUIRED_ISSUER_CN` | The issuer CN client certificates must carry |
+| `MTLS_ALLOW_INSECURE` | `true` disables the check. Local development and CI only |
+
+## The resolver
+
+The resolver is deployed separately and reads its own environment.
+
+| Variable | Default | What it does |
+|---|---|---|
+| `RESOLVER_PORT` | `8003` | The resolver's port |
+| `REDIS_URL` | required | Response cache |
+| `VAULT_BASE_URL` | | The node's vault address, e.g. `http://node:8001/vault` |
+| `RESOLVER_BASE_URL` | required | Its own public origin; the same value the node has |
+| `CACHE_TTL_SECS` | `30` | How long a response is cached. It is also the worst-case delay before a recall or suspension is visible |
+| `RATE_LIMIT_RPM` | `120` | Requests per minute per IP |
+| `TRUST_FORWARDED_FOR` | `false` | Trust `X-Forwarded-For`. Only behind a proxy that sets and sanitises it |
+| `OPERATOR_DID_URL` | derived | Defaults from the vault's host |
+| `METRICS_ADDR` | `127.0.0.1:9101` | Private metrics endpoint |
+| `SCAN_INGEST_URL` | unset | Where scan counts are flushed. Unset, the resolver counts nothing |
+| `SCAN_FLUSH_INTERVAL_SECS` | `300` | How often counts are flushed |
+| `SCAN_FLUSH_CLIENT_IDENTITY` | | PEM bundle presented for mTLS on the flush |
+
+## Read next
+
+- [Production deployment](/engine/deployment): which of these a production node must set.
+- [Backup, restore and key custody](/engine/backup): protecting the key store and the database.
