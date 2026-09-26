@@ -2,9 +2,19 @@
 // /passport-check — "Does my product need a passport?"
 //
 // Every answer is worked out at build time in lib/checker.ts from the same
-// records as /regulations and /timeline. Without JavaScript the page lists every
-// answer; the script turns the list into a one- or two-step picker and keeps
-// the choice in the address so an answer can be shared.
+// records as /regulations and /timeline. The page arrives as the picker, with
+// every answer hidden, and the script only reveals the one chosen, keeping the
+// choice in the address so an answer can be shared. It used to arrive the other
+// way round (every answer listed, the picker hidden) and the script swapped the
+// two once it loaded, so the page drew a long list and then collapsed it into a
+// form. Without JavaScript, the <noscript> style below lists every answer and
+// hides the picker, which cannot work without the script.
+//
+// An answer is hidden by the page style below until the script marks it
+// `data-shown`, not by the `hidden` attribute: Tailwind's reset hides
+// `[hidden]` with !important inside a cascade layer, and a layered !important
+// beats any unlayered override, so the <noscript> style could never reveal an
+// answer that carried it.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import BasisMark from "../components/BasisMark.astro";
@@ -43,7 +53,13 @@ const selectClass =
     </p>
 
     <div id="pc" class="not-prose mt-6">
-      <form id="pc-form" class="space-y-5" hidden>
+      <noscript>
+        <style is:inline>
+          #pc-form { display: none !important; }
+          #pc-answers [data-answer] { display: block !important; }
+        </style>
+      </noscript>
+      <form id="pc-form" class="space-y-5">
         <div>
           <label for="pc-group" class="text-sm font-semibold text-neutral-900">What do you make or sell?</label>
           <select id="pc-group" class={selectClass}>
@@ -104,6 +120,12 @@ const selectClass =
   </Section>
 </Base>
 
+<style>
+  [data-answer]:not([data-shown]) {
+    display: none;
+  }
+</style>
+
 <script>
   const root = document.getElementById("pc");
   const form = document.getElementById("pc-form");
@@ -120,7 +142,7 @@ const selectClass =
         f.hidden = !on;
         if (on) key = followSelect(f).value ? `${group.value}:${followSelect(f).value}` : "";
       }
-      for (const a of answers) a.hidden = a.dataset.answer !== key;
+      for (const a of answers) a.toggleAttribute("data-shown", a.dataset.answer === key);
       history.replaceState(null, "", key ? `#${key}` : location.pathname);
     };
 
@@ -132,7 +154,6 @@ const selectClass =
       if (f && sub) followSelect(f).value = sub;
     }
 
-    form.hidden = false;
     form.addEventListener("submit", (e) => e.preventDefault());
     group.addEventListener("change", show);
     for (const f of follows) followSelect(f).addEventListener("change", show);
