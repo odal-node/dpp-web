@@ -11,6 +11,13 @@ on:
 permissions:
   contents: read
 
+# Cancel a superseded run rather than paying for it — a rebase or a follow-up
+# push makes the in-flight run answer a question nobody is asking any more.
+# `main` is excluded: the post-merge run is the record for that commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
