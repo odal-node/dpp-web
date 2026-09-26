@@ -4,7 +4,7 @@ import Section from "../components/Section.astro";
 
 const title = "Privacy Policy | Odal Node";
 const description =
-  "How the Odal Node website handles your data: no cookies, no analytics, no third-party trackers. Hosted on Cloudflare Pages with zero data collection.";
+  "How the Odal Node website handles your data: no cookies, no analytics, no third-party trackers. Hosted on Cloudflare Pages, which sees only the request details any web host must.";
 
 // This policy covers the website at odal-node.io only — a static site with no
 // backend. How the Odal Node software handles product data is a separate,
@@ -26,7 +26,7 @@ const MAILBOX = "security@odal-node.io";
     </ul>
   </Section>
 
-  <Section eyebrow="Hosting" title="What the host sees. " tone="tinted">
+  <Section eyebrow="Hosting" title="What the host sees." tone="tinted">
     <p>
       The site is served as static files by <strong>Cloudflare Pages</strong>.
       As with any website, your browser must connect to a server to load a page,
@@ -77,6 +77,11 @@ const MAILBOX = "security@odal-node.io";
       <strong>Odal Node</strong> is responsible for this website and for the
       personal data described above. For any data or privacy matter, the contact
       is <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a>.
+    </p>
+    <p>
+      Changes to this policy are made in public. The website's source, with
+      every earlier version of this page, is in its{" "}
+      <a href="https://github.com/odal-node/dpp-web" rel="noopener">public repository</a>.
     </p>
   </Section>
 </Base>
