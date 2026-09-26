@@ -241,7 +241,7 @@
           "items": [
             {
               "title": "JavaScript and TypeScript packages",
-              "line": "Packages for building on a node in JavaScript and TypeScript, starting with a client for the node's interface. Each is generated from the node's own interface description or compiled from the open library, never rewritten by hand, so it cannot say something the node does not."
+              "line": "Packages for building on a node in JavaScript and TypeScript, starting with a client for the node's interface. Each is built directly from the node's own interface and the open library, so it always says exactly what the node does."
             },
             {
               "title": "A dashboard for running your node",
