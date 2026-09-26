@@ -9,6 +9,7 @@ import Section from "../components/Section.astro";
 import StandardsRow from "../components/StandardsRow.astro";
 import { datedPassports } from "../lib/regulations";
 import Base from "../layouts/Base.astro";
+import Button from "../components/Button.astro";
 
 // Counted from the registry, so the sentence cannot disagree with the cards.
 const WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
@@ -47,7 +48,8 @@ const steps = [
   { label: "Import", body: "Product data from CSV or Excel, including exports from your ERP, into your own node." },
   { label: "Validate", body: "Against each product group's rules, on your own node." },
   { label: "Sign", body: "With your own key, generated and held on your infrastructure." },
-  { label: "Publish", body: "Only the signed passport becomes resolvable, via QR and GS1 Digital Link." },
+  { label: "Publish", body: "The signed passport becomes resolvable through its QR code and GS1 Digital Link." },
+  { label: "Verify", body: "Anyone checks the signature against the identity on your web domain, even offline, without Odal." },
 ];
 ---
 
@@ -63,7 +65,7 @@ const steps = [
 
   <Section eyebrow="Why now" title="Know which date applies to your products." wide>
     <p>
-      Compliance arrives one product group at a time, date by date, not "everything by 2027."{" "}
+      Passports arrive one product group at a time, each with its own date.{" "}
       {lead}
     </p>
     <div class="not-prose mt-8">
@@ -96,7 +98,7 @@ const steps = [
       audience's access rights.
     </p>
     <div class="not-prose my-6">
-      <ol class="grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-4">
+      <ol class="grid grid-cols-1 gap-8 md:grid-cols-5 md:gap-4">
         {steps.map((s, i) => (
           <li>
             <div class="flex items-center">
@@ -114,17 +116,19 @@ const steps = [
       </ol>
     </div>
     <p>
-      Anyone can check the signature against the identity published on your web
-      domain, without Odal in the loop. Public fields are readable by all;
-      restricted fields (for repairers, recyclers, and market-surveillance
-      authorities) are released only against a verified credential. What the node
-      stores: the whole signed passport, the audit trail, the signature. What it
-      never stores: raw import files, supply-chain detail beyond passport content,
-      or your private keys.
+      Public fields are readable by all; restricted fields (for repairers,
+      recyclers and market-surveillance authorities) are released only against a
+      verified credential. What the node stores: the whole signed passport, its
+      audit trail, and a row-by-row record of each import. What it never stores:
+      the import files themselves, or supply-chain detail beyond the passport's
+      content. Your signing key stays on your own infrastructure, encrypted at
+      rest.
     </p>
-    <p>
-      <a href="/verify" class="link-arrow">Try it: verify a proof file</a>
-    </p>
+    <ul class="not-prose m-0 mt-6 flex list-none flex-wrap gap-x-8 gap-y-3 p-0 text-sm">
+      <li class="m-0"><a href="/verify" class="link-arrow">Try it: verify a proof file</a></li>
+      <li class="m-0"><a href="/lifecycle" class="link-arrow">Follow one passport's whole life</a></li>
+      <li class="m-0"><a href="/visibility" class="link-arrow">See who reads which part</a></li>
+    </ul>
   </Section>
 
   <Section eyebrow="What you get" title="Built for the compliance officer and the engineer at the same desk." wide>
@@ -144,11 +148,11 @@ const steps = [
         },
         {
           k: "Open core",
-          v: "The regulatory library, dpp-core, is Apache-2.0 and complete. The node, dpp-engine, is BSL-1.1 with a grant that makes self-hosting for your own compliance free.",
+          v: "The regulatory library is open source under Apache-2.0. The node is source-available under BSL-1.1, with a grant that makes self-hosting for your own compliance free.",
         },
         {
-          k: "No vendor lock-in",
-          v: "The node is a single, self-contained service. You can run it on your own infrastructure, or on a cloud you control.",
+          k: "Yours to run anywhere",
+          v: "The node is one self-contained service. Run it on your own infrastructure, or on a cloud you control.",
         },
         {
           k: "Self-host in minutes",
@@ -201,6 +205,21 @@ const steps = [
   <Section eyebrow="Standards" title="Built on open standards." tone="muted" wide>
     <div class="not-prose mt-2">
       <StandardsRow />
+    </div>
+    <p class="mt-8 text-sm">
+      <a href="/regulations" class="link-arrow">The EU acts it applies</a>
+    </p>
+  </Section>
+
+  <Section eyebrow="Next step" title="Get ready for your products' passports." wide>
+    <p>
+      Find your product group, check which dates apply, or tell us what you
+      make and we will keep you posted as the software takes shape.
+    </p>
+    <div class="not-prose mt-6 flex flex-wrap gap-3">
+      <Button href="/waitlist">Join the waitlist</Button>
+      <Button href="/product-groups" variant="secondary">Find your product group</Button>
+      <Button href="/faq" variant="secondary">Common questions</Button>
     </div>
   </Section>
 </Base>
