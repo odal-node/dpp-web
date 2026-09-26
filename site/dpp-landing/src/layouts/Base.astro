@@ -4,6 +4,7 @@
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import { shareImageFor } from "../lib/share-cards";
 
 interface Props {
   title: string;
@@ -18,7 +19,9 @@ interface Props {
 
 const { title, description, canonical, jsonLd = [], noindex = false } = Astro.props;
 const canonicalHref = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
-const ogImage = new URL("/og-image.png", Astro.site).toString();
+// Each page's own share card where it has one (lib/share-cards.ts).
+const share = shareImageFor(Astro.url.pathname);
+const ogImage = new URL(share.src, Astro.site).toString();
 
 // Base structured data — present on every page.
 const organizationLd = {
@@ -61,6 +64,7 @@ const websiteLd = {
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={share.alt} />
     <meta property="og:site_name" content="Odal Node" />
     <meta property="og:locale" content="en_US" />
 
@@ -69,6 +73,7 @@ const websiteLd = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={share.alt} />
 
     <!-- Structured Data -->
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
