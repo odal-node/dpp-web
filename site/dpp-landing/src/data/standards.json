@@ -1,9 +1,10 @@
 {
-  "_comment": "Standards row: names and one-line roles only; no third-party logos we do not have rights to use. The first four are implemented in the code (GS1 Digital Link resolution, W3C VC 2.0 credentials, did:web identity, AAS export), checked 2026-09-25. The fifth is the set of six harmonised DPP standards cited by Implementing Decision (EU) 2026/1736 (OJ 15.7.2026: EN 18216, 18219, 18220, 18221, 18222, 18223; not a range, there is no 18217 or 18218). Alignment with them is work in progress, and the row says so.",
+  "_comment": "Standards row: names and one-line roles only; no third-party logos we do not have rights to use. The first five are implemented in the code, checked 2026-09-25 and corrected 2026-09-26: a passport is signed as a JSON Web Signature (RFC 7515) under a did:web identity; W3C Verifiable Credentials are the access credentials readers present and the revocation lists behind them, NOT the passport's own format (the row said so until 2026-09-26; the SD-JWT VC form of a passport is in the open library but the node does not issue it yet). The fifth is the set of six harmonised DPP standards cited by Implementing Decision (EU) 2026/1736 (OJ 15.7.2026: EN 18216, 18219, 18220, 18221, 18222, 18223; not a range, there is no 18217 or 18218). Alignment with them is work in progress, and the row says so.",
   "standards": [
     { "name": "GS1 Digital Link", "role": "Product identification and QR resolution" },
-    { "name": "W3C Verifiable Credentials", "role": "The format of every signed passport" },
+    { "name": "JSON Web Signature", "role": "How every passport is signed" },
     { "name": "did:web", "role": "Issuer identity, anchored in your own web domain" },
+    { "name": "W3C Verifiable Credentials", "role": "How a reader proves who they are" },
     { "name": "IDTA AAS", "role": "Export for Industry 4.0 systems" },
     { "name": "European DPP standards", "role": "The six harmonised standards cited in July 2026. Alignment in progress" }
   ]

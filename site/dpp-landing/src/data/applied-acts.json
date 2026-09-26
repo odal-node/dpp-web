@@ -1,0 +1,131 @@
+{
+  "_comment": "The EU acts the software applies without any of them creating a passport: the third section of /regulations. Hand-written and landing-owned, unlike the instrument records above it, because dpp-core's catalog records only acts that create or displace a passport. Every line says what the software does with the act, checked against dpp-core and dpp-engine main on 2026-09-26 (engine v0.14.0): the code citing each act is where the line came from, and an act the code only mentions for context (CBAM, the Accounting Directive, the PEF Recommendation) is left to the docs reference rather than listed here. No dates: an act's own dates belong on EUR-Lex, and this list is not generated, so it must not carry one. Plain language, no article numbers; the docs site carries those.",
+  "groups": [
+    {
+      "title": "Signing and seals",
+      "acts": [
+        {
+          "name": "eIDAS Regulation",
+          "ref": "Regulation (EU) No 910/2014",
+          "celex": "32014R0910",
+          "what": "The EU's rules for electronic seals and trust services. The node can seal passports through a qualified trust service provider, and it reports whether each seal carries legal effect."
+        },
+        {
+          "name": "Formats for electronic seals",
+          "ref": "Implementing Regulation (EU) 2026/248",
+          "celex": "32026R0248",
+          "what": "The file formats an electronic seal may take. The node's seals use a format it lists."
+        },
+        {
+          "name": "Validating qualified seals",
+          "ref": "Implementing Regulation (EU) 2025/1945",
+          "celex": "32025R1945",
+          "what": "How a qualified seal is checked. The node reports its seal checks in these terms, including when a seal cannot be read."
+        },
+        {
+          "name": "EU trusted lists",
+          "ref": "Implementing Decision (EU) 2015/1505",
+          "celex": "32015D1505",
+          "what": "The format of the lists of trusted providers that EU countries publish. The node reads and verifies them to check who issued a seal's certificate."
+        }
+      ]
+    },
+    {
+      "title": "The EU registry and standards",
+      "acts": [
+        {
+          "name": "Digital product passport registry",
+          "ref": "Implementing Regulation (EU) 2026/1778",
+          "celex": "32026R1778",
+          "what": "Sets up the EU's registry of passports. The software models registration as it requires, including the identifiers the registry checks. Connecting to the live registry needs a registered company first."
+        },
+        {
+          "name": "Harmonised standards for passports",
+          "ref": "Implementing Decision (EU) 2026/1736",
+          "celex": "32026D1736",
+          "what": "Lists the six European standards for passports. Aligning the software with them is in progress, starting with how products are identified."
+        }
+      ]
+    },
+    {
+      "title": "Who answers for a product",
+      "acts": [
+        {
+          "name": "Market Surveillance Regulation",
+          "ref": "Regulation (EU) 2019/1020",
+          "celex": "32019R1020",
+          "what": "Requires an operator in the EU to answer for a product. A passport records who that is."
+        },
+        {
+          "name": "General Product Safety Regulation",
+          "ref": "Regulation (EU) 2023/988",
+          "celex": "32023R0988",
+          "what": "The same duty under product safety law. A passport records which rule its responsible operator is named under."
+        }
+      ]
+    },
+    {
+      "title": "Substances",
+      "acts": [
+        {
+          "name": "REACH",
+          "ref": "Regulation (EC) No 1907/2006",
+          "celex": "32006R1907",
+          "what": "Sets when a substance of very high concern must be declared. Passports record such substances, and the node checks each declaration against the EU's candidate list, noting that its copy of the list is not complete."
+        },
+        {
+          "name": "RoHS Directive",
+          "ref": "Directive 2011/65/EU",
+          "celex": "32011L0065",
+          "what": "Restricts hazardous substances in electrical equipment. Passports for phones and tablets record whether a product complies."
+        }
+      ]
+    },
+    {
+      "title": "Product information",
+      "acts": [
+        {
+          "name": "Tyre Labelling Regulation",
+          "ref": "Regulation (EU) 2020/740",
+          "celex": "32020R0740",
+          "what": "The classes on the tyre label: fuel efficiency, wet grip and rolling noise. Tyre passports carry them in the label's own terms."
+        },
+        {
+          "name": "Energy Labelling Regulation",
+          "ref": "Regulation (EU) 2017/1369",
+          "celex": "32017R1369",
+          "what": "The energy label and the EU's EPREL database. Phone and tablet passports carry the energy class."
+        },
+        {
+          "name": "Critical Raw Materials Act",
+          "ref": "Regulation (EU) 2024/1252",
+          "celex": "32024R1252",
+          "what": "Names the EU's critical raw materials. Battery and electronics passports list which of them a product contains."
+        }
+      ]
+    },
+    {
+      "title": "Unsold goods and end of life",
+      "acts": [
+        {
+          "name": "Combined Nomenclature",
+          "ref": "Regulation (EEC) No 2658/87",
+          "celex": "31987R2658",
+          "what": "The EU's customs product codes. The unsold-goods disclosure groups discarded products by these codes."
+        },
+        {
+          "name": "Waste Framework Directive",
+          "ref": "Directive 2008/98/EC",
+          "celex": "32008L0098",
+          "what": "Defines reuse, recycling, recovery and disposal. The unsold-goods disclosure and a product's recorded end of life use those definitions."
+        },
+        {
+          "name": "Company Law Directive",
+          "ref": "Directive (EU) 2017/1132",
+          "celex": "32017L1132",
+          "what": "Gives EU companies a unique identifier. The unsold-goods disclosure identifies the company by it."
+        }
+      ]
+    }
+  ]
+}

@@ -8,7 +8,9 @@ import Base from "../../layouts/Base.astro";
 import Section from "../../components/Section.astro";
 import ActCard from "../../components/ActCard.astro";
 import BasisMark from "../../components/BasisMark.astro";
-import { creatingPassports, shapingPassports, instruments, displayTitle } from "../../lib/regulations";
+import ExternalArrow from "../../components/ExternalArrow.astro";
+import { creatingPassports, shapingPassports, instruments, displayTitle, eurLex } from "../../lib/regulations";
+import appliedActs from "../../data/applied-acts.json";
 
 const title = "Regulations: the EU acts behind the passports | Odal Node";
 const description =
@@ -30,10 +32,11 @@ const itemListLd = {
 <Base title={title} description={description} jsonLd={[itemListLd]}>
   <Section eyebrow="Regulations" title="The EU acts behind the passports." wide>
     <p>
-      Each act below is a record in the software's own library. This page is
-      generated from those records, so the site cannot state a date the
-      software does not hold. Each act's own page says when it was last
-      confirmed to be in force.
+      The acts that create a passport, and the related acts that do not, are
+      records in the software's own library. Those sections are generated from
+      the records, so the site cannot state a date the software does not hold,
+      and each act's own page says when it was last confirmed to be in force.
+      A further section lists the other acts the software applies.
     </p>
     <p class="mb-2">Every date says where it comes from:</p>
     <ul class="not-prose m-0 flex list-none flex-wrap gap-x-6 gap-y-2 p-0 text-sm text-neutral-700">
@@ -63,10 +66,43 @@ const itemListLd = {
     </ul>
   </Section>
 
+  <Section eyebrow="Applied by the software" title="Other acts the software applies." tone="muted" wide>
+    <p>
+      These acts create no passport, but the software puts them to work: to
+      seal, to register, to name who answers for a product and to check what
+      it contains. This list is written for the site rather than generated,
+      so it carries no dates; each act's official text has them.
+    </p>
+    <div class="not-prose mt-8 grid gap-6 lg:grid-cols-2">
+      {appliedActs.groups.map((g) => (
+        <section class="card p-6" aria-label={g.title}>
+          <h3 class="m-0 text-base font-semibold text-neutral-900">{g.title}</h3>
+          <ul class="m-0 mt-4 list-none space-y-4 p-0">
+            {g.acts.map((a) => (
+              <li class="m-0">
+                <p class="m-0 text-sm font-semibold text-neutral-900">
+                  <a href={eurLex(a.celex)} rel="noopener">{a.name}<ExternalArrow class="ml-1" /></a>
+                </p>
+                <p class="m-0 text-xs text-neutral-500">{a.ref}</p>
+                <p class="m-0 mt-1 text-sm leading-snug text-neutral-600">{a.what}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+    <p class="mt-8 text-sm text-neutral-600">
+      The{" "}
+      <a href="https://docs.odal-node.io/regulatory/acts-and-standards" rel="noopener">documentation</a>{" "}
+      lists the articles and standards the code relies on.
+    </p>
+  </Section>
+
   <Section eyebrow="Read this first" title="What this list is, and what it is not." tone="tinted" wide>
     <p>
       <strong>It is not legal advice</strong>, and it is not a complete list of
-      what applies to your product. It is the set of acts the software models.
+      what applies to your product. It is the set of acts the software models
+      and applies.
       An act can reach products that were never modelled as a product group, so
       the absence of an act here is not evidence that none applies.
     </p>
