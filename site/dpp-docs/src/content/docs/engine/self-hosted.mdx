@@ -7,23 +7,24 @@ Self-hosting is the default way to run Odal Node. You run the engine on infrastr
 
 ## What you need
 
-Docker, and the source tree. Everything is driven by the `odal` CLI.
+Docker and the `odal` CLI. The node and resolver are published as container images (`ghcr.io/odal-node/dpp-node` and `dpp-resolver`), each with a software bill of materials and build provenance attached; a clone of the engine repository is only needed to build from source.
 
 ## The shape of it
 
-1. **Configure your secrets.** A node fails closed without them, by design — database credentials, a key-store passphrase, and your admin login live in a local environment file you create.
-2. **Bring it up.** Running `odal` walks you through it: it builds and starts the node, then onboards you and mints your first API key. The first start compiles from source and takes a few minutes; later starts are immediate.
-3. **Verify health.** `odal status` confirms the node is up and serving.
+1. **Configure your secrets.** A node fails closed without them, by design: database credentials, a key-store passphrase and your admin login live in a local environment file you create.
+2. **Bring it up.** Running `odal` walks you through it: it starts the node, then onboards you and mints your first API key. Outside a clone, `odal up` pulls the published images; inside one, it builds from source, which takes a few minutes the first time.
+3. **Verify health.** `odal status` confirms the node is up and serving, and shows which of its services are real and which are stand-ins.
+4. **Choose a profile.** Set `NODE_PROFILE=production` on a node that serves real passports; see [Operating a node securely](/engine/security#node-profiles).
 
 The [Quick Start](/quick-start) is the condensed version of this flow.
 
 ## What stays with you
 
-Your signing key is generated and held on your own infrastructure and never leaves it. Your raw import files are discarded after signing. What persists is the signed passport — the full product data you published, its history, and the metadata needed to serve it — nothing more. This holds regardless of who operates the node; see [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see).
+Your signing key is generated and held on your own infrastructure, encrypted at rest, and never leaves it. Your import files are discarded after signing. What persists is the signed passport (the full product data you published, its history and the metadata needed to serve it) and a record of what each import found, row by row. This holds regardless of who operates the node; see [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see).
 
 ## Keeping current
 
-The engine and the sector rules move as the regulation does. Updating a node brings in the latest validated sector schemas and fixes; a node you never update keeps working but drifts from the regulation over time.
+The engine and the product-group rules move as the regulation does. `odal update` pulls the latest images, with the latest product-group schemas and fixes; a new signed plugin can be installed on a running node with `odal plugin install`. A node you never update keeps working, but drifts from the regulation over time.
 
 ## Read next
 

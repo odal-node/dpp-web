@@ -1,36 +1,47 @@
 ---
 title: How the node works
-description: A node takes product data in, validates and signs it locally, keeps only the proof, and serves it for verification — one operator, one node.
+description: What runs inside an Odal Node, from import to a verifiable passport, and the background work that keeps it in step with the registry, seals and your systems.
 ---
 
 The engine is the service that runs the core's rules in production. In its simplest form it is a single node: one operator, on infrastructure they control, running the whole pipeline from raw input to a verifiable passport.
 
 ## The pipeline
 
-A node does four things, in order:
+A node does five things, in order:
 
-1. **Take data in** — product data arrives from a file or an existing system.
-2. **Validate and sign** — the node checks the data against the sector's rules and signs the result with the operator's own key. This is where the proof-bound guarantee lives: the raw import files are used to produce the signed passport, then discarded.
-3. **Keep the signed passport** — the passport and its history are stored in full; the raw import files behind it are not.
-4. **Serve it** — the passport is made resolvable, so a scan or a lookup returns the right view to the right audience.
+1. **Take data in**: product data arrives from a spreadsheet or an existing system, and each row becomes a draft.
+2. **Check it**: the node validates the draft against its product group's schema and runs that group's sandboxed rules, with plausibility warnings alongside.
+3. **Sign it**: the operator's own key signs the passport, once in full and once as its public view. The import file is discarded; what the import found in each row is kept.
+4. **Keep it**: the signed passport and its history are stored in full, and a published passport can never be deleted.
+5. **Serve it**: the passport becomes resolvable, so a scan returns the right view to the right reader, and anyone can verify it.
 
 ## The pieces
 
-Inside the node, three surfaces handle those steps:
+- **The node**: one binary that holds the write path (create, check, sign, version), bulk import, the identity service that holds the signing key and publishes the DID document, the plugin host and the registry connection.
+- **The resolver**: the public read path behind the QR code. It is deployed separately from the node, serves a passport as HTML, JSON-LD or an Asset Administration Shell by content negotiation, answers GS1 Digital Link routes, and enforces [access rights](/regulatory/access-control) on every request.
+- **PostgreSQL**: the source of truth. Everything else is derived from it.
+- **Object storage (optional)**: a private archive of passport versions, and a separate public bucket for continuity snapshots.
 
-- The **write path** — where a passport is created, validated, signed, and versioned.
-- **Bulk import** — for bringing many products in at once, each becoming a draft that flows into the write path.
-- The **public read path** — where a published passport is served and verified, and where [access rights](/regulatory/access-control) are enforced on every request.
+## Background work
 
-Signing happens inside the node itself — the operator's key never leaves their infrastructure. What the node keeps and what it discards is covered in [Permanence & retention](/engine/retention) and [Operating a node securely](/engine/security).
+Several things happen after the database write commits, each through its own durable queue, so a slow or absent outside service never blocks publishing and a crash never loses work:
+
+- **EU registry sync**: each published passport's registration is queued in the same transaction as the publish. See [EU Central Registry](/regulatory/central-registry).
+- **Seals**: when a seal provider is configured, a seal is queued for each published passport and applied by that provider. See [Electronic seals](/guides/seals).
+- **Webhooks**: passport events are delivered, signed, to your own systems. See [Integrations and statistics](/guides/integrations).
+- **Continuity snapshots**: when a snapshot bucket is configured, each published passport's signed public view is mirrored to it under a signed time bound, so a scan still works while the node is down.
+- **Trusted lists**: with `TRUSTED_LIST_REFRESH=on`, the node refreshes the EU trusted lists daily.
+
+## Trust posture
+
+At start-up the node works out, for each service it depends on for trust (rule checking, sealing, registry sync, archive, credential issuers), whether it is real, a sandbox or a stand-in. It logs that, serves it to `odal status`, and, under the production profile, refuses to start while a required one is a stand-in. See [Operating a node securely](/engine/security).
 
 ## One operator per node
 
-A node serves a single operator. There are no shared tenants and no cross-operator access; isolation is a property of the deployment, not a setting inside it. Scaling to many operators is an infrastructure concern, handled by running more nodes — not by mixing operators inside one.
+A node serves a single operator. There are no shared tenants and no cross-operator access; isolation is a property of the deployment, not a setting inside it. Serving many operators means running many nodes.
 
 ## Read next
 
-- [Permanence & retention](/engine/retention) — what a node keeps, and the guarantees that hold for years.
-- [Operating a node securely](/engine/security) — how the node protects keys, data, and access.
-- [Self-Hosting](/engine/self-hosted) — run a node on your own infrastructure.
-- [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see) — the data boundary, precisely.
+- [Permanence & retention](/engine/retention): what a node keeps, and the guarantees that hold for years.
+- [Operating a node securely](/engine/security): how the node protects keys, data and access.
+- [The CLI](/engine/cli): every command group.

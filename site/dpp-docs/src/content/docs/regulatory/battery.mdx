@@ -5,19 +5,23 @@ description: The EU Battery Regulation (EU 2023/1542) — what a battery passpor
 
 The Battery Regulation (EU 2023/1542) is the first product-group regulation that mandates a Digital Product Passport in production. Article 1(3) applies it to five categories of battery, and only five: portable, starting-lighting-ignition (SLI), light means of transport (LMT), electric vehicle (EV) and industrial. The set is closed deliberately — where a battery could fall under more than one, the strictest requirements apply, and that tie-break only works over a closed set. Stationary energy-storage systems are not a sixth category; the Regulation places them inside industrial. The regulation is already in force, and the staged compliance dates have begun passing their first checkpoints.
 
+## Which batteries need a passport
+
+Not all five. **Art. 77(1)**: from 18 February 2027, each LMT battery, each industrial battery with a capacity greater than 2 kWh and each electric-vehicle battery placed on the market or put into service must have a battery passport. Portable and SLI batteries, and industrial batteries of 2 kWh or less, do not. Under **Art. 77(8)** the passport ceases to exist once the battery has been recycled.
+
 ## What the regulation requires
 
 The battery passport itself is established by **Article 77**, and the information it must carry is set out in **Annex XIII**: the carbon footprint over the battery's lifecycle, the materials composition (with a particular focus on critical and recycled content), the State of Health (SoH) and remaining capacity for second-life evaluation, the chemistry classification, the responsible party for end-of-life management, and the supply-chain due-diligence statement.
 
 ## Supply-chain due diligence
 
-The regulation requires the economic operator to identify, prevent, and address risks in their cobalt, lithium, nickel, and natural-graphite supply chains, on terms aligned with the OECD Due Diligence Guidance, with staged checkpoints — annual reporting, third-party verification, and public disclosure.
+The regulation requires the economic operator to identify, prevent and address risks in their cobalt, lithium, nickel and natural-graphite supply chains, on terms aligned with the OECD Due Diligence Guidance, with annual reporting, third-party verification and public disclosure. Regulation (EU) 2025/1561 postponed the start of the Art. 48(1) duty to **18 August 2027**.
 
-Odal does not perform the due-diligence work itself — that is the operator's responsibility. What the passport captures is the **record** of it: the due-diligence statement, references to third-party verification, and a cryptographic link from the published passport back to the audited statement.
+Odal does not perform the due-diligence work itself; that is the operator's responsibility. What the passport captures is the **record** of it: a link to the operator's published due-diligence report.
 
 ## How Odal carries it
 
-A battery passport records the Annex XIII fields the regulation requires, with the constraints the regulation sets, versioned so that a regulation update lands as a new version without invalidating existing passports. The battery sector's rules — validating the content and confirming the due-diligence statement is present and well-formed — run through the core's sector seam, the same way every sector does.
+A battery passport records the Annex XIII fields the regulation requires, with the constraints the regulation sets, versioned so that a regulation update lands as a new version without invalidating existing passports. The battery rules run as a sandboxed plugin through the core's product-group seam, the same way every product group's do. A repurposed or remanufactured battery's new passport links back to the passport, or passports, of the batteries it came from, as Art. 77(7) requires.
 
 ## What is checked today
 
@@ -27,14 +31,14 @@ The Battery Regulation is in force, but its requirements switch on in stages, an
 - **Declared now, binding later** — the minimum recycled-content shares for cobalt, lithium, nickel and lead, set by Art. 8(2) and 8(3) and cross-referenced to Annex VIII. (Annex X is the due-diligence raw-materials list, and has nothing to do with recycled content.) These are finalised law but do not take effect until 2031, rising again in 2036, so today they are surfaced as advisory rather than as a pass/fail verdict.
 - **Awaiting a delegated act** — minimum electrochemical performance and durability values, empowered by Art. 10(5), and the carbon-footprint performance class under Art. 7(2). Art. 7(2) requires the label to declare a class but defers the classes themselves to an act that has not been adopted, and requires the scale to be revised every three years — so neither the labels nor how many there are is settled, and we do not guess at them.
 
-The passport itself becomes mandatory on **18 February 2027**. As each later requirement takes effect, the battery sector's checks extend to cover it, and passports already issued stay valid. The reasoning behind issuing a binding verdict only where the law binds is the [honesty model](/regulatory/espr) every sector follows.
+The passport itself becomes mandatory on **18 February 2027**. As each later requirement takes effect, the battery checks extend to cover it, and passports already issued stay valid. The reasoning behind issuing a binding verdict only where the law binds is the [honesty model](/regulatory/espr) every product group follows.
 
-## What is changing
+## Who may read which part
 
-The Battery Regulation interacts with the broader ESPR framework as ESPR's delegated acts begin landing. The expectation across the regulatory community is that ESPR-aligned battery passports will become the canonical form, with the Battery Regulation's specific Annex XIII requirements layered on top. `dpp-core` tracks both vocabularies so existing battery passports remain valid as the framework converges.
+Art. 77(2) splits the passport between the public, authorities and persons with a legitimate interest, and the split is not a ladder: authorities see conformity test reports nobody else does, and only a person with a legitimate interest sees the individual battery's own history. The implementing act under Art. 77(9), due by 18 August 2026, is to name who counts as a person with a legitimate interest for points 2 and 4; we hold no adopted text of it. See [Access control](/regulatory/access-control).
 
 ## Read next
 
-[Textile DPP](/regulatory/textile) — the comparable analysis for the textile delegated act.
-[Extending: sectors & plugins](/core/sectors) — how a sector's rules plug into the core.
-[What the core does](/core/overview) — the standard a battery passport implements.
+- [Access control](/regulatory/access-control): the Art. 77(2) split in detail.
+- [Product groups & plugins](/core/sectors): how a product group's rules plug into the core.
+- [Textile DPP](/regulatory/textile): a product group whose act is not adopted yet.

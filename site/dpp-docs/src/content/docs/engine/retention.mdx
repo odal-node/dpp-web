@@ -21,17 +21,23 @@ The node's storage interface has no delete operation at all. This is a structura
 
 Every transition — created, published, suspended, archived — is written to an audit trail as it happens. Entries are only ever added; they are never rewritten or deleted. A passport's provenance can therefore be examined years later and trusted to reflect what actually occurred, in the order it occurred.
 
-## Archival is a state, not an ending
+## Retiring is a state, not an ending
 
-When a product reaches end-of-life, its passport moves to *archived* — read-only, but still resolvable. The regulation's record-keeping window outlives the product itself, and archival keeps the passport readable for that entire window instead of removing it. End-of-life is a lifecycle state, never a deletion.
+A passport can be archived (renamed *retired* on core's main branch for its next release), and a product's end of life can be declared on its passport. Both are terminal states, and both keep the passport read-only but resolvable: the regulation's record-keeping window outlives the product itself. Neither is ever a deletion. See [A passport's lifecycle](/guides/lifecycle).
 
-## The address stays stable
+## Keeping the printed address working
 
-The QR code on a product encodes a resolver address that has to keep working for the full retention period — potentially long after the product was made. GS1 Digital Link and the EU Central Registry add a layer of indirection between the printed identifier and the passport's current location: the registry maps a product's identifier to wherever its passport lives, so an operator can move or re-home the resolver without reprinting a single label. The physical mark stays valid even as the infrastructure behind it changes.
+The QR code on a product encodes a web address on the operator's resolver, and that address has to keep working for the whole retention period, potentially long after the product was made. A code already printed keeps resolving after its passport is corrected or replaced. What keeps the address itself alive is the operator's domain. How a node's addresses are assigned and kept stable over the full retention period is an open design question we have not settled, and this page will say so until we have.
 
-## The independent backup
+## Readable when the node is not
 
-Article 10(4)'s back-up copy — held by a digital product passport service provider, so a passport survives an operator's insolvency or shutdown — is the operator's obligation, and Art. 11(e) requires availability to continue through insolvency, liquidation or cessation of activity. The [proof-bound model](/getting-started/what-odal-can-and-cannot-see) makes it tractable: what has to be preserved is the signed passport and its history, not a sprawling production dataset. How this meets the registry is described under [EU Central Registry](/regulatory/central-registry).
+A node can mirror each published passport's signed public view to a separate, public object-storage bucket, under a signed time bound saying how long that copy stands. A CDN or bucket website serves it at a stable path while the node is unreachable, and `odal snapshot verify` checks the time bound without needing the node. See [Proof files and verification](/guides/verification).
+
+## Archive and back-up
+
+A node can also copy every passport version to private object storage (any S3-compatible service), kept apart from the public snapshot bucket. That archive is optional today, and a node without one says so in its trust posture.
+
+Article 10(4)'s back-up copy, held by a digital product passport service provider so that a passport survives an operator's insolvency or shutdown, is a separate obligation on the operator; Art. 11(e) requires availability to continue through insolvency, liquidation or cessation of activity. The node does not provide that service. The [proof-bound model](/getting-started/what-odal-can-and-cannot-see) makes it tractable for whoever does: what has to be preserved is the signed passport and its history, not a sprawling production dataset.
 
 ## Read next
 

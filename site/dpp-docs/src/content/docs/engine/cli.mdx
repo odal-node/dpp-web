@@ -1,23 +1,87 @@
 ---
 title: The CLI
-description: odal is how you operate a node — set it up, manage passports, and check its health. Task-oriented, scriptable, and the same surface a dashboard would use.
+description: The odal command-line tool, the single control plane for a node. Every command group, and what it is for.
 ---
 
-`odal` is the command-line tool for operating a node. It is how you set a node up, work with passports, and keep an eye on it — interactively for a person, or scripted for CI. Running `odal` with no arguments starts a guided session; every step also has a direct command.
+import { Aside } from "@astrojs/starlight/components";
 
-## What you can do with it
+`odal` is the command-line tool for operating a node: setting it up, working with passports, and keeping an eye on it. Run it with no arguments for the interactive console, where every task is a menu entry; every entry is also a direct command, so the same work scripts cleanly in CI.
 
-- **Set up a node** — connect, build and start the services, and onboard your operator identity, which mints your first API key.
-- **Work with passports** — import product data, validate drafts against the sector rules, publish (which signs and makes them resolvable), and move a passport through its lifecycle when something changes.
-- **Manage access** — create and revoke API keys, and view or update your operator details.
-- **Work across nodes** — keep named profiles for more than one node (for example a local one and a production one) and switch between them.
-- **Check health** — see at a glance whether the node and its services are up.
+<Aside type="note" title="The CLI is the reference">
+`odal --help`, and `--help` on any command, lists exactly what your version supports. This page is the map; the commands are the authority.
+</Aside>
 
-## Discoverability
+## Setting up and running a node
 
-The CLI is self-describing: `odal --help`, and `--help` on any command, lists what's available in your version. The commands are the authoritative reference; this page is the map.
+| Command | What it does |
+|---|---|
+| `odal init` | Save connection settings and scaffold the compose file (for scripting; people can just run `odal`) |
+| `odal up` · `down` | Start or stop the services. Inside a clone it builds from source; otherwise it pulls the published images |
+| `odal status` | Health of every service, and the node's trust posture: which services are real and which are stand-ins |
+| `odal update` | Pull the latest container images |
+| `odal bootstrap` | Onboard the operator and mint the first API key |
+| `odal whoami` | What the configured API key actually is: its identity and scope |
+| `odal profile` | Named connection profiles for more than one node (`list`, `show`, `use`, `create`, `remove`, `rename`) |
+| `odal key` | API keys (`create`, `list`, `revoke`, `use`); a new key's secret is shown once |
+
+## Your operator identity
+
+| Command | What it does |
+|---|---|
+| `odal operator` | Show or set the operator configuration |
+| `odal operator-id` | Economic-operator identifiers; the primary one is stamped on new passports |
+| `odal facility` | Facilities, such as a GLN; the default one is stamped on new passports |
+
+See [Your operator identity](/guides/operator-identity).
+
+## Passports
+
+| Command | What it does |
+|---|---|
+| `odal template <group>` | The CSV header row an import expects |
+| `odal passport import` | Import CSV, TSV or JSON; every row becomes a draft |
+| `odal passport validate` | Check drafts, or dry-run a passport body from a file |
+| `odal passport publish` | Sign and publish drafts |
+| `odal passport list` · `find` | List or search passports; find one by its business identity |
+| `odal passport lint` | Re-run the plausibility checks; advisory, never blocks publishing |
+| `odal passport amend` · `supersede` | Correct a published passport with a successor, or retire it in favour of one that exists |
+| `odal passport suspend` · `archive` · `eol` | Suspend, retire, or declare end of life |
+| `odal passport transfer` | Hand responsibility to another operator (`initiate`, `accept`, `reject`, `cancel`) |
+| `odal passport tree` | Walk and verify a product's component tree |
+| `odal passport history` | A passport's audit trail |
+| `odal passport evidence` | Generate a signed evidence dossier |
+| `odal passport export` | Export passports as JSON or CSV |
+| `odal passport stats` | One passport's scan counts |
+
+See [Importing product data](/guides/import), [A passport's lifecycle](/guides/lifecycle) and [Handing over responsibility](/guides/transfer).
+
+## Proof and trust
+
+| Command | What it does |
+|---|---|
+| `odal verify <id\|file>` | Check an evidence dossier against the node |
+| `odal snapshot verify` | Check a continuity snapshot's signed time bound, when the node itself is unreachable |
+| `odal seal status` · `repair` | Sealing state, and a replacement seal for one that no longer verifies |
+| `odal registry` | EU registry sync status, operator-wide or per passport |
+| `odal credential issue` | Issue an access credential to a repairer, recycler or other holder of a legitimate interest |
+
+See [Proof files and verification](/guides/verification), [Electronic seals](/guides/seals) and [Access credentials](/guides/credentials).
+
+## Rules, integrations and reports
+
+| Command | What it does |
+|---|---|
+| `odal product-group` | Which product groups need a passport, from when, and under which acts (`list`, `show`) |
+| `odal schema` | Schema versions this node serves (`check`, `list`, `show`) |
+| `odal plugin install` | Install a signed product-group plugin, hot-swapped with no restart |
+| `odal ruleset reload` | Take the latest signed ruleset bundle now |
+| `odal webhook` | Signed outbound event deliveries (`list`, `add`, `test`, `remove`) |
+| `odal stats` | Operator-wide scan counts |
+| `odal unsold-goods` | Record and list lines of the unsold-goods disclosure |
+
+See [Product groups & plugins](/core/sectors), [Integrations and statistics](/guides/integrations) and [The unsold-goods disclosure](/guides/unsold-goods).
 
 ## Read next
 
-- [Self-Hosting](/engine/self-hosted) — the setup flow in context.
-- [Quick Start](/quick-start) — the fastest path from clone to first passport.
+- [Quick Start](/quick-start): the fastest path from clone to first passport.
+- [Self-Hosting](/engine/self-hosted): the setup flow in context.

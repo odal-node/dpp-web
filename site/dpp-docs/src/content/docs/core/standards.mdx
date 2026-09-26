@@ -23,7 +23,7 @@ Checked on 2026-09-26 against `dpp-core` main and `dpp-engine` v0.14.0. Where so
 - **JSON Web Signature** (RFC 7515) with **EdDSA over Ed25519** (RFC 8037): how every passport is signed.
 - **`did:web`**: the issuer's identity, anchored in their own web domain. Verifying a passport is an ordinary web lookup, with no central registry and no dependency on Odal.
 - **JSON Canonicalization Scheme** (RFC 8785): the byte-exact form data is hashed in, so a check gives the same answer on every machine.
-- **W3C Verifiable Credentials 2.0**: the access credentials a reader presents to see restricted parts of a passport, with revocation through a **W3C Bitstring Status List**.
+- **W3C Verifiable Credentials 2.0**: the access credentials a reader presents to see restricted parts of a passport. The node checks an issuer's **W3C Bitstring Status List** for revocation where the issuer publishes one; credentials the node issues itself carry no status list and are limited to 90 days instead (see [Access credentials](/guides/credentials)).
 - **SD-JWT** (RFC 9901): a passport issued as a credential its holder can present in part. On core's main branch; the node does not issue it yet.
 
 ## Electronic seals

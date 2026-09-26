@@ -31,7 +31,7 @@ The Battery Regulation (EU) 2023/1542, Article 77(2), is currently the only full
 
 Odal models this directly — audiences and disclosure classes as separate vocabularies, with an explicit table of which audience may see which class — rather than as a tier number.
 
-One detail is still pending: the delegated act under Article 77(9), which fixes the access rights for Annex XIII points 2 and 4, has not been adopted.
+One detail is still pending: Article 77(9) required the Commission to adopt, by 18 August 2026, implementing acts naming who counts as a person with a legitimate interest for points 2 and 4, and to which of that information they are entitled. We hold no adopted text of them. Article 77(2)(c) itself grants legitimate interest for two purposes only: dismantling and composition work by repairers, remanufacturers, second-life operators and recyclers, and, for an individual battery, its purchaser (or someone acting for them) making it available to energy aggregators or market participants.
 
 ## Constraints that apply everywhere
 
@@ -43,9 +43,11 @@ Read from the primary texts of ESPR, the Battery Regulation, the Toy Safety Regu
 
 ## How Odal enforces the boundaries
 
-Every field carries a disclosure classification drawn from the sector's own definition rather than hard-coded. A request arrives with a credential — a W3C Verifiable Credential asserting the holder's role — and the node resolves that role to an audience, then filters the passport to the disclosure classes that audience may see.
+Every field carries a disclosure classification drawn from the product group's own definition rather than hard-coded. A request arrives with a credential in the `X-DPP-Credential` header, a W3C Verifiable Credential asserting the holder's role, and the node resolves that role to an audience, then filters the passport to the disclosure classes that audience may see.
 
-The filtering step is a **pure function**: no network, no database. The credential check verifies the signature, the expiry, the issuer's trust status and the revocation list.
+The filtering step is a **pure function**: no network, no database. The credential check verifies the signature, the expiry, the issuer's trust status and, where the issuer publishes one, its revocation list. How a node issues credentials of its own, and their limits, is on [Access credentials](/guides/credentials).
+
+For product groups without an adopted delegated act, the software's own model holds a few fields back for credential holders, such as disassembly instructions or substances of concern. Those splits are modelling choices, not law, and they will follow each delegated act once it exists.
 
 Durable artefacts — stored signatures, audit records — are keyed by the **disclosure classes** they cover, never by an audience name. That is deliberate: ESPR's eventual actor vocabulary differs from the Battery Regulation's, and anything keyed to today's audience names would need migrating when the first ESPR delegated act lands.
 
