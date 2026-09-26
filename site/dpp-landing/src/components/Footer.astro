@@ -2,14 +2,26 @@
 // Footer.astro — closing trust signals on the navy band. No newsletter, no social row.
 // Uses the shared brand mark (currentColor variant) tinted ice for the dark band,
 // so it stays in sync with the asset instead of a hand-rolled inline copy.
+//
+// Every column comes from lib/site-map.ts (the nav's menus) and
+// lib/product-groups.ts, so a page reachable from the nav is reachable from the
+// foot of every page too, and the two cannot drift. It spans the full width,
+// with the same side padding as the nav bar, so its edges line up with the
+// logo and the waitlist button above.
 import OdalMark from "../assets/favicon.svg";
 import ExternalArrow from "./ExternalArrow.astro";
+import { menus, footerLinks } from "../lib/site-map";
+import { groups, unsoldGoods } from "../lib/product-groups";
+
 const year = new Date().getFullYear();
+const link = (href: string) => footerLinks.find((e) => e.href === href)!;
+const waitlist = link("/waitlist");
+const bottom = [link("/privacy"), link("/sitemap")];
 ---
 
 <footer class="bg-primary-900 text-primary-200">
-  <div class="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-4 py-12 text-sm sm:grid-cols-3 sm:px-6 lg:px-8 xl:grid-cols-[1.4fr_repeat(6,1fr)] xl:gap-x-6">
-    <div class="col-span-2 sm:col-span-3 xl:col-span-1">
+  <div class="grid grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 text-sm sm:grid-cols-3 sm:px-6 lg:grid-cols-6 xl:grid-cols-[1.3fr_repeat(4,1fr)_2fr] xl:gap-x-8">
+    <div class="col-span-2 sm:col-span-3 lg:col-span-6 xl:col-span-1">
       <p class="mb-2 flex items-center gap-2 font-semibold text-white">
         <OdalMark aria-hidden="true" class="h-6 w-6 shrink-0 text-primary-300" />
         Odal Node
@@ -20,71 +32,47 @@ const year = new Date().getFullYear();
       <p class="mt-2 leading-body text-primary-300/80">
         Sovereign Digital Product Passport infrastructure
       </p>
+      <p class="mt-4">
+        <a class="font-semibold text-white hover:text-primary-200" href={waitlist.href}>{waitlist.label} &rarr;</a>
+      </p>
     </div>
 
-    <!-- Mirrors the nav's five menus, in the same order, so the same pages
-         are reachable from the foot of every page. -->
-    <div>
-      <p class="mb-2 font-semibold text-white">How it works</p>
-      <ul class="m-0 list-none space-y-2 p-0">
-        <li><a class="text-primary-200 hover:text-white" href="/lifecycle">Lifecycle</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/visibility">Visibility</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/example-passport">Example passport</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/verify">Verify</a></li>
+    {menus.map((m) => (
+      <div>
+        <p class="mb-3 font-semibold text-white">{m.label}</p>
+        <ul class="m-0 list-none space-y-2 p-0">
+          {m.items.map((e) => (
+            <li>
+              <a class="text-primary-200 hover:text-white" href={e.href} rel={e.external ? "noopener" : undefined}>
+                {e.label}{e.external && <ExternalArrow class="ml-1" />}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+
+    <div class="col-span-2 sm:col-span-3 lg:col-span-2 xl:col-span-1">
+      <p class="mb-3 font-semibold text-white">
+        <a class="text-white hover:text-primary-200" href="/product-groups">Product groups</a>
+      </p>
+      <ul class="m-0 list-none columns-2 gap-x-6 p-0 sm:columns-3 lg:columns-2">
+        {[...groups, unsoldGoods].map((g) => (
+          <li class="mb-2 break-inside-avoid">
+            <a class="text-primary-200 hover:text-white" href={`/product-groups/${g.key}`}>{g.name}</a>
+          </li>
+        ))}
       </ul>
     </div>
-
-    <div>
-      <p class="mb-2 font-semibold text-white">Compliance</p>
-      <ul class="m-0 list-none space-y-2 p-0">
-        <li><a class="text-primary-200 hover:text-white" href="/passport-check">Passport check</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/timeline">Timeline</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/regulations">Regulations</a></li>
-      </ul>
-    </div>
-
-    <div>
-      <p class="mb-2 font-semibold text-white">Developers</p>
-      <ul class="m-0 list-none space-y-2 p-0">
-        <li><a class="text-primary-200 hover:text-white" href="/build-on-odal">Build on Odal</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="https://docs.odal-node.io" rel="noopener">Documentation<ExternalArrow class="ml-1" /></a></li>
-        <li><a class="text-primary-200 hover:text-white" href="https://docs.odal-node.io/api" rel="noopener">API reference<ExternalArrow class="ml-1" /></a></li>
-      </ul>
-    </div>
-
-    <div>
-      <p class="mb-2 font-semibold text-white">Resources</p>
-      <ul class="m-0 list-none space-y-2 p-0">
-        <li><a class="text-primary-200 hover:text-white" href="/roadmap">Roadmap</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/faq">FAQ</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/glossary">Glossary</a></li>
-      </ul>
-    </div>
-
-    <!-- One link here; the nav's Product groups menu lists every group. -->
-    <div>
-      <p class="mb-2 font-semibold text-white">Product groups</p>
-      <ul class="m-0 list-none space-y-2 p-0">
-        <li><a class="text-primary-200 hover:text-white" href="/product-groups">All product groups</a></li>
-      </ul>
-    </div>
-
-    <div>
-      <p class="mb-2 font-semibold text-white">Privacy &amp; security</p>
-      <ul class="m-0 list-none space-y-2 p-0">
-        <li><a class="text-primary-200 hover:text-white" href="/trust">What Odal can see</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/privacy">Privacy policy</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/security">Security</a></li>
-      </ul>
-    </div>
-
   </div>
 
   <div class="border-t border-primary-800">
-    <div class="mx-auto flex max-w-6xl px-4 py-4 text-xs text-primary-300/70 flex-row justify-between sm:px-6 lg:px-8">
-      <p class="m-0 flex flex-wrap gap-x-4">
+    <div class="flex flex-col gap-3 px-4 py-4 text-xs text-primary-300/70 sm:flex-row sm:justify-between sm:px-6">
+      <p class="m-0 flex flex-wrap gap-x-5 gap-y-2">
         <span>&copy; {year} Odal Node</span>
-        <a class="text-primary-300/70 hover:text-primary-200" href="/accessibility">Accessibility</a>
+        {bottom.map((e) => (
+          <a class="text-primary-300/70 hover:text-primary-200" href={e.href}>{e.label}</a>
+        ))}
       </p>
       <p class="m-0">
         <a class="text-primary-300/70 hover:text-primary-200" href="https://github.com/odal-node" rel="noopener">github.com/odal-node<ExternalArrow class="ml-1" /></a>

@@ -23,9 +23,10 @@
 // All open on hover for a mouse and on click or Enter for everyone else, close
 // on Escape and on a click outside, and only one is ever open.
 //
-// The product-group wording comes from product-group-copy.json, never from the
-// vendored manifests, so the menu reads the same as every other list of groups
-// on the site.
+// The pages in the four small menus come from lib/site-map.ts, which the footer,
+// /sitemap and /llms.txt read too. The product-group wording comes from
+// product-group-copy.json, never from the vendored manifests, so the menu reads
+// the same as every other list of groups on the site.
 import StatusBadge from "./StatusBadge.astro";
 // The real brand mark (currentColor variant of odal-mark), so the nav stays in
 // sync with the brand asset and the mark inherits the wordmark's colour.
@@ -34,124 +35,15 @@ import ExternalArrow from "./ExternalArrow.astro";
 import Button from "./Button.astro";
 import ProductGroupIcon from "./ProductGroupIcon.astro";
 import { groups, unsoldGoods as unsold } from "../lib/product-groups";
-
-type Entry = { href: string; label: string; line: string; icon: string; external?: boolean };
-
-const howItWorks: Entry[] = [
-  {
-    href: "/lifecycle",
-    label: "Lifecycle",
-    line: "Follow one passport from the factory to the end of its life",
-    icon: '<path d="M4 12a8 8 0 0 1 13.66-5.66L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.66 5.66L4 15.5"/><path d="M4 20v-4.5h4.5"/>',
-  },
-  {
-    href: "/visibility",
-    label: "Visibility",
-    line: "Who can read which part of a passport, and why",
-    icon: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>',
-  },
-  {
-    href: "/example-passport",
-    label: "Example passport",
-    line: "A complete battery passport, sorted by who may read it",
-    icon: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>',
-  },
-  {
-    href: "/verify",
-    label: "Verify",
-    line: "Check a passport's proof file in your browser",
-    icon: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
-  },
-  {
-    href: "/trust",
-    label: "What Odal can see",
-    line: "What stays on your node, and why that holds by design",
-    icon: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
-  },
-];
-
-const compliance: Entry[] = [
-  {
-    href: "/passport-check",
-    label: "Passport check",
-    line: "Does your product need a passport, and from when",
-    icon: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
-  },
-  {
-    href: "/timeline",
-    label: "Timeline",
-    line: "When each passport is required, year by year",
-    icon: '<rect x="3.5" y="5" width="17" height="15.5" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>',
-  },
-  {
-    href: "/regulations",
-    label: "Regulations",
-    line: "The EU acts behind the passports, and when each applies",
-    icon: '<path d="M12 3v18M5 21h14"/><path d="M5 7h14"/><path d="m5 7-2.5 6a2.5 2.5 0 0 0 5 0L5 7ZM19 7l-2.5 6a2.5 2.5 0 0 0 5 0L19 7Z"/>',
-  },
-];
-
-const developers: Entry[] = [
-  {
-    href: "/build-on-odal",
-    label: "Build on Odal",
-    line: "Libraries, plugins and the licence line",
-    icon: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M13.5 5l-3 14"/>',
-  },
-  {
-    href: "https://docs.odal-node.io",
-    label: "Documentation",
-    line: "Install, run and operate a node",
-    icon: '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5v-13Z"/>',
-    external: true,
-  },
-  {
-    href: "https://docs.odal-node.io/api",
-    label: "API reference",
-    line: "Every route a node serves",
-    icon: '<path d="M8 4H7a2 2 0 0 0-2 2v4l-2 2 2 2v4a2 2 0 0 0 2 2h1M16 4h1a2 2 0 0 1 2 2v4l2 2-2 2v4a2 2 0 0 1-2 2h-1"/>',
-    external: true,
-  },
-];
-
-const resources: Entry[] = [
-  {
-    href: "/roadmap",
-    label: "Roadmap",
-    line: "What is built, what is waiting and what comes next",
-    icon: '<path d="M5 21V4"/><path d="M5 4.5h11l-2 3.5 2 3.5H5"/>',
-  },
-  {
-    href: "/faq",
-    label: "FAQ",
-    line: "Short answers to the questions people ask first",
-    icon: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7"/><path d="M12 17h.01"/>',
-  },
-  {
-    href: "/glossary",
-    label: "Glossary",
-    line: "The words around a passport, explained",
-    icon: '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5v-15Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/><path d="M9 8h6M9 11h4"/>',
-  },
-  {
-    href: "/security",
-    label: "Security",
-    line: "Report an issue, and how passports and keys are protected",
-    icon: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="M12 8v5M12 16h.01"/>',
-  },
-];
+import { menus, type Entry } from "../lib/site-map";
 
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 const within = (list: Entry[]) => list.some((e) => path === e.href || path.startsWith(`${e.href}/`));
 const inGroups = path.startsWith("/product-groups");
 
-// The four small menus, in bar order; "Product groups" follows them.
-const small = [
-  { id: "dd-how", label: "How it works", items: howItWorks },
-  { id: "dd-compliance", label: "Compliance", items: compliance },
-  { id: "dd-developers", label: "Developers", items: developers },
-  { id: "dd-resources", label: "Resources", items: resources },
-].map((m) => ({ ...m, current: within(m.items) }));
+// The four small menus, in bar order, from lib/site-map.ts; "Product groups"
+// follows them.
+const small = menus.map((m) => ({ ...m, current: within(m.items) }));
 ---
 
 <header class="sticky top-0 z-50 border-b border-neutral-100 bg-gray-100">
