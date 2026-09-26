@@ -1,23 +1,61 @@
 ---
-// DeadlineCards.astro — the regulatory clock. Data: src/data/deadlines.json.
-// Uses the regulatory semantic tokens (amber family) — these are deadline
-// callouts, not brand surfaces. Every card carries its legal citation.
-import data from "../data/deadlines.json";
-const { deadlines } = data;
+// DeadlineCards.astro — the regulatory clock, read from the instrument records
+// vendored out of dpp-core (see lib/regulations.ts). Nothing here is typed in by
+// hand: a card exists for every passport obligation the registry dates, and its
+// date, citation and basis are the registry's own. Uses the regulatory semantic
+// tokens (amber family): these are deadline callouts, not brand surfaces.
+//
+// A date that has passed reads "In force since", not as something upcoming.
+// The comparison runs at build time, the only clock a static site has; every
+// deploy rebuilds, so a card is at most one deploy out of date.
+import BasisMark from "./BasisMark.astro";
+import { datedPassports, shortTitle, groupRef, basisLabel } from "../lib/regulations";
+
+const today = new Date().toISOString().slice(0, 10);
+const cols =
+  datedPassports.length >= 4
+    ? "md:grid-cols-2 lg:grid-cols-4"
+    : datedPassports.length === 3
+      ? "md:grid-cols-3"
+      : "md:grid-cols-2";
+
+const cards = datedPassports.map(({ act, view }) => {
+  const bindings = act.productGroups ?? [];
+  return {
+    id: act.id,
+    title: shortTitle(act),
+    groups: bindings.map((b) => groupRef(b.productGroup).name).join(", "),
+    // The article the obligation rests on, or, where the act reaches no group
+    // the software models, the act's own number.
+    citation:
+      bindings.find((b) => b.legalBasis?.length)?.legalBasis?.[0] ??
+      `Regulation ${act.title.match(/\(EU\)\s*\d{4}\/\d+/)?.[0] ?? ""}`.trim(),
+    date: view.date!,
+    detail: view.detail,
+  };
+});
 ---
 
-<div class="grid gap-6 md:grid-cols-3">
-  {deadlines.map((d) => (
-    <article class="rounded-md border border-regulatory-border bg-regulatory-bg p-6">
-      <p class="m-0 text-sm font-semibold uppercase tracking-wide text-regulatory-text">
-        {d.dateLabel}
-      </p>
-      <h3 class="mb-1 mt-2 text-xl font-semibold text-neutral-900">{d.title}</h3>
-      <p class="m-0 mb-3 text-xs font-medium uppercase tracking-wide text-neutral-500">
-        {d.who}
-      </p>
-      <p class="m-0 text-sm leading-body text-neutral-700">{d.summary}</p>
-      <p class="m-0 mt-4 text-xs text-neutral-500">{d.citation}</p>
-    </article>
+<ul class={`m-0 grid list-none gap-5 p-0 ${cols}`}>
+  {cards.map((c) => (
+    <li class="m-0">
+      <a
+        href={`/regulations/${c.id}`}
+        class="flex h-full flex-col rounded-md border border-regulatory-border bg-regulatory-bg p-5 no-underline transition-shadow hover:shadow-md hover:no-underline"
+      >
+        <span class="text-sm font-semibold uppercase tracking-wide text-regulatory-text">
+          {c.date.iso <= today ? "In force since " : "From "}{c.date.text}
+        </span>
+        <span class="mt-2 text-lg font-semibold leading-snug text-neutral-900">{c.title}</span>
+        {c.groups && (
+          <span class="mt-1 text-xs font-medium uppercase tracking-wide text-neutral-500">{c.groups}</span>
+        )}
+        <span class="mt-3 text-sm leading-body text-neutral-700">{c.detail}</span>
+        <span class="mt-auto flex flex-wrap items-center gap-2 pt-4">
+          <BasisMark basis={c.date.basis} label={basisLabel(c.date.basis)} />
+          <span class="text-xs text-neutral-500">{c.citation}</span>
+        </span>
+      </a>
+    </li>
   ))}
-</div>
+</ul>

@@ -1,0 +1,162 @@
+---
+// /repairers-and-recyclers — the passport from the side of the people who
+// repair, remanufacture, repurpose and recycle products.
+//
+// What each reader may see is read from data/access.json (the battery
+// passport's Art. 77(2) access rules, the same file /visibility uses), so the
+// two pages cannot disagree. Checked 2026-09-26 against Regulation (EU)
+// 2023/1542 Art. 77 (consolidated text 02023R1542-20250731) and the released
+// node's credential behaviour: node-issued credentials last at most 90 days
+// and cannot be withdrawn, and a credential is accepted on its own, without
+// proof that the person presenting it is its holder.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import Button from "../components/Button.astro";
+import access from "../data/access.json";
+
+const title = "For repairers and recyclers: reading a Digital Product Passport | Odal Node";
+const description =
+  "What a repairer, remanufacturer, second-life operator or recycler can read in a battery passport, how to get the credential that opens the restricted parts, and what happens to the passport when the battery changes hands or is recycled.";
+
+const point = (id: string) => access.points.find((p) => p.id === id)!;
+const open = point("1");
+const withCredential = [point("2"), point("4")];
+
+const mailto = `mailto:contact@odal-node.io?subject=${encodeURIComponent("Reading passports as a repairer or recycler")}`;
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="For repairers and recyclers" title="The parts of a passport made for your work." wide>
+    <p>
+      A battery passport has parts anyone can read and parts the law keeps for
+      readers with a legitimate interest: repairers, remanufacturers,
+      second-life operators and recyclers, for taking the battery apart safely
+      and knowing what is inside it, and the buyer of an individual battery. On
+      a passport served by Odal Node, those parts open with a credential.
+    </p>
+    <p>
+      This page covers the battery passport, the first one the law requires,
+      from 18 February 2027. For other product groups, no act sets these
+      access rights yet.
+    </p>
+  </Section>
+
+  <Section eyebrow="What you can read" title="Open to anyone, and open with a credential." tone="muted" wide>
+    <div class="not-prose grid gap-5 md:grid-cols-2">
+      <div class="card m-0 p-5">
+        <p class="m-0 text-xs font-semibold uppercase tracking-wide text-neutral-500">Without a credential</p>
+        <p class="m-0 mt-2 text-base font-semibold text-neutral-900">{open.title}</p>
+        <p class="m-0 mt-1.5 text-sm leading-body text-neutral-700">{open.note}</p>
+      </div>
+      <div class="card m-0 border-primary-300 p-5">
+        <p class="m-0 text-xs font-semibold uppercase tracking-wide text-primary-700">With a credential</p>
+        {withCredential.map((p) => (
+          <>
+            <p class="m-0 mt-2 text-base font-semibold text-neutral-900">{p.title}</p>
+            <p class="m-0 mt-1.5 text-sm leading-body text-neutral-700">{p.note}</p>
+          </>
+        ))}
+      </div>
+    </div>
+    <p class="mt-6">
+      Test reports proving compliance are for authorities only, and a
+      battery's own history is for readers with a legitimate interest only:
+      neither group sees everything. <a href="/visibility">Visibility</a> shows
+      the split field by field, and the <a href="/example-passport">example
+      passport</a> shows a complete one.
+    </p>
+  </Section>
+
+  <Section eyebrow="Getting a credential" title="Two ways to be let in." wide>
+    <ol class="not-prose m-0 grid list-none gap-5 p-0 md:grid-cols-2">
+      <li class="card m-0 p-5">
+        <p class="m-0 text-base font-semibold text-neutral-900">From the company behind the product</p>
+        <p class="m-0 mt-2 text-sm leading-body text-neutral-700">
+          The company that runs the passport can issue you a credential from its
+          own node, naming your role: repairer, recycler, remanufacturer,
+          preparer for re-use or distributor. It lasts up to 90 days, and you
+          ask for a new one when it ends.
+        </p>
+      </li>
+      <li class="card m-0 p-5">
+        <p class="m-0 text-base font-semibold text-neutral-900">From an issuer the company trusts</p>
+        <p class="m-0 mt-2 text-sm leading-body text-neutral-700">
+          A company can also accept credentials from other issuers, such as a
+          trade body, and chooses which ones. Where that issuer publishes a
+          list of withdrawn credentials, the node checks it.
+        </p>
+      </li>
+    </ol>
+    <p class="mt-6">
+      There is no EU-wide issuer of these credentials yet. EU law lets the
+      Commission set out how credentials are issued and checked, and the
+      Batteries Regulation required it to specify, by 18 August 2026, who
+      counts as having a legitimate interest and what they may do with the
+      information. Until the software follows those acts, it applies the
+      Regulation's own wording.
+    </p>
+  </Section>
+
+  <Section eyebrow="Keep it safe" title="Treat a credential like a password." tone="muted">
+    <p>
+      A credential works on its own: anyone holding a copy can use it until it
+      expires or its issuer withdraws it. Keep it inside the business doing the
+      work. A credential issued by a company's own node cannot be withdrawn,
+      which is why it lasts 90 days at most.
+    </p>
+  </Section>
+
+  <Section eyebrow="After the sale" title="When the battery changes hands, and when it ends." wide>
+    <ul class="not-prose m-0 grid list-none gap-5 p-0 md:grid-cols-3">
+      <li class="card m-0 p-5">
+        <p class="m-0 text-base font-semibold text-neutral-900">Repurposed or remanufactured</p>
+        <p class="m-0 mt-2 text-sm leading-body text-neutral-700">
+          Whoever puts a re-used, repurposed or remanufactured battery back on
+          the market takes over the passport duties, and the battery gets a new
+          passport linked to the original.
+        </p>
+      </li>
+      <li class="card m-0 p-5">
+        <p class="m-0 text-base font-semibold text-neutral-900">Waste</p>
+        <p class="m-0 mt-2 text-sm leading-body text-neutral-700">
+          Once a battery becomes waste, the duties pass to its producer, the
+          producer's take-back scheme, or the waste operator chosen to handle
+          it.
+        </p>
+      </li>
+      <li class="card m-0 p-5">
+        <p class="m-0 text-base font-semibold text-neutral-900">Recycled</p>
+        <p class="m-0 mt-2 text-sm leading-body text-neutral-700">
+          After the battery has been recycled, its passport ceases to exist.
+        </p>
+      </li>
+    </ul>
+    <p class="mt-6">
+      Odal Node records a handover inside the passport, signed by both sides,
+      and exports the whole record as one signed file anyone can check
+      without a network connection. <a href="/lifecycle">Lifecycle</a> follows
+      a passport from start to end.
+    </p>
+  </Section>
+
+  <Section eyebrow="Check it is genuine" title="Verify a passport yourself." tone="muted">
+    <p>
+      Every passport served by Odal Node is signed with an identity on the
+      issuing company's own web domain. Drop its proof file into{" "}
+      <a href="/verify">Verify</a> to check the signatures and history in your
+      browser, without Odal.
+    </p>
+  </Section>
+
+  <Section eyebrow="Talk to us" title="Reading passports in your workshop or plant." tone="tinted">
+    <p>
+      If you repair, remanufacture or recycle batteries and want to try
+      reading passports with a credential, write to us and say what you handle
+      and which systems you use.
+    </p>
+    <div class="not-prose mt-6 flex flex-wrap gap-3">
+      <Button href={mailto}>Email contact@odal-node.io</Button>
+      <Button href="/visibility" variant="secondary">See who reads what</Button>
+    </div>
+  </Section>
+</Base>

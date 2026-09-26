@@ -1,0 +1,81 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'site/**'
+      - 'packages/**'
+      - 'public/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  purge-cloudflare-cache-landing:
+    name: Purge Cloudflare Cache (landing)
+    runs-on: ubuntu-latest
+    environment: ${{ vars.CLOUDFLARE_ENVIRONMENT_LANDING || 'landing' }}
+
+    steps:
+      - name: Check Cloudflare secrets
+        id: cloudflare
+        env:
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$CLOUDFLARE_ZONE_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Purge Cloudflare cache
+        if: steps.cloudflare.outputs.ready == 'true'
+        env:
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          curl --fail --silent --show-error \
+            -X POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
+
+      - name: Skip purge if secrets are missing
+        if: steps.cloudflare.outputs.ready != 'true'
+        run: echo "Skipping Cloudflare cache purge because the required secrets are not configured for the landing environment."
+
+  purge-cloudflare-cache-docs:
+    name: Purge Cloudflare Cache (docs)
+    runs-on: ubuntu-latest
+    environment: ${{ vars.CLOUDFLARE_ENVIRONMENT_DOCS || 'docs' }}
+
+    steps:
+      - name: Check Cloudflare secrets
+        id: cloudflare
+        env:
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$CLOUDFLARE_ZONE_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Purge Cloudflare cache
+        if: steps.cloudflare.outputs.ready == 'true'
+        env:
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          curl --fail --silent --show-error \
+            -X POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
+
+      - name: Skip purge if secrets are missing
+        if: steps.cloudflare.outputs.ready != 'true'
+        run: echo "Skipping Cloudflare cache purge because the required secrets are not configured for the docs environment."

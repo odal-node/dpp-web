@@ -1,0 +1,129 @@
+{
+  "_comment": "The FAQ, the single editable source for /faq and its FAQPage structured data. Written 2026-09-26 for manufacturers and compliance leads: plain language, no routes, commands, field names or version numbers. Every answer restates something another page already shows and links to it; an answer with nothing to link to is a claim with no home and does not belong here. Checked against dpp-engine main (v0.14.0), dpp-core main and the acts' official texts that day. When a roadmap item or a regulation date moves, check the answers that mention it.",
+  "groups": [
+    {
+      "title": "Passports and the law",
+      "items": [
+        {
+          "q": "What is a Digital Product Passport?",
+          "a": [
+            "A digital record that stays with a product for its whole life: what it is made of, where it came from, and how to repair and recycle it. Anyone reaches the public part by scanning a code on the product.",
+            "EU law is making passports compulsory one product group at a time."
+          ],
+          "link": { "href": "/lifecycle", "label": "Follow one passport through its life" }
+        },
+        {
+          "q": "Do my products need one, and from when?",
+          "a": [
+            "It depends on the product group. Electric-vehicle, light-transport and larger industrial batteries need one from 18 February 2027, detergents from 23 September 2029 and toys from 1 August 2030. New vehicles need their own vehicle passport from 1 September 2032. Most other product groups get their date from a Commission act that has not been adopted yet.",
+            "The regulations page lists every act the software tracks and where each date comes from. It is a summary, not legal advice."
+          ],
+          "link": { "href": "/regulations", "label": "See every act and its date" }
+        },
+        {
+          "q": "Does the software tell me whether I comply?",
+          "a": [
+            "It checks every passport against its product group's rules before signing, and warns about values that look implausible. Where a rule cannot be assessed yet, because the law behind it does not apply yet, it says so rather than guessing.",
+            "It supports your compliance work. It does not replace legal advice."
+          ],
+          "link": { "href": "/roadmap", "label": "What the checks cover today" }
+        }
+      ]
+    },
+    {
+      "title": "Your data",
+      "items": [
+        {
+          "q": "Where is my data kept?",
+          "a": [
+            "On your own node, on servers you choose. Your product data is checked and signed there with your own key, and the signed passport is stored and served from there. The spreadsheet you imported is not kept once the passport is signed."
+          ],
+          "link": { "href": "https://docs.odal-node.io/getting-started/what-odal-can-and-cannot-see", "label": "What Odal can and cannot see" }
+        },
+        {
+          "q": "Can Odal see my data?",
+          "a": [
+            "Not when you run your own node. We have no access to its servers, its database or its signing keys, and checking a passport does not involve us."
+          ],
+          "link": { "href": "https://docs.odal-node.io/getting-started/what-odal-can-and-cannot-see", "label": "The full statement" }
+        },
+        {
+          "q": "Who can read my passports?",
+          "a": [
+            "Anyone can read the public part by scanning the code on the product, with no login and no fee. Other parts are shown only to the readers the law names, such as market surveillance authorities or readers with a legitimate interest, and they prove who they are with a credential.",
+            "What each reader may see is set separately for each product group."
+          ],
+          "link": { "href": "/visibility", "label": "See it for a battery passport" }
+        },
+        {
+          "q": "What if my server goes down?",
+          "a": [
+            "A signed copy of each public page can be kept outside the node, so a scan still reaches the passport while the node is down."
+          ],
+          "link": { "href": "/roadmap", "label": "More on what is available" }
+        }
+      ]
+    },
+    {
+      "title": "Getting started",
+      "items": [
+        {
+          "q": "How does product data get in?",
+          "a": [
+            "From the spreadsheets you already have. Import a CSV or Excel file with a trial run first, and the node reports any problems row by row instead of rejecting the whole file. Import covers most product groups today."
+          ],
+          "link": { "href": "/lifecycle", "label": "Where import fits in" }
+        },
+        {
+          "q": "What does it cost?",
+          "a": [
+            "Running the node for your own organisation's passports is free, and so is the open-source core library. Offering the node to others as a hosted service, or shipping it inside a competing product, needs a commercial licence."
+          ],
+          "link": { "href": "/build-on-odal", "label": "The licence line" }
+        },
+        {
+          "q": "Do I have to run it myself?",
+          "a": [
+            "Today, yes. The node runs on infrastructure you choose and is brought up with a single command. A node run for you is being considered, and it would still be yours alone: one company, one node, nothing shared."
+          ],
+          "link": { "href": "/roadmap", "label": "See the roadmap" }
+        },
+        {
+          "q": "Is it ready to use?",
+          "a": [
+            "Odal Node is in alpha and in active development. Everything marked as available on the roadmap is built and tested, and nobody runs it in production yet.",
+            "The roadmap shows what is ready, what is in progress and what is planned."
+          ],
+          "link": { "href": "/roadmap", "label": "See the roadmap" }
+        },
+        {
+          "q": "Can it apply qualified electronic seals and register passports with the EU?",
+          "a": [
+            "Sealing is built and tested end to end. Under EU law only a legal person, such as a registered company, can create an electronic seal with legal effect, so until then every seal says plainly that it carries none.",
+            "Registering passports in the EU registry needs the same legal identity. The connection will be finished against the registry's official interface."
+          ],
+          "link": { "href": "/roadmap", "label": "Built, waiting on a legal step" }
+        }
+      ]
+    },
+    {
+      "title": "Trust",
+      "items": [
+        {
+          "q": "How can anyone check that a passport is genuine?",
+          "a": [
+            "Every passport is signed. Its proof file holds the passport, its signatures and its full history, and anyone can check it offline, in their own browser, without trusting us."
+          ],
+          "link": { "href": "/verify", "label": "Check a proof file" }
+        },
+        {
+          "q": "Which standards does it use?",
+          "a": [
+            "Open ones: GS1 Digital Link for the code on the product, web-based identities for signatures, W3C Verifiable Credentials for proving who a reader is, and the Asset Administration Shell for industrial systems."
+          ],
+          "link": { "href": "https://docs.odal-node.io/core/standards", "label": "The standards in detail" }
+        }
+      ]
+    }
+  ]
+}

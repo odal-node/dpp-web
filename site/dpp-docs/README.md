@@ -39,9 +39,9 @@ site/dpp-docs/
 │       └── custom.css                 # Starlight overrides via @odal/brand-tokens
 ```
 
-Brand assets shared with the landing site come from the workspace-root `../../public/brand/`, copied into the build by `viteStaticCopy` (see `astro.config.mjs`).
+Brand assets live in this site’s own `public/` and `src/assets/`. There is no shared asset directory — the two sites are deployed independently, and a cross-site copy step was removed because it published a duplicate favicon at a path nothing referenced.
 
-The sidebar structure is declared in `astro.config.mjs` and mirrored by the file-system layout under `src/content/docs/`. Renamed or removed slugs keep a redirect (e.g. `/design/proof-bound` → `/getting-started/what-odal-can-and-cannot-see`); the full redirect map is in `astro.config.mjs`. The current IA decisions live in [`../../docs/WEB_CONTENT_STRATEGY.md`](../../docs/WEB_CONTENT_STRATEGY.md) §6.
+The sidebar structure is declared in `astro.config.mjs` and mirrored by the file-system layout under `src/content/docs/`. Renamed or removed slugs keep a redirect (e.g. `/design/proof-bound` → `/getting-started/what-odal-can-and-cannot-see`); the full redirect map is in `astro.config.mjs`, which is the source of truth for the information architecture.
 
 ## Honest stubs for `dpp-engine`
 
@@ -49,7 +49,7 @@ Pages under `src/content/docs/engine/` that document unshipped surfaces use the 
 
 ## Terminology rules
 
-**Proof-bound architecture** (never "no-touch"); compliance calculators are **open** (never "pro-tier"); deployment claims only for shipped code — capability claims ("wasm32-safe, can run in edge runtimes") are fine. Full rules: [`../../docs/WEB_CONTENT_STRATEGY.md`](../../docs/WEB_CONTENT_STRATEGY.md) §7.
+**Proof-bound architecture** (never "no-touch"); compliance calculators are **open** (never "pro-tier"); deployment claims only for shipped code — capability claims ("wasm32-safe, can run in edge runtimes") are fine. State what is built in the present tense and what is planned in the future tense, and never mix the two in one sentence.
 
 ## Deployment
 

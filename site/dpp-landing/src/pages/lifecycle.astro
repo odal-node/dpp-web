@@ -1,0 +1,98 @@
+---
+// /lifecycle — the chain of custody, long-form.
+//
+// The longest route on the site, chosen deliberately: this page's job is not
+// to convert quickly but to be the thing a sceptical reader finishes and
+// believes. It is written for anyone, so it names who touches the record at
+// each station and what happens there, and leaves routes and commands to the
+// docs site.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import stations from "../data/stations.json";
+
+const title = "Lifecycle: one passport, eight stations | Odal Node";
+const description =
+  "One record, eight stations: declare, link, check, sign, resolve, disclose, hand over, end. Who touches the passport at each one, and what happens there.";
+
+// Stations six to eight are the ones that only matter after the sale.
+const afterSale = stations.stations.filter((s) => s.n >= 6);
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Lifecycle" title="A passport is not a document. It is a record with a life." wide>
+    <p>
+      Most descriptions of a product passport stop at publication: import,
+      check, sign, publish. That is the first half. A product is then repaired,
+      resold, remanufactured and eventually recycled, and its record has to
+      survive all of it while answering different people differently.
+    </p>
+    <p>
+      Eight stations. Each names who touches the record there, and what
+      happens to it.
+    </p>
+  </Section>
+
+  <Section eyebrow="The spine" title="One record, eight stations." tone="muted" wide>
+    <div class="not-prose space-y-5">
+      {stations.stations.map((s) => (
+        <article id={s.key} class={`card p-6 ${s.n >= 6 ? "card-emphasis" : ""}`}>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <span class="font-mono text-sm text-neutral-500">
+              {String(s.n).padStart(2, "0")}
+            </span>
+            <h3 class="text-xl font-bold text-neutral-900">{s.title}</h3>
+            <span class="text-sm text-neutral-500">{s.who}</span>
+          </div>
+          <p class="mt-3 text-base font-medium text-neutral-900">{s.lead}</p>
+          <p class="mt-2 text-sm leading-relaxed text-neutral-700">{s.body}</p>
+          {s.link && (
+            <p class="mt-3 text-sm">
+              <a href={s.link} class="link-arrow text-primary-700">
+                See it for yourself
+              </a>
+            </p>
+          )}
+        </article>
+      ))}
+    </div>
+  </Section>
+
+  <Section eyebrow="After the sale" title="The record keeps working after the sale." wide>
+    <p>
+      Import, check, sign, publish and resolve give a product its passport.
+      The stations after that keep the passport accurate for the rest of the
+      product's life.
+    </p>
+    <p>
+      Stations {afterSale.map((s) => s.n).join(", ")} are what keep a record
+      intact through years of repairs and changes of owner, rather than
+      describing a product only on the day it was made:
+    </p>
+    <ul>
+      {afterSale.map((s) => (
+        <li>
+          <strong>{s.title}:</strong> {s.lead}
+        </li>
+      ))}
+    </ul>
+    <p>
+      They are why this page is long. A capability that only matters years
+      after purchase cannot be shown in a screenshot, so the next best thing is
+      to describe it precisely.
+    </p>
+  </Section>
+
+  <Section eyebrow="Status" title="What is built, stated plainly." tone="tinted">
+    <p>
+      All eight stations exist in the software today. <strong>Nobody is running
+      it in production:</strong> no customers, no pilots, no live deployments.
+      The battery passport obligation begins on 18 February 2027, and we would
+      rather be correct when it arrives than early and wrong.
+    </p>
+    <p>
+      The core library is{" "}
+      <a href="https://github.com/odal-node/dpp-core">open source</a> under
+      Apache-2.0, and anyone can read, audit or reuse it.
+    </p>
+  </Section>
+</Base>

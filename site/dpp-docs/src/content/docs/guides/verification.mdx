@@ -1,0 +1,46 @@
+---
+title: Proof files and verification
+description: The signed evidence dossier, the three ways to check it, and how a passport stays verifiable while its node is down.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Every passport is signed with the operator's key, so anyone can check it against the operator's DID document without Odal. For a complete, portable proof, a node produces an **evidence dossier**: one signed file holding the passport and everything needed to check it.
+
+## What a dossier holds
+
+- a signed manifest naming the passport, the issuer's DID, the node and core versions, and a hash of every part;
+- the passport's full view and its public view, as signed at publication;
+- the DID documents needed to check every signature in it;
+- the passport's audit trail;
+- where they exist: the [transfer chain](/guides/transfer), the end-of-life record, calculation receipts, the component tree and the qualified seal.
+
+```bash
+odal passport evidence <id> -o dossier.json   # generate and store a dossier
+```
+
+## Three ways to check one
+
+- **Against the node**: `odal verify <dossier-id|file>`. The node's verifier checks every signature, the audit chain link by link, the transfer chain and, where present, the qualified seal.
+- **In a browser**: [odal-node.io/verify](https://odal-node.io/verify) runs the same checks in the page, offline. The file is not uploaded. Its verdicts are tested against the node verifier's own on every change to the site. It reports a qualified seal as not checked rather than guessing.
+- **By hand**: every signature is a JSON Web Signature, checkable with any JOSE library against the keys in the included DID documents; the manifest's hashes are taken over canonical JSON (RFC 8785).
+
+<Aside type="caution" title="What a dossier does not prove">
+A valid dossier proves the file is intact and was signed by the keys it names. It does not prove who controls those keys: compare the included DID document with the one the operator publishes on its own domain.
+</Aside>
+
+## When the node is down
+
+A node can mirror each published passport's signed public view to a public object-storage bucket, under a signed time bound (`validUntil`) saying how long that copy stands. A CDN or bucket website serves it while the node is unreachable.
+
+```bash
+odal snapshot verify <path|url> --key <base64-public-key>
+odal snapshot verify <path|url> --did-url <url>
+```
+
+checks that time bound. You supply the key, or a DID document URL that is still reachable, because on a single-binary deployment the node also serves its own DID document, so that is unreachable too. This checks the snapshot's outer proof only; the passport content inside still carries its own publish-time signature, checked separately.
+
+## Read next
+
+- [Security & cryptography](/core/security): the signing model behind all of this.
+- [A passport's lifecycle](/guides/lifecycle): the history a dossier carries.

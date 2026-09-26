@@ -6,12 +6,12 @@
  * Starlight CSS-variable overrides import from here (directly, or via the
  * mirrored CSS custom properties in `tokens.css`).
  *
- * See BRAND.md section 4.1 for the editorial rationale behind each scale.
+ * Each scale is tuned for a specific surface; see the contrast notes below.
  */
 
 /**
  * Primary scale — navy/ice blue family, anchored on the logo
- * (decision 2026-06-10, docs/redesign/DESIGN_SPEC.md §1).
+ * (decision 2026-06-10).
  * 50–300 are ice tints (the logo stroke is 300); 500/600 are the interactive
  * action blues (AA on white); 800/900 are the navy surfaces (logo field = 900).
  */

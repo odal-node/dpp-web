@@ -1,0 +1,98 @@
+---
+// /security — how to report a vulnerability, and how the software protects
+// passports and keys, in plain language. The response times are the ones in
+// the engine's published SECURITY.md; keep them in step with it.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import ExternalArrow from "../components/ExternalArrow.astro";
+
+const title = "Security | Odal Node";
+const description =
+  "How to report a security issue in Odal Node, what happens next, and how the software protects passports and signing keys.";
+
+const MAILBOX = "security@odal-node.io";
+
+const steps = [
+  { when: "Within 48 hours", what: "We acknowledge your report." },
+  { when: "Within 5 business days", what: "We assess it and classify its severity." },
+  { when: "Within 14 days", what: "A fix or mitigation for critical and high-severity issues." },
+  { when: "Within 30 days", what: "A fix or mitigation for medium and low-severity issues." },
+  { when: "After the fix", what: "Public disclosure, coordinated with you." },
+];
+
+const protections = [
+  {
+    title: "Your key stays with you",
+    body: "Every passport is signed on your own servers, with a key that is encrypted at rest and never leaves them.",
+  },
+  {
+    title: "Anyone can check a passport",
+    body: "Signatures are checked against the identity on your own web domain, so verifying a passport never depends on us.",
+  },
+  {
+    title: "Rules run in a sandbox",
+    body: "Each product group's checks run isolated from the network, the files and the signing key, and a node only runs checks signed by a key its operator trusts.",
+  },
+  {
+    title: "Safe by default",
+    body: "A node will not start with sample passwords or a missing key-store passphrase, and it reports which of the services it relies on are real and which are stand-ins.",
+  },
+  {
+    title: "Releases you can inspect",
+    body: "Published releases carry a list of the components inside them and a record of how they were built.",
+  },
+  {
+    title: "Dependencies watched",
+    body: "Every change is checked against known security advisories, and any advisory we accept is recorded with its reasoning and an expiry date.",
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Security" title="Report a security issue privately.">
+    <p>
+      If you find a vulnerability in Odal Node, email{" "}
+      <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a>. Please do not open a
+      public issue. Include what you found and what it could affect, how to
+      reproduce it, the version you tested, and any fix you would suggest.
+    </p>
+    <p>
+      We follow coordinated disclosure: we fix first, then publish, together
+      with you.
+    </p>
+  </Section>
+
+  <Section eyebrow="What happens next" title="How we respond." tone="muted">
+    <ol class="not-prose m-0 list-none space-y-3 p-0">
+      {steps.map((s) => (
+        <li class="card m-0 flex flex-col gap-1 p-4 sm:flex-row sm:items-baseline sm:gap-6">
+          <span class="shrink-0 text-sm font-semibold text-primary-700 sm:w-48">{s.when}</span>
+          <span class="text-sm text-neutral-700">{s.what}</span>
+        </li>
+      ))}
+    </ol>
+  </Section>
+
+  <Section eyebrow="By design" title="How passports and keys are protected." wide>
+    <ul class="not-prose m-0 grid list-none gap-5 p-0 md:grid-cols-2 lg:grid-cols-3">
+      {protections.map((p) => (
+        <li class="card m-0 p-6">
+          <h3 class="m-0 text-base font-semibold text-neutral-900">{p.title}</h3>
+          <p class="m-0 mt-2 text-sm leading-body text-neutral-600">{p.body}</p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section eyebrow="More detail" title="Where to read further." tone="tinted">
+    <p>
+      The full policy is in the{" "}
+      <a href="https://github.com/odal-node/dpp-engine/blob/main/SECURITY.md" rel="noopener">
+        security policy<ExternalArrow class="ml-1" />
+      </a>, and how a node protects keys, data and access is in the{" "}
+      <a href="https://docs.odal-node.io/engine/security" rel="noopener">documentation<ExternalArrow class="ml-1" /></a>.
+      What we can and cannot see of your data is on{" "}
+      <a href="/trust">What Odal can see</a>.
+    </p>
+  </Section>
+</Base>

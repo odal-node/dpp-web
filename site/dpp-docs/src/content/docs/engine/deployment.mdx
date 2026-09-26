@@ -1,0 +1,73 @@
+---
+title: Production deployment
+description: The recommended shape for running a node for real, one machine per operator behind a TLS proxy, and the checks to run before going live.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The recommended shape is the bundled compose stack on one machine per operator, behind a TLS proxy. One machine per operator keeps the isolation between operators physical, keeps the disk your signing key lives on under your control, and scales by adding machines rather than redesigning.
+
+```text
+            Internet
+               │ :443
+        ┌──────▼──────┐
+        │  TLS proxy  │
+        └──┬───────┬──┘
+   api.<your-domain>  dpp.<your-domain>
+           │           │
+      ┌────▼───┐ ┌─────▼────┐
+      │  node  │ │ resolver │   postgres · redis · nats (internal only)
+      └────────┘ └──────────┘
+```
+
+## 1. Decide the two addresses
+
+- **`api.<your-domain>`**: the node's API, for you and your systems. `DID_WEB_BASE_URL` must be the public HTTPS origin that serves `/.well-known/did.json` here.
+- **`dpp.<your-domain>`**: the resolver, the address printed on your products. This is `RESOLVER_BASE_URL`.
+
+<Aside type="caution" title="Decide the resolver address once">
+`RESOLVER_BASE_URL` is signed into every published passport's carrier. Choose it before you publish anything real; changing it later means reissuing labels.
+</Aside>
+
+## 2. Harden the machine
+
+SSH keys only, a firewall allowing only 22, 80 (for certificate issuance) and 443, automatic security updates, and a non-root user in the `docker` group. Bind the node's and resolver's ports to loopback (`127.0.0.1`) in the compose file, so they are reachable only through the proxy.
+
+## 3. Put TLS in front
+
+Any reverse proxy works. With Caddy, certificates are automatic:
+
+```text
+api.example.com { reverse_proxy 127.0.0.1:8001 }
+dpp.example.com { reverse_proxy 127.0.0.1:8003 }
+```
+
+## 4. Fill in the environment
+
+Start from `.env.example`; every variable is on the [configuration reference](/engine/configuration). Then:
+
+- generate the database passwords and the key-store passphrase, and store the passphrase as [Backup, restore and key custody](/engine/backup) describes;
+- set `ADMIN_USERNAME` and `ADMIN_PASSWORD` only for `odal bootstrap`, then unset them;
+- **pin the image version** (`ODAL_VERSION`) to a release tag, never `latest`;
+- `chmod 600 .env`.
+
+<Aside type="note" title="About the production profile">
+`NODE_PROFILE=production` refuses to start while sealing or EU registry sync is a stand-in, and both wait on a registered company holding a qualified certificate. Until then, run without the profile, and watch the trust posture (below) so nothing is a stand-in by accident.
+</Aside>
+
+## 5. Check before going live
+
+1. **Trust posture**: call the authenticated `GET /vault/api/v1/node/state` with an API key and confirm the profile, the trust tier of each service and the ruleset version. The public `/health` answers `{"status":"ok"}` and nothing else, so a probe on it proves the node is up and nothing more.
+2. Create and publish a test passport.
+3. Resolve it through the resolver's public address, as HTML and as JSON.
+4. Generate its evidence dossier and verify it with `odal verify`.
+
+## Monitoring
+
+- **From outside**: a simple uptime probe on the resolver's `/health`, and on a known passport.
+- **On the machine**: the metrics endpoint (loopback only) exports a `trust_mode` gauge per service: `0` stand-in, `1` sandbox, `2` real. Alert when any service drops below what you expect.
+
+## Read next
+
+- [Upgrading](/engine/upgrading): the routine for a new release.
+- [Operating a node securely](/engine/security): profiles, keys and access.

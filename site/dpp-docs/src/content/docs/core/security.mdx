@@ -7,7 +7,7 @@ A Digital Product Passport is only worth the trust you can place in it. The core
 
 ## A passport is a signed proof, not a record
 
-When a passport is published, the validated data is wrapped as a W3C Verifiable Credential and signed with the issuer's own Ed25519 key. The signature covers the exact bytes of the passport: change a single value afterwards and verification fails. A passport is therefore not a database entry you have to take on faith — it is a proof that carries its own evidence.
+When a passport is published, the validated data is signed as a JSON Web Signature with the issuer's own Ed25519 key, twice: once over the full passport and once over its public view. Each signature covers the exact bytes it signs: change a single value afterwards and verification fails. (W3C Verifiable Credentials play a different role: they are what a reader presents to see restricted parts; see [Access control](/regulatory/access-control).) A passport is therefore not a database entry you have to take on faith — it is a proof that carries its own evidence.
 
 ## The trust root is the issuer's own domain
 
@@ -32,11 +32,11 @@ A signing key is generated from the operating system's own randomness — never 
 
 The practical guarantee is simple: the encrypted key file on its own is useless without the passphrase. Where that store lives and how a running node guards it is covered in [Operating a node securely](/engine/security).
 
-## Sector logic is isolated by construction
+## Product-group logic is isolated by construction
 
-The rules that decide whether a product's data is compliant change sector by sector and regulation by regulation — so they are deliberately *not* part of the trusted core. Each sector's compliance logic is compiled to WebAssembly and runs inside a sandbox with no ambient capabilities: no filesystem, no network, no way to reach the host. Product data goes in as plain memory, a validation verdict comes out, and nothing else crosses the boundary. Execution is bounded too — a fixed memory cap and a metered CPU budget — so a plugin that misbehaves is stopped, not obeyed. And a plugin is signature-verified before it is ever loaded.
+The rules that decide whether a product's data is compliant change product group by product group and regulation by regulation, so they are deliberately *not* part of the trusted core. Each product group's compliance logic is compiled to WebAssembly and runs inside a sandbox with a deliberately short capability list. There is no filesystem and no network: no file can be read or written, and no socket opened. What the plugin *can* do beyond computing on the data it is given is narrow and enumerated — write a log line, read a clock pinned to one instant for the whole invocation, and draw OS randomness. Nothing in that set reaches the signing key, the database, or any other passport. Execution is bounded too — a fixed memory cap and a metered CPU budget — so a plugin that misbehaves is stopped, not obeyed. And a node verifies a plugin's signature against its pinned publisher key before loading it; the only way round that is an explicit development override, which logs a warning (see [Product groups & plugins](/core/sectors)).
 
-What this buys is a hard separation between *judging* data and *vouching for* it: a buggy or even hostile sector rule can fail a validation, but it can never touch the signing key, alter a passport, or forge a proof. New regulations arrive as new sandboxed plugins — the cryptographic guarantees on this page never depend on trusting them. The concrete runtime limits are described in [Operating a node securely](/engine/security).
+What this buys is a hard separation between *judging* data and *vouching for* it: a buggy or even hostile product-group rule can fail a validation, but it can never touch the signing key, alter a passport, or forge a proof. New regulations arrive as new sandboxed plugins — the cryptographic guarantees on this page never depend on trusting them. The concrete runtime limits are described in [Operating a node securely](/engine/security).
 
 ## Binding the proof to the physical product
 

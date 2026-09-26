@@ -1,28 +1,38 @@
 ---
 title: Textile DPP
-description: The Textile DPP delegated act under ESPR — fibre composition, recycled content, the unsold-goods provision, and what a textile passport carries.
+description: Where textiles stand under ESPR, what the software models for a textile passport today, and how it relates to the separate unsold-goods duties.
 ---
 
-Textiles are the second product group with concrete DPP requirements under ESPR, and the textile delegated act is in active drafting at the time of writing. The current draft establishes content requirements around fibre composition, supply-chain traceability, recycled content reporting, and the unsold-goods provision that prohibits the destruction of unsold consumer textiles.
+import { Aside } from "@astrojs/starlight/components";
 
-## What the textile delegated act requires
+Textiles are one of the product groups ESPR names for priority, but no textile passport is required yet: the delegated act that would require one has not been adopted.
 
-The textile DPP carries the **fibre composition** (with the relevant ISO and CEN standards' vocabulary), the **recycled content** breakdown (post-consumer vs post-industrial, by fibre type), the **supply-chain traceability** record (the chain from raw fibre to finished product, with the geographic origin information that consumer-protection regulators expect), and the **unsold-goods status** that lets the regulator track whether unsold inventory has been destroyed in violation of the ban.
+## Where textiles stand
 
-## The unsold-goods provision
+ESPR Art. 18(5) lists "textiles, in particular garments and footwear" among the product groups the first working plan must prioritise. The Commission's 2025–2030 working plan selects textiles as a final product, with an indicative adoption year of 2027 for its delegated act. Until that act is adopted there is no textile passport obligation, no date, and no legally defined set of fields or access rights; everything below is what the software models ahead of it.
 
-ESPR introduced an explicit prohibition on the destruction of unsold consumer textiles, with reporting obligations that flow through the DPP. The structural property the regulation needs is the ability to mark a passport as belonging to unsold inventory, record its disposal pathway (recycling, reuse, donation), and produce a cryptographically verifiable record of which pathway was taken. Odal handles this with a dedicated unsold-goods variant of the textile passport that adds those lifecycle fields on top of the base textile content.
+## What a textile passport carries
 
-## How Odal carries it
+The software's textile schema covers fibre composition (each fibre with its share and country of origin), country of origin and of raw material, care instructions (ISO 3758 symbols or free text), recycled content, carbon footprint, water use, microplastic shedding per wash, repair and durability scores, expected wash cycles, product weight, allergens and substances of concern (with CAS numbers and, where notified, a SCIP identifier), recyclability class, disassembly instructions, spare-part availability, end-of-life instructions and reuse condition.
 
-A textile passport records the fibre composition, the recycled-content breakdown, the supply-chain record, and the unsold-goods status, and the textile sector's rules check that content through the core's sector seam.
+A few of those fields are held back for credential holders by the software's own model; ESPR leaves the actual split to the delegated act. See [Access control](/regulatory/access-control).
 
-The textile rules are the ones most likely to change in the near term, because the delegated act is still in drafting. They are versioned: new versions are added without breaking existing passports, and every passport records which version it was validated against.
+## What is checked today
 
-Because the act is not yet adopted, a textile passport is validated *structurally* today — fibre percentages must resolve to a whole composition, country codes must be valid ISO 3166-1 — while a binding sector-wide compliance verdict waits for the act to take effect. The unsold-goods destruction ban under Article 25 (Annex VII) — in force for large companies since 19 July 2026, medium-sized from 2030 — is the obligation Odal acts on now. How structural validation is separated from a binding determination is described in the [ESPR Overview](/regulatory/espr).
+Because the act is not adopted, a textile passport is validated *structurally*: fibre shares must add up to a whole composition, country codes must be valid ISO 3166-1, and declared substances are checked against the part of the REACH candidate list the software holds. A binding compliance verdict waits for the act. How structural validation is kept apart from a binding determination is described in the [ESPR Overview](/regulatory/espr).
+
+The schema is versioned: when the act is adopted, a new version is added without breaking passports issued under an older one, and every passport records which version it was validated against.
+
+## Unsold goods are a separate duty
+
+ESPR Art. 25 has prohibited large companies from destroying unsold apparel, clothing accessories and footwear since 19 July 2026, and Art. 24 requires companies that discard unsold consumer products to disclose what they discarded each year. Neither involves a passport: both are duties on a company over a financial year, not on a product. The software models the disclosure separately; see [The unsold-goods disclosure](/guides/unsold-goods).
+
+<Aside type="note" title="Changed from an earlier version of this page">
+This page used to describe unsold-goods reporting as flowing through the textile passport, as a variant of it. That was wrong: the disclosure is published by the company on its own website, and no passport carries it.
+</Aside>
 
 ## Read next
 
-[Battery DPP](/regulatory/battery) — the comparable analysis for the battery regulation.
-[Extending: sectors & plugins](/core/sectors) — how a sector's rules plug into the core.
-[ESPR Overview](/regulatory/espr) — the framework regulation the textile delegated act sits inside.
+- [ESPR Overview](/regulatory/espr): the framework regulation a textile delegated act would sit inside.
+- [Product groups & plugins](/core/sectors): how a product group's rules plug into the core.
+- [Battery DPP](/regulatory/battery): the one product group whose passport is already dated.

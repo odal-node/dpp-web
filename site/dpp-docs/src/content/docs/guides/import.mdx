@@ -1,0 +1,51 @@
+---
+title: Importing product data
+description: "Bring product data into a node from spreadsheets: templates, trial runs, row-by-row findings, and what the node keeps afterwards."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Product data arrives the way it already exists: in spreadsheets and exports. Every row you import becomes a draft passport, checked before anything is signed.
+
+## Start from a template
+
+Each product group has a CSV template: the header row the import expects.
+
+```bash
+odal template battery -o battery.csv
+```
+
+Templates and bulk import cover nine of the eleven product groups today; phones and tablets, and detergents, are still to come. The JSON Schema behind each group is available too, with `odal schema show <group>`.
+
+## Import, with a trial run first
+
+```bash
+odal passport import battery.csv
+```
+
+The CLI imports CSV, TSV or JSON files; the import service also accepts Excel workbooks. Send an import with `mode=dry_run` to the import endpoint to validate every row without creating anything, and get back the results the real run would produce.
+
+The node reports problems **row by row** instead of rejecting the whole file, so one bad row does not hold up the rest.
+
+## Check before you publish
+
+```bash
+odal passport validate           # check the drafts
+odal passport validate p.json    # dry-run one passport body from a file
+odal passport lint <id>          # re-run the plausibility checks
+```
+
+Validation runs the product group's schema and its sandboxed rules. Plausibility checks flag values that look unlikely; they are advisory and never block publishing.
+
+## What the node keeps
+
+The import **file** is discarded once the passport is signed; no setting keeps it. What the import produced is kept: the draft passports, and a job record with each row's validation findings. See [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see).
+
+<Aside type="tip" title="Stamped automatically">
+New passports carry your default facility and primary operator identifier without a column for them. See [Your operator identity](/guides/operator-identity).
+</Aside>
+
+## Read next
+
+- [A passport's lifecycle](/guides/lifecycle): publishing and everything after it.
+- [Product groups & plugins](/core/sectors): what each group checks.

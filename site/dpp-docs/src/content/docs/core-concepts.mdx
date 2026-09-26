@@ -5,13 +5,13 @@ description: The three ideas behind Odal Node — the proof-bound architecture, 
 
 import { Aside } from "@astrojs/starlight/components";
 
-Three ideas explain almost everything about how Odal Node is built and why. Understand these and the rest of the documentation — and the code — reads easily. This page is the synthesis; each idea has a fuller treatment under Design Principles.
+Three ideas explain almost everything about how Odal Node is built and why. Understand these and the rest of the documentation, and the code, reads easily. Each idea links to its fuller treatment.
 
 ## Proof-bound: the data stays yours
 
-The most important decision in the project is that the operator's raw source files never enter Odal's systems. The manufacturer validates a passport locally, signs it with their own key, and the node discards the import files it was built from. What the node keeps and serves is the signed passport itself — the product data the operator chose to publish, every field bound to a proof and gated by access tier — not the raw exports, spreadsheets, or supply-chain detail behind it.
+The most important decision in the project is that the operator's raw source files never enter Odal's systems. The manufacturer validates a passport locally, signs it with their own key, and the node discards the import files it was built from. What the node keeps and serves is the signed passport itself — the product data the operator chose to publish, every field bound to a proof and filtered by the reader's access rights — not the raw exports, spreadsheets, or supply-chain detail behind it.
 
-This is a property of the software, not a promise about our conduct. Because the node discards the source files after signing, the raw inputs behind a passport are gone — there is nothing for an operator, or for us, to hand over later. Verification needs only the signed passport and the manufacturer's public identity; it does not need Odal to be online, or to exist.
+This is a property of the software, not a promise about our conduct. Because the node discards the source files after signing, the uploaded file itself is gone. What survives is what the import produced: the passport, and a job record of what validated and what did not. Verification needs only the signed passport and the manufacturer's public identity; it does not need Odal to be online, or to exist.
 
 A fuller treatment of the data boundary is in [What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see).
 
@@ -21,14 +21,14 @@ Odal Node is two parts with two licences. The **core** is the regulatory standar
 
 One rule decides which side any change belongs on: *if it changes because an EU regulation changed, it belongs in the core; if it changes because of how the system is deployed or operated, it belongs in the engine.* The dependency only ever points one way — the engine uses the core; the core knows nothing of the engine.
 
-A fuller treatment is in [Licensing](/engine/licensing).
+What each licence allows is on [Licensing](/getting-started/licensing).
 
 ## One seam for new regulation
 
-Regulation arrives sector by sector, and it keeps moving. So the core is built around a single extension point: each sector's compliance logic plugs in through one seam, and new sectors and revised rules enter there without changing anything around them.
+Regulation arrives product group by product group, and it keeps moving. So the core is built around a single extension point: each product group's compliance logic plugs in through one seam, and new product groups and revised rules enter there without changing anything around them. See [Product groups & plugins](/core/sectors).
 
 <Aside type="note" title="The seam is technical, not commercial">
-That extension point is an architectural boundary, never a paywall. The built-in sectors and any added later use the same mechanism, and all of it is open — new regulatory coverage is never a paid unlock.
+That extension point is an architectural boundary, never a paywall. The built-in product groups and any added later use the same mechanism, and all of it is open: new regulatory coverage is never a paid unlock.
 </Aside>
 
 ## Where to go next

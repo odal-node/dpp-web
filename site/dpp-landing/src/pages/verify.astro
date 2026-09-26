@@ -1,0 +1,342 @@
+---
+// /verify — check a passport's proof file (an evidence dossier) in the browser.
+//
+// Everything runs on the visitor's machine: the file is read with the File API
+// and checked by src/lib/verify/, which mirrors the node's own verifier and is
+// tested against its verdicts on every build (tests/verify.test.ts). The page
+// makes no request carrying the file, and its Content-Security-Policy
+// (public/_headers) forbids any request to another origin, so that promise is
+// enforced rather than stated.
+//
+// Content from the file is only ever written with textContent, never as HTML:
+// a dossier is untrusted input.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+
+const title = "Verify a proof file | Odal Node";
+const description =
+  "Check a Digital Product Passport's proof file in your browser: its signatures, its history and its handovers. The page does not upload your file.";
+
+const examples = [
+  { file: "04-valid-full-lifecycle.json", label: "A genuine passport" },
+  { file: "05-tampered-signature.json", label: "A forged signature" },
+  { file: "06-tampered-audit-entry.json", label: "An edited history" },
+  { file: "08-hidden-field-injection.json", label: "A hidden field" },
+  { file: "10-not-json.txt", label: "Not a proof file" },
+];
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Verify" title="Check a passport's proof file yourself." wide>
+    <p>
+      A proof file holds a passport, its signatures, its full history and every
+      handover of responsibility. Drop one here and your browser checks it
+      against the keys it names.
+    </p>
+    <p>
+      <strong>This page does not upload your file.</strong> The check runs in
+      your browser, and the page is not allowed to contact any other website:
+      the only thing it asks this one for is the example files below. Browser
+      extensions can read any page you open, so check a confidential file in a
+      browser window without them.
+    </p>
+
+    <div class="not-prose mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">
+      <div>
+        <label
+          id="drop"
+          for="file"
+          class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-primary-200 bg-primary-50/50 px-6 py-12 text-center transition-colors hover:border-primary-400 hover:bg-primary-50"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="h-10 w-10 text-primary-600" aria-hidden="true">
+            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z" /><path d="M14 3v5h5" /><path d="m9 14 2 2 4-4" />
+          </svg>
+          <span class="mt-3 text-base font-semibold text-neutral-900">Drop a proof file here</span>
+          <span class="mt-1 text-sm text-neutral-600">or <span class="font-medium text-primary-700 underline">choose one</span> from your computer</span>
+          <input id="file" type="file" accept=".json,application/json" class="sr-only" />
+        </label>
+
+        <details class="mt-4 rounded-lg border border-neutral-200 bg-white">
+          <summary class="cursor-pointer px-4 py-3 text-sm font-medium text-neutral-800">Or paste its contents</summary>
+          <div class="border-t border-neutral-200 p-4">
+            <textarea
+              id="paste"
+              rows="8"
+              spellcheck="false"
+              class="w-full rounded-md border border-neutral-300 p-3 font-mono text-xs text-neutral-800 focus:border-primary-500 focus:outline-none"
+              placeholder='{"manifest": …}'
+            ></textarea>
+            <button id="check-paste" type="button" class="mt-3 rounded-md bg-primary-700 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-800">
+              Check
+            </button>
+          </div>
+        </details>
+      </div>
+
+      <div class="rounded-xl bg-primary-900 p-5 text-primary-200">
+        <p class="m-0 text-xs font-semibold uppercase tracking-widest text-primary-300">No file to hand?</p>
+        <p class="m-0 mt-2 text-sm">Try one of these. The tampered ones were each changed after signing.</p>
+        <ul class="m-0 mt-4 list-none space-y-2 p-0">
+          {examples.map((e) => (
+            <li class="m-0">
+              <button
+                type="button"
+                data-example={e.file}
+                class="w-full rounded-md bg-white/5 px-3 py-2 text-left text-sm font-medium text-white ring-1 ring-white/10 transition-colors hover:bg-white/10"
+              >
+                {e.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div id="result" class="not-prose mt-10" aria-live="polite"></div>
+  </Section>
+
+  <Section eyebrow="Know its limits" title="What this proves, and what it does not." tone="muted" wide>
+    <ul class="not-prose m-0 grid list-none gap-4 p-0 md:grid-cols-2">
+      <li class="card m-0 p-5">
+        <h3 class="m-0 text-base font-semibold text-neutral-900">It proves the file is intact</h3>
+        <p class="m-0 mt-2 text-sm text-neutral-600">
+          Every signature is checked against the passport it covers, the
+          history is checked link by link, and a single changed character is
+          caught where it happened.
+        </p>
+      </li>
+      <li class="card m-0 p-5">
+        <h3 class="m-0 text-base font-semibold text-neutral-900">It does not prove who holds the keys</h3>
+        <p class="m-0 mt-2 text-sm text-neutral-600">
+          The file carries a copy of the issuer's identity document. To tie the
+          keys to a company, compare it with the one that company publishes on
+          its own web domain.
+        </p>
+      </li>
+      <li class="card m-0 p-5">
+        <h3 class="m-0 text-base font-semibold text-neutral-900">A qualified seal is not opened here</h3>
+        <p class="m-0 mt-2 text-sm text-neutral-600">
+          If the file carries a qualified electronic seal, the browser reports
+          it as not checked rather than guessing. The node's own verifier reads
+          seals.
+        </p>
+      </li>
+      <li class="card m-0 p-5">
+        <h3 class="m-0 text-base font-semibold text-neutral-900">It agrees with the node, by test</h3>
+        <p class="m-0 mt-2 text-sm text-neutral-600">
+          This checker mirrors the verifier inside Odal Node. Every change to
+          this site is tested against verdicts that verifier produced.
+        </p>
+      </li>
+    </ul>
+  </Section>
+</Base>
+
+<script>
+  import { verifyDossierText, type Check, type Outcome } from "../lib/verify/verify.ts";
+
+  const result = document.getElementById("result")!;
+  const MAX_BYTES = 20 * 1024 * 1024;
+
+  const LABELS: Record<Check["name"], { title: string; line: string }> = {
+    manifest_signature: { title: "Signed contents list", line: "The list of what the file contains is signed by the issuer." },
+    content_integrity: { title: "Nothing changed after signing", line: "Every part of the file matches what the issuer signed." },
+    full_view_signature: { title: "Full passport signature", line: "The complete passport carries the issuer's valid signature." },
+    public_view_signature: { title: "Public passport signature", line: "The public view carries the issuer's valid signature." },
+    audit_chain: { title: "Unbroken history", line: "Each entry in the history is linked to the one before it." },
+    transfer_chain: { title: "Signed handovers", line: "Every change of responsible company is signed." },
+    checkpoint: { title: "History checkpoint", line: "An outside anchor for the history. Not used yet." },
+    calc_receipts: { title: "Calculation receipts", line: "Proof of how computed figures were produced. Not used yet." },
+    component_graph: { title: "Component passports", line: "The passports of the parts this product is made of." },
+    qualified_seal: { title: "Qualified electronic seal", line: "A legally recognised seal. Not opened in the browser." },
+    input_fidelity: { title: "Nothing hidden in the file", line: "The file holds nothing the other checks would have skipped over." },
+  };
+
+  const MEMBERS: Record<string, string> = {
+    fullView: "the full passport",
+    publicView: "the public passport",
+    auditEntries: "the history",
+    transferChain: "the handovers",
+    eolEvent: "the end-of-life record",
+    componentGraph: "the component passports",
+    qualifiedSeal: "the seal",
+  };
+
+  /** One plain sentence for a failed check; the raw detail stays available below it. */
+  function plainFailure(c: Check & { detail: string }): string {
+    const n = /at (?:entry|transfer) (\d+)/.exec(c.detail);
+    const position = n ? Number(n[1]) + 1 : null;
+    switch (c.name) {
+      case "manifest_signature": return "The contents list is not validly signed by the key the file names.";
+      case "content_integrity": {
+        const parts = (c.detail.split("for: ")[1] ?? "").split(", ").filter(Boolean).map((m) => MEMBERS[m] ?? m);
+        return parts.length ? `These parts differ from what was signed: ${parts.join(", ")}.` : "The file's parts do not match the signed contents list.";
+      }
+      case "full_view_signature":
+      case "public_view_signature": return "This signature does not match the passport it is attached to.";
+      case "audit_chain":
+        return position ? `The history was changed after it was recorded, at entry ${position}.` : "The history was changed after it was recorded.";
+      case "transfer_chain":
+        return position ? `The signature on handover ${position} does not verify.` : "A handover's signature does not verify.";
+      case "input_fidelity": return "The file carries extra content that the other checks would have skipped over.";
+      case "component_graph": return "A component passport does not match its reference.";
+      default: return "This file uses a part this checker cannot verify yet.";
+    }
+  }
+
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", text?: string): HTMLElementTagNameMap[K] {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function banner(tone: "ok" | "bad" | "warn" | "neutral", heading: string, body: string): HTMLElement {
+    const tones = {
+      ok: "border-status-released/40 bg-status-released/10",
+      bad: "border-red-300 bg-red-50",
+      warn: "border-amber-300 bg-amber-50",
+      neutral: "border-neutral-300 bg-neutral-50",
+    };
+    const box = el("div", `rounded-xl border p-5 ${tones[tone]}`);
+    box.append(el("p", "m-0 text-lg font-bold text-neutral-900", heading), el("p", "m-0 mt-1 text-sm text-neutral-700", body));
+    return box;
+  }
+
+  const fmt = (iso: string) =>
+    new Date(iso).toLocaleString("en-GB", { dateStyle: "long", timeStyle: "short", timeZone: "UTC" }) + " UTC";
+
+  function render(outcome: Outcome, source: string): void {
+    result.replaceChildren();
+    const from = el("p", "m-0 mb-3 text-sm text-neutral-500", `Checked: ${source}`);
+    result.append(from);
+
+    if (outcome.kind === "malformed") {
+      // A required member missing from an otherwise well-formed file is almost
+      // always an earlier format: proof files written before the contents list
+      // named the core version lack `coreVersion`. The node's own verifier
+      // rejects them for the same reason, so saying "not understood" here would
+      // read as a fault in this checker when it is not one.
+      const missing = /missing field `([^`]+)`/.exec(outcome.message);
+      const unknown = /unknown field `([^`]+)`/.exec(outcome.message);
+      if (missing) {
+        result.append(banner("warn", "This proof file is in an older format, or has been edited.",
+          `It is missing a part every current proof file carries (${missing[1]}), so the node's own verifier would reject it too. If it was made by an earlier version of Odal Node, generate it again with a current one.`));
+      } else if (unknown) {
+        result.append(banner("warn", "This proof file contains a part the format does not define.",
+          `It carries "${unknown[1]}", which no proof file has. Rather than check the rest and ignore it, the file is rejected, as the node's own verifier does.`));
+      } else {
+        result.append(banner("warn", "Not a proof file this checker understands.", `The file could not be read as an evidence dossier: ${outcome.message.replace(/\s+—\s+/g, ": ")}.`));
+      }
+      return;
+    }
+    if (outcome.kind === "unsupported") {
+      result.append(banner("neutral", "This file cannot be checked in a browser.", `${outcome.message}. Check it with the node's own verifier instead.`));
+      return;
+    }
+
+    const failed = outcome.checks.filter((c) => c.status === "fail");
+    result.append(
+      outcome.exit === 0
+        ? banner("ok", "Verified. Every check passed.", "The file is intact and was signed with the keys it names.")
+        : banner("bad", `Tampered. ${failed.length} check${failed.length === 1 ? "" : "s"} failed.`, "Something in the file was changed after it was signed. The failed checks below show where."),
+    );
+
+    const d = outcome.dossier;
+    const group = typeof (d.fullView.payload as Record<string, unknown>)?.productGroup === "string"
+      ? String((d.fullView.payload as Record<string, unknown>).productGroup)
+      : null;
+    const facts = el("dl", "m-0 mt-4 grid gap-x-6 gap-y-2 rounded-xl border border-neutral-200 bg-white p-5 text-sm sm:grid-cols-2");
+    const fact = (k: string, v: string) => {
+      const wrap = el("div");
+      wrap.append(el("dt", "text-xs font-semibold uppercase tracking-wide text-neutral-500", k), el("dd", "m-0 mt-0.5 break-all text-neutral-900", v));
+      facts.append(wrap);
+    };
+    fact("Passport", d.manifest.passportId);
+    fact("Issued by", d.manifest.issuerDid);
+    fact("File created", fmt(d.manifest.createdAt));
+    if (group) fact("Product group", group);
+    fact("History entries", String(d.auditEntries.length));
+    fact("Handovers", String(d.transferChain?.transfers.length ?? 0));
+    result.append(facts);
+
+    const list = el("ul", "m-0 mt-6 list-none space-y-2 p-0");
+    for (const c of outcome.checks) {
+      const label = LABELS[c.name];
+      const item = el("li", "m-0 flex gap-3 rounded-lg border border-neutral-200 bg-white p-4");
+      const badge =
+        c.status === "pass" ? el("span", "mt-0.5 shrink-0 self-start rounded-md bg-primary-100 px-2 py-0.5 text-xs font-semibold text-primary-800", "Passed")
+        : c.status === "fail" ? el("span", "mt-0.5 shrink-0 self-start rounded-md bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800", "Failed")
+        : el("span", "mt-0.5 shrink-0 self-start rounded-md bg-neutral-100 px-2 py-0.5 text-xs font-semibold text-neutral-600",
+            c.name === "qualified_seal" && c.detail.includes("not opened") ? "Not checked here" : "Not applicable");
+      const text = el("div", "min-w-0");
+      text.append(el("p", "m-0 text-sm font-semibold text-neutral-900", label.title));
+      text.append(el("p", "m-0 mt-0.5 text-sm text-neutral-600", c.status === "fail" ? plainFailure(c) : label.line));
+      if (c.status === "fail") {
+        const more = el("details", "mt-2");
+        more.append(el("summary", "cursor-pointer text-xs text-neutral-500", "Technical detail"));
+        more.append(el("p", "m-0 mt-1 break-words font-mono text-xs text-neutral-600", c.detail.replace(/\s+—\s+/g, ": ")));
+        text.append(more);
+      }
+      item.append(badge, text);
+      list.append(item);
+    }
+    result.append(list);
+    result.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  async function check(text: string, source: string) {
+    result.replaceChildren(el("p", "m-0 text-sm text-neutral-600", "Checking…"));
+    render(await verifyDossierText(text), source);
+  }
+
+  async function checkFile(file: File) {
+    if (file.size > MAX_BYTES) {
+      result.replaceChildren(banner("warn", "That file is too large.", "A proof file is a few hundred kilobytes at most; this one is over 20 MB."));
+      return;
+    }
+    await check(await file.text(), file.name);
+  }
+
+  // Without Ed25519 in WebCrypto, a signature cannot be checked at all; say so
+  // up front instead of reporting every signature as failed.
+  crypto.subtle
+    .importKey("raw", new Uint8Array(32), { name: "Ed25519" }, false, ["verify"])
+    .catch((e: Error) => {
+      if (e.name === "NotSupportedError") {
+        result.replaceChildren(banner("neutral", "This browser cannot check these signatures.", "It does not support Ed25519. Any current version of Chrome, Edge, Firefox or Safari does."));
+      }
+    });
+
+  const input = document.getElementById("file") as HTMLInputElement;
+  input.addEventListener("change", () => input.files?.[0] && checkFile(input.files[0]));
+
+  const drop = document.getElementById("drop")!;
+  for (const type of ["dragenter", "dragover"]) {
+    drop.addEventListener(type, (e) => {
+      e.preventDefault();
+      drop.classList.add("border-primary-500", "bg-primary-50");
+    });
+  }
+  for (const type of ["dragleave", "drop"]) {
+    drop.addEventListener(type, () => drop.classList.remove("border-primary-500", "bg-primary-50"));
+  }
+  drop.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const file = (e as DragEvent).dataTransfer?.files?.[0];
+    if (file) checkFile(file);
+  });
+
+  document.getElementById("check-paste")!.addEventListener("click", () => {
+    const text = (document.getElementById("paste") as HTMLTextAreaElement).value;
+    if (text.trim()) check(text, "pasted text");
+  });
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-example]")) {
+    button.addEventListener("click", async () => {
+      const name = button.dataset.example!;
+      const res = await fetch(`/verify/examples/${name}`);
+      await check(await res.text(), `example: ${button.textContent?.trim()}`);
+    });
+  }
+</script>

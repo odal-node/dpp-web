@@ -26,3 +26,11 @@ Thumbs.db
 # CI / deploy artefacts
 .wrangler/
 .cloudflare/
+
+# local-only assets (never publish, never commit — this repo is public)
+deprecated/
+.claude/
+
+# Sibling repositories CI checks out for the drift gates. Never ours to commit.
+.dpp-core/
+.dpp-engine/

@@ -1,28 +1,56 @@
 ---
-// waitlist.astro — minimal waitlist signup.
+// waitlist.astro — join by email.
 // Deliberately backend-free: no form, no form service, no CMS, nothing stored
-// by us. To join, visitors email the public mailbox directly — consistent with
-// the project's transparency and git-only posture.
+// by us. To join, visitors email the public mailbox directly, consistent with
+// the project's transparency and git-only posture. Rewritten 2026-09-26 to say
+// who it is for and what joining gets them, without promising anything the
+// project cannot yet give.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
+import Button from "../components/Button.astro";
 
-const title = "Join the Waitlist — Odal Node | EU Digital Product Passport";
+const title = "Join the Waitlist | Odal Node";
 const description =
-  "Sign up for early access to Odal Node — open-source EU Digital Product Passport infrastructure for ESPR compliance.";
+  "Join the Odal Node waitlist by email: tell us what you make and how you keep product data today, and hear when your product group and the tools you need are ready.";
 
 const MAILBOX = "contact@odal-node.io";
+const mailto = `mailto:${MAILBOX}?subject=${encodeURIComponent("Odal Node waitlist")}`;
 ---
 
 <Base title={title} description={description}>
-  <Section eyebrow="Waitlist" title="Join the waitlist.">
+  <Section h1 eyebrow="Waitlist" title="Get ready for your products' passports.">
     <p>
-      Odal Node is in active development (alpha). To be kept posted, email
-      <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a> with a sentence about your
-      products or what you're looking for.
+      Odal Node is built for the companies that will issue Digital Product
+      Passports: manufacturers, importers and the compliance teams who work
+      with them. If that is you, write to us and we will keep you close as it
+      takes shape.
+    </p>
+    <p class="not-prose mt-8">
+      <Button href={mailto} size="lg">Email {MAILBOX}</Button>
+    </p>
+    <p class="mt-8 text-sm text-neutral-600">
+      No form and no tracking: your email goes straight to our inbox, and we
+      read every one ourselves.
+    </p>
+  </Section>
+
+  <Section eyebrow="In your email" title="Three things that help us help you." tone="muted">
+    <ul>
+      <li><strong>What you make</strong>, and which EU markets you sell into.</li>
+      <li><strong>How you keep product data today</strong>: spreadsheets, a product or ERP system, or supplier documents.</li>
+      <li><strong>What you need first</strong>: a date you are working towards, a product group, or a question you cannot get answered.</li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="What happens next" title="A reply from the people building it.">
+    <p>
+      We aim to reply within a week. After that, you hear from us when
+      something you care about is ready, such as your product group or a tool
+      you asked for.
     </p>
     <p>
-      We tend to the mailbox roughly once a week, so expect a reply within a few
-      days and we hope to get in touch with you directly.
+      Odal Node is in alpha, and the <a href="/roadmap">roadmap</a> shows what
+      is ready today and what comes next.
     </p>
   </Section>
 </Base>

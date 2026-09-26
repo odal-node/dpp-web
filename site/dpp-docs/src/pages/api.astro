@@ -17,10 +17,8 @@ import '../styles/scalar-api-reference.css';
 import logoLight from '../assets/logo-light.svg';
 import logoDark from '../assets/logo-dark.svg';
 
-// Same alpha banner Starlight renders on every docs page (content.config.ts
-// schema default) and the same shared CSS (banner.css) — this page skips the
-// Starlight layout entirely so neither comes for free here.
-import '../styles/banner.css';
+// No alpha banner on this page, by the founder's choice (2026-09-26): the
+// reference is the contract, and the docs pages carry the notice.
 
 // Full-page OpenAPI reference, mounted client-side from the **bundled**
 // @scalar/api-reference — no CDN, no third-party runtime dependency, so the
@@ -79,9 +77,6 @@ import '../styles/banner.css';
       </a>
       <div class="odal-header-right"></div>
     </header>
-    <!-- Scalar renders the alpha banner through its supported plugin-view
-         slot, which keeps it inside the docs content area without relying on
-         brittle DOM mutation. -->
     <div id="scalar-api-reference"></div>
     <script>
       import '../scripts/mount-api-reference';

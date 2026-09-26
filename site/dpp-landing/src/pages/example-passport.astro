@@ -1,0 +1,130 @@
+---
+// /example-passport — one realistic battery passport, sorted by who may read
+// each part. The data is the engine's own demo EV battery (fictional company),
+// copied with provenance into src/data/example-passport.json. The sorting uses
+// the battery disclosure map vendored from dpp-core, the same map the software
+// and /visibility use: a field it does not list is public.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import { fieldLabel, categoryLabel } from "../lib/product-groups";
+import battery from "../data/product-groups/battery.json";
+import example from "../data/example-passport.json";
+
+const title = "Example battery passport | Odal Node";
+const description =
+  "A complete example of an electric-vehicle battery passport, sorted into what anyone can read, what authorities and readers with a legitimate interest can read, and what only one of them can.";
+
+type Json = null | boolean | number | string | Json[] | { [k: string]: Json };
+const p = example.passport as unknown as Record<string, Json> & { productGroupData: Record<string, Json> };
+const disclosure = (battery as { disclosure: Record<string, string> }).disclosure;
+
+// The envelope fields every passport carries, then the battery's own data.
+const envelope: [string, Json][] = [
+  ["productName", p.productName],
+  ["manufacturer", p.manufacturer],
+  ["batchId", p.batchId],
+  ["placedOnMarketDate", p.placedOnMarketDate],
+  ["commodityCode", p.commodityCode],
+  ["materials", p.materials],
+  ["repairabilityScore", p.repairabilityScore],
+];
+const groupData = Object.entries(p.productGroupData).filter(([k]) => k !== "productGroup");
+
+const classOf = (field: string) => disclosure[field] ?? "public";
+const buckets: Record<string, [string, Json][]> = { public: [...envelope], restricted: [], conformity: [], individual: [] };
+for (const [k, v] of groupData) (buckets[classOf(k)] ??= []).push([k, v]);
+
+const SECTIONS = [
+  {
+    key: "public",
+    eyebrow: "Anyone who scans",
+    title: "The public part.",
+    note: "No login and no fee. This is what a phone camera opens.",
+  },
+  {
+    key: "restricted",
+    eyebrow: "Authorities and readers with a legitimate interest",
+    title: "Held back for credential holders.",
+    note: "Dismantling and composition detail, shown to authorities and to readers with a legitimate interest, such as repairers and recyclers.",
+  },
+  {
+    key: "conformity",
+    eyebrow: "Authorities only",
+    title: "The evidence of conformity.",
+    note: "Test results, shown to notified bodies, market surveillance authorities and the Commission.",
+  },
+  {
+    key: "individual",
+    eyebrow: "Readers with a legitimate interest only",
+    title: "This battery's own history.",
+    note: "State of health and use, shown to readers with a legitimate interest and not to authorities.",
+  },
+];
+
+const isObj = (v: Json): v is Record<string, Json> => !!v && typeof v === "object" && !Array.isArray(v);
+const scalar = (v: Json) => (v === true ? "Yes" : v === false ? "No" : typeof v === "number" ? v.toLocaleString("en-GB") : String(v));
+const flat = (o: Record<string, Json>) =>
+  Object.entries(o)
+    .filter(([, v]) => v !== null && !(Array.isArray(v) && v.length === 0))
+    .map(([k, v]) => `${fieldLabel(k)}: ${Array.isArray(v) ? `${v.length} entries` : isObj(v) ? "…" : scalar(v)}`)
+    .join(" · ");
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Example" title="An example battery passport." wide>
+    <p>
+      This is a complete passport for an electric-vehicle battery, from the
+      software's own example data. The company, <strong>Voltex Battery GmbH</strong>,
+      is invented, and the page shows the data a company submits before it is
+      signed, sorted the way a node shows it to each reader.
+    </p>
+    <p>
+      To see a signed proof file checked in your browser, use{" "}
+      <a href="/verify">Verify</a>. To switch between readers and watch the parts
+      change, use <a href="/visibility">Visibility</a>.
+    </p>
+  </Section>
+
+  {SECTIONS.map((s, i) => {
+    const rows = (buckets[s.key] ?? []).filter(([, v]) => v !== null && !(Array.isArray(v) && v.length === 0));
+    return (
+      <Section eyebrow={s.eyebrow} title={s.title} tone={i % 2 === 0 ? "muted" : "default"} wide>
+        <p>{s.note}</p>
+        <dl class="not-prose mt-6 grid gap-px overflow-hidden rounded-xl border border-neutral-200 bg-neutral-200 md:grid-cols-2">
+          {rows.map(([k, v]) => (
+            <div class="bg-white p-4">
+              <dt class="text-xs font-semibold uppercase tracking-wide text-neutral-500">{fieldLabel(k)}</dt>
+              <dd class="m-0 mt-1 text-sm text-neutral-800">
+                {Array.isArray(v) ? (
+                  v.every((x) => !isObj(x)) ? (
+                    v.map(scalar).join(", ")
+                  ) : (
+                    <ul class="m-0 list-none space-y-1 p-0">
+                      {v.map((x) => <li class="m-0">{isObj(x) ? flat(x) : scalar(x)}</li>)}
+                    </ul>
+                  )
+                ) : isObj(v) ? (
+                  flat(v)
+                ) : k === "batteryType" ? (
+                  categoryLabel(String(v))
+                ) : (
+                  scalar(v)
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+    );
+  })}
+
+  <Section eyebrow="Read this first" title="What this example is." tone="tinted">
+    <p>
+      The fields and who may read them are the software's own, for a battery
+      under the Batteries Regulation. The values are invented. A field the
+      software does not list as restricted is shown publicly, which is why the
+      public part is the largest.
+    </p>
+    <p><a href="/product-groups/battery" class="link-arrow">The battery product group</a></p>
+  </Section>
+</Base>

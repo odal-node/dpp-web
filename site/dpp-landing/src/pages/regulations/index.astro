@@ -1,0 +1,114 @@
+---
+// /regulations — the EU acts behind the passports, generated from the
+// instrument records vendored out of dpp-core. Nothing here is hand-written
+// law: every date, status and product group comes from those records, which
+// the software itself runs on. See lib/regulations.ts for the one rule the
+// wording enforces.
+import Base from "../../layouts/Base.astro";
+import Section from "../../components/Section.astro";
+import ActCard from "../../components/ActCard.astro";
+import BasisMark from "../../components/BasisMark.astro";
+import ExternalArrow from "../../components/ExternalArrow.astro";
+import { creatingPassports, shapingPassports, instruments, displayTitle, eurLex } from "../../lib/regulations";
+import appliedActs from "../../data/applied-acts.json";
+
+const title = "Regulations: the EU acts behind the passports | Odal Node";
+const description =
+  "The EU acts that create Digital Product Passports, and related acts that do not, with the date each passport is required from and where that date comes from, and the other acts the software applies.";
+
+const itemListLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "EU acts modelled by Odal Node",
+  itemListElement: instruments.map((i, n) => ({
+    "@type": "ListItem",
+    position: n + 1,
+    name: displayTitle(i),
+    url: `https://odal-node.io/regulations/${i.id}`,
+  })),
+};
+---
+
+<Base title={title} description={description} jsonLd={[itemListLd]}>
+  <Section h1 eyebrow="Regulations" title="The EU acts behind the passports." wide>
+    <p>
+      The first two sections show each act exactly as the software records it,
+      with every date the software relies on, and each act's own page says when
+      it was last confirmed to be in force. A third section lists the other
+      acts the software applies. The <a href="/timeline">timeline</a> puts the
+      same dates in order, year by year, with the Commission's planned acts.
+    </p>
+    <p class="mb-2">Every date says where it comes from:</p>
+    <ul class="not-prose m-0 flex list-none flex-wrap gap-x-6 gap-y-2 p-0 text-sm text-neutral-700">
+      <li class="m-0 flex items-center gap-2">
+        <BasisMark basis="sourced" label="From the text" /> stated in the act's official text
+      </li>
+      <li class="m-0 flex items-center gap-2">
+        <BasisMark basis="assumed" label="Our assumption" /> our reading, with no text that states it
+      </li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="Passports" title="Acts that create a passport." tone="muted" wide>
+    <ul class="not-prose m-0 grid list-none gap-4 p-0 md:grid-cols-2 lg:grid-cols-3">
+      {creatingPassports.map((act) => (
+        <li class="m-0"><ActCard act={act} /></li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section eyebrow="Related acts" title="Acts that create no passport." wide>
+    <p>The software tracks these acts too, but none of them creates a passport.</p>
+    <ul class="not-prose m-0 grid list-none gap-4 p-0 md:grid-cols-2 lg:grid-cols-3">
+      {shapingPassports.map((act) => (
+        <li class="m-0"><ActCard act={act} /></li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section eyebrow="Applied by the software" title="Other acts the software applies." tone="muted" wide>
+    <p>
+      These acts create no passport, but the software puts them to work: to
+      seal, to register, to name who answers for a product and to check what
+      it contains. Each links to its official text, where its dates are.
+    </p>
+    <div class="not-prose mt-8 grid gap-6 lg:grid-cols-2">
+      {appliedActs.groups.map((g) => (
+        <section class="card p-6" aria-label={g.title}>
+          <h3 class="m-0 text-base font-semibold text-neutral-900">{g.title}</h3>
+          <ul class="m-0 mt-4 list-none space-y-4 p-0">
+            {g.acts.map((a) => (
+              <li class="m-0">
+                <p class="m-0 text-sm font-semibold text-neutral-900">
+                  <a href={eurLex(a.celex)} rel="noopener">{a.name}<ExternalArrow class="ml-1" /></a>
+                </p>
+                <p class="m-0 text-xs text-neutral-500">{a.ref}</p>
+                <p class="m-0 mt-1 text-sm leading-snug text-neutral-600">{a.what}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+    <p class="mt-8 text-sm text-neutral-600">
+      The{" "}
+      <a href="https://docs.odal-node.io/regulatory/acts-and-standards" rel="noopener">documentation</a>{" "}
+      lists the articles and standards the code relies on.
+    </p>
+  </Section>
+
+  <Section eyebrow="Read this first" title="What this list is, and what it is not." tone="tinted" wide>
+    <p>
+      <strong>It is not legal advice</strong>, and it is not a complete list of
+      what applies to your product. It is the set of acts the software models
+      and applies.
+      An act can reach products that were never modelled as a product group, so
+      the absence of an act here is not evidence that none applies.
+    </p>
+    <p>
+      Where an act requires a passport but leaves the date to rules that have
+      not been adopted, the page says so rather than showing a date as a
+      deadline.
+    </p>
+  </Section>
+</Base>

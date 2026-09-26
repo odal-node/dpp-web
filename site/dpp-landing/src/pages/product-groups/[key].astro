@@ -1,0 +1,186 @@
+---
+// /product-groups/[key] — one page per modelled product group, generated from
+// the manifests vendored out of dpp-core and worded by product-group-copy.json.
+//
+// Written for a general reader: no schema versions, plugin names, field keys
+// or commit hashes. Those belong on the docs site. A page cannot claim a group
+// the software does not model, because it is generated from the same
+// definitions the software reads.
+//
+// WHAT THESE PAGES DELIBERATELY DO NOT SAY
+//
+// No act numbers, no dates, no "mandatory from". The product-group manifests
+// carry no law, and a regulatory date published here would be a claim this
+// repository then has to keep current. The one thing worse than no date is a
+// stale one.
+import Base from "../../layouts/Base.astro";
+import Section from "../../components/Section.astro";
+import ProductGroupIcon from "../../components/ProductGroupIcon.astro";
+import { allPages, categoryLabel, fieldLabel, type Group } from "../../lib/product-groups";
+import { actsFor, displayTitle, kindLabel, bindingLabel } from "../../lib/regulations";
+
+export function getStaticPaths() {
+  return allPages.map((g) => ({ params: { key: g.key }, props: { group: g } }));
+}
+
+const { group } = Astro.props as { group: Group };
+const isUnsold = group.key === "unsold-goods";
+
+// The acts recorded as reaching this group. Dates stay on the regulation pages,
+// so there is one place on the site a date can be wrong.
+const acts = actsFor(group.key);
+
+// The disclosure map is field -> class. Invert it: a reader wants to know who
+// sees what, not to scan a field list for the one they care about.
+const byClass = new Map<string, string[]>();
+for (const [field, cls] of Object.entries(group.disclosure ?? {})) {
+  if (!byClass.has(cls)) byClass.set(cls, []);
+  byClass.get(cls)!.push(fieldLabel(field));
+}
+
+// Who each class is for, in plain words. `conformity` and `individual` appear
+// for batteries only, because that is the one product group whose own law
+// splits access this way.
+const CLASS: Record<string, { title: string; note: string }> = {
+  restricted: {
+    title: "For readers with a credential",
+    note: "Not public. Shown only to a reader who holds a credential for this product group.",
+  },
+  conformity: {
+    title: "For authorities only",
+    note: "Evidence that the product meets the rules. Shown to notified bodies, market surveillance authorities and the Commission.",
+  },
+  individual: {
+    title: "For readers with a legitimate interest only",
+    note: "The individual item's own history. Shown only to readers with a legitimate interest in it, and not to authorities.",
+  },
+};
+const ORDER = ["restricted", "conformity", "individual"];
+const classes = [...byClass.entries()].sort(
+  (a, b) => ORDER.indexOf(a[0]) - ORDER.indexOf(b[0]),
+);
+
+const title = `${group.name}: product group | Odal Node`;
+const description = isUnsold
+  ? "How Odal Node records the disclosure of discarded unsold products: a yearly report by the operator, not a product passport."
+  : `What an Odal Node passport for ${group.name.toLowerCase()} carries, and who may read each part of it.`;
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow={isUnsold ? "Also covered" : "Product group"} title={group.name} wide>
+    <div class="not-prose mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-primary-50 text-primary-700 ring-1 ring-primary-100">
+      <ProductGroupIcon group={group.key} class="h-7 w-7" />
+    </div>
+    <p class="text-lg text-neutral-800">{group.line}.</p>
+    {isUnsold ? (
+      <p>
+        This is not a product group, and it carries no passport. Large
+        companies that discard unsold consumer products must publish, each
+        year, how many they discarded, why, and what happened to them.
+        Medium-sized companies join later, and micro and small companies are
+        exempt. Odal Node records that disclosure line by line,
+        per type of product, reason and destination, for the company rather
+        than for any single product.
+      </p>
+    ) : (
+      <p>
+        This page shows the passport exactly as the software builds and checks
+        it for this group. It describes{" "}
+        <strong>what is modelled</strong>, not what the law requires.
+      </p>
+    )}
+  </Section>
+
+  {group.productCategories?.length ? (
+    <Section eyebrow="Categories" title="The kinds of product it tells apart." tone="muted" wide>
+      <p>
+        A category can change which rules apply to a passport, so the software
+        asks for one.
+      </p>
+      <div class="not-prose mt-6 flex flex-wrap gap-2">
+        {group.productCategories.map((c) => (
+          <span class="rounded-full border border-neutral-300 bg-white px-3.5 py-1.5 text-sm text-neutral-800">
+            {categoryLabel(c)}
+          </span>
+        ))}
+      </div>
+    </Section>
+  ) : null}
+
+  {!isUnsold && (
+    <Section eyebrow="Visibility" title="Which parts are not public." wide>
+      {classes.length === 0 ? (
+        <>
+          <p>
+            <strong>Everything in this passport is public for now.</strong>{" "}
+            Who may see which part of a passport is set by each product group's
+            own rules, and the software models no such split for{" "}
+            {group.name.toLowerCase()} yet.
+          </p>
+        </>
+      ) : (
+        <>
+          <p>
+            The public sees the rest of the passport. These parts are shown only
+            to the readers named.
+          </p>
+          <div class="not-prose mt-6 space-y-4">
+            {classes.map(([cls, fields]) => (
+              <div class="card p-5">
+                <h3 class="m-0 text-base font-semibold text-neutral-900">
+                  {CLASS[cls]?.title ?? "Not public"}
+                </h3>
+                {CLASS[cls] && <p class="mt-1 text-sm text-neutral-600">{CLASS[cls].note}</p>}
+                <ul class="m-0 mt-4 flex list-none flex-wrap gap-2 p-0">
+                  {fields.sort().map((f) => (
+                    <li class="m-0 rounded-md bg-primary-50 px-2.5 py-1 text-sm text-primary-900">{f}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          {byClass.has("conformity") && byClass.has("individual") && (
+            <p class="mt-6">
+              <strong>These are not ranked.</strong> Authorities see the
+              conformity evidence and not the item's own history; readers with a
+              legitimate interest see the history and not the evidence. See{" "}
+              <a href="/visibility">how visibility works</a>.
+            </p>
+          )}
+        </>
+      )}
+    </Section>
+  )}
+
+  <Section eyebrow="The law" title="The acts that reach it." tone="muted" wide>
+    {acts.length === 0 ? (
+      <p>No act recorded in the software's library reaches this group yet.</p>
+    ) : (
+      <ul class="not-prose m-0 grid list-none gap-3 p-0 md:grid-cols-2">
+        {acts.map(({ instrument, binding }) => (
+          <li class="m-0">
+            <a href={`/regulations/${instrument.id}`} class="card flex h-full flex-col p-5 no-underline">
+              <span class="text-xs font-medium uppercase tracking-wide text-neutral-500">{kindLabel(instrument)}</span>
+              <span class="mt-1 font-semibold text-neutral-900">{displayTitle(instrument)}</span>
+              <span class:list={[
+                "mt-3 self-start rounded-md px-2 py-0.5 text-xs font-semibold",
+                binding.status === "in_force" ? "bg-primary-100 text-primary-800" : "bg-neutral-100 text-neutral-600",
+              ]}>
+                {bindingLabel(binding.status)}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+    <p class="mt-6 text-sm text-neutral-600">
+      Dates, and where each one comes from, are on each act's page.
+    </p>
+  </Section>
+
+  <Section eyebrow="Other groups" title="Every product group." tone="tinted" wide>
+    <p>
+      <a href="/product-groups" class="link-arrow">See all product groups</a>
+    </p>
+  </Section>
+</Base>

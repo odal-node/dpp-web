@@ -1,0 +1,15 @@
+{
+  "key": "toy",
+  "title": "Toys",
+  "schemaVersions": [
+    "1.0.0",
+    "1.1.0",
+    "1.2.0"
+  ],
+  "currentSchemaVersion": "1.2.0",
+  "productCategories": [],
+  "disclosure": {
+    "svhcSubstances": "restricted"
+  },
+  "plugin": "product-group-toy"
+}

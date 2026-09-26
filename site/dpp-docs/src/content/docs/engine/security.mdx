@@ -21,15 +21,27 @@ The public passport endpoint requires no credential at all — it only ever serv
 
 ## Least privilege in the database
 
-The node connects to PostgreSQL with an application role that cannot change the schema and cannot delete rows. Schema migrations run under a *separate*, privileged credential that is used only at startup and never kept in the live connection pool. On top of that, the database enforces the [permanence guarantees](/engine/retention) itself — a trigger rejects edits to a locked passport, and the audit trail is append-only at the database level — so those rules hold even if application code is wrong.
+The node connects to PostgreSQL with an application role that cannot change the schema, and that holds no DELETE grant anywhere except on the import-job table, where a cleanup sweep needs one. Schema migrations run under a *separate*, privileged credential that is used only at startup and never kept in the live connection pool. On top of that, the database enforces the [permanence guarantees](/engine/retention) itself — a trigger rejects edits to a locked passport, and the audit trail is append-only at the database level — so those rules hold even if application code is wrong.
 
 ## The node fails closed
 
-A node refuses to start without its secrets — database credentials, the key-store passphrase, the signing domain. The production stack goes further and refuses to start on left-over development defaults. There is no insecure default that quietly "just works"; a misconfigured node does not run rather than running unsafely.
+A node refuses to start without its secrets: database credentials, the key-store passphrase, the signing domain. It also refuses the sample passwords and passphrase the repository once shipped, and an empty key-store passphrase. There is no insecure default that quietly "just works"; a misconfigured node does not run rather than running unsafely.
 
-## Sector logic is sandboxed
+## Node profiles
 
-Each sector's compliance logic runs in a Wasm sandbox with no filesystem, no network, and no system clock or randomness, capped at 64 MiB of memory and a fixed CPU budget (fuel metering). A buggy or hostile plugin exhausts its budget and is stopped — it can never reach the signing key, the database, or the rest of the node. This is the host enforcing, with concrete limits, the sandbox model described in [Security & cryptography](/core/security).
+`NODE_PROFILE` sets how strict a node is about the services it depends on for trust (rule checking, sealing, registry sync):
+
+| Profile | What it accepts |
+|---|---|
+| unset (development) | Anything, with the trust posture logged |
+| `sandbox` | Real or sandbox services (test authorities); refuses stand-ins |
+| `production` | Only real services; refuses sandboxes and stand-ins |
+
+Two development overrides exist and are not refused by any profile today: `ALLOW_DEV_CREDENTIALS=true` accepts the sample credentials, and `ALLOW_UNSIGNED_PLUGINS=true` loads plugins without a signature. Both log a warning. Never set either on a node anyone else can reach.
+
+## Product-group logic is sandboxed
+
+Each product group's compliance logic runs in a Wasm sandbox with no filesystem and no network, capped at 64 MiB of memory and a fixed CPU budget (fuel metering). It is not a vacuum: the plugin can read a clock and draw randomness. The clock is **pinned** to a single instant for the whole invocation, so a determination cannot vary with the time it ran; randomness is real OS entropy, deliberately not pinned, because a fixed seed would make a plugin's hash iteration order predictable without making any determination more reproducible. A buggy or hostile plugin exhausts its budget and is stopped — it can never reach the signing key, the database, or the rest of the node. This is the host enforcing, with concrete limits, the sandbox model described in [Security & cryptography](/core/security).
 
 ## The database is the source of truth
 
@@ -41,7 +53,7 @@ A node serves exactly one operator. Isolation is a property of the deployment �
 
 ## Reporting a vulnerability
 
-The engine implements no cryptography of its own — it delegates all of it to the core. Dependencies are scanned for known advisories on every change. Suspected vulnerabilities go to **security@odal-node.io** under coordinated disclosure, never to a public issue first.
+The signing path is the core's: the engine holds no signature or key-derivation code of its own. It does hash on its own account — SHA-256 for API-key and admin-password digests, compared in constant time — because those are node-operational concerns rather than passport ones. Dependencies are scanned for known advisories on every change. Suspected vulnerabilities go to **security@odal-node.io** under coordinated disclosure, never to a public issue first.
 
 ## Read next
 

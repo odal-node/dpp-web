@@ -1,0 +1,46 @@
+---
+title: Error reference
+description: The problem types the node's API returns, what each one means, and what to do about it.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+When a call fails, the API answers with an RFC 9457 problem document (`application/problem+json`): a `type` naming the kind of problem, a `title`, the HTTP `status`, and usually a `detail` saying what went wrong in this case.
+
+```json
+{
+  "type": "https://problems.odal-node.io/unprocessable-entity",
+  "title": "Unprocessable Entity",
+  "status": 422,
+  "detail": "One or more fields failed validation."
+}
+```
+
+<Aside type="note" title="Match on the type, not the text">
+The `type` identifies the problem and stays stable; `title` and `detail` are for people. The `type` values are identifiers: the addresses do not serve a page yet, and this page is where they are explained.
+</Aside>
+
+## Problem types
+
+| `type` (after `https://problems.odal-node.io/`) | Status | What it means | What to do |
+|---|---|---|---|
+| `bad-request` | 400 | The request is malformed | Check the body and parameters against the [API reference](/api) |
+| `unauthorized` | 401 | No valid credential was presented | Send `Authorization: Bearer <api-key>`; a key may have been revoked or expired |
+| `forbidden` | 403 | The credential is valid but its scope does not allow this | Use a key with the needed scope (read, write or admin) |
+| `not-found` | 404 | No such passport or resource | Check the ID |
+| `not-acceptable` | 406 | The resolver cannot serve any format the `Accept` header allows | Ask for HTML, JSON or `application/aas+json` |
+| `conflict` | 409 | The request conflicts with the current state, for example editing a published passport | Read the current state; published passports change through the [lifecycle](/guides/lifecycle), not by editing |
+| `idempotent-request-in-flight` | 409 | A request with the same `Idempotency-Key` is still being processed | Wait and retry with the same key |
+| `gone` | 410 | The passport has been suspended by its operator | Nothing to fix on your side |
+| `unprocessable-entity` | 422 | The data failed validation | Fix the fields named in `detail` |
+| `bad-gateway` | 502 | A service the node depends on answered badly | Retry later; check `odal status` |
+| `service-unavailable` | 503 | A service the node depends on is not available | Retry later; check `odal status` |
+
+## Retrying safely
+
+Many write routes accept an `Idempotency-Key` header (and `odal --idempotency-key <key>` sends one). Retrying a request with the same key cannot create a duplicate: the node returns the first result, or `idempotent-request-in-flight` while the first is still running.
+
+## Read next
+
+- [API reference](/api): every route, with the errors each can return.
+- [Troubleshooting](/guides/troubleshooting): when the node itself will not start.

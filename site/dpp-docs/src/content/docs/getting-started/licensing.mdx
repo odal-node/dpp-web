@@ -1,0 +1,57 @@
+---
+title: Licensing
+description: Apache-2.0 for the regulatory core, BSL-1.1 for the node. What each licence lets you do, and where the line sits.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Odal Node is released under two licences: one for the regulatory core, one for the node that runs it.
+
+<Aside type="note" title="This page is a summary">
+The `LICENSE` file in each repository is what binds. Where this page and a `LICENSE` file differ, the file is right.
+</Aside>
+
+## The split
+
+| Layer | Repository | Licence | What it contains |
+|---|---|---|---|
+| **Regulatory core** | [`dpp-core`](https://github.com/odal-node/dpp-core) | Apache-2.0 | The passport model and its versioned schemas, validation and cross-field rules, the product-group plugins and the SDK to write them, signing primitives, verifiable credentials, GS1 Digital Link parsing, the Asset Administration Shell export, the EU registry types and the calculators |
+| **The node** | [`dpp-engine`](https://github.com/odal-node/dpp-engine) | BSL-1.1 | Everything that runs a node: issuing, versioning and signing passports, the did:web identity and signing service, the public resolver behind the QR code, spreadsheet import, the plugin sandbox, the qualified-seal adapter, storage, and the `odal` CLI |
+
+The dividing rule: code that changes because an EU regulation changed lives in `dpp-core`. Code that exists to run, store and serve passports lives in `dpp-engine`. See [Core Concepts](/core-concepts) for the reasoning.
+
+## Apache-2.0: the core
+
+Use it, adapt it and build on it under the terms of that licence. The core crates are published on crates.io, and the product-group plugins are under the same licence.
+
+## BSL-1.1: the node
+
+The Business Source License 1.1 makes the source available now and converts each release to Apache-2.0 later. For `dpp-engine` it permits:
+
+- **Any non-production use**: evaluation, testing, integration work, local development.
+- **Production self-hosting, at no charge**: running the node to issue, sign, store and serve Digital Product Passports for your own organisation's products and regulatory-compliance obligations. This is the licence's *Additional Use Grant*.
+- **Copying, modifying and redistributing** the source.
+
+Any other production use needs a commercial licence from the licensor, in particular:
+
+- **Offering it to third parties as a hosted or managed service**, paid or not.
+- **Redistributing or embedding it in a competing product.**
+
+The licence qualifies these with *"where the Licensed Work provides a material part of that service or product's value"*.
+
+<Aside type="note" title="When a release becomes Apache-2.0">
+The licence sets the change date as **four years from the date of each release**. On that date, that release converts to Apache-2.0 and can be used without restriction. Later releases keep their own four-year clock.
+</Aside>
+
+## Dependency licences
+
+`dpp-engine` builds on `dpp-core` (Apache-2.0) and a tree of open-source Rust crates.
+
+This page deliberately does **not** reproduce a table of those licences. A copied licence list goes stale silently: each licence lives in the dependency's own metadata and changes on the dependency's schedule, not ours. That is not hypothetical: an earlier version of this page carried a licence for one component that had been wrong since 2024.
+
+The authoritative answer for any given build is the build itself. `cargo license` or `cargo deny` over the workspace lists every crate and its licence from the resolved dependency graph. `Cargo.lock` is committed, so the result is reproducible for any tagged release. If you are checking licence compatibility, run it against the version you intend to deploy.
+
+## Read next
+
+[Self-Hosting](/engine/self-hosted): deploying a node on your own infrastructure.
+[What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see): why the core is designed so that regulatory capability is never gated.

@@ -1,0 +1,24 @@
+---
+// BasisMark.astro — says where a date comes from. "From the text" is stated in
+// the act's official text; "Our assumption" is a reading with no text that
+// states it. The two must never look alike.
+interface Props {
+  basis: "sourced" | "assumed";
+  label: string;
+}
+const { basis, label } = Astro.props;
+---
+
+<span
+  class:list={[
+    "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+    basis === "sourced" ? "bg-status-released/10 text-neutral-800" : "bg-amber-100 text-amber-900",
+  ]}
+>
+  {basis === "sourced" ? (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-3 w-3" aria-hidden="true"><path d="m5 12 5 5 9-10" /></svg>
+  ) : (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="h-3 w-3" aria-hidden="true"><path d="M12 7v6M12 17h.01" /></svg>
+  )}
+  {label}
+</span>

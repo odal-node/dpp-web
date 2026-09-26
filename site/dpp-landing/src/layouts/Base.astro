@@ -4,6 +4,7 @@
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import { shareImageFor } from "../lib/share-cards";
 
 interface Props {
   title: string;
@@ -18,12 +19,15 @@ interface Props {
 
 const { title, description, canonical, jsonLd = [], noindex = false } = Astro.props;
 const canonicalHref = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
-const ogImage = new URL("/og-image.png", Astro.site).toString();
+// Each page's own share card where it has one (lib/share-cards.ts).
+const share = shareImageFor(Astro.url.pathname);
+const ogImage = new URL(share.src, Astro.site).toString();
 
 // Base structured data — present on every page.
 const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": "https://odal-node.io/#organization",
   name: "Odal Node",
   url: "https://odal-node.io",
   logo: new URL("/favicon.svg", Astro.site).toString(),
@@ -38,6 +42,41 @@ const websiteLd = {
   name: "Odal Node",
   url: "https://odal-node.io",
 };
+
+// What the project actually is. `Organization` says who publishes the site and
+// `WebSite` says the site exists; neither describes the software, which is the
+// thing anyone is searching for.
+//
+// `SoftwareSourceCode`, not `SoftwareApplication`: this is a library and a
+// self-hosted engine, not an installable end-user application with an operating
+// system and a price. `SoftwareApplication` would imply the second and invite
+// the "free / paid" question the licence answers differently for each half.
+const softwareLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "@id": "https://odal-node.io/#software",
+  name: "Odal Node",
+  alternateName: "Odal Node DPP infrastructure",
+  description:
+    "Open-source EU Digital Product Passport (DPP) infrastructure. Self-hosted software for issuing, signing, holding and serving the product logbooks required by the Ecodesign for Sustainable Products Regulation (ESPR) and the Battery Regulation.",
+  codeRepository: "https://github.com/odal-node/dpp-core",
+  programmingLanguage: "Rust",
+  license: "https://www.apache.org/licenses/LICENSE-2.0",
+  url: "https://odal-node.io",
+  keywords: [
+    "digital product passport",
+    "DPP",
+    "product logbook",
+    "ESPR",
+    "battery passport",
+    "open source",
+    "self-hosted",
+    "EU compliance",
+    "EN 18219",
+    "GS1 Digital Link",
+  ],
+  publisher: { "@id": "https://odal-node.io/#organization" },
+};
 ---
 
 <!doctype html>
@@ -49,6 +88,7 @@ const websiteLd = {
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonicalHref} />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="theme-color" content="#080C2C" />
@@ -61,6 +101,7 @@ const websiteLd = {
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={share.alt} />
     <meta property="og:site_name" content="Odal Node" />
     <meta property="og:locale" content="en_US" />
 
@@ -69,12 +110,14 @@ const websiteLd = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={share.alt} />
 
     <!-- Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
-    <script type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(softwareLd)} />
     {jsonLd.map((block) => (
-      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(block)} />
     ))}
   </head>
   <body class="min-h-screen flex flex-col bg-neutral-0 text-neutral-900">

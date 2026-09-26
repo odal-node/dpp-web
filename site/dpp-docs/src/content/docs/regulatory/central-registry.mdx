@@ -1,33 +1,34 @@
 ---
 title: EU Central Registry
-description: What the EU Central Registry is, what it requires of implementations, and how Odal prepares for the registry API once it is published.
+description: What the EU's passport registry is, what registering a passport requires, how the node queues registrations, and what stands between that and a live connection.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-ESPR establishes a central registry operated by the European Commission as the authoritative directory of registered passports. The registry is one of the regulation's structural mechanisms for letting authorities, recyclers, and market-surveillance bodies find a passport from a product without needing to know which platform issued it.
+ESPR Art. 13 establishes a central registry, run by the European Commission, as the directory of registered passports. It lets authorities and others find a passport from a product without knowing which system issued it. The Commission set the registry up in July 2026, as Art. 13(1) required by 19 July, and Commission Implementing Regulation (EU) 2026/1778 sets out how registration works.
 
-## What the central registry is
+## A directory, not a store
 
-The registry is a directory, not a store. It holds the mapping from product identifier (typically GS1 GTIN plus serial) to passport location (the issuing platform's resolver endpoint). It does **not** hold the passport content. The content lives at the issuing platform; the registry just tells the world where to look.
+The registry holds identifiers and where each passport lives. It does not hold the passport's content: that stays with the issuer. Discovery is centralised; data is not.
 
-This design is the right one because it lets the regulation centralise discovery without centralising data. The market-surveillance authority that needs to inspect a batch of textile passports queries the registry to find each batch's resolver endpoint, then queries each resolver for the actual passport content. The registry does not become a single point of failure for passport content; it does become a single point of failure for *discovery*, which is a more tractable operational problem.
+## What registering a passport involves
 
-## What the registry requires of implementations
+Under the implementing act, the economic operator uploads the passport's unique identifiers; the registry checks some of them itself (Art. 8(7)(c)–(d)), and the granularity of the passport follows the most granular level any applicable act requires (Art. 8(3)). A battery's operator must upload its unique identifier under Battery Regulation Art. 77(10). A successful registration returns a proof of registration (Art. 9).
 
-The registry's API is being defined at the time of writing. The expected requirements are: every published passport must be registered with the registry, the registration carries the product identifier and the resolver endpoint, the issuing platform must keep the registration in sync as passports are suspended or archived, and the platform must respond to registry health checks.
+## How the node handles it
 
-Odal has prepared for this beyond modelling the interface: **every published passport already commits its registration intent to a durable outbox, in the same database transaction as the publish itself.** A background worker drains that outbox with retry and backoff. The practical consequence: publishing never blocks on the registry, a crash never loses a registration, and the day the Commission's API goes live, the accumulated backlog registers without a single passport falling through. (For context: the Commission's own deadline to set up the registry was 19 July 2026; as of this writing, the API specification remains unpublished — so this durable-queue posture is not caution, it's the correct engineering for the actual situation.)
+Every published passport commits its registration to a durable queue in the same database transaction as the publish itself, and a background worker drains that queue with retries. Publishing never waits on the registry, a crash never loses a registration, and a backlog from an outage drains without a passport falling through. `odal registry` shows the sync state, operator-wide or for one passport.
 
-<Aside type="note" title="Status">
-Activation of the registry integration is on the longer roadmap, [contingent on the registry API being published](https://odal-node.io/roadmap). The interface is already modelled, so the implementation can land in days rather than months once the upstream API stabilises.
+<Aside type="caution" title="Not connected yet">
+The registration path is modelled and queued, but not connected to the live registry. Registering needs the operator's legal identity, and there is no registered company behind this project yet, the same step that holds back electronic seals with legal effect. The connection will be finished against the registry's official interface, not guessed at. See the [roadmap](https://odal-node.io/roadmap).
 </Aside>
 
-## Why pre-investing in the bridge
+## How long an identifier may be
 
-Designing the central-registry interface before the registry exists is unusual, and it has a specific rationale. ESPR is a regulation in active definition, and the registry API is being co-defined with the implementation community (CIRPASS-2, the standards bodies, the early-mover platforms). Having a stable, opinion-bearing interface ready means the project can contribute to the API definition from a position of having already thought about the shape it wants the API to take. Showing up to the design conversation with an empty notebook is a worse position than showing up with a draft.
+The limit on a unique product identifier comes from the Commission's registry user guide, not from law or from EN 18219. Version 1.01 of the guide (28 July 2026) said 50 characters, shorter than any GS1 Digital Link a node builds; version 1.02 (24 August 2026) says 2,000. Core's main branch checks a registration against the current figure, and because it lives in a user guide rather than in the Official Journal, it is treated as current rather than settled.
 
 ## Read next
 
-[ESPR Overview](/regulatory/espr) — the framework regulation that mandates the registry.
-[Standards & interoperability](/core/standards) — the open standards a passport speaks.
+- [ESPR Overview](/regulatory/espr): the framework regulation that mandates the registry.
+- [Acts and standards](/regulatory/acts-and-standards): the registry act's articles the code relies on.
+- [Standards & interoperability](/core/standards): EN 18219 and the other identifier standards.

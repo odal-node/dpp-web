@@ -1,0 +1,71 @@
+{
+  "_comment": "The chain of custody as eight stations, the spine of /lifecycle. Written for a general reader: no routes, commands or field names, which belong on the docs site. Every station describes something the software does today; checked against the engine's routes and handlers on 2026-09-25. No competitive claims: nobody here has seen what other tools ship past publishing, so the page does not say.",
+  "stations": [
+    {
+      "n": 1,
+      "key": "declare",
+      "title": "Declare",
+      "who": "Manufacturer, importer",
+      "lead": "Product data arrives the way it already exists: in spreadsheets.",
+      "body": "Upload a CSV or Excel file and run a trial first. The node reports what is wrong row by row instead of rejecting the whole file, so nobody has to rebuild their data before they can start."
+    },
+    {
+      "n": 2,
+      "key": "components",
+      "title": "Link",
+      "who": "Component maker",
+      "lead": "A product made of parts points to the passports of its parts.",
+      "body": "A passport can reference the passports of its components, such as the battery inside a scooter, and the whole chain is verified in one check. A component passport that changed after it was referenced shows up as a break, at the exact point it happened."
+    },
+    {
+      "n": 3,
+      "key": "check",
+      "title": "Check",
+      "who": "Compliance lead",
+      "lead": "Checked against the product group's rules before anything is signed.",
+      "body": "Most product groups carry their own set of rules, and they run on your node, inside a sandbox. A new signed version of a group's rules can be installed without restarting the node."
+    },
+    {
+      "n": 4,
+      "key": "sign",
+      "title": "Sign",
+      "who": "The operator",
+      "lead": "Signed with your own key, on your own servers.",
+      "body": "The signature is tied to an identity on a web domain you control, and nothing is sent anywhere to be signed. That is the difference between holding a record and renting access to it."
+    },
+    {
+      "n": 5,
+      "key": "resolve",
+      "title": "Resolve",
+      "who": "Consumer, retailer",
+      "lead": "Scan the code, see the public passport. No login, no fee.",
+      "body": "The code on the product leads straight to its passport. Products with a barcode number resolve through GS1 Digital Link; products without one get a plain web address, so nobody needs a GS1 membership to take part."
+    },
+    {
+      "n": 6,
+      "key": "disclose",
+      "title": "Disclose",
+      "who": "Repairer, recycler, authority",
+      "lead": "Each reader sees the part of the record they are entitled to.",
+      "body": "The same passport answers a repairer, a recycler and an authority differently, field by field. Access is proven with a credential the reader holds, not by a setting they can change. For batteries the rules are not a simple ladder: an authority and a reader with a legitimate interest each see something the other cannot.",
+      "link": "/visibility"
+    },
+    {
+      "n": 7,
+      "key": "handover",
+      "title": "Hand over",
+      "who": "Two companies",
+      "lead": "Responsibility changes hands on the record, with the handover signed.",
+      "body": "Remanufacturing, repurposing or selling a product line: the outgoing company signs the handover and the node signs its acceptance, so the change of hands is part of the passport rather than an email thread. Either side can decline or withdraw before it completes."
+    },
+    {
+      "n": 8,
+      "key": "end",
+      "title": "End",
+      "who": "Recycler, auditor",
+      "lead": "A recorded end of life, and a file anyone can check offline.",
+      "body": "The passport, its signatures and its full history export as one signed file. Someone who has never heard of Odal Node can verify it without a network connection and without trusting us.",
+      "link": "/verify"
+    }
+  ]
+}

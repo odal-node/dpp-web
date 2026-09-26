@@ -1,0 +1,89 @@
+---
+// /roadmap — what the software does today, what is waiting, and what is next.
+//
+// Rewritten 2026-09-25 with the founder; a fifth status, "planned", added
+// 2026-09-26 for committed work nobody is building yet. The page lists capabilities, never
+// tasks: no issue links, commands, routes or version numbers. Every "available"
+// item was checked against the engine and core repositories that day. The rule
+// the page holds itself to: no item is written in the grammar of a stronger
+// claim than it can support, and nothing that is not built carries a date.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import OurRoadmap from "../components/Roadmap.astro";
+import data from "../data/roadmap.json";
+
+const updated = new Date(`${data.updated}T00:00:00Z`).toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+const title = "Roadmap: what is built, waiting and next | Odal Node";
+const description =
+  "What the Odal Node software does today, what is built and waiting on a legal step, what is in progress, what is planned, and what is being considered. No dates on anything unbuilt.";
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Roadmap" title="What is built, what is waiting, and what comes next." wide>
+    <p>
+      This page lists capabilities, not tasks, and it is checked against the
+      software itself rather than against its own last version.
+    </p>
+    <p>
+      <strong>Nobody is running this in production.</strong> No customers, no
+      pilots, no live deployments, and nothing below should be read as evidence
+      of any. The battery passport obligation begins on 18 February 2027, and we
+      would rather be correct when it arrives than early and wrong.
+    </p>
+    <p>
+      There are no dates on anything unbuilt. Timing depends on EU acts,
+      standards votes and registry access, none of which we control, so the
+      status is the commitment and a quarter would be a guess.
+    </p>
+    <p class="text-sm text-neutral-500">
+      Last updated <time datetime={data.updated}>{updated}</time>.
+    </p>
+  </Section>
+
+  <Section eyebrow="Status" title="Where each capability stands today." tone="muted" wide>
+    <div class="not-prose">
+      <OurRoadmap />
+    </div>
+  </Section>
+
+  <Section eyebrow="How items move" title="What it takes to change status." wide>
+    <p>
+      An item is <strong>available</strong> when it is in a released version
+      and a test exercises it through the running system. Merged is not
+      available, and neither is demonstrated.
+    </p>
+    <p>
+      An item is <strong>waiting on a legal step</strong> when it is built and
+      tested but cannot yet do the thing it exists for, for a legal reason
+      rather than an engineering one.
+    </p>
+    <p>
+      An item is <strong>in progress</strong> only while someone is building
+      it. An item is <strong>planned</strong> when we have committed to it and
+      nobody is building it yet; it carries no date. An item{" "}
+      <strong>being considered</strong> is an option: it carries no date and
+      no promise.
+    </p>
+    <p>
+      Items can move backwards. Finding out while building something that it
+      needs more groundwork is an ordinary outcome, and a reversal recorded here
+      is better than an item quietly drifting.
+    </p>
+  </Section>
+
+  <Section eyebrow="More detail" title="Where the technical detail lives." tone="tinted" wide>
+    <p>
+      This page is written for everyone. How each capability works, and how to
+      run it, is in the{" "}
+      <a href="https://docs.odal-node.io" rel="noopener">documentation</a>, and
+      the code itself is{" "}
+      <a href="https://github.com/odal-node" rel="noopener">public on GitHub</a>.
+    </p>
+  </Section>
+</Base>

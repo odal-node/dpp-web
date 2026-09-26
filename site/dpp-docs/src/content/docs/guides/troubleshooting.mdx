@@ -1,0 +1,43 @@
+---
+title: Troubleshooting
+description: Why a node refuses to start, what each refusal means, and how to fix it. Most are deliberate safety checks, not bugs.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A node would rather not start than run unsafely, so most start-up failures are deliberate checks. The message names the setting; this page says why it matters and how to fix it. Every setting is on the [configuration reference](/engine/configuration).
+
+## The node will not start
+
+| Message mentions | Why | Fix |
+|---|---|---|
+| `KEY_STORE_PASSPHRASE is empty` | The passphrase protects the signing key | Generate one: `openssl rand -base64 32`, and keep it safe ([Backup and key custody](/engine/backup)) |
+| `KEY_STORE_PASSPHRASE is still the placeholder` | Anyone with the repository would know it and could forge your passports | Generate a new passphrase |
+| `ADMIN_USERNAME/ADMIN_PASSWORD are still admin/admin` | That login is full admin over HTTP | Set both to values you generate, or unset them once your first API key exists |
+| `KEY_STORE_PATH is a 32-byte base64 value, which is a key and not a path` | The key-store path was given a secret instead of a file path | Set a file path, such as the data volume in the bundled compose file |
+| `found N Wasm plugin(s) but PLUGIN_SIGNING_KEY is not set` | Unsigned code would decide whether passports comply | Set `PLUGIN_SIGNING_KEY` to the publisher's public key, or remove the plugins |
+| `plugin for product_group '…' failed to load` | A plugin's signature, format or interface did not check out; running without it would publish that group unchecked | Replace the file with a correctly signed plugin, or remove it to run that group without rules deliberately |
+| `NODE_PROFILE=production refuses to boot: required trust port(s) […]` | A service the production profile requires is a stand-in or a sandbox | See [Node profiles](/engine/security#node-profiles); run without the production profile until those services are real |
+| `RESOLVER_BASE_URL` | Required since v0.14.0, with no default | Set it to your resolver's public address, decided once ([Production deployment](/engine/deployment)) |
+| The database connects as a superuser | A superuser owns the audit table, so the append-only protection could not hold | Point `DATABASE_URL` at the application role |
+| An unrecognised `SEAL_PROVIDER` or `SEAL_CONFORMANCE_LEVEL` | A typo must not quietly seal lower than you intended, or not at all | Use `local`, or unset/`none`; and `B`, `T`, `LT` or `LTA` |
+| `NATS_URL` is set but unreachable | With an event bus configured, the node fails fast rather than dropping events | Start NATS, or unset `NATS_URL` to run without an event bus |
+
+<Aside type="caution" title="The development overrides">
+`ALLOW_DEV_CREDENTIALS=true` and `ALLOW_UNSIGNED_PLUGINS=true` make the first rows go away by accepting the risk instead of fixing it. They exist for a laptop, log a warning, and must never be set on a node anyone else can reach.
+</Aside>
+
+## The node starts, but something is missing
+
+- **Passports are published unsealed**: `SEAL_PROVIDER` is unset. See [Electronic seals](/guides/seals).
+- **Registrations never reach the EU registry**: the registry credentials are unset, so registrations are queued but not submitted. That is expected today; see [EU Central Registry](/regulatory/central-registry).
+- **Readers' credentials are all refused**: the node trusts no issuer until one is named. See `CREDENTIAL_ISSUERS_*` in the [configuration reference](/engine/configuration#access-credentials).
+- **No scan counts**: the resolver's `SCAN_INGEST_URL` is unset.
+- **A group's passports pass with no findings**: no plugin is loaded for that group. The node logs which groups have none at start-up.
+
+`odal status` shows, for every service the node relies on, whether it is real, a sandbox or a stand-in, which answers most of these at a glance.
+
+## Read next
+
+- [Error reference](/guides/errors): what the API returns when a call fails.
+- [Operating a node securely](/engine/security): why these checks exist.

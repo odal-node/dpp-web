@@ -1,23 +1,61 @@
 ---
-title: Extending it — sectors & plugins
-description: New regulation arrives sector by sector and keeps moving; the core absorbs it through a single extension seam, so a new sector is a plugin, not a rewrite.
+title: Product groups & plugins
+description: How each product group's rules enter the software through one seam, run in a sandbox, and are updated on a running node without a restart.
 ---
 
-ESPR does not arrive all at once. It lands sector by sector — batteries, then textiles, then electronics — and each sector's rules keep changing as the delegated acts are finalised. The core is built so that movement is normal: every sector's compliance logic enters through one seam.
+import { Aside } from "@astrojs/starlight/components";
 
-## One seam, many sectors
+Product-passport obligations do not arrive all at once. They land product group by product group, each on its own act and its own date, and each group's rules keep changing as the acts are finalised. The core is built so that movement is normal: every product group's compliance logic enters through one seam.
 
-Each sector's rules live behind a single, shared interface. Adding a sector, or updating one when the regulation changes, means supplying new logic to that seam — not modifying the system around it. A frozen deployment falls behind; a maintained one simply receives the update.
+## The product groups
+
+The software models eleven product groups: batteries, textiles, iron and steel, aluminium, tyres, furniture, mattresses, phones and tablets, toys, detergents and construction products. The unsold-goods disclosure is modelled too, but it is not a product group and carries no passport; see [The unsold-goods disclosure](/guides/unsold-goods).
+
+Each group has a versioned schema, a list of product categories it tells apart, and a map of which fields are restricted to credential holders. A node can tell you, per group, whether a passport is required, from when and under which acts:
+
+```bash
+odal product-group list          # every group, whether a passport is required and from when
+odal product-group show battery  # one group in full, with the acts behind it
+odal schema list                 # the schema version this node serves for each group
+odal template battery            # the CSV header row an import expects
+```
+
+## One seam, many product groups
+
+Each group's rules live behind a single, shared interface. Adding a group, or updating one when the regulation changes, means supplying new logic to that seam, not modifying the system around it. The core repository has ten plugins, covering every group except mattresses.
+
+A group with no plugin loaded still works: its passports are checked against the schema, but no group-specific rules run and no findings are produced. The node says so at start-up rather than letting "no findings" read as "checked and clean", and a node started with the production profile refuses to run without a plugin for every group whose passport obligation is live.
 
 ## Sandboxed by default
 
-Sector logic runs in an isolated, resource-limited sandbox. It can do its job — validate a passport against the sector's rules — and nothing more: it cannot reach the network, the filesystem, or the rest of the node. That keeps each sector's logic independent and safe to update on its own.
+A plugin is WebAssembly and runs in an isolated sandbox with no filesystem and no network, a 64 MiB memory cap and a metered CPU budget. It can judge a passport's data and nothing more: it cannot reach the signing key, the database or the rest of the node. The concrete limits are on [Operating a node securely](/engine/security).
+
+## Signed, and installed without a restart
+
+A node runs a plugin only if it is signed by the publisher key its operator pins (`PLUGIN_SIGNING_KEY`). Without a key configured, a node refuses to start while unsigned plugins are present, unless `ALLOW_UNSIGNED_PLUGINS=true` is set; that override exists for development and logs a warning.
+
+A new signed version can be installed on a running node:
+
+```bash
+odal plugin install product-group-battery.wasm   # uploads the .wasm and its sibling .sig
+```
+
+The node verifies the signature, checks the plugin's interface version, persists it so a restart reloads it, and swaps it into service. A plugin that fails any step is refused and the previous one keeps serving.
+
+<Aside type="note" title="Rule bundles are a separate channel">
+The node also accepts signed ruleset bundles (`odal ruleset reload`) and proves which bundle version it runs. Today a bundle carries only that version: the rules that run are the plugins above, and no bundle changes how a passport is checked yet.
+</Aside>
+
+## Writing a plugin
+
+A plugin is a Rust crate compiled to `wasm32-wasip1` against the core's plugin SDK, which generates the interface the node calls and a `describe()` export the node checks before it dispatches anything. The battery plugin in the core repository is the reference implementation.
 
 ## Open, not gated
 
-The seam is an architectural boundary, never a commercial one. The built-in sectors and any added later use the exact same mechanism, and all of them are open. New regulatory coverage is never a paid unlock.
+The seam is an architectural boundary, never a commercial one. The built-in product groups and any added later use the exact same mechanism, and all of them are open. New regulatory coverage is never a paid unlock.
 
 ## Read next
 
-- [What the core does](/core/overview) — the standard sectors plug into.
-- [Battery DPP](/regulatory/battery) · [Textile DPP](/regulatory/textile) · [Electronics DPP](/regulatory/electronics) — sectors in context.
+- [What the core does](/core/overview): the standard product groups plug into.
+- [Battery DPP](/regulatory/battery) · [Textile DPP](/regulatory/textile) · [Toy DPP](/regulatory/toys) · [Detergent DPP](/regulatory/detergents) · [Construction product DPP](/regulatory/construction) · [Phones and tablets](/regulatory/phones): product groups in context.
+- [Acts and standards](/regulatory/acts-and-standards): the acts each group rests on.

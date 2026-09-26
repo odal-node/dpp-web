@@ -1,0 +1,55 @@
+---
+title: Electronic seals
+description: How a node seals published passports with its local sealer, how it reports what each seal is worth, and why none carries legal effect yet.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+On top of the operator's own signature, a node can apply an **electronic seal** to each published passport, in the formats the EU's eIDAS Regulation recognises. A *qualified* seal, made with a qualified certificate, carries a legal presumption of integrity and origin that a plain signature does not.
+
+<Aside type="caution" title="No legal effect yet">
+Under eIDAS only a legal person can create an electronic seal, and there is no registered company behind this project yet. Sealing works end to end, but every seal a node makes today says plainly that it carries no legal effect.
+</Aside>
+
+## The local sealer
+
+```bash
+SEAL_PROVIDER=local
+```
+
+The local sealer makes a real CAdES seal (ETSI EN 319 122-1) over each passport's signature, at the long-term archival level (`LTA`): a signature time stamp, revocation material and an archive time stamp, from a local time-stamping authority the node sets up beside its sealing key. Every path that reads a seal (the seal routes, the background seal check, the evidence dossier and its verifier) works on these seals exactly as it would on a qualified one.
+
+What it is not is qualified. The node generates its own key and certificate, and the certificate says so in its organisation field: **NOT A QUALIFIED SEAL**. Its time-stamping certificate says **NOT A QUALIFIED TIMESTAMP**. Anyone inspecting a seal sees that, not only whoever reads the node's log.
+
+The key and certificate persist at `SEAL_LOCAL_KEY_PATH` (default `./.seal-local`; in the bundled container that is the data volume), so a seal made yesterday still verifies today. Back it up with the rest of the node; see [Backup, restore and key custody](/engine/backup).
+
+Leave `SEAL_PROVIDER` unset, or set it to `none`, for no sealing; the node then reports that sealing is not configured. An unrecognised value stops the node rather than quietly leaving passports unsealed.
+
+<Aside type="note" title="Production profile">
+The local sealer counts as a stand-in for a qualified seal, so a node started with `NODE_PROFILE=production` will not accept it. See [Operating a node securely](/engine/security#node-profiles).
+</Aside>
+
+## How sealing runs
+
+Each published passport's seal is queued in the same transaction as the publish and applied in the background, so publishing never waits on sealing and a crash never loses one. `SEAL_CONFORMANCE_LEVEL` (`B`, `T`, `LT` or `LTA`, default `LTA`) sets the level every seal is made at.
+
+## What a node reports about a seal
+
+```bash
+odal seal status            # how many published passports are unsealed
+odal seal status <id>       # one passport's seal, its certificate, and whether it still covers the current signature
+odal seal repair <id>       # queue a replacement for a seal that no longer verifies
+```
+
+A background pass opens every stored seal and reports any that no longer verify, checking its certificate chain, validity window and revocation material the way EU law requires seals to be validated. "Cannot be read" is reported as its own result, not as a failure. `repair` is refused unless the stored seal is demonstrably broken at the moment you ask.
+
+With `TRUSTED_LIST_REFRESH=on`, the node also fetches and verifies the EU trusted lists daily, so a seal's report can say whether its certificate comes from a qualified provider. For the local sealer, the answer is no.
+
+## In a proof file
+
+An [evidence dossier](/guides/verification) carries the seal, who issued it and the level its bytes carry. The node's verifier checks it; the browser verifier reports it as not checked rather than guessing.
+
+## Read next
+
+- [Configuration reference](/engine/configuration#electronic-seals): every seal setting.
+- [Acts and standards](/regulatory/acts-and-standards): the seal acts the code relies on.

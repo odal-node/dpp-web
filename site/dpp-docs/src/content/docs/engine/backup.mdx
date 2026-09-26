@@ -1,0 +1,48 @@
+---
+title: Backup, restore and key custody
+description: What to back up on a node, how often, where to keep the key-store passphrase, and how to prove a restore works before you need it.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A node's passports are permanent, so its backups have to be too. Two things matter above everything else: the database and the signing key.
+
+<Aside type="danger" title="The key store and its passphrase">
+Every passport is signed with the key in the key store. **Lose the key store or its passphrase and the node can no longer sign, and the identity that verifies its published passports goes with it. Leak them and passports can be forged.** Keep the passphrase in a password manager *and* as a sealed offline copy, and never in the same place as the backups.
+</Aside>
+
+## What to back up
+
+| What | Where it lives | How |
+|---|---|---|
+| The database | PostgreSQL (`pg-data` volume in the bundled compose file) | `pg_dump -Fc` nightly |
+| The key store | `KEY_STORE_PATH` (on the `node-data` volume in the bundled compose file) | Copy the file with every database backup |
+| The local sealer's key and certificate | `SEAL_LOCAL_KEY_PATH` (also on `node-data` in the container) | Copy with the key store, so earlier seals keep verifying |
+| Your `.env` | The deployment directory (`chmod 600`) | In your secrets manager, not beside the backups |
+
+Not needed: Redis is a response cache and NATS a replayable event bus. Plugins can be installed again from their signed files. The archive and snapshot buckets are already copies held off the node.
+
+Send backups **off the machine**, to object storage in a region you choose, with versioning and a retention window, for example thirty days.
+
+## Prove the restore
+
+A backup you have never restored is a hope. Once a month, on a scratch machine:
+
+1. restore the database dump and copy in the key store;
+2. start the node with the same passphrase and `DID_WEB_BASE_URL`;
+3. check `odal status`, resolve a known passport, and verify its [evidence dossier](/guides/verification).
+
+Record the date of each drill.
+
+## Rotating the signing key
+
+The identity service can rotate the operator's signing key. A rotation adds a new key and keeps every earlier one in the published DID document, and every signature names the key that made it, so passports signed before the rotation keep verifying. Back up the key store again straight after a rotation.
+
+## Upgrades and rollback
+
+Database migrations run forward only. The rollback for an upgrade is restoring the backup you took just before it, which is why an upgrade starts with a backup. See [Upgrading](/engine/upgrading).
+
+## Read next
+
+- [Production deployment](/engine/deployment): where these volumes and files sit.
+- [Security & cryptography](/core/security): how the key store is encrypted.

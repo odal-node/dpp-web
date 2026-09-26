@@ -1,0 +1,95 @@
+---
+// /product-groups — the index for the generated product-group pages.
+//
+// Answers "which products does this cover?" for a general reader. Every group
+// is read from the manifests vendored out of dpp-core and worded by
+// product-group-copy.json, so the list cannot drift from the software. No
+// counts, versions or commits: those belong on the docs site.
+import Base from "../../layouts/Base.astro";
+import Section from "../../components/Section.astro";
+import ProductGroupIcon from "../../components/ProductGroupIcon.astro";
+import { groups, unsoldGoods } from "../../lib/product-groups";
+
+const title = "Product groups | Odal Node";
+const description =
+  "The product groups Odal Node can build passports for, what each passport carries, and who may read each part of it.";
+
+// An ItemList is the one structured-data type that genuinely describes this
+// page. It is a list of pages, and saying so is neither a rating nor a claim.
+const itemListLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Product groups modelled by Odal Node",
+  itemListElement: [...groups, unsoldGoods].map((g, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: g.name,
+    url: `https://odal-node.io/product-groups/${g.key}`,
+  })),
+};
+---
+
+<Base title={title} description={description} jsonLd={[itemListLd]}>
+  <Section h1 eyebrow="Product groups" title="What the software can build passports for." wide>
+    <p>
+      A product group decides what a passport has to carry and which rules it
+      is checked against. Pick one to see what its passport covers and who may
+      read each part.
+    </p>
+    <p>
+      <strong>Modelled is not the same as mandated.</strong> Most of these
+      groups have no adopted passport rules yet. Modelling one early means the
+      passport exists to be argued with now, rather than written in a hurry once
+      a date is fixed.
+    </p>
+  </Section>
+
+  <Section eyebrow="The list" title="Every product group modelled today." tone="muted" wide>
+    <ul class="not-prose m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+      {groups.map((g) => (
+        <li class="m-0">
+          <a href={`/product-groups/${g.key}`} class="card group flex h-full items-start gap-4 p-5 no-underline">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-700 ring-1 ring-primary-100 transition-colors group-hover:bg-primary-700 group-hover:text-white group-hover:ring-0">
+              <ProductGroupIcon group={g.key} class="h-6 w-6" />
+            </span>
+            <span class="min-w-0">
+              <span class="block text-base font-semibold text-neutral-900">{g.name}</span>
+              <span class="mt-1 block text-sm leading-snug text-neutral-600">{g.line}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="not-prose mt-10">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-widest text-primary-700">Also covered</p>
+      <a
+        href={`/product-groups/${unsoldGoods.key}`}
+        class="group flex items-start gap-4 rounded-xl bg-primary-900 p-5 text-primary-200 no-underline hover:no-underline sm:max-w-xl"
+      >
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white/10 transition-colors group-hover:bg-primary-300 group-hover:text-primary-900">
+          <ProductGroupIcon group={unsoldGoods.key} class="h-6 w-6" />
+        </span>
+        <span class="min-w-0">
+          <span class="block text-base font-semibold text-white">{unsoldGoods.name}</span>
+          <span class="mt-1 block text-sm leading-snug text-primary-300">{unsoldGoods.line}</span>
+        </span>
+      </a>
+    </div>
+  </Section>
+
+  <Section eyebrow="Where this comes from" title="Always in step with the software." tone="tinted">
+    <p>
+      Every page here matches the product definitions the software itself
+      uses, and the site is checked against them before it is published. A
+      page describes exactly the passport the software builds, and when a
+      definition changes, the page changes with it.
+    </p>
+    <p>
+      <strong>Dates live on the regulations pages.</strong> Each act's dates,
+      and where each one comes from, are on its own page under{" "}
+      <a href="/regulations">regulations</a>, so there is one place to check
+      them.
+    </p>
+  </Section>
+</Base>

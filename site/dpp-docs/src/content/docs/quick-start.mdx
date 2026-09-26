@@ -26,7 +26,7 @@ The engine builds against the core's published releases on crates.io, so it comp
 
 ## 2. Build the `odal` CLI
 
-Build the CLI once and put it on your `PATH` (or grab a release binary). From here on, `odal` is the single command you use — for infrastructure, setup, and passports alike.
+Build the CLI once and put it on your `PATH`. From here on, `odal` is the single command you use — for infrastructure, setup, and passports alike.
 
 ```bash
 cargo build -p dpp-cli --release
@@ -52,8 +52,8 @@ odal
 
 Prefer it scripted? The same flow is `odal up` (build and start) followed by `odal bootstrap` (onboard and mint the key).
 
-<Aside type="tip" title="First run builds from source">
-The first `up` compiles the node, so it takes a few minutes. Subsequent starts are immediate.
+<Aside type="tip" title="Built from source, or pulled ready-made">
+Inside a clone of the repository, the first `up` compiles the node from source, so it takes a few minutes; later starts are immediate. Outside a clone, `odal init` scaffolds a compose file and `odal up` pulls the published images instead.
 </Aside>
 
 ## 5. Drive it from the Console
@@ -63,8 +63,10 @@ With the node up, running `odal` on its own opens the **Console** — an interac
 ```text
 ? What would you like to do?
 > Infrastructure            start · stop · status · update images
-  Passports                 import · validate · publish · export
   Operator                  view · edit configuration
+  Registry identity         facilities · operator identifiers
+  Passports                 import · validate · publish · export
+  Dossiers                  verify an exported evidence dossier
   API keys                  create · list · revoke
   Environment               switch · create · view profiles (dev/prod)
   Schema                    check for updates
@@ -78,10 +80,12 @@ Arrow-key to a section and press Enter. Each one is also a direct command, so th
 |---|---|---|
 | **Infrastructure** | Start, stop, check status, update container images | `odal up` · `odal down` · `odal status` · `odal update` |
 | **Passports** | The full lifecycle — import, validate, publish, export | `odal passport` · `import` · `validate` · `publish` · `export` |
-| **Operator** | View and edit your operator identity and branding | `odal operator set` |
+| **Operator** | View and edit your operator identity and branding | `odal operator show` · `set` |
+| **Registry identity** | The facilities and operator identifiers stamped on new passports | `odal facility` · `odal operator-id` |
+| **Dossiers** | Check an evidence dossier against the node | `odal verify` |
 | **API keys** | Create, list, and revoke keys for CI or integrations | `odal key` ·`create` · `list` · `revoke` |
 | **Environment** | Switch or create profiles for more than one node (dev/prod) | `odal profile` · `use` · `create` · `list` |
-| **Schema** | Check for sector-schema updates as the regulation moves | `odal schema check` |
+| **Schema** | Check for product-group schema updates as the regulation moves | `odal schema check` · `list` · `show` |
 | **Setup / Reconfigure** | Reconnect, re-onboard, or mint a first key | `odal --reconfigure` · `odal bootstrap` |
 
 Start with **Infrastructure → Status** to confirm the node is healthy — validating, signing, and serving.
@@ -90,14 +94,15 @@ Start with **Infrastructure → Status** to confirm the node is healthy — vali
 
 From **Passports**, the lifecycle is three stops:
 
-1. **Import** — bring product data in from a CSV or Excel file; each row becomes a draft.
-2. **Validate** — check the drafts against the sector's schema and rules before anything is signed, so problems surface while they are still cheap to fix.
-3. **Publish** — sign each passport with your key and make it resolvable.
+1. **Import**: bring product data in from a spreadsheet; each row becomes a draft. `odal template <product-group>` gives you the header row the import expects.
+2. **Validate**: check the drafts against the product group's schema and rules before anything is signed, so problems surface while they are still cheap to fix.
+3. **Publish**: sign each passport with your key and make it resolvable.
 
-The published passport carries a signature bound to your public identity. Any consumer, authority, or recycler can verify it against your DID document — no access to your node, and no dependency on Odal, required.
+The published passport carries a signature bound to your public identity. Any consumer, authority, or recycler can verify it against your DID document, with no access to your node and no dependency on Odal.
 
 ## Where to go next
 
-- [Self-Hosting](/engine/self-hosted) — full prerequisites and the operational picture.
-- [Core Concepts](/core-concepts) — what just happened, and why it's built this way.
-- [What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see) — the data boundary, stated precisely.
+- [Importing product data](/guides/import): templates, trial runs and row-by-row findings.
+- [A passport's lifecycle](/guides/lifecycle): everything you can do after publishing.
+- [Self-Hosting](/engine/self-hosted): full prerequisites and the operational picture.
+- [What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see): the data boundary, stated precisely.
