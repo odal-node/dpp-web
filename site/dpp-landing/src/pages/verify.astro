@@ -15,7 +15,7 @@ import Section from "../components/Section.astro";
 
 const title = "Verify a proof file | Odal Node";
 const description =
-  "Check a Digital Product Passport's proof file in your browser: its signatures, its history and its handovers. The file never leaves your machine.";
+  "Check a Digital Product Passport's proof file in your browser: its signatures, its history and its handovers. The page does not upload your file.";
 
 const examples = [
   { file: "04-valid-full-lifecycle.json", label: "A genuine passport" },
@@ -34,9 +34,11 @@ const examples = [
       against the keys it names.
     </p>
     <p>
-      <strong>The file never leaves your machine.</strong> Nothing is uploaded:
-      the check runs in this page. The page is only allowed to contact this
-      website, and the only thing it asks it for is the example files below.
+      <strong>This page does not upload your file.</strong> The check runs in
+      your browser, and the page is not allowed to contact any other website:
+      the only thing it asks this one for is the example files below. Browser
+      extensions can read any page you open, so check a confidential file in a
+      browser window without them.
     </p>
 
     <div class="not-prose mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">

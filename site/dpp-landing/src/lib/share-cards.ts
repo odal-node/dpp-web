@@ -21,7 +21,7 @@ const pages: Card[] = [
   { path: "/lifecycle", eyebrow: "Lifecycle", title: "A passport is not a document. It is a record with a life.", line: "One record, eight stations, from the factory to the end of its life." },
   { path: "/visibility", eyebrow: "Visibility", title: "Each reader sees the part the law gives them.", line: "Who can read which part of a battery passport, and why." },
   { path: "/example-passport", eyebrow: "Example", title: "An example battery passport.", line: "Sorted into what anyone can read and what only some readers can." },
-  { path: "/verify", eyebrow: "Verify", title: "Check a passport's proof file yourself.", line: "Signatures and history, checked in your browser. The file never leaves your machine." },
+  { path: "/verify", eyebrow: "Verify", title: "Check a passport's proof file yourself.", line: "Signatures and history, checked in your browser. The page does not upload your file." },
   { path: "/trust", eyebrow: "Data and trust", title: "What Odal Node can and cannot see.", line: "Why that holds by design rather than by promise." },
   { path: "/passport-check", eyebrow: "Passport check", title: "Does my product need a passport?", line: "Pick what you make or sell, and see which date applies and where it comes from." },
   { path: "/timeline", eyebrow: "Timeline", title: "When passports arrive, year by year.", line: "From batteries in 2027 to vehicles in 2032, with where every date comes from." },

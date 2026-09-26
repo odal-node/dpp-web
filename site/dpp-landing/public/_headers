@@ -16,8 +16,8 @@
 /og-image.png
   Cache-Control: public, max-age=604800
 
-# /verify promises that a checked file never leaves the machine. This makes
-# it enforceable: the page may only talk to its own origin (to fetch the
+# /verify promises that it does not upload a checked file. This makes that
+# enforceable: the page may only talk to its own origin (to fetch the
 # example files), so no script on it can send a file anywhere else, by
 # request, beacon or image.
 /verify
