@@ -1,28 +1,63 @@
 ---
 title: Standards & interoperability
-description: Odal Node speaks the open standards the regulation itself cites, so passports interoperate with the wider ecosystem instead of becoming a silo.
+description: The open standards Odal Node is built on, what each one is used for, and where the software stands against the six harmonised European passport standards.
 ---
 
-A passport is only useful if the rest of the world can read it. The core speaks the open standards the regulation itself references, so a passport works with existing tooling rather than locking you into one vendor's format.
+import { Aside } from "@astrojs/starlight/components";
 
-## The standards it speaks
+A passport is only useful if the rest of the world can read it. Odal Node builds on published, open standards, so a passport works with existing tooling rather than a format only we can read. This page lists the ones the code relies on and what each is used for. The full list, with every EU act the code applies and the articles it relies on, is in [Acts and standards](/regulatory/acts-and-standards).
 
-- **GS1 Digital Link** — the identifier scheme behind the QR code on a product. A scan resolves the product to its passport, and the same link can serve different views to different audiences (a consumer, a recycler, an authority).
-- **W3C Verifiable Credentials with `did:web`** — how a passport proves who issued it. Identity is anchored in the issuer's own domain, so verification is an ordinary web lookup — no central registry, no blockchain, no dependency on Odal staying online.
-- **IDTA Asset Administration Shell** — an industrial submodel projection, so a passport can flow into Industry 4.0 systems that already speak AAS.
+<Aside type="note" title="Checked against the code">
+Checked on 2026-09-26 against `dpp-core` main and `dpp-engine` v0.14.0. Where something is on core's main branch but not yet in a released node, the entry says so.
+</Aside>
 
-## The European system standards, tracked clause by clause
+## Identifying a product and resolving its passport
 
-The European DPP system standards — written by CEN/CENELEC JTC 24, in the EN 182xx series — are landing in stages, covering exchange, identifiers, data carriers, storage, lifecycle APIs, interoperability, access rights and data authentication.
+- **GS1 Digital Link**: the web address behind the QR code. A scan resolves to the passport, and the same link can serve different views and link types; a request for `linkset` returns an RFC 9264 linkset.
+- **ISO/IEC 18004**: the QR code itself. The node renders it with the four-module quiet zone the standard requires.
+- **EN 18219** (unique identifiers): the product identifier schemes it allows, including GS1, ISO/IEC 15459 issuing-agency identifiers and the IEC 61406 identification link, with its clause 5 syntax. This is on core's main branch and arrives with its next release; a released node identifies products by GTIN.
+- **ISO 3166-1** country codes, and **ISO 17442** legal entity identifiers with their **ISO 7064** check characters.
 
-We are **tracking** that series, not claiming conformance to it, and the distinction is deliberate. These are paid standards and we have not purchased the texts. Nobody here has read them, so there is no clause-by-clause matrix and no basis on which we could assert that our identifier, carrier, API or authentication semantics align with what they actually say. We would rather state that plainly than describe an alignment nobody could check.
+## Signing a passport and proving access
 
-What we have built to instead are the open, published specifications those standards draw on — GS1 Digital Link, W3C Verifiable Credentials, `did:web`, the IDTA Asset Administration Shell — all of which are readable by anyone evaluating this claim. When the EN texts are purchased and read, this page will say what was found, including where it disagrees with what we built.
+- **JSON Web Signature** (RFC 7515) with **EdDSA over Ed25519** (RFC 8037): how every passport is signed.
+- **`did:web`**: the issuer's identity, anchored in their own web domain. Verifying a passport is an ordinary web lookup, with no central registry and no dependency on Odal.
+- **JSON Canonicalization Scheme** (RFC 8785): the byte-exact form data is hashed in, so a check gives the same answer on every machine.
+- **W3C Verifiable Credentials 2.0**: the access credentials a reader presents to see restricted parts of a passport, with revocation through a **W3C Bitstring Status List**.
+- **SD-JWT** (RFC 9901): a passport issued as a credential its holder can present in part. On core's main branch; the node does not issue it yet.
 
-One further nuance that will still apply then: even a published standard is *available* but not yet *harmonised* (cited in the Official Journal), so presumption of conformity is a claim for the day that citation lands, not before.
+## Electronic seals
+
+- **ETSI EN 319 122-1** (CAdES): the format the node's seals are made in.
+- **ETSI TS 119 182-1** (JAdES): the JSON seal format, with the certificate carried in the header as the EU formats act requires.
+- **ETSI EN 319 102-1**: the validation procedure. The node reports its seal checks in its terms, including when a seal cannot be read.
+- **ETSI TS 119 612**: the EU trusted lists, which the node reads and verifies to check who issued a seal's certificate.
+- **RFC 5652** (CMS) and **RFC 3161** (time stamps): the structures underneath a CAdES seal.
+
+## Industrial systems and errors
+
+- **IDTA Asset Administration Shell** (metamodel IDTA-01001-3-0): a passport can be served in this shape by content negotiation. The structure follows the metamodel; the semantic identifiers are in Odal's own `urn:odal-node:` namespace for now, so this is AAS-shaped output, not a claim of IDTA conformance.
+- **RFC 9457** problem details: every error the API returns.
+
+## Product data
+
+- **EN 45554**: the scale for repairability scores.
+- **ISO 3758**: care symbols on textile passports.
+- **IEC 62660-1**: named as a cycle-life test method a battery passport can cite.
+
+## The six harmonised European passport standards
+
+Commission Implementing Decision (EU) 2026/1736 cited six standards from CEN/CENELEC JTC 24 in the Official Journal on 15 July 2026: **EN 18216, 18219, 18220, 18221, 18222 and 18223**. Under ESPR Art. 41(2), conforming to a cited standard gives a presumption of conformity with the requirements it covers.
+
+Where the software stands:
+
+- **EN 18219** (unique identifiers) and **EN 18221** (data storage, archiving and persistence) have been read in full. Identifier support follows EN 18219 clause 5 on core's main branch. EN 18221's presumption covers only the technical back-up arrangement, and the node's archive support is optional today.
+- **EN 18216, 18220, 18222 and 18223** have not been read. No conformance with them is claimed.
+
+We say *aligning*, never *conformant*, until a clause-by-clause reading says otherwise, and this page will say what that reading finds, including where it disagrees with what we built.
 
 ## Read next
 
-- [What the core does](/core/overview) — the standard the passport implements.
-- [Extending it: sectors & plugins](/core/sectors) — how sector rules plug in.
-- [EU Central Registry](/regulatory/central-registry) — registration and the registry interface.
+- [Acts and standards](/regulatory/acts-and-standards): every act and standard the code relies on.
+- [What the core does](/core/overview): the model the passport implements.
+- [EU Central Registry](/regulatory/central-registry): registration and the registry interface.

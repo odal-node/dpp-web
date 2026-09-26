@@ -1,0 +1,92 @@
+---
+title: Acts and standards
+description: Every EU act and standard the Odal Node code relies on, the articles it relies on them for, and what the software does with each.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+This is the reference behind the website's [regulations page](https://odal-node.io/regulations): every EU act and standard the code cites, grouped by what the software does with it, with the articles it relies on.
+
+<Aside type="note" title="How this list was made">
+Built on 2026-09-26 by searching `dpp-core` main and `dpp-engine` v0.14.0 for every act and standard cited in source, schemas and rules, and keeping only those the code acts on. Acts cited only for background are listed separately at the end. It is not legal advice, and it is not a list of everything that applies to a product.
+</Aside>
+
+## Acts that create or displace a passport
+
+These are records in the core library's instrument catalog, and the website's regulations page is generated from them, with dates and where each date comes from.
+
+| Act | Passport provision the catalog rests on |
+|---|---|
+| Batteries Regulation (EU) 2023/1542 | Art. 77(1), from 18 February 2027; access by Art. 77(2) and Annex XIII |
+| Ecodesign for Sustainable Products Regulation (EU) 2024/1781 | Art. 9(1), dated act by act through delegated acts; access by Art. 11(b) |
+| Construction Products Regulation (EU) 2024/3110 | Art. 22(7): 18 months after the Art. 75(1) delegated act, not yet adopted |
+| Detergents Regulation (EU) 2026/405 | Art. 21(1), applying from 23 September 2029 (Art. 37); transition in Art. 36(2) |
+| Toy Safety Regulation (EU) 2025/2509 | Art. 19(1), applying from 1 August 2030 (Art. 59) |
+| End-of-Life Vehicles Regulation (EU) 2026/1738 | Art. 13(1): a vehicle passport from 1 September 2032 |
+| Delegated Regulation (EU) 2026/296 and Implementing Regulation (EU) 2026/2 | No passport: the unsold-goods destruction derogations and disclosure format |
+| Regulations (EU) 2023/1670 and 2023/1669 | No passport: product information goes to EPREL |
+| Packaging and Packaging Waste Regulation (EU) 2025/40 | No passport: a shared data carrier only |
+
+## Acts the software applies
+
+### Signing and seals
+
+| Act | Relied on for | What the code does |
+|---|---|---|
+| eIDAS, Regulation (EU) No 910/2014 as amended | Art. 3(27) qualified seal; Art. 22 trusted lists; Art. 32 applied to seals by Art. 40; Art. 42 qualified time stamps | Seals passports through a qualified trust service provider and reports whether a seal carries legal effect; without a legal person behind the node, every seal says it carries none |
+| Implementing Regulation (EU) 2026/248 | Annex I reference formats; Annex II formats lawful until February 2028 | Makes seals in CAdES (ETSI EN 319 122-1); JAdES headers carry the certificate chain (`x5c`) |
+| Implementing Regulation (EU) 2025/1945 | Validation of qualified seals, including revocation freshness | The seal audit reports in ETSI EN 319 102-1 terms, and treats "cannot be read" as its own result, not a failure |
+| Implementing Decision (EU) 2015/1505, as amended by (EU) 2025/2164 | Annex I trusted-list signature profile | Reads and verifies the EU trusted lists to check who issued a seal's certificate |
+
+### The EU registry and standards
+
+| Act | Relied on for | What the code does |
+|---|---|---|
+| Implementing Regulation (EU) 2026/1778 | Art. 8(3) granularity; Art. 8(7)(c)–(d) fields the registry checks; Art. 9(2)(a) proof of registration; commodity codes | Models registration and the identifiers the registry checks; the live connection waits on a legal person |
+| Implementing Decision (EU) 2026/1736, with ESPR Art. 41(2) | The six harmonised passport standards and their presumption of conformity | Identifier schemes follow EN 18219 on core's main branch; see [Standards & interoperability](/core/standards) |
+
+### Who answers for a product
+
+| Act | Relied on for | What the code does |
+|---|---|---|
+| Market Surveillance Regulation (EU) 2019/1020 | Art. 4(4) operator contact details; Art. 4(5) product scope | Records the responsible economic operator in the EU and the basis they are named under, as ESPR Annex III(k) requires |
+| General Product Safety Regulation (EU) 2023/988 | Art. 15, as ESPR Annex III(k) cites it (the responsible-person provision itself is Art. 16) | An alternative basis for the same record; a third is "similar tasks pursuant to other Union law" |
+
+### Substances
+
+| Act | Relied on for | What the code does |
+|---|---|---|
+| REACH, Regulation (EC) No 1907/2006 | Art. 33(1), the 0.1 % w/w threshold | Records substances of very high concern and checks declarations against a compiled part of the candidate list (32 substances), flagging that the list is partial |
+| RoHS Directive 2011/65/EU | Annex II restricted substances | Phone and tablet passports record compliance |
+
+### Product information
+
+| Act | Relied on for | What the code does |
+|---|---|---|
+| Tyre Labelling Regulation (EU) 2020/740 | Annex I label classes; Part C noise bands against the Regulation (EC) No 661/2009 limits | Tyre passports carry fuel efficiency, wet grip and noise classes |
+| Energy Labelling Regulation (EU) 2017/1369 | Art. 12, the EPREL product database | Phone and tablet passports carry the energy class; EPREL is the system that displaces a passport for them |
+| Critical Raw Materials Act (EU) 2024/1252 | The list of critical raw materials | Battery and electronics passports list the ones a product contains |
+
+### Unsold goods and end of life
+
+| Act | Relied on for | What the code does |
+|---|---|---|
+| Combined Nomenclature, Regulation (EEC) No 2658/87 | Annex I product codes, as Implementing Regulation (EU) 2026/2 Art. 3 requires | Groups discarded products by CN code |
+| Waste Framework Directive 2008/98/EC | Art. 3(15)–(19): recovery, preparing for reuse, recycling, disposal | Treatment categories in the unsold-goods disclosure; a product's waste status at end of life |
+| Company Law Directive (EU) 2017/1132 | The European unique identifier (EUID) | Identifies the undertaking in the unsold-goods disclosure |
+
+## Cited for background, not applied
+
+- **Carbon Border Adjustment Mechanism, Regulation (EU) 2023/956.** The steel and aluminium checks use reference carbon values as warnings only. CBAM sets no per-product limit a passport is checked against.
+- **Accounting Directive 2013/34/EU, Arts. 19a and 29a.** Implementing Regulation (EU) 2026/2 Art. 2(2) lets an undertaking point its unsold-goods disclosure at its sustainability reporting instead. The software does not model that route yet.
+- **Superseded acts**, cited so the history reads correctly: Directive 2006/66/EC (batteries), Directive 2009/48/EC (toys), Regulation (EC) No 648/2004 (detergents), Regulation (EU) No 305/2011 (construction), Directive 2009/125/EC (ecodesign), Regulation (EC) No 1222/2009 (tyre labels) and Directive 1999/93/EC (electronic signatures).
+
+## Standards
+
+The standards the code relies on, and what each is used for, are on [Standards & interoperability](/core/standards).
+
+## Read next
+
+- [ESPR overview](/regulatory/espr): the framework and where each product group stands.
+- [Access control](/regulatory/access-control): who may read which part of a passport.
+- [EU Central Registry](/regulatory/central-registry): registration and its legal prerequisite.

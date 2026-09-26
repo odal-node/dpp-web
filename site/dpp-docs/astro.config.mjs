@@ -95,6 +95,7 @@ export default defineConfig({
             // collection. Restore this entry with the page, not before it.
             { label: 'Access Control', link: '/regulatory/access-control' },
             { label: 'EU Central Registry', link: '/regulatory/central-registry' },
+            { label: 'Acts and standards', link: '/regulatory/acts-and-standards' },
           ],
         },
         {
