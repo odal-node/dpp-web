@@ -108,6 +108,25 @@ An **August 2026 audit** of both sites read every published page against primary
 
 What remains before public launch: a manual screen-reader and keyboard pass (the automated axe check is done, and the landing's accessibility page says what it covered), a runtime check that the API reference does not relay requests through a third-party proxy, and a named data controller in the privacy policy — which is blocked on a registered entity existing, not on a copy edit.
 
+## Rate limit on /verify
+
+/verify checks files in the browser, so there is no server of ours to limit. The limit is a
+Cloudflare rate-limiting rule on the `odal-node.io` zone: paths starting with `/verify`, 20
+requests per 10 seconds per IP address, then 429 for 10 seconds. That is the most the Free plan
+allows, and well above one person's use (a visit is the page plus at most five example files).
+It covers the custom domain only; `*.pages.dev` previews are not in the zone.
+
+The zone is not managed as code elsewhere, so `scripts/cloudflare-rate-limit.mjs` is the rule's
+source of truth. It replaces only its own rule and keeps any other:
+
+```bash
+# Dry run: prints the ruleset it would write. The token needs "Zone WAF: Edit".
+CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ZONE_ID=… pnpm run rate-limit:verify
+
+# Write it
+CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ZONE_ID=… pnpm run rate-limit:verify -- --apply
+```
+
 ## How changes land
 
 `main` is what Cloudflare Pages publishes, so nothing lands on it directly.

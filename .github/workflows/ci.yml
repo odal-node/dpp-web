@@ -93,6 +93,12 @@ jobs:
       - name: llms.txt points only at pages that were built
         run: pnpm run check:llms
 
+      # The /verify rate limit is a Cloudflare zone rule written by a script,
+      # not by a deploy. This holds the rule inside the Free plan's limits and
+      # proves a write keeps every rule it does not own.
+      - name: Test the rate-limit script
+        run: pnpm run test:scripts
+
       # The product-group and regulation pages are generated from data vendored
       # out of dpp-core. This fails if a vendored copy no longer matches the
       # commit recorded in core-source.json, so a page cannot describe a product
