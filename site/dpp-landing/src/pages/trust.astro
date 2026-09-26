@@ -14,7 +14,7 @@ const description =
 const guarantees = [
   {
     title: "Raw inputs are discarded",
-    body: "The node keeps the signed passport and discards the import file it came from. No setting keeps the raw import after validation.",
+    body: "The node discards the import file once the passport is signed. It keeps the signed passport and a record of what the import found in each row. No setting keeps the file itself.",
   },
   {
     title: "We cannot reach your node",
@@ -32,9 +32,10 @@ const guarantees = [
     <p>
       Odal Node is built on a proof-bound architecture: the manufacturer's raw
       production data is validated and signed locally, on infrastructure the
-      manufacturer controls, then discarded. Only the signed proof is stored
-      and served. This is a property of the software, not a policy promise: it
-      holds regardless of who operates the node.
+      manufacturer controls, and the import file is then discarded. What is
+      stored and served is the signed passport. This is a property of the
+      software, not a policy promise: it holds regardless of who operates the
+      node.
     </p>
   </Section>
 
@@ -77,9 +78,9 @@ const guarantees = [
         tied to an identity on a web domain you control.
       </li>
       <li>
-        <strong>Publish.</strong> Only the signed passport becomes publicly
-        readable, through its QR code and GS1 Digital Link. The raw input is
-        discarded.
+        <strong>Publish.</strong> The signed passport's public part becomes
+        readable through its QR code and GS1 Digital Link; other parts are
+        shown only to readers with a credential. The import file is discarded.
       </li>
       <li>
         <strong>Verify.</strong> Any consumer, authority or recycler checks the
