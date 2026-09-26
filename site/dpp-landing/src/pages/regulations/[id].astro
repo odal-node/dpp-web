@@ -44,7 +44,7 @@ const description = `${kindLabel(act)}: ${passport.label.toLowerCase()}. What it
 ---
 
 <Base title={title} description={description}>
-  <Section eyebrow={kindLabel(act)} title={name} wide>
+  <Section h1 eyebrow={kindLabel(act)} title={name} wide>
     <!-- The facts vary per act (three or four). An odd last fact spans the row,
          so the grid never shows an empty cell. -->
     <dl class="not-prose m-0 grid gap-px overflow-hidden rounded-xl border border-neutral-200 bg-neutral-200 sm:grid-cols-2 sm:[&>div:last-child:nth-child(odd)]:col-span-2">

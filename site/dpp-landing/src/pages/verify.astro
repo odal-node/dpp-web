@@ -27,7 +27,7 @@ const examples = [
 ---
 
 <Base title={title} description={description}>
-  <Section eyebrow="Verify" title="Check a passport's proof file yourself." wide>
+  <Section h1 eyebrow="Verify" title="Check a passport's proof file yourself." wide>
     <p>
       A proof file holds a passport, its signatures, its full history and every
       handover of responsibility. Drop one here and your browser checks it
@@ -71,7 +71,7 @@ const examples = [
         </details>
       </div>
 
-      <aside class="rounded-xl bg-primary-900 p-5 text-primary-200">
+      <div class="rounded-xl bg-primary-900 p-5 text-primary-200">
         <p class="m-0 text-xs font-semibold uppercase tracking-widest text-primary-300">No file to hand?</p>
         <p class="m-0 mt-2 text-sm">Try one of these. The tampered ones were each changed after signing.</p>
         <ul class="m-0 mt-4 list-none space-y-2 p-0">
@@ -87,7 +87,7 @@ const examples = [
             </li>
           ))}
         </ul>
-      </aside>
+      </div>
     </div>
 
     <div id="result" class="not-prose mt-10" aria-live="polite"></div>

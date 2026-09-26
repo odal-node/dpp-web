@@ -20,7 +20,7 @@ const thisYear = todayIso.slice(0, 4);
 ---
 
 <Base title={title} description={description}>
-  <Section eyebrow="Timeline" title="When passports arrive, year by year." wide>
+  <Section h1 eyebrow="Timeline" title="When passports arrive, year by year." wide>
     <p>
       Batteries come first, in February 2027. Detergents, toys and vehicles
       follow on dates their own laws set, and the Commission plans acts for more
@@ -57,8 +57,11 @@ const thisYear = todayIso.slice(0, 4);
                   <li
                     class:list={[
                       "m-0 rounded-md border p-5",
-                      e.mark === "plan" ? "border-dashed border-primary-300 bg-transparent" : "border-neutral-200 bg-white",
-                      e.past && "opacity-80",
+                      e.mark === "plan"
+                        ? "border-dashed border-primary-300 bg-transparent"
+                        : e.past
+                          ? "border-neutral-200 bg-neutral-50"
+                          : "border-neutral-200 bg-white",
                     ]}
                   >
                     <p class="m-0 text-sm font-semibold uppercase tracking-wide text-regulatory-text">

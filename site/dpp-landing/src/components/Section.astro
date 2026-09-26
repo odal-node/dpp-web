@@ -16,8 +16,11 @@ interface Props {
   tone?: "default" | "muted" | "tinted";
   /** Widen the inner container for grid-heavy sections. */
   wide?: boolean;
+  /** The page's opening section: its title is the page's one h1. */
+  h1?: boolean;
 }
-const { eyebrow, title, id, tone = "default", wide = false } = Astro.props;
+const { eyebrow, title, id, tone = "default", wide = false, h1 = false } = Astro.props;
+const Heading = h1 ? "h1" : "h2";
 const bg =
   tone === "muted" ? "bg-neutral-50" : tone === "tinted" ? "bg-primary-50" : "bg-transparent";
 const width = wide ? "max-w-6xl" : "max-w-5xl";
@@ -37,9 +40,9 @@ const headingId = id ? `${id}-title` : undefined;
         {eyebrow}
       </p>
     )}
-    <h2 id={headingId} class="mb-6 max-w-3xl text-3xl font-bold text-neutral-900 md:text-4xl">
+    <Heading id={headingId} class="mb-6 max-w-3xl text-3xl font-bold text-neutral-900 md:text-4xl">
       {title}
-    </h2>
+    </Heading>
     <div class="prose prose-neutral max-w-none leading-body">
       <slot />
     </div>

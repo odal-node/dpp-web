@@ -19,7 +19,7 @@ const afterSale = stations.stations.filter((s) => s.n >= 6);
 ---
 
 <Base title={title} description={description}>
-  <Section eyebrow="Lifecycle" title="A passport is not a document. It is a record with a life." wide>
+  <Section h1 eyebrow="Lifecycle" title="A passport is not a document. It is a record with a life." wide>
     <p>
       Most descriptions of a product passport stop at publication: import,
       check, sign, publish. That is the first half. A product is then repaired,
@@ -37,7 +37,7 @@ const afterSale = stations.stations.filter((s) => s.n >= 6);
       {stations.stations.map((s) => (
         <article id={s.key} class={`card p-6 ${s.n >= 6 ? "card-emphasis" : ""}`}>
           <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <span class="font-mono text-sm text-neutral-400">
+            <span class="font-mono text-sm text-neutral-500">
               {String(s.n).padStart(2, "0")}
             </span>
             <h3 class="text-xl font-bold text-neutral-900">{s.title}</h3>

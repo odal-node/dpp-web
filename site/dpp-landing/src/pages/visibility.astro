@@ -28,7 +28,7 @@ const description =
 ---
 
 <Base title={title} description={description}>
-  <Section
+  <Section h1
     eyebrow="Visibility"
     title="Each reader sees the part the law gives them."
     wide
@@ -79,11 +79,11 @@ const description =
           <li
             data-point={p.id}
             data-visible={shown ? "true" : "false"}
-            class:list={["point", "card", "p-5", { "opacity-40": !shown }]}
+            class:list={["point", "card", "p-5", { "withheld": !shown }]}
           >
             <div class="flex items-start justify-between gap-4">
-              <h3 class="text-base font-semibold text-neutral-900">{p.title}</h3>
-              <span class:list={["state shrink-0 rounded px-2 py-1 text-xs font-semibold", shown ? "bg-primary-100 text-primary-800" : "bg-neutral-100 text-neutral-500"]}>
+              <h2 class="text-base font-semibold text-neutral-900">{p.title}</h2>
+              <span class:list={["state shrink-0 rounded px-2 py-1 text-xs font-semibold", shown ? "bg-primary-100 text-primary-800" : "bg-neutral-100 text-neutral-700"]}>
                 {shown ? "Visible" : "Withheld"}
               </span>
             </div>
@@ -175,6 +175,15 @@ const description =
   </Section>
 </Base>
 
+<style>
+  /* A part this reader may not see. Marked by the card, not by fading its
+     text: faded text fell below the contrast a reader needs to read it. */
+  .point.withheld {
+    border-style: dashed;
+    background: var(--color-neutral-50);
+  }
+</style>
+
 <script>
   // Each audience button carries what it may see (data-sees) and its legal
   // basis (data-basis), so the script needs no data of its own.
@@ -183,7 +192,7 @@ const description =
   const basisEl = document.getElementById("basis");
 
   const SHOWN = ["bg-primary-100", "text-primary-800"];
-  const HIDDEN = ["bg-neutral-100", "text-neutral-500"];
+  const HIDDEN = ["bg-neutral-100", "text-neutral-700"];
 
   function apply(active: HTMLButtonElement) {
     const visible = new Set((active.dataset.sees ?? "").split(","));
@@ -192,7 +201,7 @@ const description =
 
     for (const p of points) {
       const shown = visible.has(p.dataset.point ?? "");
-      p.classList.toggle("opacity-40", !shown);
+      p.classList.toggle("withheld", !shown);
       p.dataset.visible = String(shown);
       const state = p.querySelector(".state");
       if (state) {

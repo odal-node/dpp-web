@@ -67,7 +67,7 @@ const description = isUnsold
 ---
 
 <Base title={title} description={description}>
-  <Section eyebrow={isUnsold ? "Also covered" : "Product group"} title={group.name} wide>
+  <Section h1 eyebrow={isUnsold ? "Also covered" : "Product group"} title={group.name} wide>
     <div class="not-prose mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-primary-50 text-primary-700 ring-1 ring-primary-100">
       <ProductGroupIcon group={group.key} class="h-7 w-7" />
     </div>

@@ -31,6 +31,7 @@ const pages: Card[] = [
   { path: "/faq", eyebrow: "FAQ", title: "Questions people ask first.", line: "Which products need a passport, where your data lives and who can read it." },
   { path: "/glossary", eyebrow: "Glossary", title: "The words around a passport, explained.", line: "Product groups, delegated acts, legitimate interest, seals and more." },
   { path: "/security", eyebrow: "Security", title: "Report a security issue privately.", line: "How we respond, and how passports and signing keys are protected." },
+  { path: "/accessibility", eyebrow: "Accessibility", title: "This site should work for everyone who needs it.", line: "How it was checked, what was fixed, and what has not been tested yet." },
   { path: "/privacy", eyebrow: "Privacy policy", title: "No cookies, no analytics, no trackers.", line: "What this website's host sees, and what you can ask of us." },
   { path: "/waitlist", eyebrow: "Waitlist", title: "Get ready for your products' passports.", line: "Tell us what you make, and hear when your product group is ready." },
   { path: "/repairers-and-recyclers", eyebrow: "For repairers and recyclers", title: "The parts of a passport made for your work.", line: "What you can read, and how to get the credential that opens it." },
