@@ -54,10 +54,19 @@ export default defineConfig({
       ],
       favicon: '/favicon.svg',
       head: [
-        { tag: 'meta', attrs: { property: 'og:image', content: 'https://docs.odal-node.io/favicon.svg' } },
-        { tag: 'meta', attrs: { property: 'og:image:width', content: '400' } },
-        { tag: 'meta', attrs: { property: 'og:image:height', content: '400' } },
-        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://docs.odal-node.io/favicon.svg' } },
+        // 🚨 These pointed at `favicon.svg`, declared 400x400, and the result
+        // was that every share of a docs URL rendered with no image at all.
+        // Two independent reasons: Slack, LinkedIn and X do not reliably
+        // render an SVG `og:image`, and 400x400 is not the aspect ratio an
+        // unfurler expects. `og-image.png` is the landing site's card, reused
+        // — one brand, one preview — at the conventional 1200x630.
+        { tag: 'meta', attrs: { property: 'og:image', content: 'https://docs.odal-node.io/og-image.png' } },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://docs.odal-node.io/og-image.png' } },
+        // Without this, X renders the small square card whatever the image is.
+        // The landing layout already sets it; this site set no card type at all.
+        { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
       ],
       sidebar,
       customCss: ['./src/styles/custom.css'],
