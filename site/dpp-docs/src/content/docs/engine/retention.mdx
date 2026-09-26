@@ -11,7 +11,7 @@ Retention has two directions that are easy to conflate, so state them plainly: t
 
 ## Publishing locks a passport
 
-The moment a passport is published, a retention lock is set on it — and it is never cleared. A locked passport can still change *state*: it can be suspended during a recall, or archived at end-of-life. But its *content* can no longer be edited. Only a draft is mutable; once a passport becomes a signed, published proof, it is fixed.
+The moment a passport is published, a retention lock is set on it — and it is never cleared. A locked passport can still change *state*: it can be suspended during a recall, or retired once its retention period has run. But its *content* can no longer be edited. Only a draft is mutable; once a passport becomes a signed, published proof, it is fixed.
 
 ## There is no delete
 
@@ -19,11 +19,17 @@ The node's storage interface has no delete operation at all. This is a structura
 
 ## History is append-only
 
-Every transition — created, published, suspended, archived — is written to an audit trail as it happens. Entries are only ever added; they are never rewritten or deleted. A passport's provenance can therefore be examined years later and trusted to reflect what actually occurred, in the order it occurred.
+Every transition — created, published, suspended, retired — is written to an audit trail as it happens. Entries are only ever added; they are never rewritten or deleted. A passport's provenance can therefore be examined years later and trusted to reflect what actually occurred, in the order it occurred.
 
-## Archival is a state, not an ending
+## Retirement is a state, not an ending
 
-When a product reaches end-of-life, its passport moves to *archived* — read-only, but still resolvable. The regulation's record-keeping window outlives the product itself, and archival keeps the passport readable for that entire window instead of removing it. End-of-life is a lifecycle state, never a deletion.
+Once the record-keeping window has run, a passport moves to *retired* — read-only, but still resolvable. The regulation's window outlives the product itself, and retirement keeps the passport readable instead of removing it. It is a lifecycle state, never a deletion.
+
+## Archiving is a different thing, and it runs the whole time
+
+*Retired* is where a passport's publication life ends. *Archiving* is what happens to a passport that is still very much alive: every time its content changes, the version it replaces is kept, whole, for as long as the passport exists. Anyone entitled to read the current passport can ask what it said at an earlier moment and get that version back, under the same access rules.
+
+This is EN 18221:2026 clause 4.2, one of the six standards the Commission cited in Implementing Decision (EU) 2026/1736. The two words were once the same word here, which made the difference easy to miss: a system can retire records faithfully and still keep no history at all. Odal does both, and calls them by different names so nobody has to guess which one they are looking at.
 
 ## The address stays stable
 
