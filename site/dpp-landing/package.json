@@ -27,6 +27,6 @@
     "fontkitten": "^1.0.3",
     "sharp": "^0.35.4",
     "typescript": "^5",
-    "vite-plugin-static-copy": "^4.1.0"
+    "vite-plugin-static-copy": "^4.1.1"
   }
 }
