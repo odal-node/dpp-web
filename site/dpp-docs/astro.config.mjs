@@ -8,7 +8,9 @@ export default defineConfig({
     // Design pages removed; redirect to the closest living equivalent.
     '/design/no-touch-data': '/getting-started/what-odal-can-and-cannot-see',
     '/design/proof-bound': '/getting-started/what-odal-can-and-cannot-see',
-    '/design/open-core': '/engine/licensing',
+    '/design/open-core': '/getting-started/licensing',
+    // Licensing covers core and node alike, so it sits with the orientation pages.
+    '/engine/licensing': '/getting-started/licensing',
     '/design/adr': '/core-concepts',
     '/design/why-no-capability-gating': '/core-concepts',
     // Core consolidated from per-crate/type pages into three concept pages.
@@ -56,6 +58,7 @@ export default defineConfig({
             { label: 'Quick Start', link: '/quick-start' },
             { label: 'Core Concepts', link: '/core-concepts' },
             { label: 'What Odal can and cannot see', link: '/getting-started/what-odal-can-and-cannot-see' },
+            { label: 'Licensing', link: '/getting-started/licensing' },
           ],
         },
         {
@@ -78,7 +81,6 @@ export default defineConfig({
             { label: 'Operating securely', link: '/engine/security' },
             { label: 'Self-Hosting', link: '/engine/self-hosted' },
             { label: 'The CLI', link: '/engine/cli' },
-            { label: 'Licensing', link: '/engine/licensing' },
           ],
         },
         {
