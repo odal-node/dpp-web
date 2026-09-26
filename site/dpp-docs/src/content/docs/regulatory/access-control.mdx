@@ -55,7 +55,7 @@ Durable artefacts — stored signatures, audit records — are keyed by the **di
 
 The natural alternative — issuing API keys to recyclers and authorities — fails on three counts. API keys are bearer secrets that get reused, leaked or sold. They carry no verifiable identity assertion: possession is proof of access, not proof of who holds it. And they bind to a single issuer's authentication system, so every regulator would have to integrate with every platform separately.
 
-Verifiable Credentials address all three. They are non-bearer, they carry a signed issuer assertion, and any platform that can verify them can accept them.
+Verifiable Credentials answer the second and third: they carry a signed issuer assertion, and any platform that can verify them can accept them. The first is not answered yet. The node accepts a credential on its own, without proof that the presenter is its holder, so a copied credential works until it expires or is revoked. That is one reason credentials a node issues itself are capped at 90 days.
 
 This is also where the regulation is heading. ESPR Article 11 empowers the Commission to adopt implementing acts on procedures to issue and verify "the digital credentials of economic operators and other relevant actors that have access rights", and the toy and detergent regulations both defer their credential procedures to that same provision. Those implementing acts are not yet adopted, so no conformance claim is available — but the direction is legislated rather than speculative.
 
