@@ -1,17 +1,17 @@
 {
-  "_comment": "Example data for /example-passport: a fictional EV battery from the engine demo set, copied unchanged from odal-node/dpp-engine ops/demo/passports/04-battery-ev-nmc.json at v0.14.0 (5e43ab6). Voltex Battery GmbH is invented. This is the body a company submits before signing, not a signed passport; the page says so. Refresh it from the engine rather than editing it here.",
+  "_comment": "Example data for /example-passport: a fictional EV battery from the engine demo set, copied from odal-node/dpp-engine ops/demo/passports/04-battery-ev-nmc.json at v0.14.0 (5e43ab6) with one change: the engine demo's company name is also a real company's, so the company, its product name and its domain are renamed here to Musterzelle GmbH, musterzelle.example (invented; \"Muster\" is the German word for a sample). Everything else is unchanged. This is the body a company submits before signing, not a signed passport; the page says so. Refresh it from the engine and re-apply the rename, rather than editing it here.",
   "source": {
     "repository": "odal-node/dpp-engine",
     "path": "ops/demo/passports/04-battery-ev-nmc.json",
     "commit": "5e43ab60a716ccabcb57cb7e55c8a3922d45fcaa"
   },
   "passport": {
-    "productName": "Voltex EV Traction Battery 75 kWh",
+    "productName": "Musterzelle EV Traction Battery 75 kWh",
     "batchId": "VBX-EV-2026-0421",
     "manufacturer": {
-      "name": "Voltex Battery GmbH",
+      "name": "Musterzelle GmbH",
       "address": "Werkstrasse 5, 85055 Ingolstadt, DE",
-      "didWebUrl": "https://voltex.example/.well-known/did.json"
+      "didWebUrl": "https://musterzelle.example/.well-known/did.json"
     },
     "placedOnMarketDate": "2026-07-01",
     "commodityCode": "85076000",
@@ -183,13 +183,13 @@
         "VBX-BMS-MASTER-V4",
         "VBX-PACK-HV-75"
       ],
-      "sparePartsContacts": "hv-service@voltex.example; +49 841 5550 400 (certified HV workshops only)",
-      "disassemblyInstructionsUrl": "https://voltex.example/service/ev75/disassembly",
+      "sparePartsContacts": "hv-service@musterzelle.example; +49 841 5550 400 (certified HV workshops only)",
+      "disassemblyInstructionsUrl": "https://musterzelle.example/service/ev75/disassembly",
       "safetyMeasures": "High-voltage (>60 V DC). HV-qualified personnel only. Service disconnect plug removed and locked out. Insulated PPE class 00.",
       "testReportResults": "IEC 62660-2:2018 pass; ISO 6469-1:2019 pass; UN 38.3 pass; report VBX-TR-2026-0507",
       "markingInformation": "Separate-collection symbol per Art. 13(4); capacity 75 kWh; HV warning label",
       "euDeclarationOfConformity": "EU-DoC VBX-2026-EV-0142 dated 2026-05-18, per Regulation (EU) 2023/1542 Art. 18",
-      "wasteBatteryInformation": "EV battery - handled by the vehicle manufacturer take-back scheme. Do not open or discharge. Contact hv-service@voltex.example. Producer registration DE-BATT-00981.",
+      "wasteBatteryInformation": "EV battery - handled by the vehicle manufacturer take-back scheme. Do not open or discharge. Contact hv-service@musterzelle.example. Producer registration DE-BATT-00981.",
       "batteryStatus": "original",
       "dynamicPerformance": {
         "ratedCapacityAh": 209,
