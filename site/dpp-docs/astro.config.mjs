@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { sidebar } from './src/sidebar.mjs';
 
 export default defineConfig({
   site: 'https://docs.odal-node.io',
@@ -31,6 +32,14 @@ export default defineConfig({
     '/engine/resolver': '/engine/architecture',
     '/engine/integrator': '/engine/architecture',
   },
+  vite: {
+    // The API reference imports Scalar only on /api. Left to discovery, the dev
+    // server found Scalar's dependencies on the first visit, re-bundled them
+    // mid-load and answered the page's own requests with "504 Outdated
+    // Optimize Dep", so /api rendered blank until a restart. Bundling it at
+    // startup removes the late discovery. Production builds are unaffected.
+    optimizeDeps: { include: ['@scalar/api-reference'] },
+  },
   integrations: [
     starlight({
       title: 'Odal Node',
@@ -50,84 +59,7 @@ export default defineConfig({
         { tag: 'meta', attrs: { property: 'og:image:height', content: '400' } },
         { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://docs.odal-node.io/favicon.svg' } },
       ],
-      sidebar: [
-        {
-          label: 'Getting Started',
-          items: [
-            { label: 'Introduction', link: '/introduction' },
-            { label: 'Quick Start', link: '/quick-start' },
-            { label: 'Core Concepts', link: '/core-concepts' },
-            { label: 'What Odal can and cannot see', link: '/getting-started/what-odal-can-and-cannot-see' },
-            { label: 'Licensing', link: '/getting-started/licensing' },
-          ],
-        },
-        {
-          label: 'The Core',
-          collapsed: true,
-          items: [
-            { label: 'What the core does', link: '/core/overview' },
-            // { label: 'Verify a passport yourself', link: '/core/verify' },
-            { label: 'Standards & interoperability', link: '/core/standards' },
-            { label: 'Security & cryptography', link: '/core/security' },
-            { label: 'Product groups & plugins', link: '/core/sectors' },
-          ],
-        },
-        {
-          label: 'The Engine',
-          collapsed: true,
-          items: [
-            { label: 'How the node works', link: '/engine/architecture' },
-            { label: 'Permanence & retention', link: '/engine/retention' },
-            { label: 'Operating securely', link: '/engine/security' },
-            { label: 'Self-Hosting', link: '/engine/self-hosted' },
-            { label: 'Production deployment', link: '/engine/deployment' },
-            { label: 'Configuration reference', link: '/engine/configuration' },
-            { label: 'Backup, restore & key custody', link: '/engine/backup' },
-            { label: 'Upgrading', link: '/engine/upgrading' },
-            { label: 'The CLI', link: '/engine/cli' },
-          ],
-        },
-        {
-          label: 'Using the node',
-          collapsed: true,
-          items: [
-            { label: 'Importing product data', link: '/guides/import' },
-            { label: "A passport's lifecycle", link: '/guides/lifecycle' },
-            { label: 'Handing over responsibility', link: '/guides/transfer' },
-            { label: 'Proof files and verification', link: '/guides/verification' },
-            { label: 'Access credentials', link: '/guides/credentials' },
-            { label: 'Your operator identity', link: '/guides/operator-identity' },
-            { label: 'Integrations and statistics', link: '/guides/integrations' },
-            { label: 'Electronic seals', link: '/guides/seals' },
-            { label: 'The unsold-goods disclosure', link: '/guides/unsold-goods' },
-            { label: 'Webhook events', link: '/guides/webhook-events' },
-            { label: 'Error reference', link: '/guides/errors' },
-            { label: 'Troubleshooting', link: '/guides/troubleshooting' },
-          ],
-        },
-        {
-          label: 'Regulatory Context',
-          collapsed: true,
-          items: [
-            { label: 'ESPR Overview', link: '/regulatory/espr' },
-            { label: 'Battery DPP', link: '/regulatory/battery' },
-            { label: 'Textile DPP', link: '/regulatory/textile' },
-            { label: 'Toy DPP', link: '/regulatory/toys' },
-            { label: 'Detergent DPP', link: '/regulatory/detergents' },
-            { label: 'Construction product DPP', link: '/regulatory/construction' },
-            { label: 'Vehicle passport', link: '/regulatory/vehicles' },
-            { label: 'Phones and tablets', link: '/regulatory/phones' },
-            { label: 'Access Control', link: '/regulatory/access-control' },
-            { label: 'EU Central Registry', link: '/regulatory/central-registry' },
-            { label: 'Acts and standards', link: '/regulatory/acts-and-standards' },
-          ],
-        },
-        {
-          label: 'API Reference',
-          link: '/api',
-          badge: { text: 'OpenAPI', variant: 'note' },
-        },
-      ],
+      sidebar,
       customCss: ['./src/styles/custom.css'],
     }),
   ],
