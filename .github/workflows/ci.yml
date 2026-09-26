@@ -87,6 +87,12 @@ jobs:
       - name: Check inline spacing
         run: pnpm run check:spacing
 
+      # Each site's llms.txt is generated from its page lists, and nothing else
+      # parses it: it is plain text, so the link checker never reaches it. This
+      # holds every on-site URL in the built file to a page or file in dist/.
+      - name: llms.txt points only at pages that were built
+        run: pnpm run check:llms
+
       # The product-group and regulation pages are generated from data vendored
       # out of dpp-core. This fails if a vendored copy no longer matches the
       # commit recorded in core-source.json, so a page cannot describe a product

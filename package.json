@@ -22,6 +22,7 @@
     "sync:openapi": "pnpm --filter dpp-docs run sync:openapi",
     "preview:landing": "pnpm --filter dpp-landing preview",
     "preview:docs": "pnpm --filter dpp-docs preview",
-    "clean": "pnpm -r exec rm -rf dist .astro node_modules && rm -rf node_modules"
+    "clean": "pnpm -r exec rm -rf dist .astro node_modules && rm -rf node_modules",
+    "check:llms": "node scripts/check-llms-txt.mjs site/dpp-landing https://odal-node.io && node scripts/check-llms-txt.mjs site/dpp-docs https://docs.odal-node.io"
   }
 }

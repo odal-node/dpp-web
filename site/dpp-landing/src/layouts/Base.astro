@@ -27,6 +27,7 @@ const ogImage = new URL(share.src, Astro.site).toString();
 const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": "https://odal-node.io/#organization",
   name: "Odal Node",
   url: "https://odal-node.io",
   logo: new URL("/favicon.svg", Astro.site).toString(),
@@ -40,6 +41,41 @@ const websiteLd = {
   "@type": "WebSite",
   name: "Odal Node",
   url: "https://odal-node.io",
+};
+
+// What the project actually is. `Organization` says who publishes the site and
+// `WebSite` says the site exists; neither describes the software, which is the
+// thing anyone is searching for.
+//
+// `SoftwareSourceCode`, not `SoftwareApplication`: this is a library and a
+// self-hosted engine, not an installable end-user application with an operating
+// system and a price. `SoftwareApplication` would imply the second and invite
+// the "free / paid" question the licence answers differently for each half.
+const softwareLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "@id": "https://odal-node.io/#software",
+  name: "Odal Node",
+  alternateName: "Odal Node DPP infrastructure",
+  description:
+    "Open-source EU Digital Product Passport (DPP) infrastructure. Self-hosted software for issuing, signing, holding and serving the product logbooks required by the Ecodesign for Sustainable Products Regulation (ESPR) and the Battery Regulation.",
+  codeRepository: "https://github.com/odal-node/dpp-core",
+  programmingLanguage: "Rust",
+  license: "https://www.apache.org/licenses/LICENSE-2.0",
+  url: "https://odal-node.io",
+  keywords: [
+    "digital product passport",
+    "DPP",
+    "product logbook",
+    "ESPR",
+    "battery passport",
+    "open source",
+    "self-hosted",
+    "EU compliance",
+    "EN 18219",
+    "GS1 Digital Link",
+  ],
+  publisher: { "@id": "https://odal-node.io/#organization" },
 };
 ---
 
@@ -79,6 +115,7 @@ const websiteLd = {
     <!-- Structured Data -->
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(softwareLd)} />
     {jsonLd.map((block) => (
       <script is:inline type="application/ld+json" set:html={JSON.stringify(block)} />
     ))}

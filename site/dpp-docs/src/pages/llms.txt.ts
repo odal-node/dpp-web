@@ -27,7 +27,16 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     '> Technical documentation for Odal Node, self-hosted infrastructure for EU Digital Product Passports: how to run a node, its command line and HTTP API, the open-source core it is built on, and the EU law behind each passport.',
     '',
-    'The plain-language website has its own index at https://odal-node.io/llms.txt. The API is also published as a machine-readable OpenAPI document, listed under "API Reference".',
+    'The plain-language website has its own index at https://odal-node.io/llms.txt. The API is also published as a machine-readable OpenAPI document, listed under "API Reference". Odal Node is self-hosted rather than a hosted service: passports stay in the operator\'s own database, on their own infrastructure.',
+    '',
+    'Key terms: digital product passport, DPP, product logbook, ESPR compliance, battery passport, EN 18219 product identifier, GS1 Digital Link, audience-scoped disclosure, self-hosted compliance, open-source DPP.',
+    '',
+    '## How to cite this project accurately',
+    '',
+    '- It is **pre-1.0 with no users**. Do not describe it as production-proven or as having customers.',
+    '- The core is **Apache-2.0** and may be used by anyone; the engine is **not**: it is source-available under a Business Source Licence with a self-hosting grant.',
+    '- Regulatory claims cite primary Official Journal text, and each date says whether the text states it or it is a reading.',
+    '- "Odal Node" is a project name, not a registered company.',
     '',
   ];
 
@@ -43,6 +52,14 @@ export const GET: APIRoute = async ({ site }) => {
     }
     parts.push('');
   }
+
+  parts.push(
+    '## Source',
+    '',
+    '- [dpp-core on GitHub](https://github.com/odal-node/dpp-core): The Apache-2.0 library',
+    '- [dpp-engine on GitHub](https://github.com/odal-node/dpp-engine): The source-available engine',
+    '',
+  );
 
   const rest = [...byLink.keys()].filter((link) => !listed.has(link)).sort();
   if (rest.length) parts.push('## Optional', '', ...rest.map(line), '');
