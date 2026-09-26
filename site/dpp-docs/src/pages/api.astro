@@ -17,12 +17,8 @@ import '../styles/scalar-api-reference.css';
 import logoLight from '../assets/logo-light.svg';
 import logoDark from '../assets/logo-dark.svg';
 
-// Same alpha banner Starlight renders on every docs page (content.config.ts
-// schema default) and the same shared CSS (banner.css) — this page skips the
-// Starlight layout entirely so neither comes for free here. The text is
-// imported from site-meta so the two banners cannot drift apart.
-import '../styles/banner.css';
-import { ALPHA_BANNER_TEXT } from '../site-meta';
+// No alpha banner on this page, by the founder's choice (2026-09-26): the
+// reference is the contract, and the docs pages carry the notice.
 
 // Full-page OpenAPI reference, mounted client-side from the **bundled**
 // @scalar/api-reference — no CDN, no third-party runtime dependency, so the
@@ -81,11 +77,6 @@ import { ALPHA_BANNER_TEXT } from '../site-meta';
       </a>
       <div class="odal-header-right"></div>
     </header>
-    <!-- Rendered here rather than through a Scalar plugin slot: this is static
-         markup that no upgrade to the bundled reference can silently drop. An
-         earlier plugin-based attempt was disabled and left this page as the one
-         docs page carrying no alpha notice at all. -->
-    <div class="odal-banner">{ALPHA_BANNER_TEXT}</div>
     <div id="scalar-api-reference"></div>
     <script>
       import '../scripts/mount-api-reference';

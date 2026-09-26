@@ -62,20 +62,6 @@ export default defineConfig({
           ],
         },
         {
-          label: 'Using the node',
-          items: [
-            { label: 'Importing product data', link: '/guides/import' },
-            { label: "A passport's lifecycle", link: '/guides/lifecycle' },
-            { label: 'Handing over responsibility', link: '/guides/transfer' },
-            { label: 'Proof files and verification', link: '/guides/verification' },
-            { label: 'Access credentials', link: '/guides/credentials' },
-            { label: 'Your operator identity', link: '/guides/operator-identity' },
-            { label: 'Integrations and statistics', link: '/guides/integrations' },
-            { label: 'Electronic seals', link: '/guides/seals' },
-            { label: 'The unsold-goods disclosure', link: '/guides/unsold-goods' },
-          ],
-        },
-        {
           label: 'The Core',
           collapsed: true,
           items: [
@@ -95,6 +81,21 @@ export default defineConfig({
             { label: 'Operating securely', link: '/engine/security' },
             { label: 'Self-Hosting', link: '/engine/self-hosted' },
             { label: 'The CLI', link: '/engine/cli' },
+          ],
+        },
+        {
+          label: 'Using the node',
+          collapsed: true,
+          items: [
+            { label: 'Importing product data', link: '/guides/import' },
+            { label: "A passport's lifecycle", link: '/guides/lifecycle' },
+            { label: 'Handing over responsibility', link: '/guides/transfer' },
+            { label: 'Proof files and verification', link: '/guides/verification' },
+            { label: 'Access credentials', link: '/guides/credentials' },
+            { label: 'Your operator identity', link: '/guides/operator-identity' },
+            { label: 'Integrations and statistics', link: '/guides/integrations' },
+            { label: 'Electronic seals', link: '/guides/seals' },
+            { label: 'The unsold-goods disclosure', link: '/guides/unsold-goods' },
           ],
         },
         {

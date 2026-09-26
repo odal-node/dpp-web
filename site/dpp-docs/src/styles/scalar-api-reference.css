@@ -51,8 +51,6 @@
   --odal-header-border: hsl(224, 20%, 94%);
   --odal-header-title-color: var(--odal-primary-800);
 
-  /* = --sl-shadow-sm (light), used by Starlight's Banner.astro */
-  --odal-banner-shadow: 0px 1px 1px rgba(0, 0, 0, 0.06), 0px 2px 1px rgba(0, 0, 0, 0.06);
 
   /* Sidebar text (light mode): every entry is black, including group
      headers (those render with -color-2, Scalar's secondary sidebar text
@@ -86,8 +84,6 @@
   --odal-header-border: hsl(224, 10%, 10%);
   --odal-header-title-color: var(--odal-primary-300);
 
-  /* = --sl-shadow-sm (dark), used by Starlight's Banner.astro */
-  --odal-banner-shadow: 0px 1px 1px rgba(0, 0, 0, 0.12), 0px 2px 1px rgba(0, 0, 0, 0.24);
 
   /* Sidebar text (dark mode): every entry is white, including group headers
      (those render with -color-2, Scalar's secondary sidebar text token, not
@@ -116,11 +112,8 @@
  */
 /*
  * Scalar's "Developer Tools / Configure / Share / Deploy" promo toolbar has
- * no config switch in the bundled version, and it stacked a third bar under
- * our header + alpha banner. Hiding it keeps the page to the same two-bar
- * chrome as every Starlight docs page — and lets the alpha banner be a plain
- * static element in api.astro instead of a MutationObserver injecting into
- * Scalar's Vue tree (the previous approach, deleted with this rule).
+ * no config switch in the bundled version, and it stacked an extra bar under
+ * our header. Hiding it keeps the page's chrome to our own header.
  */
 .narrow-references-container > .api-reference-toolbar {
   display: none;
