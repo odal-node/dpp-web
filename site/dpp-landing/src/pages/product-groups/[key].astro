@@ -74,10 +74,11 @@ const description = isUnsold
     <p class="text-lg text-neutral-800">{group.line}.</p>
     {isUnsold ? (
       <p>
-        This is not a product group, and it carries no passport. Companies
-        that discard unsold consumer products must publish, each year, how
-        many they discarded, why, and what happened to them; the smallest
-        companies are exempt. Odal Node records that disclosure line by line,
+        This is not a product group, and it carries no passport. Large
+        companies that discard unsold consumer products must publish, each
+        year, how many they discarded, why, and what happened to them.
+        Medium-sized companies join later, and micro and small companies are
+        exempt. Odal Node records that disclosure line by line,
         per type of product, reason and destination, for the company rather
         than for any single product.
       </p>
@@ -112,10 +113,9 @@ const description = isUnsold
         <>
           <p>
             <strong>Everything in this passport is public for now.</strong>{" "}
-            That is not an oversight. Who may see which part of a passport is
-            set by each product group's own rules, and the software models no
-            such split for {group.name.toLowerCase()} yet. Inventing one would
-            mean asserting a rule nobody has written.
+            Who may see which part of a passport is set by each product group's
+            own rules, and the software models no such split for{" "}
+            {group.name.toLowerCase()} yet.
           </p>
         </>
       ) : (
