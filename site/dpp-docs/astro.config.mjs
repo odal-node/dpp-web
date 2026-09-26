@@ -100,6 +100,9 @@ export default defineConfig({
             { label: 'Integrations and statistics', link: '/guides/integrations' },
             { label: 'Electronic seals', link: '/guides/seals' },
             { label: 'The unsold-goods disclosure', link: '/guides/unsold-goods' },
+            { label: 'Webhook events', link: '/guides/webhook-events' },
+            { label: 'Error reference', link: '/guides/errors' },
+            { label: 'Troubleshooting', link: '/guides/troubleshooting' },
           ],
         },
         {
@@ -109,9 +112,11 @@ export default defineConfig({
             { label: 'ESPR Overview', link: '/regulatory/espr' },
             { label: 'Battery DPP', link: '/regulatory/battery' },
             { label: 'Textile DPP', link: '/regulatory/textile' },
-            // Electronics DPP is withdrawn pending a rewrite — its source is
-            // `_electronics.mdx`, which the underscore keeps out of the content
-            // collection. Restore this entry with the page, not before it.
+            { label: 'Toy DPP', link: '/regulatory/toys' },
+            { label: 'Detergent DPP', link: '/regulatory/detergents' },
+            { label: 'Construction product DPP', link: '/regulatory/construction' },
+            { label: 'Vehicle passport', link: '/regulatory/vehicles' },
+            { label: 'Phones and tablets', link: '/regulatory/phones' },
             { label: 'Access Control', link: '/regulatory/access-control' },
             { label: 'EU Central Registry', link: '/regulatory/central-registry' },
             { label: 'Acts and standards', link: '/regulatory/acts-and-standards' },

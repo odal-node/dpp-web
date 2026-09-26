@@ -1,0 +1,32 @@
+---
+title: Phones and tablets
+description: The ecodesign and energy-labelling rules for smartphones and tablets, why they create no passport, and what the software carries.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Two regulations adopted before ESPR have applied to phones and tablets since 20 June 2025:
+
+- **Regulation (EU) 2023/1670** sets ecodesign requirements for smartphones, other mobile phones, cordless phones and slate tablets, under the Ecodesign Directive 2009/125/EC.
+- **Regulation (EU) 2023/1669** sets the energy label for smartphones and slate tablets, under the Energy Labelling Regulation (EU) 2017/1369.
+
+Both leave out phones and tablets with a rollable main display and smartphones for high-security communication, and 2023/1670 also leaves out devices for explosive atmospheres (Art. 1). No other electronics, such as laptops, monitors, televisions or chargers, carry a passport obligation under any EU act today.
+
+## No passport
+
+Neither Regulation creates a digital product passport; the phrase does not appear in either. Their information goes through **EPREL**, the EU's product database for energy labelling. Under 2023/1669 Art. 3(1), the supplier enters the values of the product information sheet into EPREL's public part (point (b)) and the technical documentation into the database (point (d)).
+
+<Aside type="note" title="Binding, but not a passport">
+The obligations themselves are in force: an energy label with a repairability class and a drop-test reliability class, durability requirements, spare parts, and operating-system updates. What does not exist for these products is a passport obligation.
+</Aside>
+
+## What the software carries
+
+The software models phones and tablets as a product group anyway, because the same data fits a passport-shaped record and a future act may require one. A record in the released software carries the barcode number, category (smartphone, other mobile phone, cordless phone, slate tablet), energy class, carbon footprint, repairability score, spare-part availability, links to repair and disassembly instructions, substances of very high concern, RoHS compliance, critical raw materials, recycled content, standby power, expected lifetime, and how long firmware updates are provided. It is checked by the electronics plugin.
+
+The development version of the core adds the six inputs from which the Regulation's repairability index is calculated, as optional fields.
+
+## Read next
+
+- [ESPR Overview](/regulatory/espr): how phones fit among the product groups.
+- [Acts and standards](/regulatory/acts-and-standards): the energy labelling and substance rules the code relies on.

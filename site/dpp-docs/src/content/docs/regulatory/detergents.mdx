@@ -1,0 +1,43 @@
+---
+title: Detergent DPP
+description: What the Detergents Regulation (EU) 2026/405 requires of a detergent passport, from when, the transition, and what the software carries today.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The Detergents Regulation (EU) 2026/405 creates a passport for detergents and end-user surfactants. It replaces Regulation (EC) No 648/2004 and is built on the same passport regime as the [toy passport](/regulatory/toys).
+
+## When
+
+- **The passport applies from 23 September 2029**, when the Regulation applies (Art. 37; only Art. 4(3) and (4) apply earlier).
+- **Transition** (Art. 36):
+  - Products that meet the old Regulation and are placed on the market **before** 23 September 2029 may continue to be made available indefinitely.
+  - Products that meet the old Regulation and are placed on the market **between 23 September 2029 and 22 September 2030** may be made available until 23 September 2030. For that year, a detergent can be placed on the market without a passport.
+
+<Aside type="caution" title="A lead time to watch">
+The passport's technical requirements (data carriers, layout, standards, access rights, who may create and update it) come from an implementing act under Art. 21(10). Its date of application may not be earlier than 18 months after it enters into force, save in duly justified cases. Unless that act enters into force by 23 March 2028, the passport duty applies before the requirements it must meet.
+</Aside>
+
+## What it requires
+
+- **Art. 21(1)**: "Before placing a detergent or end-user surfactant on the market, the manufacturer shall create a digital product passport for that product."
+- **Art. 21(2)**: the passport corresponds to a model, states that compliance has been demonstrated, contains at least Annex VI Part A, is available in the language the Member State requires, is accessible to consumers, authorities, customs, the Commission and other operators according to their access rights, and stays available for ten years after placing on the market, including through insolvency.
+- **Annex VI Part A**: nine items, among them a colour image of the packaging or label, the full list of intentionally added substances, and any intentionally added micro-organisms.
+- **Art. 21(4)**: the data carrier is on the label or packaging (on the accompanying documents for bulk, and on the refill station for refills), indelible, machine-readable, visible before purchase including in distance sales, and accompanied by the statement "Please scan for more comprehensive information on the product" or a similar one.
+- **Art. 21(6)**: where other Union law also requires a passport, there is one passport carrying both.
+- **Art. 21(9)**: by creating the passport, the manufacturer assumes responsibility for the product's compliance.
+- **Art. 22**: consumers must not be asked to register or give a password, and usage information may not be tracked, analysed or used beyond what serving the passport strictly needs.
+
+## What the software carries
+
+A detergent passport in the released software records the barcode number, product type, format, surfactants, country of origin, carbon footprint, whether the packaging is recyclable, recommended dosage and biodegradability. It is checked by the detergent plugin.
+
+<Aside type="caution" title="Not yet the full Annex">
+The detergent product group is provisional. It carries few of Annex VI Part A's nine items, and the passport model has no place yet for a product **image** or for a **language**. Both are on the [roadmap](https://odal-node.io/roadmap), and the detergent passport will be completed against the Annex before 2029.
+</Aside>
+
+## Read next
+
+- [Toy DPP](/regulatory/toys): the same regime with a 2030 date.
+- [Access control](/regulatory/access-control): access rights and the no-registration rule.
+- [Acts and standards](/regulatory/acts-and-standards): every act the code relies on.
