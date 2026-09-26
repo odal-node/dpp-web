@@ -23,7 +23,7 @@
       "title": "Check",
       "who": "Compliance lead",
       "lead": "Checked against the product group's rules before anything is signed.",
-      "body": "Most product groups carry their own set of rules. The rules arrive as signed updates, so when a threshold changes the rules change with it, without reinstalling anything."
+      "body": "Most product groups carry their own set of rules, and they run on your node, inside a sandbox."
     },
     {
       "n": 4,

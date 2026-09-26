@@ -2,18 +2,24 @@
 // /build-on-odal — how someone other than us builds on the software.
 //
 // Every route described here exists in the code today: the Apache-2.0 core
-// library, signed product-group plugins, signed rule updates and the Asset
-// Administration Shell export. The page says plainly that nobody has built on
-// it yet, because an ecosystem page is the easiest place on a site to imply
-// one that does not exist. Technical detail lives on the docs site; this page
-// links to it rather than repeating it.
+// library, signed product-group plugins and the Asset Administration Shell
+// export. The page says plainly that nobody has built on it yet, because an
+// ecosystem page is the easiest place on a site to imply one that does not
+// exist. Technical detail lives on the docs site; this page links to it rather
+// than repeating it.
+//
+// Signed rule bundles are deliberately NOT a way in. The node verifies and
+// hot-swaps them, but a bundle carries only a signed version today: the rules
+// that run are compiled in and no bundle reaches them (dpp-engine
+// `infra/ruleset.rs`, "What a swap changes today"). Add it back when a bundle
+// changes how a passport is checked.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import ExternalArrow from "../components/ExternalArrow.astro";
 
 const title = "Build on Odal | Odal Node";
 const description =
-  "Four ways to build on Odal Node: embed the open library, write product-group rules, publish rule updates, and connect industrial systems. Trusted by signatures, not by us.";
+  "Three ways to build on Odal Node: embed the open library, write product-group rules, and connect industrial systems. A plugin is trusted by a signature its node's operator accepts, not by us.";
 
 const ways = [
   {
@@ -25,21 +31,14 @@ const ways = [
   },
   {
     title: "Write product-group rules",
-    body: "A product group's checks can ship as a plugin that runs in an isolated sandbox. In production, a node runs a plugin only when it is signed by a key its operator trusts.",
+    body: "A product group's checks can ship as a plugin that runs in an isolated sandbox. A node refuses a plugin that is not signed by a key its operator trusts, unless the operator deliberately switches that check off for development.",
     href: "https://docs.odal-node.io/core/sectors",
     cta: "Extending it with plugins",
     icon: '<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M9 9h6v6H9z"/>',
   },
   {
-    title: "Publish rule updates",
-    body: "Rule updates travel as signed bundles. A node accepts one only when it is signed by a key its operator has chosen to trust, and swaps it in without reinstalling anything.",
-    href: "https://docs.odal-node.io/engine/architecture",
-    cta: "How the node works",
-    icon: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
-  },
-  {
     title: "Connect industrial systems",
-    body: "Passports export in the Asset Administration Shell format, so Industry 4.0 systems can read them without a custom integration.",
+    body: "A node can serve a published passport in the Asset Administration Shell format that Industry 4.0 systems read. The structure follows the standard, but the field meanings use Odal's own identifiers for now, so a receiving system still has to map them.",
     href: "https://docs.odal-node.io/core/standards",
     cta: "The standards it uses",
     icon: '<rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="13" width="7" height="7" rx="1.5"/><path d="M10 7.5h4a2 2 0 0 1 2 2V13"/>',
@@ -50,10 +49,10 @@ const ways = [
 <Base title={title} description={description}>
   <Section eyebrow="Build on Odal" title="Other people's compliance work, on nodes we do not run." wide>
     <p>
-      Odal Node is built so that rules, plugins and integrations written by
-      someone else can run on it, on infrastructure we never touch. They are
-      trusted because of signatures a node's operator chooses to accept, not
-      because of us.
+      Odal Node is built so that product-group rules and integrations written
+      by someone else can run on it, on infrastructure we never touch. A plugin
+      is trusted because of a signature the node's operator chooses to accept,
+      not because of us.
     </p>
     <p>
       <strong>Nobody has built on it yet.</strong> This page describes what is
@@ -61,8 +60,8 @@ const ways = [
     </p>
   </Section>
 
-  <Section eyebrow="Four ways in" title="What you can build today." tone="muted" wide>
-    <ul class="not-prose m-0 grid list-none gap-5 p-0 md:grid-cols-2">
+  <Section eyebrow="Three ways in" title="What you can build today." tone="muted" wide>
+    <ul class="not-prose m-0 grid list-none gap-5 p-0 md:grid-cols-2 lg:grid-cols-3">
       {ways.map((w) => (
         <li class="card m-0 flex flex-col p-6">
           <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-50 text-primary-700 ring-1 ring-primary-100">
@@ -91,7 +90,7 @@ const ways = [
       it is published.
     </p>
     <p>
-      <a href="https://docs.odal-node.io/engine/licensing" rel="noopener">The licensing page</a>{" "}
+      <a href="https://docs.odal-node.io/getting-started/licensing" rel="noopener">The licensing page</a>{" "}
       has the detail, and the licence texts in each repository are the ones
       that bind.
     </p>

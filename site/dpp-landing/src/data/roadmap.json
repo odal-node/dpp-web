@@ -1,6 +1,6 @@
 {
   "_comment": "The public roadmap, the single editable source for /roadmap. Locked with the founder on 2026-09-25 and checked against dpp-engine main (v0.14.0) and dpp-core main that day. Rules: features and outcomes only, written for a general reader. No issue links, commands, routes, crate names, version numbers or decision-record numbers; technical detail belongs on the docs site. No dates on anything that is not built. 'variants' lists the main forms a capability takes, in plain words. Update 'updated' whenever an item moves.",
-  "updated": "2026-09-25",
+  "updated": "2026-09-26",
   "registers": [
     {
       "status": "available",
@@ -33,11 +33,10 @@
             },
             {
               "title": "Checked before anything is signed",
-              "line": "Each product group's rules run before signing, alongside warnings for values that look implausible. Rule updates arrive signed and apply without reinstalling anything.",
+              "line": "Each product group's rules run before signing, alongside warnings for values that look implausible.",
               "variants": [
                 "Blocking checks",
-                "Advisory warnings",
-                "Signed rule updates"
+                "Advisory warnings"
               ]
             }
           ]
