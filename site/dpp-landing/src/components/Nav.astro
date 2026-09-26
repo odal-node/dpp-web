@@ -1,13 +1,14 @@
 ---
-// Nav.astro — top navigation. Mark + wordmark left; five menus, Docs and the
-// CTA right.
+// Nav.astro — top navigation. Mark + wordmark left; five menus and the CTA
+// right. There is no separate Docs link: Developers carries Documentation and
+// the API reference (removed at the founder's request, 2026-09-26).
 //
 // Five menus, in this order, each answering one question: "How it works" (what
 // the software does), "Compliance" (what the law requires of my product, and
 // when), "Developers" (how to build on it), "Resources" (is it ready, what does
 // this word mean, how do I report a flaw) and "Product groups". Split this way
 // on 2026-09-26 at the founder's choice, when "Resources" had grown to seven
-// items; "Product groups" and the Docs link were kept exactly as they were.
+// items; "Product groups" was kept exactly as it was.
 //
 // Each is a disclosure (a button that shows and hides a panel), not an ARIA
 // menu: the panels hold ordinary links, and a screen reader should read them as
@@ -15,10 +16,11 @@
 // template. "Product groups" is a full-width panel, because eleven groups with
 // a line each do not fit under a button.
 //
-// The bar appears from `xl` (1280px). Five menus, Docs and the CTA beside the
-// wordmark measured about 1,100px on 2026-09-26, and at 1024px "How it works"
-// and "Product groups" wrapped onto two lines. Below `xl` the hamburger panel
-// carries the same five sections.
+// The bar appears from `xl` (1280px). Five menus and the CTA beside the
+// wordmark measure about 1,010px (2026-09-26, after the Docs link went), which
+// leaves no room at 1024px once a scrollbar takes its share; with Docs it was
+// 1,100px and two labels wrapped. Below `xl` the hamburger panel carries the
+// same five sections.
 //
 // All open on hover for a mouse and on click or Enter for everyone else, close
 // on Escape and on a click outside, and only one is ever open.
@@ -153,13 +155,6 @@ const small = menus.map((m) => ({ ...m, current: within(m.items) }));
         </div>
       </div>
 
-      <a
-        href="https://docs.odal-node.io"
-        rel="noopener"
-        class="rounded-md px-3 py-2 text-sm font-medium text-neutral-600 no-underline hover:bg-neutral-200/60 hover:text-neutral-900"
-      >
-        Docs<ExternalArrow class="ml-1" />
-      </a>
       <Button href="/waitlist" class="ml-2">Join the waitlist</Button>
     </div>
 
@@ -223,13 +218,6 @@ const small = menus.map((m) => ({ ...m, current: within(m.items) }));
       </ul>
     </details>
 
-    <a
-      href="https://docs.odal-node.io"
-      rel="noopener"
-      class="block rounded-md px-3 py-2.5 text-sm font-medium text-neutral-700 no-underline hover:bg-neutral-100"
-    >
-      Docs<ExternalArrow class="ml-1" />
-    </a>
     <Button href="/waitlist" class="mt-2 w-full">Join the waitlist</Button>
   </div>
 </header>
