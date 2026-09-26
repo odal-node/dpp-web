@@ -5,7 +5,7 @@ description: The Ecodesign for Sustainable Products Regulation — what it is, w
 
 import { Aside } from "@astrojs/starlight/components";
 
-The Ecodesign for Sustainable Products Regulation (ESPR, EU 2024/1781) is the framework regulation that establishes the Digital Product Passport requirement across the European Union. It entered into force in 2024. **No delegated act under Article 4 has yet been adopted for any product group**, so ESPR itself binds nobody to a passport today — the framework is in force and the obligations that hang off it are not. The dated passport obligations that do exist come from other instruments: the Battery Regulation from 18 February 2027, and the Construction Products Regulation from 8 January 2027.
+The Ecodesign for Sustainable Products Regulation (ESPR, EU 2024/1781) is the framework regulation that establishes the Digital Product Passport requirement across the European Union. It entered into force in 2024. **No delegated act under Article 4 has yet been adopted for any product group**, so ESPR itself binds nobody to a passport today — the framework is in force and the obligations that hang off it are not. The dated passport obligations that do exist come from other instruments: the Battery Regulation from 18 February 2027, the Detergents Regulation from 23 September 2029 and the Toy Safety Regulation from 1 August 2030. The Construction Products Regulation requires a passport too, but Art. 22(7) dates it 18 months after the Commission's delegated act setting up the construction passport system (Art. 75(1)), and that act has not been adopted.
 
 ## What ESPR requires
 
@@ -25,7 +25,7 @@ Odal covers the articles of ESPR that are technically substantive for a passport
 
 **Articles 10 and 11** — the passport's requirements and its technical design. Art. 11(b) is the access provision: readers get access "based on their respective access rights set out in the applicable delegated act", **free of charge**, with the actor-to-data mapping delegated to each product group under Art. 9(2)(f). ESPR fixes no access tiers of its own, and no product-group act has been adopted yet.
 
-**Transfer of responsibility** — when a product changes economic operator along the supply chain, Odal implements a dual-signature chain: both transferor and transferee sign, creating a verifiable chain of custody. One honest note: ESPR has **no single article** establishing transfer mechanics — the closest operative text is Art. 11(e) (passport continuity when an operator ceases activity). Our handshake is an engineering choice that satisfies and exceeds that continuity duty; we say so rather than inventing a citation.
+**Transfer of responsibility** — when a product changes economic operator along the supply chain, Odal records the handover on the passport: the outgoing operator signs the transfer and the hosting node, not the incoming operator, signs its acceptance, creating a verifiable chain of custody. One honest note: ESPR has **no single article** establishing transfer mechanics — the closest operative text is Art. 11(e) (passport continuity when an operator ceases activity). Our handshake is an engineering choice that satisfies and exceeds that continuity duty; we say so rather than inventing a citation.
 
 **Article 13** — the EU Central Registry: the Commission-run directory of registered passports, which went live on 20 July 2026. Public access to the passport itself is served by the resolver — the public view, cached to stay fast under load.
 
@@ -45,7 +45,7 @@ ESPR is a framework; the binding detail arrives through per-product-group delega
 | **Textile** | ESPR delegated act (in drafting) | Structural validation now; unsold-goods ban (Art. 25) applies from 2026 |
 | **Electronics** | EU 2023/1670 + 2023/1669 — ecodesign and energy labelling, not ESPR | In force since 20 Jun 2025 for smartphones, other mobile phones, cordless phones and tablets |
 | **Steel · Aluminium** | CBAM 2023/956 / ESPR | Reference benchmarks only; no DPP mandate yet (aluminium expected ~2030) |
-| **Construction** | CPR 2024/3110 | In force; passport applies from 8 Jan 2027. Operator owes 10 years of availability, the passport *system* 25 |
+| **Construction** | CPR 2024/3110 | In force; passport owed 18 months after the Commission's delegated act setting up the construction passport system (Art. 22(7), Art. 75(1)), not yet adopted. Operator owes 10 years of availability, the passport *system* 25 |
 | **Toys** | EU 2025/2509 | In force; passport applies from 1 Aug 2030 — a date set by the Toy Safety Regulation itself, not by an awaited act |
 | **Detergent** | EU 2026/405 | In force; passport applies from 23 Sep 2029 |
 | **Tyre** | Tyre labelling 2020/740 / ESPR | Labelling in force; no DPP mandate yet |
