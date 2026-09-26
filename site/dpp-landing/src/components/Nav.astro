@@ -1,21 +1,24 @@
 ---
-// Nav.astro — top navigation. Mark + wordmark left; three menus, Docs and the
+// Nav.astro — top navigation. Mark + wordmark left; five menus, Docs and the
 // CTA right.
 //
-// Three menus, in this order: "How it works" (the software itself),
-// "Resources" (the reference pages) and "Product groups". Split this way
-// 2026-09-26, at the founder's choice, when the FAQ would have made one
-// "Explore" menu seven items long.
+// Five menus, in this order, each answering one question: "How it works" (what
+// the software does), "Compliance" (what the law requires of my product, and
+// when), "Developers" (how to build on it), "Resources" (is it ready, what does
+// this word mean, how do I report a flaw) and "Product groups". Split this way
+// on 2026-09-26 at the founder's choice, when "Resources" had grown to seven
+// items; "Product groups" and the Docs link were kept exactly as they were.
 //
 // Each is a disclosure (a button that shows and hides a panel), not an ARIA
 // menu: the panels hold ordinary links, and a screen reader should read them as
-// links. The first two are small panels under their buttons, rendered from one
+// links. The first four are small panels under their buttons, rendered from one
 // template. "Product groups" is a full-width panel, because eleven groups with
 // a line each do not fit under a button.
 //
-// The bar appears from `lg` (1024px), not `md`: three menus, Docs and the CTA
-// beside the wordmark need about 760px, and at 768px every label wrapped onto
-// two lines. Below `lg` the hamburger panel carries the same three sections.
+// The bar appears from `xl` (1280px). Five menus, Docs and the CTA beside the
+// wordmark measured about 1,100px on 2026-09-26, and at 1024px "How it works"
+// and "Product groups" wrapped onto two lines. Below `xl` the hamburger panel
+// carries the same five sections.
 //
 // All open on hover for a mouse and on click or Enter for everyone else, close
 // on Escape and on a click outside, and only one is ever open.
@@ -32,7 +35,7 @@ import Button from "./Button.astro";
 import ProductGroupIcon from "./ProductGroupIcon.astro";
 import { groups, unsoldGoods as unsold } from "../lib/product-groups";
 
-type Entry = { href: string; label: string; line: string; icon: string };
+type Entry = { href: string; label: string; line: string; icon: string; external?: boolean };
 
 const howItWorks: Entry[] = [
   {
@@ -59,20 +62,20 @@ const howItWorks: Entry[] = [
     line: "Check a passport's proof file in your browser",
     icon: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
   },
+  {
+    href: "/trust",
+    label: "What Odal can see",
+    line: "What stays on your node, and why that holds by design",
+    icon: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  },
 ];
 
-const resources: Entry[] = [
+const compliance: Entry[] = [
   {
-    href: "/build-on-odal",
-    label: "Build on Odal",
-    line: "Libraries, plugins and the licence line",
-    icon: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M13.5 5l-3 14"/>',
-  },
-  {
-    href: "/regulations",
-    label: "Regulations",
-    line: "The EU acts behind the passports, and when each applies",
-    icon: '<path d="M12 3v18M5 21h14"/><path d="M5 7h14"/><path d="m5 7-2.5 6a2.5 2.5 0 0 0 5 0L5 7ZM19 7l-2.5 6a2.5 2.5 0 0 0 5 0L19 7Z"/>',
+    href: "/passport-check",
+    label: "Passport check",
+    line: "Does your product need a passport, and from when",
+    icon: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
   },
   {
     href: "/timeline",
@@ -81,11 +84,37 @@ const resources: Entry[] = [
     icon: '<rect x="3.5" y="5" width="17" height="15.5" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>',
   },
   {
-    href: "/passport-check",
-    label: "Passport check",
-    line: "Does your product need a passport, and from when",
-    icon: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+    href: "/regulations",
+    label: "Regulations",
+    line: "The EU acts behind the passports, and when each applies",
+    icon: '<path d="M12 3v18M5 21h14"/><path d="M5 7h14"/><path d="m5 7-2.5 6a2.5 2.5 0 0 0 5 0L5 7ZM19 7l-2.5 6a2.5 2.5 0 0 0 5 0L19 7Z"/>',
   },
+];
+
+const developers: Entry[] = [
+  {
+    href: "/build-on-odal",
+    label: "Build on Odal",
+    line: "Libraries, plugins and the licence line",
+    icon: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M13.5 5l-3 14"/>',
+  },
+  {
+    href: "https://docs.odal-node.io",
+    label: "Documentation",
+    line: "Install, run and operate a node",
+    icon: '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5v-13Z"/>',
+    external: true,
+  },
+  {
+    href: "https://docs.odal-node.io/api",
+    label: "API reference",
+    line: "Every route a node serves",
+    icon: '<path d="M8 4H7a2 2 0 0 0-2 2v4l-2 2 2 2v4a2 2 0 0 0 2 2h1M16 4h1a2 2 0 0 1 2 2v4l2 2-2 2v4a2 2 0 0 1-2 2h-1"/>',
+    external: true,
+  },
+];
+
+const resources: Entry[] = [
   {
     href: "/roadmap",
     label: "Roadmap",
@@ -104,17 +133,25 @@ const resources: Entry[] = [
     line: "The words around a passport, explained",
     icon: '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5v-15Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/><path d="M9 8h6M9 11h4"/>',
   },
+  {
+    href: "/security",
+    label: "Security",
+    line: "Report an issue, and how passports and keys are protected",
+    icon: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="M12 8v5M12 16h.01"/>',
+  },
 ];
 
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 const within = (list: Entry[]) => list.some((e) => path === e.href || path.startsWith(`${e.href}/`));
 const inGroups = path.startsWith("/product-groups");
 
-// The two small menus, in bar order; "Product groups" follows them.
-const small = {
-  how: { id: "dd-how", label: "How it works", items: howItWorks, current: within(howItWorks) },
-  resources: { id: "dd-resources", label: "Resources", items: resources, current: within(resources) },
-};
+// The four small menus, in bar order; "Product groups" follows them.
+const small = [
+  { id: "dd-how", label: "How it works", items: howItWorks },
+  { id: "dd-compliance", label: "Compliance", items: compliance },
+  { id: "dd-developers", label: "Developers", items: developers },
+  { id: "dd-resources", label: "Resources", items: resources },
+].map((m) => ({ ...m, current: within(m.items) }));
 ---
 
 <header class="sticky top-0 z-50 border-b border-neutral-100 bg-gray-100">
@@ -125,8 +162,8 @@ const small = {
     </a>
 
     <!-- desktop -->
-    <div class="hidden items-center gap-1 lg:flex">
-      {[small.how, small.resources].map((m) => (
+    <div class="hidden items-center gap-1 xl:flex">
+      {small.map((m) => (
         <div class="dd relative" data-dd>
           <button
             type="button"
@@ -143,6 +180,7 @@ const small = {
                 <li class="m-0">
                   <a
                     href={e.href}
+                    rel={e.external ? "noopener" : undefined}
                     aria-current={path === e.href ? "page" : undefined}
                     class="dd-item group flex items-start gap-3 rounded-lg p-3 no-underline hover:no-underline"
                   >
@@ -150,7 +188,7 @@ const small = {
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-5 w-5" set:html={e.icon} />
                     </span>
                     <span class="min-w-0">
-                      <span class="block text-sm font-semibold text-neutral-900">{e.label}</span>
+                      <span class="block text-sm font-semibold text-neutral-900">{e.label}{e.external && <ExternalArrow class="ml-1" />}</span>
                       <span class="mt-0.5 block text-xs leading-snug text-neutral-500">{e.line}</span>
                     </span>
                   </a>
@@ -237,7 +275,7 @@ const small = {
     <button
       id="nav-toggle"
       type="button"
-      class="inline-flex items-center justify-center rounded-md p-2 text-neutral-700 hover:bg-neutral-100 lg:hidden"
+      class="inline-flex items-center justify-center rounded-md p-2 text-neutral-700 hover:bg-neutral-100 xl:hidden"
       aria-controls="nav-menu"
       aria-expanded="false"
       aria-label="Open menu"
@@ -248,20 +286,20 @@ const small = {
     </button>
   </nav>
 
-  <!-- mobile panel: the three menus become collapsible sections -->
-  <div id="nav-menu" class="hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-neutral-200 bg-white px-4 pb-4 pt-2 lg:hidden">
+  <!-- mobile panel: the five menus become collapsible sections -->
+  <div id="nav-menu" class="hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-neutral-200 bg-white px-4 pb-4 pt-2 xl:hidden">
     <div class="px-3 pb-2 pt-1">
       <StatusBadge tone="light" label="Alpha · in active development" />
     </div>
 
-    {[small.how, small.resources].map((m) => (
+    {small.map((m) => (
       <details class="m-section" open={m.current}>
         <summary>{m.label}</summary>
         <ul class="m-0 list-none p-0 pb-2">
           {m.items.map((e) => (
             <li class="m-0">
-              <a href={e.href} class="block rounded-md px-3 py-2 text-sm text-neutral-700 no-underline hover:bg-neutral-100">
-                <span class="font-medium text-neutral-900">{e.label}</span>
+              <a href={e.href} rel={e.external ? "noopener" : undefined} class="block rounded-md px-3 py-2 text-sm text-neutral-700 no-underline hover:bg-neutral-100">
+                <span class="font-medium text-neutral-900">{e.label}{e.external && <ExternalArrow class="ml-1" />}</span>
                 <span class="block text-xs text-neutral-500">{e.line}</span>
               </a>
             </li>
@@ -311,6 +349,7 @@ const small = {
     gap: 0.35rem;
     border-radius: 0.375rem;
     padding: 0.5rem 0.75rem;
+    white-space: nowrap;
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-neutral-600);

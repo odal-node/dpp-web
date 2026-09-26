@@ -8,8 +8,8 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="bg-primary-900 text-primary-200">
-  <div class="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 text-sm sm:grid-cols-2 sm:px-6 lg:grid-cols-12 lg:px-8">
-    <div class="lg:col-span-3">
+  <div class="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-4 py-12 text-sm sm:grid-cols-3 sm:px-6 lg:px-8 xl:grid-cols-[1.4fr_repeat(6,1fr)] xl:gap-x-6">
+    <div class="col-span-2 sm:col-span-3 xl:col-span-1">
       <p class="mb-2 flex items-center gap-2 font-semibold text-white">
         <OdalMark aria-hidden="true" class="h-6 w-6 shrink-0 text-primary-300" />
         Odal Node
@@ -22,9 +22,9 @@ const year = new Date().getFullYear();
       </p>
     </div>
 
-    <!-- Mirrors the nav's three menus, in the same order, so the same pages
+    <!-- Mirrors the nav's five menus, in the same order, so the same pages
          are reachable from the foot of every page. -->
-    <div class="lg:col-span-2">
+    <div>
       <p class="mb-2 font-semibold text-white">How it works</p>
       <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/lifecycle">Lifecycle</a></li>
@@ -34,13 +34,27 @@ const year = new Date().getFullYear();
       </ul>
     </div>
 
-    <div class="lg:col-span-2">
-      <p class="mb-2 font-semibold text-white">Resources</p>
+    <div>
+      <p class="mb-2 font-semibold text-white">Compliance</p>
+      <ul class="m-0 list-none space-y-2 p-0">
+        <li><a class="text-primary-200 hover:text-white" href="/passport-check">Passport check</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="/timeline">Timeline</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="/regulations">Regulations</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="mb-2 font-semibold text-white">Developers</p>
       <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/build-on-odal">Build on Odal</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/regulations">Regulations</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/timeline">Timeline</a></li>
-        <li><a class="text-primary-200 hover:text-white" href="/passport-check">Passport check</a></li>
+        <li><a class="text-primary-200 hover:text-white" href="https://docs.odal-node.io" rel="noopener">Documentation<ExternalArrow class="ml-1" /></a></li>
+        <li><a class="text-primary-200 hover:text-white" href="https://docs.odal-node.io/api" rel="noopener">API reference<ExternalArrow class="ml-1" /></a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="mb-2 font-semibold text-white">Resources</p>
+      <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/roadmap">Roadmap</a></li>
         <li><a class="text-primary-200 hover:text-white" href="/faq">FAQ</a></li>
         <li><a class="text-primary-200 hover:text-white" href="/glossary">Glossary</a></li>
@@ -48,14 +62,14 @@ const year = new Date().getFullYear();
     </div>
 
     <!-- One link here; the nav's Product groups menu lists every group. -->
-    <div class="lg:col-span-2">
+    <div>
       <p class="mb-2 font-semibold text-white">Product groups</p>
       <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/product-groups">All product groups</a></li>
       </ul>
     </div>
 
-    <div class="lg:col-span-3">
+    <div>
       <p class="mb-2 font-semibold text-white">Privacy &amp; security</p>
       <ul class="m-0 list-none space-y-2 p-0">
         <li><a class="text-primary-200 hover:text-white" href="/trust">What Odal can see</a></li>
