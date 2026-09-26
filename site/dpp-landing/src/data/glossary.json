@@ -65,7 +65,7 @@
     },
     {
       "term": "EU registry",
-      "definition": "The European Commission's directory of registered passports, live since 20 July 2026. It records where each passport lives, not its content.",
+      "definition": "The European Commission's directory of registered passports, set up in July 2026. It records where each passport lives, not its content.",
       "link": { "href": "https://docs.odal-node.io/regulatory/central-registry", "label": "The EU registry" }
     },
     {
