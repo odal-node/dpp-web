@@ -1,0 +1,64 @@
+---
+title: Webhook events
+description: Every event a node sends to a webhook, the envelope each one arrives in, and how to verify a delivery.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A node sends an event to each matching [webhook subscription](/guides/integrations#webhooks) after the change it describes has been committed. Subscribe to all events, or filter with `--events`.
+
+## The envelope
+
+Every delivery's body is the same versioned envelope:
+
+```json
+{
+  "version": 1,
+  "eventId": "01964f3a-…",
+  "eventType": "dpp.passport.published",
+  "timestamp": "2026-05-27T14:30:00Z",
+  "operatorId": "self_hosted",
+  "data": { "passportId": "…", "status": "active" }
+}
+```
+
+- `eventId` is a time-ordered UUID (v7): use it to ignore a delivery you have already processed.
+- `version` changes only if the shape of `data` changes in a breaking way.
+- The event type is also sent in the `X-Odal-Event` header, and the signature in `X-Odal-Signature`.
+
+## Event types
+
+| Event | When it is sent |
+|---|---|
+| `dpp.passport.created` | A draft passport was created |
+| `dpp.passport.updated` | A draft passport was changed |
+| `dpp.passport.published` | A passport was signed and published |
+| `dpp.passport.suspended` | A published passport was suspended |
+| `dpp.passport.superseded` | A passport was replaced by a successor; `data` carries `successorId`, and the superseded record stays resolvable |
+| `dpp.passport.archived` | A passport was archived |
+| `dpp.passport.deactivated` | A passport's end of life was declared |
+| `dpp.passport.transferred` | A handover of responsibility changed state |
+
+`odal webhook test <id>` sends a test delivery with its own event type, so you can check your receiver without changing a passport.
+
+<Aside type="note" title="Treat events as notifications">
+The database is the source of truth; an event says that something changed, not the whole new state. For the current state, read the passport from the node.
+</Aside>
+
+## Verifying a delivery
+
+```text
+X-Odal-Signature: t=<unix-time>,v1=<hex HMAC-SHA256(secret, "<t>.<body>")>
+```
+
+1. Split the header into the timestamp `t` and the signature `v1`.
+2. Compute HMAC-SHA256 over `"<t>.<raw body>"` with your subscription's secret.
+3. Compare with `v1` in constant time.
+4. Reject a timestamp older than a few minutes, and an `eventId` you have seen before.
+
+A delivery that fails is retried with backoff, up to eight attempts in all.
+
+## Read next
+
+- [Integrations and statistics](/guides/integrations): adding and testing subscriptions.
+- [Error reference](/guides/errors): what the API returns when a call fails.
