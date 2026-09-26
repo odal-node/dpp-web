@@ -17,6 +17,10 @@
             {
               "title": "Signed with your own key",
               "line": "Every passport is signed on your servers, with a key that never leaves them, under an identity on a web domain you control. The key can be rotated without invalidating anything it already signed."
+            },
+            {
+              "title": "Releases you can inspect",
+              "line": "Published releases now carry a list of the components inside them and a record of how they were built, so you can check what you are running."
             }
           ]
         },
@@ -33,11 +37,16 @@
             },
             {
               "title": "Checked before anything is signed",
-              "line": "Each product group's rules run before signing, alongside warnings for values that look implausible.",
+              "line": "Each product group's rules run before signing, alongside warnings for values that look implausible. A new signed version of a group's rules can be installed on a running node without a restart.",
               "variants": [
                 "Blocking checks",
-                "Advisory warnings"
+                "Advisory warnings",
+                "Updates without a restart"
               ]
+            },
+            {
+              "title": "Does it need a passport?",
+              "line": "Ask the node whether a product group needs a passport, from when, and under which acts. Every date says whether it comes from the text of the law or from a reading of it."
             }
           ]
         },
@@ -51,6 +60,10 @@
                 "With a GS1 barcode",
                 "Without a barcode"
               ]
+            },
+            {
+              "title": "The code, generated for you",
+              "line": "The node generates each passport's QR code as an image, pointing to its public page."
             },
             {
               "title": "Each reader sees what they are entitled to",
@@ -76,7 +89,7 @@
           "items": [
             {
               "title": "Changes without losing history",
-              "line": "Correct a passport, replace it with a newer one, suspend it or retire it. Every earlier version stays readable, and every change is written to a tamper-evident trail.",
+              "line": "Correct a passport, replace it with a newer one, suspend it or retire it. Every earlier version stays readable, a code already printed on a product still works after its passport is replaced, and every change is written to a tamper-evident trail.",
               "variants": [
                 "Correct",
                 "Replace",
@@ -91,6 +104,10 @@
             {
               "title": "A handover between companies",
               "line": "Responsibility moves from one company to another on the record: the outgoing company signs the handover and the node signs its acceptance. Either side can decline or withdraw before it completes."
+            },
+            {
+              "title": "A second life, on the record",
+              "line": "When a product is repurposed or remanufactured, its new passport links back to the passport, or passports, it came from, and says which of those happened."
             },
             {
               "title": "Products made of products",
@@ -151,6 +168,10 @@
               "line": "Record what was discarded, why and where it went, line by line, ready for the yearly disclosure."
             },
             {
+              "title": "Clear about its own state",
+              "line": "The node reports which of the services it relies on are fully working and which are still stand-ins, so nothing looks more finished than it is."
+            },
+            {
               "title": "Safe by default",
               "line": "A node will not start with the sample passwords and keys from its own setup files. One set up for production also will not start while a service it relies on, such as sealing or rule checking, is only a stand-in. Overrides exist for development, and they are logged as warnings."
             }
@@ -192,7 +213,7 @@
             },
             {
               "title": "Carbon and repairability figures in the passport",
-              "line": "The calculators are written and published in the open library. The node does not run them yet, so no passport carries a computed figure today."
+              "line": "The node already checks a battery's declared recycled content against the legal minimums. The carbon and repairability calculators are written and published in the open library, but the node does not run them yet, so no passport carries a computed carbon or repairability figure today."
             },
             {
               "title": "Spreadsheet import for every product group",
@@ -257,6 +278,18 @@
             {
               "title": "A public checker anyone can run",
               "line": "Check any passport against the European standards on your own machine, without sending it anywhere."
+            },
+            {
+              "title": "Keys in hardware you control",
+              "line": "Signing keys held in a hardware security module or your own key service, rather than in an encrypted file on the server."
+            },
+            {
+              "title": "Update notices for self-hosted nodes",
+              "line": "A signed channel that tells a self-hosted node when a new release is available."
+            },
+            {
+              "title": "A practice copy of the EU registry",
+              "line": "Somewhere to rehearse registering passports before connecting to the real registry."
             },
             {
               "title": "Battery carbon footprint",

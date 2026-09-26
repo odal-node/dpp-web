@@ -23,7 +23,7 @@
       "title": "Check",
       "who": "Compliance lead",
       "lead": "Checked against the product group's rules before anything is signed.",
-      "body": "Most product groups carry their own set of rules, and they run on your node, inside a sandbox."
+      "body": "Most product groups carry their own set of rules, and they run on your node, inside a sandbox. A new signed version of a group's rules can be installed without restarting the node."
     },
     {
       "n": 4,
