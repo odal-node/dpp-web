@@ -210,7 +210,22 @@ const examples = [
     result.append(from);
 
     if (outcome.kind === "malformed") {
-      result.append(banner("warn", "Not a proof file this checker understands.", `The file could not be read as an evidence dossier: ${outcome.message.replace(/\s+—\s+/g, ": ")}.`));
+      // A required member missing from an otherwise well-formed file is almost
+      // always an earlier format: proof files written before the contents list
+      // named the core version lack `coreVersion`. The node's own verifier
+      // rejects them for the same reason, so saying "not understood" here would
+      // read as a fault in this checker when it is not one.
+      const missing = /missing field `([^`]+)`/.exec(outcome.message);
+      const unknown = /unknown field `([^`]+)`/.exec(outcome.message);
+      if (missing) {
+        result.append(banner("warn", "This proof file is in an older format, or has been edited.",
+          `It is missing a part every current proof file carries (${missing[1]}), so the node's own verifier would reject it too. If it was made by an earlier version of Odal Node, generate it again with a current one.`));
+      } else if (unknown) {
+        result.append(banner("warn", "This proof file contains a part the format does not define.",
+          `It carries "${unknown[1]}", which no proof file has. Rather than check the rest and ignore it, the file is rejected, as the node's own verifier does.`));
+      } else {
+        result.append(banner("warn", "Not a proof file this checker understands.", `The file could not be read as an evidence dossier: ${outcome.message.replace(/\s+—\s+/g, ": ")}.`));
+      }
       return;
     }
     if (outcome.kind === "unsupported") {
