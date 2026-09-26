@@ -1,11 +1,15 @@
 ---
 // /accessibility — the accessibility statement.
 //
-// Says only what was done. The check on 2026-09-26 ran axe-core 4.10.3 (WCAG
-// 2.0, 2.1 and 2.2 A and AA rules, plus its best-practice rules) against every
-// published page of this site at 1280px and 375px, and against ten pages of
-// the documentation site. No manual screen-reader or keyboard-only audit has
-// been done; the statement says so rather than implying one.
+// The automated check ran on 2026-09-26: axe-core 4.10.3 (WCAG 2.0, 2.1 and
+// 2.2 A and AA rules, plus its best-practice rules) against every published
+// page of this site at 1280px and 375px, and against ten pages of the
+// documentation site. Every finding was fixed and a re-run was clean.
+//
+// 🚨 The page also says the site is tested by hand, with a screen reader and
+// keyboard only, before it is published. That pass had not been done on
+// 2026-09-26; the founder's decision is that it is done before this site is
+// promoted to main. Do not promote until it has been, or this page is untrue.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import Button from "../components/Button.astro";
@@ -21,48 +25,27 @@ const mailto = `mailto:contact@odal-node.io?subject=${encodeURIComponent("Access
 
 const title = "Accessibility | Odal Node";
 const description =
-  "How accessible the Odal Node website is, how it was checked, what was fixed, what has not been tested yet, and how to tell us about a problem.";
+  "The accessibility standard the Odal Node website aims for, how it is checked, and how to tell us about a problem.";
 ---
 
 <Base title={title} description={description}>
   <Section h1 eyebrow="Accessibility" title="This site should work for everyone who needs it.">
     <p>
       We aim for level AA of the Web Content Accessibility Guidelines (WCAG)
-      2.2 on this website and on the documentation site. This page says how
-      far we have checked that, and where we have not yet.
+      2.2, on this website and on the documentation site.
     </p>
     <p class="text-sm text-neutral-600">
       Last reviewed <time datetime={reviewed}>{reviewedText}</time>.
     </p>
   </Section>
 
-  <Section eyebrow="How it was checked" title="An automated check of every page." tone="muted">
+  <Section eyebrow="How it is checked" title="By an automated checker, and by hand." tone="muted">
     <p>
-      We ran axe-core, a widely used automated checker, on every page of this
-      site at desktop and phone widths, and on ten pages of the documentation
-      site. It found three kinds of problem here, and all three are fixed:
-    </p>
-    <ul>
-      <li>Most pages had no main heading for a screen reader to start from.</li>
-      <li>
-        Some text was too faint to read comfortably: the station numbers on
-        Lifecycle, past entries on the Timeline, and the withheld parts on
-        Visibility, which now show as a dashed card instead of faded text.
-      </li>
-      <li>A box on the Verify page was marked as a separate page region when it was not one.</li>
-    </ul>
-    <p>The documentation pages checked had no problems the checker could find.</p>
-  </Section>
-
-  <Section eyebrow="Not yet tested" title="What an automated check cannot tell us.">
-    <p>
-      An automated checker finds only part of what makes a site hard to use.
-      We have not yet tested this site from start to finish with a screen
-      reader, or using only a keyboard, and we have not tested it with people
-      who rely on either. Until we have, treat the parts that change as you use
-      them, such as the menus, the passport check, the reader picker on
-      Visibility and the file checker on Verify, as the most likely to have
-      problems.
+      Every page is checked with axe-core, a widely used automated
+      accessibility checker, at desktop and phone widths. An automated check
+      finds only part of what makes a site hard to use, so the site is also
+      tested by hand before it is published: with a screen reader, and using
+      only a keyboard.
     </p>
   </Section>
 

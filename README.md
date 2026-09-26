@@ -106,7 +106,7 @@ The original phased build (workspace foundations → landing MVP → docs IA →
 
 An **August 2026 audit** of both sites read every published page against primary regulatory text and against the engine's source. It found a delegated act that does not exist described as adopted, roughly twenty misattributed citations, four security-property claims the code contradicted, and a registry described as unbuilt eight months after it went live. Those are corrected; the findings register lives outside this repository.
 
-What remains before public launch: a manual screen-reader and keyboard pass (the automated axe check is done, and the landing's accessibility page says what it covered), a runtime check that the API reference does not relay requests through a third-party proxy, and a named data controller in the privacy policy — which is blocked on a registered entity existing, not on a copy edit.
+What remains before public launch: a manual screen-reader and keyboard pass (the automated axe check is done, and the landing's accessibility page already says the site is tested by hand before it is published, so the pass must happen before promotion), a runtime check that the API reference does not relay requests through a third-party proxy, and a named data controller in the privacy policy — which is blocked on a registered entity existing, not on a copy edit.
 
 ## Rate limit on /verify
 
