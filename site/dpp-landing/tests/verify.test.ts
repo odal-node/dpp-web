@@ -2,7 +2,7 @@
 //
 // public/verify/examples/ holds dossiers built with dpp-engine's own types and
 // Ed25519 signing; verify-expected.json holds what dpp-vault's
-// `verify_dossier_json` said about each one (engine e8ec2b4, 2026-09-25). This
+// `verify_dossier_json` said about each one (engine #423, 2026-09-28). This
 // test fails if the TypeScript verifier disagrees with the Rust one on the
 // outcome or on any single check. A second implementation that is not held to
 // the first is two verifiers that will disagree one day without anyone
@@ -51,11 +51,16 @@ for (const file of files) {
 }
 
 // The page's own claim: a single changed character in a signed member is
-// caught, and caught precisely. The first occurrence of the model id is in the
-// full view, so exactly the full view's signature and the content hashes fail;
-// the public view, untouched, still verifies.
+// caught, and caught precisely. The edit goes into the full view, so exactly
+// the full view's signature and the content hashes fail; the public view,
+// untouched, still verifies. It is aimed there on purpose: the `published`
+// history entry records the same payload, as a node's does, and comes first in
+// the file, so the first occurrence of the model id is not in the full view.
 test("a one-character edit to a signed payload is caught, and only where it happened", async () => {
-  const text = readFileSync(`${dir}04-valid-full-lifecycle.json`, "utf8").replace('"ACME-LMT-48V"', '"ACME-LMT-49V"');
+  const raw = readFileSync(`${dir}04-valid-full-lifecycle.json`, "utf8");
+  const at = raw.indexOf('"fullView":');
+  assert.ok(at > 0, "04 has a full view");
+  const text = raw.slice(0, at) + raw.slice(at).replace('"ACME-LMT-48V"', '"ACME-LMT-49V"');
   const got = await verifyDossierText(text);
   assert.equal(got.kind, "report");
   if (got.kind === "report") {
