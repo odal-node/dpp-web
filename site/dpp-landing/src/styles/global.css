@@ -3,9 +3,10 @@
  *
  * Order of imports is meaningful:
  *   1. "tailwindcss" pulls in Tailwind 4's base, components, utilities layers.
- *   2. "@odal/brand-tokens/tokens.css" provides --odal-* raw variables AND a
- *      Tailwind @theme block exposing --color-primary-*, etc. as Tailwind
- *      utility classes. That file lives under packages/brand-tokens/.
+ *   2. "@odal/brand-tokens/tokens.css" provides the --odal-* raw variables.
+ *   3. "@odal/brand-tokens/theme.css" is the Tailwind @theme block exposing
+ *      --color-primary-*, etc. as Tailwind utility classes. Both files live
+ *      under packages/brand-tokens/.
  *
  * After this CSS loads, every Tailwind utility class for the brand palette
  * (bg-primary-500, text-neutral-900, font-sans, etc.) is available.
@@ -19,6 +20,7 @@
 
 @import "tailwindcss";
 @import "@odal/brand-tokens/tokens.css";
+@import "@odal/brand-tokens/theme.css";
 
 @layer base {
   html {
