@@ -1,0 +1,75 @@
+---
+title: Harmonised standards
+description: The six European passport standards cited in the Official Journal, which of them we have read, and where Odal Node stands against each one.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+On 15 July 2026, [Commission Implementing Decision (EU) 2026/1736](https://eur-lex.europa.eu/eli/dec_impl/2026/1736/oj/eng) published the references of six European standards for digital product passports in the Official Journal. Under **Article 41(2)** of the Ecodesign for Sustainable Products Regulation (EU) 2024/1781, a passport that conforms to one of them is presumed to meet the requirements of **Articles 10 and 11** that the standard covers. That is what makes these six matter: they are the recognised way to show a passport system meets the Regulation's technical requirements.
+
+<Aside type="note" title="What this page claims, and what it does not">
+Checked on 2026-09-28 against `dpp-core` main and `dpp-engine` v0.14.0.
+
+We have read **EN 18219** and **EN 18221** in full. What this page says about them is our own reading, in our own words: it quotes nothing from either standard, and the clause numbers are there so a reader with their own copy can check. For the other four we give only the title the Official Journal gives, and claim nothing.
+
+We say *aligning*, never *conformant*. No standard here has been assessed clause by clause to the end, and one of them cannot be yet.
+</Aside>
+
+## The six
+
+| Standard | Title in the Official Journal | Read by us | Where Odal Node stands |
+|---|---|---|---|
+| EN 18216:2026 | Digital product passport – Data exchange protocols | No | No claim |
+| EN 18219:2026 | Digital product passport – Unique identifiers | Yes | [Aligning, with one open question](#en-18219-unique-identifiers) |
+| EN 18220:2026 | Digital product passport – Data carriers | No | No claim |
+| EN 18221:2026 | Digital product passport – Data storage, archiving, and persistence | Yes | [Partly in place](#en-18221-data-storage-archiving-and-persistence) |
+| EN 18222:2026 | Digital Product Passport – Application Programming Interfaces (APIs) for product passport lifecycle management and searchability | No | No claim |
+| EN 18223:2026 | Digital Product Passport – System interoperability | No | No claim |
+
+The numbers are not a range. The Decision cites these six and no others: there is no EN 18217 or EN 18218 in it.
+
+## EN 18219: unique identifiers
+
+How a passport's unique product identifier is formed. The standard admits several identification schemes as alternatives, and an identifier has to follow one of them as well as a set of general rules.
+
+| Topic | Where Odal Node stands |
+|---|---|
+| Identification scheme (clause 5) | A released node identifies each product with a GS1 Digital Link, `/01/{gtin}/21/{serial}`, which is one route within **scheme 1**. On core's main branch a passport can also identify itself with an **identification link** (scheme 2, EN IEC 61406) or a **decentralised identifier** (scheme 3), so an operator without a GS1 membership can issue a passport. That arrives with core's next release. A scheme 2 value is checked only for being a web address, not against EN IEC 61406. |
+| Length and characters (clause 4.3) | The standard sets no length limit. The 20-character serial comes from GS1's rules for the serial number (AI 21). Every identifier the node mints is plain ASCII, percent-encoded as RFC 3986 requires. |
+| Granularity (clause 4.4) | Once a passport is published, its level (model, batch or item) cannot change, whether through the node or through the core library's update rules. |
+| GS1 Digital Link version (scheme 1) | **Open.** Scheme 1 asks for conformance with a named version of the GS1 Digital Link URI syntax, and EN 18219 names version 1.6.0 (2022). Our parser and builder have not yet been compared against that version. |
+| Issuing agency code (scheme 1) | **Not assessed.** Scheme 1 relies on an issuing agency registered under ISO/IEC 15459-2. Whether that applies to someone running a resolver has not been worked out. |
+| An identifier that outlives its issuer (clause 4.2) | **Not a software property.** Keeping an identifier alive after the company behind it stops trading is an operational and contractual guarantee, not something code can give. |
+
+## EN 18221: data storage, archiving, and persistence
+
+Where a passport is stored, how earlier versions of a live passport are kept, the back-up copy ESPR Article 10(4) requires, and how data reaches that back-up.
+
+The standard says itself (Annex ZA) that its presumption for Article 10(4) covers the technical side of the back-up only, not whether a back-up exists or who runs it. So building the mechanism and settling who may act as the independent back-up provider (ESPR Article 2(32)) are separate questions.
+
+| Topic | Where Odal Node stands |
+|---|---|
+| Storage (clause 4.1) | **Aligning.** The node stores the passports it issues. |
+| Earlier versions (clause 4.2) | **In place for the operator, since engine v0.14.0.** Every change keeps the whole version it replaced, append-only, and the passport as it stood at any past moment can be read back through the versions route in the [API reference](/api). Two gaps: earlier versions are served to the operator only, not yet to other authorised readers under the current passport's access rules; and no copy is held by a back-up provider (next row). The standard's integrity requirement for earlier versions points at EN 18246, which is not published. |
+| Back-up copy (clause 4.3) | **Not in place.** The node's [database back-ups](/engine/backup) restore a node after a failure. They are not a back-up copy that serves passports and their earlier versions to authorised users. |
+| Access after the operator leaves the market (clause 4.3) | **Not built.** The standard expects wider access through the back-up once the operator is no longer active on the market. |
+| Documents a passport points to (clause 4.4) | **Not in place.** Declarations and instructions are carried as links. The node does not check that they can be downloaded and kept, and does not keep them available for the passport's lifetime. |
+| Replication to the back-up (clause 4.5) | **Cannot be assessed.** It is to run over EN 18216, using the interfaces of EN 18222, and we have read neither. |
+
+A word to watch: the node's `archived` status marks the end of a passport's retention period. It has nothing to do with the archiving of earlier versions in clause 4.2.
+
+### No one can conform to EN 18221 in full yet
+
+EN 18221 refers normatively to two more standards, **EN 18239** and **EN 18246**, which were still being prepared when it was issued and are not among the six cited. Until they are published, no system can conform to EN 18221 in full. That is a property of the standard, not of any implementation, including ours.
+
+## The four we have not read
+
+We make no claim about EN 18216, EN 18220, EN 18222 or EN 18223. Two of them come next: EN 18221's replication requirement depends on EN 18216 and EN 18222, so assessing it needs both.
+
+This page will say what each reading finds, including where it disagrees with what we built.
+
+## Read next
+
+- [Standards & interoperability](/core/standards): the open standards the code is built on.
+- [Acts and standards](/regulatory/acts-and-standards): every act and standard the code relies on.
+- [Backup, restore and key custody](/engine/backup): what the node's own back-ups do.

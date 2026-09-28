@@ -15,7 +15,7 @@ Checked on 2026-09-26 against `dpp-core` main and `dpp-engine` v0.14.0. Where so
 
 - **GS1 Digital Link**: the web address behind the QR code. A scan resolves to the passport, and the same link can serve different views and link types; a request for `linkset` returns an RFC 9264 linkset.
 - **ISO/IEC 18004**: the QR code itself. The node renders it with the four-module quiet zone the standard requires.
-- **EN 18219** (unique identifiers): the product identifier schemes it allows, including GS1, ISO/IEC 15459 issuing-agency identifiers and the IEC 61406 identification link, with its clause 5 syntax. This is on core's main branch and arrives with its next release; a released node identifies products by GTIN.
+- **EN 18219** (unique identifiers): three of the product identifier schemes it allows, a GS1 Digital Link, the IEC 61406 identification link and a decentralised identifier (DID). This is on core's main branch and arrives with its next release; a released node identifies products by GTIN. See [Harmonised standards](/regulatory/harmonised-standards).
 - **ISO 3166-1** country codes, and **ISO 17442** legal entity identifiers with their **ISO 7064** check characters.
 
 ## Signing a passport and proving access
@@ -49,12 +49,7 @@ Checked on 2026-09-26 against `dpp-core` main and `dpp-engine` v0.14.0. Where so
 
 Commission Implementing Decision (EU) 2026/1736 cited six standards from CEN/CENELEC JTC 24 in the Official Journal on 15 July 2026: **EN 18216, 18219, 18220, 18221, 18222 and 18223**. Under ESPR Art. 41(2), conforming to a cited standard gives a presumption of conformity with the requirements it covers.
 
-Where the software stands:
-
-- **EN 18219** (unique identifiers) and **EN 18221** (data storage, archiving and persistence) have been read in full. Identifier support follows EN 18219 clause 5 on core's main branch. EN 18221's presumption covers only the technical back-up arrangement, and the node's archive support is optional today.
-- **EN 18216, 18220, 18222 and 18223** have not been read. No conformance with them is claimed.
-
-We say *aligning*, never *conformant*, until a clause-by-clause reading says otherwise, and this page will say what that reading finds, including where it disagrees with what we built.
+We have read EN 18219 and EN 18221 in full, and claim nothing about the other four. Each standard's title, and where the software stands against it topic by topic, is on [Harmonised standards](/regulatory/harmonised-standards). We say *aligning*, never *conformant*.
 
 ## Read next
 

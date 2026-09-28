@@ -71,6 +71,7 @@ export const sidebar = [
       { label: 'Access Control', link: '/regulatory/access-control' },
       { label: 'EU Central Registry', link: '/regulatory/central-registry' },
       { label: 'Acts and standards', link: '/regulatory/acts-and-standards' },
+      { label: 'Harmonised standards', link: '/regulatory/harmonised-standards' },
     ],
   },
   {
