@@ -18,7 +18,6 @@ export const sidebar = [
     collapsed: true,
     items: [
       { label: 'What the core does', link: '/core/overview' },
-      // { label: 'Verify a passport yourself', link: '/core/verify' },
       { label: 'Standards & interoperability', link: '/core/standards' },
       { label: 'Security & cryptography', link: '/core/security' },
       { label: 'Product groups & plugins', link: '/core/sectors' },
