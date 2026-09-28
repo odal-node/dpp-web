@@ -9,7 +9,15 @@ const description =
 // This policy covers the website at odal-node.io only — a static site with no
 // backend. How the Odal Node software handles product data is a separate,
 // architectural question; see /trust.
-const MAILBOX = "security@odal-node.io";
+const MAILBOX = "contact@odal-node.io";
+
+const updated = "2026-09-27";
+const updatedText = new Date(`${updated}T00:00:00Z`).toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
 
 // TODO(legal): once a registered entity exists, name the data controller and
 // its jurisdiction here and in the "Who is responsible" section below.
@@ -24,6 +32,9 @@ const MAILBOX = "security@odal-node.io";
       <li>We do not build a profile of you, and we do not sell or share data. There is nothing to sell.</li>
       <li>The only data that exists is what your browser unavoidably sends to load a web page, and anything you choose to email us.</li>
     </ul>
+    <p class="text-sm text-neutral-600">
+      Last updated <time datetime={updated}>{updatedText}</time>.
+    </p>
   </Section>
 
   <Section eyebrow="Hosting" title="What the host sees." tone="tinted">
@@ -47,7 +58,22 @@ const MAILBOX = "security@odal-node.io";
     </p>
   </Section>
 
-  <Section eyebrow="Off-site links" title="Where the site sends you.">
+  <Section eyebrow="Email" title="What happens to an email you send us.">
+    <p>
+      If you write to us, for example to join the waitlist, we receive your
+      email address, your name if you give it, and whatever your message says.
+      We use it to reply to you and, if you asked to hear from us, to write
+      when something you asked about is ready. We do not add you to a mailing
+      list, and nobody but us and the provider that hosts our email handles
+      what you send.
+    </p>
+    <p>
+      We keep your emails until you ask us to delete them. Ask at any time and
+      we delete the whole correspondence.
+    </p>
+  </Section>
+
+  <Section eyebrow="Off-site links" title="Where the site sends you." tone="tinted">
     <p>
       Some links lead off this site: the <a href="https://docs.odal-node.io" rel="noopener">documentation</a>,
       our <a href="https://github.com/odal-node" rel="noopener">GitHub organisation</a>,
@@ -57,7 +83,7 @@ const MAILBOX = "security@odal-node.io";
     </p>
   </Section>
 
-  <Section eyebrow="Your rights" title="What you can ask of us." tone="tinted">
+  <Section eyebrow="Your rights" title="What you can ask of us.">
     <p>
       Under the GDPR and equivalent laws you can ask us to confirm what personal
       data we hold about you, to correct it, to send you a copy, or to delete it.
@@ -72,7 +98,7 @@ const MAILBOX = "security@odal-node.io";
     </p>
   </Section>
 
-  <Section eyebrow="Responsibility & changes" title="Who is responsible, and how this page changes.">
+  <Section eyebrow="Responsibility & changes" title="Who is responsible, and how this page changes." tone="tinted">
     <p>
       <strong>Odal Node</strong> is responsible for this website and for the
       personal data described above. For any data or privacy matter, the contact
