@@ -20,7 +20,7 @@ const branch = process.env.CF_PAGES_BRANCH;
 export const DOCS_ORIGIN =
   process.env.DOCS_ORIGIN ??
   (import.meta.env.DEV
-    ? "http://localhost:4321"
+    ? "http://localhost:4325"
     : branch && branch !== "main"
       ? `https://${alias(branch)}.odal-node-docs.pages.dev`
       : PRODUCTION_DOCS);

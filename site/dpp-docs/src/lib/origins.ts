@@ -19,7 +19,7 @@ const branch = process.env.CF_PAGES_BRANCH;
 export const LANDING_ORIGIN =
   process.env.LANDING_ORIGIN ??
   (import.meta.env.DEV
-    ? 'http://localhost:4325'
+    ? 'http://localhost:4321'
     : branch && branch !== 'main'
       ? `https://${alias(branch)}.odal-node-landing.pages.dev`
       : PRODUCTION_LANDING);

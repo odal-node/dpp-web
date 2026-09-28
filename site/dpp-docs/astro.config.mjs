@@ -145,4 +145,8 @@ export default defineConfig({
     }),
   ],
   output: 'static',
+  // Fixed, so the two dev servers can run side by side and link to each other:
+  // the landing site expects this one at 4325 (site/dpp-landing/src/lib/origins.ts),
+  // and this one expects the landing at 4321 (src/lib/origins.ts).
+  server: { port: 4325 },
 });
