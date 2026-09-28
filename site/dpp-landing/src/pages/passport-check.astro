@@ -146,8 +146,17 @@ const selectClass =
       history.replaceState(null, "", key ? `#${key}` : location.pathname);
     };
 
-    // An answer shared by its address opens on that answer.
-    const [g, sub] = decodeURIComponent(location.hash.slice(1)).split(":");
+    // An answer shared by its address opens on that answer. A mangled address
+    // (a stray "%" that is not an escape) opens on the empty picker instead:
+    // decodeURIComponent throws on it, and an uncaught throw here would leave
+    // the picker with no listeners, so nothing could be chosen at all.
+    let shared = "";
+    try {
+      shared = decodeURIComponent(location.hash.slice(1));
+    } catch {
+      /* not a valid escape sequence: ignore it */
+    }
+    const [g, sub] = shared.split(":");
     if (g && [...group.options].some((o) => o.value === g)) {
       group.value = g;
       const f = follows.find((x) => x.dataset.follow === g);
