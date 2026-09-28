@@ -46,6 +46,10 @@ const RULES = [
   { pattern: /DESIGN_SPEC/g, why: 'a private-repo document path' },
   { pattern: /\bBRAND\.md\b/g, why: 'a private-repo document path' },
   { pattern: /\.\.\/\.\.\/docs\//g, why: 'a relative path into the private repo' },
+  // The private docs repository's reference tree, named in a source comment on
+  // the home page until 2026-09-27. Comments are public too: the repository is.
+  { pattern: /\breference\/regulatory\//g, why: 'a path into the private docs repository' },
+  { pattern: /DPP-SECTOR-INVENTORY/g, why: 'a private-repo document name' },
 ];
 
 const walk = (dir, out = []) => {
