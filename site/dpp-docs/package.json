@@ -1,6 +1,6 @@
 {
   "name": "dpp-docs",
-  "description": "Technical documentation site for docs.odal-node.io. Astro 5 + Starlight + Cloudflare Pages. Sibling of dpp-landing.",
+  "description": "Technical documentation site for docs.odal-node.io. Astro + Starlight + Cloudflare Pages. Sibling of dpp-landing.",
   "type": "module",
   "version": "0.1.0",
   "license": "Apache-2.0",
@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9",
-    "typescript": "^5",
-    "vite-plugin-static-copy": "^4.1.1"
+    "typescript": "^5"
   }
 }
