@@ -132,6 +132,17 @@ const examples = [
   </Section>
 </Base>
 
+<style>
+  /* The file input is visually hidden inside its label, so its own focus ring
+     cannot be seen, and a keyboard reader could not tell they were on the drop
+     zone. The label, which is what they see, carries the ring instead: the
+     same one every other control has (global.css). */
+  #drop:has(input:focus-visible) {
+    outline: 2px solid var(--odal-action-600);
+    outline-offset: 2px;
+  }
+</style>
+
 <script>
   import { verifyDossierText, type Check, type Outcome } from "../lib/verify/verify.ts";
 
@@ -236,9 +247,12 @@ const examples = [
     }
 
     const failed = outcome.checks.filter((c) => c.status === "fail");
+    // "Verified" is about the file, not the company: anyone can make a file that
+    // passes, signed with their own keys and naming any issuer. The banner says
+    // so where the green is, not only further down the page.
     result.append(
       outcome.exit === 0
-        ? banner("ok", "Verified. Every check passed.", "The file is intact and was signed with the keys it names.")
+        ? banner("ok", "Verified. Every check passed.", "The file is intact and was signed with the keys it carries. That does not show who holds those keys: compare the issuer's identity with the one it publishes on its own web domain.")
         : banner("bad", `Tampered. ${failed.length} check${failed.length === 1 ? "" : "s"} failed.`, "Something in the file was changed after it was signed. The failed checks below show where."),
     );
 
@@ -253,7 +267,7 @@ const examples = [
       facts.append(wrap);
     };
     fact("Passport", d.manifest.passportId);
-    fact("Issued by", d.manifest.issuerDid);
+    fact("Issuer, as the file names it", d.manifest.issuerDid);
     fact("File created", fmt(d.manifest.createdAt));
     if (group) fact("Product group", group);
     fact("History entries", String(d.auditEntries.length));
@@ -335,7 +349,24 @@ const examples = [
   for (const button of document.querySelectorAll<HTMLButtonElement>("[data-example]")) {
     button.addEventListener("click", async () => {
       const name = button.dataset.example!;
-      const res = await fetch(`/verify/examples/${name}`);
+      // A failed fetch must not reach the checker: the error page it returns
+      // (a 429 from the edge rate limit, a 404) would be reported as "not a
+      // proof file", which blames the example rather than the request.
+      let res: Response;
+      try {
+        res = await fetch(`/verify/examples/${name}`);
+      } catch {
+        result.replaceChildren(banner("neutral", "The example could not be loaded.", "Check your connection and try again."));
+        return;
+      }
+      if (!res.ok) {
+        result.replaceChildren(
+          res.status === 429
+            ? banner("neutral", "Too many requests in a short time.", "Wait ten seconds, then try the example again.")
+            : banner("neutral", "The example could not be loaded.", `The server answered ${res.status}. Try again, or check a file of your own.`),
+        );
+        return;
+      }
       await check(await res.text(), `example: ${button.textContent?.trim()}`);
     });
   }
