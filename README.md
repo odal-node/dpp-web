@@ -5,7 +5,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/odal-node/dpp-web/actions/workflows/ci.yml/badge.svg)](https://github.com/odal-node/dpp-web/actions/workflows/ci.yml)
 [![Node 22.13+](https://img.shields.io/badge/Node-22.13%2B-brightgreen.svg)](https://nodejs.org/)
-[![Status: Active Development](https://img.shields.io/badge/Status-Active%20Development-green.svg)]()
+[![Status: Active Development](https://img.shields.io/badge/Status-Active%20Development-green.svg)](https://odal-node.io/roadmap)
 
 The two public-facing web properties for Odal Node, organised as a pnpm workspace and deployed as two independent Cloudflare Pages projects.
 
@@ -61,7 +61,8 @@ pnpm install
 
 # Run a dev server for either site
 pnpm dev:landing      # http://localhost:4321  → site/dpp-landing
-pnpm dev:docs         # http://localhost:4321  → site/dpp-docs
+pnpm dev:docs         # http://localhost:4325  → site/dpp-docs
+# Run both at once and links between them point at each other.
 
 # Build for production (same command Cloudflare runs)
 pnpm -r build
@@ -76,7 +77,11 @@ pnpm run check:leakage    # internal vocabulary / private-repo paths, incl. publ
 pnpm run check:openapi    # vendored API spec still matches its pinned engine commit
 pnpm --filter dpp-landing run check:core   # vendored core records match their pin
 pnpm --filter dpp-landing run test:verify  # the browser verifier agrees with the node's
-pnpm audit --audit-level critical
+pnpm run test:scripts     # the rate-limit and external-link scripts
+pnpm audit --audit-level high
+
+# Not a pull-request gate: run weekly by .github/workflows/external-links.yml.
+pnpm run check:external   # links to other sites (EUR-Lex, GitHub …); fails only on a 404 or 410
 ```
 
 `pnpm -r check` does **not** check links, and never did — a markdown link target is an opaque
@@ -106,7 +111,11 @@ The original phased build (workspace foundations → landing MVP → docs IA →
 
 An **August 2026 audit** of both sites read every published page against primary regulatory text and against the engine's source. It found a delegated act that does not exist described as adopted, roughly twenty misattributed citations, four security-property claims the code contradicted, and a registry described as unbuilt eight months after it went live. Those are corrected; the findings register lives outside this repository.
 
-What remains before public launch: a manual screen-reader and keyboard pass (the automated axe check is done, and the landing's accessibility page already says the site is tested by hand before it is published, so the pass must happen before promotion), a runtime check that the API reference does not relay requests through a third-party proxy, and a named data controller in the privacy policy — which is blocked on a registered entity existing, not on a copy edit.
+What remains before public launch: a screen-reader pass by a person (the landing's accessibility page already says the site is tested by hand with a screen reader before it is published, so the pass must happen before promotion) and a named data controller in the privacy policy — which is blocked on a registered entity existing, not on a copy edit.
+
+The keyboard pass is done. On 2026-09-27 every page of both sites was walked with Tab alone at 1280px and 375px in headless Chromium: every control shows a focus ring, nothing traps focus, the first Tab on the landing reaches "Skip to content", and the menus, the passport check and /verify work from the keyboard. axe-core 4.13 (WCAG 2.0–2.2 A and AA, plus best practice) ran on every page of both sites at both widths and, on the docs, in both themes. The landing is clean. What it still reports is inside Scalar's API reference on `/api` (ARIA attributes on the wrong roles, a few icon buttons with no name, a second banner landmark on a phone, a scrolling list that cannot take focus) and Expressive Code's unnamed code-block regions on the docs, a best-practice rule rather than a WCAG one. Those are third-party markup this repository does not render.
+
+The API reference does not relay requests through a third party. Checked at runtime on 2026-09-27: in headless Chromium, "Test Request → Send" on `/api` went straight to the spec's server (`http://localhost:8001/vault/api/v1/dpp`), and the session made no request to any `scalar.com` host. That rests on `proxyUrl: ''` in `site/dpp-docs/src/scripts/mount-api-reference.ts`; re-check it after upgrading `@scalar/api-reference`.
 
 ## Rate limit on /verify
 
@@ -149,4 +158,4 @@ Do **not** open public issues for security vulnerabilities (e.g. XSS, exposed se
 
 ---
 
-*Odal Node — built by [Odal Node](https://odal-node.io)
+*Odal Node — built by [Odal Node](https://odal-node.io)*
