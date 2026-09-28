@@ -121,6 +121,24 @@ export default defineConfig({
         // Without this, X renders the small square card whatever the image is.
         // The landing layout already sets it; this site set no card type at all.
         { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
+        // Starlight makes each markdown table its own horizontal scroller. On a
+        // phone the wide ones (configuration, quick start, acts) overflow, and
+        // a keyboard can only scroll what it can focus. So a table that
+        // overflows becomes a tab stop, and stops being one when it fits,
+        // rather than every table adding a stop nobody needs.
+        {
+          tag: 'script',
+          content: `(() => {
+  const mark = () => {
+    for (const table of document.querySelectorAll('.sl-markdown-content table')) {
+      if (table.scrollWidth > table.clientWidth + 1) table.tabIndex = 0;
+      else table.removeAttribute('tabindex');
+    }
+  };
+  addEventListener('DOMContentLoaded', mark);
+  addEventListener('resize', mark);
+})();`,
+        },
       ],
       sidebar,
       customCss: ['./src/styles/custom.css'],

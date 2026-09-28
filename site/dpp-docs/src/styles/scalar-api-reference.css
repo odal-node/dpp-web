@@ -17,21 +17,37 @@
  * odal-primary override ../styles/custom.css applies to Starlight's
  * `--sl-color-accent*`.
  *
- * HTTP-method / status colors (green/red/yellow/blue/orange/purple) are left
- * untouched — those are semantic (GET/POST/DELETE...), not brand, matching
+ * HTTP-method / status colors (green/red/yellow/blue/orange/purple) keep
+ * Scalar's hues — those are semantic (GET/POST/DELETE...), not brand, matching
  * the same split @odal/brand-tokens draws between `--odal-status-*` and the
- * `--odal-primary-*` brand scale.
+ * `--odal-primary-*` brand scale. Only their lightness is moved, where
+ * Scalar's default is below 4.5:1 against these backgrounds.
+ *
+ * Contrast (WCAG 2.2 AA, 4.5:1 for text): every text token below is at least
+ * that against all three backgrounds in light mode, and against background-1
+ * and -2 in dark mode. Starlight's gray-4, which light -color-3 used to copy,
+ * is 2.9:1 on background-3, so -color-3 is darker than Starlight's own.
  */
 
 @import "@odal/brand-tokens/tokens.css";
 
 .light-mode {
-  /* = --sl-color-text / -gray-3 / -gray-4 (light) */
+  /* = --sl-color-text / -gray-3 (light); -color-3 darkened to 4.5:1 on
+     background-3 (Starlight's -gray-4 is 2.9:1) */
   --scalar-color-1: hsl(224, 10%, 23%);
   --scalar-color-2: hsl(224, 7%, 36%);
-  --scalar-color-3: hsl(224, 6%, 56%);
+  --scalar-color-3: hsl(224, 7%, 44%);
   /* = --sl-color-accent (light), i.e. odal-primary-500 */
   --scalar-color-accent: var(--odal-primary-500);
+
+  /* Method and status colors, darkened to 4.5:1 or more on background-3.
+     Scalar's defaults for these five are 1.5:1 (yellow) to 4.3:1 (red)
+     there; its purple is already 7.9:1. */
+  --scalar-color-green: #047857;
+  --scalar-color-blue: #0069a8;
+  --scalar-color-orange: #b43f00;
+  --scalar-color-red: #c2150f;
+  --scalar-color-yellow: #8a6100;
 
   /* = --sl-color-bg / -bg-nav / -bg-inline-code (light) */
   --scalar-background-1: #ffffff;
@@ -61,12 +77,17 @@
 }
 
 .dark-mode {
-  /* = --sl-color-text / -gray-3 / -gray-4 (dark) */
+  /* = --sl-color-text (dark); -color-2 and -color-3 lightened to 5.4:1 and
+     4.5:1 on background-3 (Starlight's -gray-3 / -gray-4 are 3.5:1 / 1.7:1) */
   --scalar-color-1: hsl(224, 6%, 77%);
-  --scalar-color-2: hsl(224, 6%, 56%);
-  --scalar-color-3: hsl(224, 7%, 36%);
+  --scalar-color-2: hsl(224, 6%, 70%);
+  --scalar-color-3: hsl(224, 6%, 64%);
   /* = --sl-color-text-accent (dark), i.e. odal-primary-300 */
   --scalar-color-accent: var(--odal-primary-300);
+
+  /* Scalar's dark red is 3.4:1 on background-2; every other method color
+     already clears 4.5:1 there. */
+  --scalar-color-red: #ff6b6b;
 
   /* = --sl-color-bg / -bg-nav / -bg-inline-code (dark) */
   --scalar-background-1: hsl(224, 10%, 10%);
@@ -104,6 +125,18 @@
      is the token that's actually 600, so point at that instead of a raw
      number to stay in step if Scalar's weight scale ever changes. */
   --scalar-sidebar-font-weight-active: var(--scalar-bold);
+}
+
+/*
+ * A visible focus ring on everything that takes keyboard focus. Scalar's own
+ * controls (the response-code toggles, sidebar entries, tabs) draw none, so a
+ * keyboard reader could not see where they were. Unlayered, so it wins over
+ * Scalar's layered resets, in the accent color of the current mode.
+ */
+#scalar-api-reference :focus-visible,
+.odal-header a:focus-visible {
+  outline: 2px solid var(--scalar-color-accent);
+  outline-offset: 2px;
 }
 
 /*

@@ -26,7 +26,42 @@ createApiReference('#scalar-api-reference', {
   // rather than overriding it.
   proxyUrl: '',
   hideDarkModeToggle: true,
+  // Scalar otherwise declares its Inter and JetBrains Mono from
+  // fonts.scalar.com. The theme (scalar-api-reference.css) sets the docs' own
+  // system font stacks, so nothing used them, but declaring them left the page
+  // one font away from a third-party request, and the site's CSP refuses them.
+  withDefaultFonts: false,
 });
+
+// Scalar renders the spec's contact URL as a link holding only an icon, which a
+// screen reader announces as a link with no name. Each such link is named by
+// where it goes. Scalar renders after mount and again as the reader moves
+// around, so new links are named as they appear rather than once.
+const UNNAMED_LINK = 'a[href]:not([aria-label]):not([aria-labelledby]):not([title])';
+
+function nameIconOnlyLinks(added: Element): void {
+  const links = added.matches(UNNAMED_LINK)
+    ? [added as HTMLAnchorElement]
+    : added.querySelectorAll<HTMLAnchorElement>(UNNAMED_LINK);
+  for (const link of links) {
+    if (link.textContent?.trim()) continue;
+    const url = new URL(link.href, location.href);
+    const where = url.host + (url.pathname === '/' ? '' : url.pathname);
+    link.setAttribute('aria-label', link.target === '_blank' ? `${where} (opens in a new tab)` : where);
+  }
+}
+
+const referenceRoot = document.getElementById('scalar-api-reference');
+if (referenceRoot) {
+  new MutationObserver((records) => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        if (node instanceof Element) nameIconOnlyLinks(node);
+      }
+    }
+  }).observe(referenceRoot, { childList: true, subtree: true });
+  nameIconOnlyLinks(referenceRoot);
+}
 
 // Keep the resolved theme live after first paint, mirroring exactly what
 // Starlight's ThemeProvider does on the docs pages:
