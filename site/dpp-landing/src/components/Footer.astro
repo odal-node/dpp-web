@@ -1,14 +1,13 @@
 ---
 // Footer.astro — closing trust signals on the navy band. No newsletter, no social row.
-// Uses the shared brand mark (currentColor variant) tinted ice for the dark band,
-// so it stays in sync with the asset instead of a hand-rolled inline copy.
+// Uses the shared brand mark as an image (see Nav.astro for why not inline), so
+// it stays in sync with the asset instead of a hand-rolled copy.
 //
 // Every column comes from lib/site-map.ts (the nav's menus) and
 // lib/product-groups.ts, so a page reachable from the nav is reachable from the
 // foot of every page too, and the two cannot drift. It spans the full width,
 // with the same side padding as the nav bar, so its edges line up with the
 // logo and the waitlist button above.
-import OdalMark from "../assets/favicon.svg";
 import ExternalArrow from "./ExternalArrow.astro";
 import { menus, footerLinks } from "../lib/site-map";
 import { groups, unsoldGoods } from "../lib/product-groups";
@@ -22,7 +21,7 @@ const bottom = [link("/privacy"), link("/sitemap")];
   <div class="grid grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 text-sm sm:grid-cols-3 sm:px-6 lg:grid-cols-6 xl:grid-cols-[1.3fr_repeat(4,1fr)_2fr] xl:gap-x-8">
     <div class="col-span-2 sm:col-span-3 lg:col-span-6 xl:col-span-1">
       <p class="mb-2 flex items-center gap-2 font-semibold text-white">
-        <OdalMark aria-hidden="true" class="h-6 w-6 shrink-0 text-primary-300" />
+        <img src="/favicon.svg" alt="" width="24" height="24" class="h-6 w-6 shrink-0" />
         Odal Node
       </p>
       <p class="leading-body text-primary-300">

@@ -3,7 +3,6 @@
 // Navy band with the brand mark as a quiet watermark, ice text and a single
 // call to action. One action on purpose: a lone outline button on a navy band
 // reads as a secondary choice with nothing to be secondary to.
-import Watermark from "../assets/favicon.svg";
 import StatusBadge from "./StatusBadge.astro";
 import Button from "./Button.astro";
 
@@ -28,7 +27,7 @@ const { eyebrow, title, subtitle, ctaHref, ctaLabel, status = false } = Astro.pr
     style="background: radial-gradient(closest-side, rgba(94,143,199,0.18), transparent);"
     aria-hidden="true"
   ></div>
-  <Watermark aria-hidden="true" class="pointer-events-none absolute -right-16 top-1/2 hidden h-120 w-120 -translate-y-1/2 opacity-[0.07] lg:block" />
+  <img src="/favicon.svg" alt="" width="480" height="480" class="pointer-events-none absolute -right-16 top-1/2 hidden h-120 w-120 -translate-y-1/2 opacity-[0.07] lg:block" />
 
   <div class="relative mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:px-8">
     <div class="max-w-3xl">
@@ -39,7 +38,7 @@ const { eyebrow, title, subtitle, ctaHref, ctaLabel, status = false } = Astro.pr
               {eyebrow}
             </p>
           )}
-          {status && <StatusBadge tone="navy" label="Alpha · Active development" />}
+          {status && <StatusBadge tone="navy" />}
         </div>
       )}
       <h1 class="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl">

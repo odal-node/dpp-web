@@ -90,7 +90,8 @@ const softwareLd = {
     <link rel="canonical" href={canonicalHref} />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    {/* iOS does not use an SVG here; it wants a 180px PNG. */}
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#080C2C" />
 
     <!-- Open Graph -->
