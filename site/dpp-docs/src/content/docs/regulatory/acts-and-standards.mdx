@@ -8,7 +8,7 @@ import { Aside } from "@astrojs/starlight/components";
 This is the reference behind the website's [regulations page](https://odal-node.io/regulations): every EU act and standard the code cites, grouped by what the software does with it, with the articles it relies on.
 
 <Aside type="note" title="How this list was made">
-Built on 2026-09-26 by searching `dpp-core` main and `dpp-engine` v0.14.0 for every act and standard cited in source, schemas and rules, and keeping only those the code acts on. Acts cited only for background are listed separately at the end. It is not legal advice, and it is not a list of everything that applies to a product.
+We searched the core library and the engine for every act and standard cited in source, schemas and rules, and kept only those the code acts on. Acts cited only for background are listed separately at the end. It is not legal advice, and it is not a list of everything that applies to a product.
 </Aside>
 
 ## Acts that create or displace a passport
@@ -43,7 +43,7 @@ These are records in the core library's instrument catalog, and the website's re
 | Act | Relied on for | What the code does |
 |---|---|---|
 | Implementing Regulation (EU) 2026/1778 | Art. 8(3) granularity; Art. 8(7)(c)–(d) fields the registry checks; Art. 9(2)(a) proof of registration; commodity codes | Models registration and the identifiers the registry checks; the live connection waits on a legal person |
-| Implementing Decision (EU) 2026/1736, with ESPR Art. 41(2) | The six harmonised passport standards and their presumption of conformity | Identifier schemes follow EN 18219 on core's main branch, and earlier passport versions are kept as EN 18221 describes; see [Harmonised standards](/regulatory/harmonised-standards) |
+| Implementing Decision (EU) 2026/1736, with ESPR Art. 41(2) | The six harmonised passport standards and their presumption of conformity | Identifiers follow EN 18219, with two more of its schemes in the next core release, and earlier passport versions are kept as EN 18221 describes; see [Harmonised standards](/regulatory/harmonised-standards) |
 
 ### Who answers for a product
 

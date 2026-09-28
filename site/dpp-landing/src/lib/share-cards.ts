@@ -27,7 +27,7 @@ const pages: Card[] = [
   { path: "/timeline", eyebrow: "Timeline", title: "When passports arrive, year by year.", line: "From batteries in 2027 to vehicles in 2032, with where every date comes from." },
   { path: "/regulations", eyebrow: "Regulations", title: "The EU acts behind the passports.", line: "Every act, the passport date it sets, and where that date comes from." },
   { path: "/build-on-odal", eyebrow: "Build on Odal", title: "Other people's compliance work, on nodes we do not run.", line: "Libraries, plugins and the licence line." },
-  { path: "/roadmap", eyebrow: "Roadmap", title: "What is built, what is waiting, and what comes next.", line: "Capabilities, checked against the software itself." },
+  { path: "/roadmap", eyebrow: "Roadmap", title: "What is built, what is waiting, and what comes next.", line: "Capabilities, not tasks, and where each one stands." },
   { path: "/faq", eyebrow: "FAQ", title: "Questions people ask first.", line: "Which products need a passport, where your data lives and who can read it." },
   { path: "/glossary", eyebrow: "Glossary", title: "The words around a passport, explained.", line: "Product groups, delegated acts, legitimate interest, seals and more." },
   { path: "/security", eyebrow: "Security", title: "Report a security issue privately.", line: "How we respond, and how passports and signing keys are protected." },
