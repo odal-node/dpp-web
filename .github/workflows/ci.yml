@@ -95,8 +95,9 @@ jobs:
 
       # The /verify rate limit is a Cloudflare zone rule written by a script,
       # not by a deploy. This holds the rule inside the Free plan's limits and
-      # proves a write keeps every rule it does not own.
-      - name: Test the rate-limit script
+      # proves a write keeps every rule it does not own. It also tests the
+      # weekly external-link check's parsing and verdicts.
+      - name: Test the scripts
         run: pnpm run test:scripts
 
       # The product-group and regulation pages are generated from data vendored
@@ -139,10 +140,10 @@ jobs:
             git --no-pager log --oneline "$PIN"..origin/main -- api/openapi.yaml || true
           fi
 
-      # Fails on a high-severity advisory. The remaining advisories are all
-      # build-time or dev-server issues in transitive dependencies, which do not
-      # reach a static deploy — so this is set to fail on `critical` today and
-      # should be tightened to `high` once those clear. The point is that a new
-      # advisory becomes visible on the pull request that introduces it.
+      # Fails on a high or critical advisory. It was set to `critical` while
+      # high-severity advisories in transitive build-time dependencies were
+      # open; those cleared (2026-09-27: 2 low, 2 moderate, all build- or
+      # dev-time), so it is at `high` now. The point is that a new advisory
+      # becomes visible on the pull request that introduces it.
       - name: Audit dependencies
-        run: pnpm audit --audit-level critical
+        run: pnpm audit --audit-level high

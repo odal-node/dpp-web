@@ -97,6 +97,8 @@ jobs:
           pnpm -r check
           pnpm run check:links
           pnpm run check:leakage
+          pnpm run check:spacing
+          pnpm run check:llms
         env:
           DPP_ENGINE_DIR: ${{ github.workspace }}/.dpp-engine
 
