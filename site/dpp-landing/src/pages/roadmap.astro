@@ -10,14 +10,6 @@
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import OurRoadmap from "../components/Roadmap.astro";
-import data from "../data/roadmap.json";
-
-const updated = new Date(`${data.updated}T00:00:00Z`).toLocaleDateString("en-GB", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-});
 
 const title = "Roadmap: what is built, waiting and next | Odal Node";
 const description =
@@ -37,11 +29,8 @@ const description =
     </p>
     <p>
       There are no dates on anything unbuilt. Timing depends on EU acts,
-      standards votes and registry access, none of which we control, so the
-      status is the commitment and a quarter would be a guess.
-    </p>
-    <p class="text-sm text-neutral-500">
-      Last updated <time datetime={data.updated}>{updated}</time>.
+      standards votes and registry access, none of which we control. We commit
+      to the status, not to a quarter we would only be guessing.
     </p>
   </Section>
 
@@ -54,8 +43,8 @@ const description =
   <Section eyebrow="How items move" title="What it takes to change status." wide>
     <p>
       An item is <strong>available</strong> when it is in a released version
-      and a test exercises it through the running system. Merged is not
-      available, and neither is demonstrated.
+      and a test exercises it through the running system. Code that is written
+      but not released does not count, and neither does a demonstration.
     </p>
     <p>
       An item is <strong>waiting on a legal step</strong> when it is built and
@@ -71,8 +60,8 @@ const description =
     </p>
     <p>
       Items can move backwards. Finding out while building something that it
-      needs more groundwork is an ordinary outcome, and a reversal recorded here
-      is better than an item quietly drifting.
+      needs more groundwork is an ordinary outcome, and we record it here
+      rather than let the item slip without notice.
     </p>
   </Section>
 

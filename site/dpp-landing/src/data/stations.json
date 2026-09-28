@@ -31,7 +31,7 @@
       "title": "Sign",
       "who": "The operator",
       "lead": "Signed with your own key, on your own servers.",
-      "body": "The signature is tied to an identity on a web domain you control, and nothing is sent anywhere to be signed. That is the difference between holding a record and renting access to it."
+      "body": "The signature is tied to an identity on a web domain you control, and nothing is sent anywhere to be signed. The record is yours, not held on someone else's platform."
     },
     {
       "n": 5,

@@ -18,15 +18,15 @@ export type Card = {
 };
 
 const pages: Card[] = [
-  { path: "/lifecycle", eyebrow: "Lifecycle", title: "A passport is not a document. It is a record with a life.", line: "One record, eight stations, from the factory to the end of its life." },
+  { path: "/lifecycle", eyebrow: "Lifecycle", title: "What happens to a passport over a product's life.", line: "One record, eight stations, from the factory to the end of its life." },
   { path: "/visibility", eyebrow: "Visibility", title: "Each reader sees the part the law gives them.", line: "Who can read which part of a battery passport, and why." },
   { path: "/example-passport", eyebrow: "Example", title: "An example battery passport.", line: "Sorted into what anyone can read and what only some readers can." },
   { path: "/verify", eyebrow: "Verify", title: "Check a passport's proof file yourself.", line: "Signatures and history, checked in your browser. The page does not upload your file." },
-  { path: "/trust", eyebrow: "Data and trust", title: "What Odal Node can and cannot see.", line: "Why that holds by design rather than by promise." },
+  { path: "/trust", eyebrow: "Data and trust", title: "What Odal Node can and cannot see.", line: "And why that does not depend on trusting us." },
   { path: "/passport-check", eyebrow: "Passport check", title: "Does my product need a passport?", line: "Pick what you make or sell, and see which date applies and where it comes from." },
   { path: "/timeline", eyebrow: "Timeline", title: "When passports arrive, year by year.", line: "From batteries in 2027 to vehicles in 2032, with where every date comes from." },
   { path: "/regulations", eyebrow: "Regulations", title: "The EU acts behind the passports.", line: "Every act, the passport date it sets, and where that date comes from." },
-  { path: "/build-on-odal", eyebrow: "Build on Odal", title: "Other people's compliance work, on nodes we do not run.", line: "Libraries, plugins and the licence line." },
+  { path: "/build-on-odal", eyebrow: "Build on Odal", title: "Write rules and integrations that run on other people's nodes.", line: "Libraries, plugins and the licence line." },
   { path: "/roadmap", eyebrow: "Roadmap", title: "What is built, what is waiting, and what comes next.", line: "Capabilities, not tasks, and where each one stands." },
   { path: "/faq", eyebrow: "FAQ", title: "Questions people ask first.", line: "Which products need a passport, where your data lives and who can read it." },
   { path: "/glossary", eyebrow: "Glossary", title: "The words around a passport, explained.", line: "Product groups, delegated acts, legitimate interest, seals and more." },

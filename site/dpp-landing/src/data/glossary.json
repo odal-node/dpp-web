@@ -23,7 +23,7 @@
     },
     {
       "term": "Continuity snapshot",
-      "definition": "A signed copy of a passport's public page, kept outside the node so a scan still works while the node is down. It says how long it stands.",
+      "definition": "A signed copy of a passport's public page, kept outside the node so a scan still works while the node is down. It says how long it is valid.",
       "link": { "href": "https://docs.odal-node.io/guides/verification", "label": "Proof and verification" }
     },
     {

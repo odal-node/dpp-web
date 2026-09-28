@@ -12,7 +12,7 @@
           "items": [
             {
               "title": "Runs on your own infrastructure",
-              "line": "One self-contained node on servers you choose, brought up with a single command. Self-hosting for your own compliance is free."
+              "line": "One self-contained node on servers you choose. Build our setup tool once, and it sets up and starts the node. Self-hosting for your own compliance is free."
             },
             {
               "title": "Signed with your own key",
@@ -169,7 +169,7 @@
             },
             {
               "title": "Clear about its own state",
-              "line": "The node reports which of the services it relies on are fully working and which are still stand-ins, so nothing looks more finished than it is."
+              "line": "The node reports which of the services it relies on are fully working and which are still stand-ins, so it is clear what is not finished yet."
             },
             {
               "title": "Safe by default",
@@ -189,11 +189,11 @@
           "items": [
             {
               "title": "Electronic seals with legal effect",
-              "line": "Sealing works end to end today. Until a company holds a qualified certificate, every seal it makes says plainly that it carries no legal effect, rather than rounding that up."
+              "line": "Sealing works end to end today. Until a company holds a qualified certificate, every seal it makes says plainly that it carries no legal effect."
             },
             {
               "title": "Registration in the EU registry",
-              "line": "Registering passports needs the same legal identity. Our connection to the registry will be finished against its official interface, not guessed at."
+              "line": "Registering passports needs the same legal identity. Our connection to the registry will be finished against its official interface."
             }
           ]
         }

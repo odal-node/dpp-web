@@ -19,20 +19,20 @@ const afterSale = stations.stations.filter((s) => s.n >= 6);
 ---
 
 <Base title={title} description={description}>
-  <Section h1 eyebrow="Lifecycle" title="A passport is not a document. It is a record with a life." wide>
+  <Section h1 eyebrow="Lifecycle" title="What happens to a passport over a product's life." wide>
     <p>
       Most descriptions of a product passport stop at publication: import,
-      check, sign, publish. That is the first half. A product is then repaired,
-      resold, remanufactured and eventually recycled, and its record has to
-      survive all of it while answering different people differently.
+      check, sign, publish. After that, a product is repaired, resold,
+      remanufactured and eventually recycled. Its passport has to stay accurate
+      through all of it, and show different people different parts.
     </p>
     <p>
-      Eight stations. Each names who touches the record there, and what
-      happens to it.
+      The passport passes through eight stations. Each one below says who works
+      with the record there, and what happens to it.
     </p>
   </Section>
 
-  <Section eyebrow="The spine" title="One record, eight stations." tone="muted" wide>
+  <Section eyebrow="The stations" title="One record, eight stations." tone="muted" wide>
     <div class="not-prose space-y-5">
       {stations.stations.map((s) => (
         <article id={s.key} class={`card p-6 ${s.n >= 6 ? "card-emphasis" : ""}`}>
@@ -75,14 +75,9 @@ const afterSale = stations.stations.filter((s) => s.n >= 6);
         </li>
       ))}
     </ul>
-    <p>
-      They are why this page is long. A capability that only matters years
-      after purchase cannot be shown in a screenshot, so the next best thing is
-      to describe it precisely.
-    </p>
   </Section>
 
-  <Section eyebrow="Status" title="What is built, stated plainly." tone="tinted">
+  <Section eyebrow="Status" title="What is built today." tone="tinted">
     <p>
       All eight stations exist in the software today. <strong>Nobody is running
       it in production:</strong> no customers, no pilots, no live deployments.

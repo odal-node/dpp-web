@@ -23,7 +23,7 @@ export const menus: Menu[] = [
       {
         href: "/trust",
         label: "What Odal can see",
-        line: "What stays on your node, and why that holds by design",
+        line: "What stays on your node, and why",
         icon: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
       },
       {
@@ -139,7 +139,7 @@ export const menus: Menu[] = [
       {
         href: "/accessibility",
         label: "Accessibility",
-        line: "How this site was checked, and how to report a problem",
+        line: "How this site is tested, and how to report a problem",
         icon: '<circle cx="12" cy="4.5" r="1.5"/><path d="M5 8.5c2.3.7 4.6 1 7 1s4.7-.3 7-1M12 9.5V14m0 0-3 7m3-7 3 7"/>',
       },
       {

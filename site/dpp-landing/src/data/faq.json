@@ -84,7 +84,7 @@
         {
           "q": "Do I have to run it myself?",
           "a": [
-            "Today, yes. The node runs on infrastructure you choose and is brought up with a single command. A node run for you is being considered, and it would still be yours alone: one company, one node, nothing shared."
+            "Today, yes. The node runs on infrastructure you choose: you build our setup tool once, and it sets up and starts the node. A node run for you is being considered, and it would still be yours alone: one company, one node, nothing shared."
           ],
           "link": { "href": "/roadmap", "label": "See the roadmap" }
         },

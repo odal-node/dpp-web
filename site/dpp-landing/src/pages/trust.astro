@@ -9,7 +9,7 @@ import Section from "../components/Section.astro";
 
 const title = "Trust | Odal Node";
 const description =
-  "What Odal can and cannot see, and why that holds by design rather than by promise.";
+  "What Odal can and cannot see, and why that does not depend on trusting us.";
 
 const guarantees = [
   {
@@ -32,14 +32,13 @@ const guarantees = [
     <p>
       Odal Node is built on a proof-bound architecture: the manufacturer's raw
       production data is validated and signed locally, on infrastructure the
-      manufacturer controls, and the import file is then discarded. What is
-      stored and served is the signed passport. This is a property of the
-      software, not a policy promise: it holds regardless of who operates the
-      node.
+      manufacturer controls, and the import file is then discarded. The node
+      stores and serves only the signed passport. This is how the software
+      works, whoever operates the node.
     </p>
   </Section>
 
-  <Section eyebrow="By design" title="Three things that do not depend on trusting us." tone="tinted" wide>
+  <Section eyebrow="Guarantees" title="Three things that do not depend on trusting us." tone="tinted" wide>
     <ul class="not-prose m-0 grid list-none gap-6 p-0 md:grid-cols-3">
       {guarantees.map((g) => (
         <li class="card m-0 p-6">
@@ -52,17 +51,16 @@ const guarantees = [
 
   <Section eyebrow="Scan telemetry" title="What a scan count is, and what it is not." wide>
     <p>
-      When a passport is resolved, the node can record that it happened: an
-      aggregate count, per passport, per day. That is the whole of it. A scan
-      count records <strong>nothing about the person who scanned</strong>: no IP
-      address, no device, no location, no identity, no session. The software has
-      no field in which to store any of it, so there is nothing to leak and
-      nothing that could quietly become tracking. Producing a QR-code image is
-      counted separately; it measures label production, not people.
+      When a passport is resolved, the node can record that it happened, as a
+      count per passport per day, and nothing more. A scan count records{" "}
+      <strong>nothing about the person who scanned</strong>: no IP address,
+      device, location, identity or session. The software has no field to store
+      any of it, so none of it can be kept or leaked. Generating a QR-code image
+      is counted separately, because it measures label printing, not readers.
     </p>
   </Section>
 
-  <Section eyebrow="How it works" title="The mechanism, not the promise." tone="muted" wide>
+  <Section eyebrow="How it works" title="How it works, step by step." tone="muted" wide>
     <ol>
       <li>
         <strong>Import.</strong> Product data arrives at your node as CSV, Excel
