@@ -1,46 +1,46 @@
 ---
 title: Permanence & retention
-description: A published passport must stay accessible and unaltered for years. How a node guarantees permanence by construction, in line with ESPR Article 9.
+description: A published passport must stay accessible and unaltered for years. How a node keeps it that way, in line with ESPR Article 9.
 ---
 
-ESPR makes a published passport a long-lived obligation, not a transient record. Once a product is on the market, Art. 9(2)(i) requires its passport to stay available for a period the delegated act sets, "at least the expected lifetime of a specific product" — ESPR itself fixes no number. And under Art. 10(4) the operator must make a **back-up copy** available through a "digital product passport service provider", so the passport survives even if the operator does not.
+Under ESPR a published passport is a long-term obligation. Once a product is on the market, Art. 9(2)(i) requires its passport to stay available for a period the delegated act sets, "at least the expected lifetime of a specific product"; ESPR itself fixes no number. Under Art. 10(4) the operator must also make a **back-up copy** available through a "digital product passport service provider", so the passport survives even if the operator does not.
 
-A node is built so those guarantees hold by construction, not by good behaviour. Permanence is not a policy an operator opts into; it is a property of how the software works.
+A node enforces these guarantees in its code. The operator does not have to switch them on, and cannot switch them off.
 
-Retention has two directions that are easy to conflate, so state them plainly: the raw *import files* fed into a node are discarded after signing and never retained (see [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see)); the signed *passport* they produce is retained permanently and can never be deleted. This page is about the second direction — the permanence of a published passport.
+Retention works in two opposite directions. The raw *import files* fed into a node are discarded after signing and never kept (see [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see)). The signed *passport* they produce is kept permanently and can never be deleted. This page is about the second: how a published passport stays permanent.
 
 ## Publishing locks a passport
 
-The moment a passport is published, a retention lock is set on it — and it is never cleared. A locked passport can still change *state*: it can be suspended during a recall, or archived at end-of-life. But its *content* can no longer be edited. Only a draft is mutable; once a passport becomes a signed, published proof, it is fixed.
+When a passport is published, a retention lock is set on it, and it is never cleared. A locked passport can still change *state*: it can be suspended during a recall, or archived at end of life. Its *content* can no longer be edited. Only a draft can change; once a passport is signed and published, it is fixed.
 
 ## There is no delete
 
-The node's storage interface has no delete operation at all. This is a structural guarantee rather than a setting: a published passport cannot be removed, regardless of what the database underneath would technically allow, and regardless of who operates the node. The capability simply does not exist in the surface that talks to the data — and, as a second line of defence, the database itself rejects the change (see [Operating a node securely](/engine/security)).
+The node's storage interface has no delete operation. A published passport cannot be removed through the node, whatever the database underneath would allow and whoever operates the node. As a second safeguard, the database itself rejects the change (see [Operating a node securely](/engine/security)).
 
 ## History is append-only
 
-Every transition — created, published, suspended, archived — is written to an audit trail as it happens. Entries are only ever added; they are never rewritten or deleted. A passport's provenance can therefore be examined years later and trusted to reflect what actually occurred, in the order it occurred.
+Every transition (created, published, suspended, archived) is written to an audit trail when it happens. Entries are only ever added, never rewritten or deleted, so years later a passport's history still shows what happened and in what order.
 
 ## Retiring is a state, not an ending
 
-A passport can be archived (called *retired* from the next core release), and a product's end of life can be declared on its passport. Both are terminal states, and both keep the passport read-only but resolvable: the regulation's record-keeping window outlives the product itself. Neither is ever a deletion. See [A passport's lifecycle](/guides/lifecycle).
+A passport can be archived (called *retired* from the next core release), and a product's end of life can be declared on its passport. Both are terminal states. Both keep the passport read-only but resolvable, because the regulation's record-keeping period runs longer than the product's life. Neither is a deletion. See [A passport's lifecycle](/guides/lifecycle).
 
 ## Keeping the printed address working
 
-The QR code on a product encodes a web address on the operator's resolver, and that address has to keep working for the whole retention period, potentially long after the product was made. A code already printed keeps resolving after its passport is corrected or replaced. What keeps the address itself alive is the operator's domain. How a node's addresses are assigned and kept stable over the full retention period is an open design question we have not settled, and this page will say so until we have.
+The QR code on a product encodes a web address on the operator's resolver, and that address has to keep working for the whole retention period, possibly long after the product was made. A code already printed keeps resolving after its passport is corrected or replaced. The address itself stays alive only as long as the operator's domain does. How a node's addresses are assigned and kept stable over the full retention period is an open design question we have not settled yet.
 
 ## Readable when the node is not
 
-A node can mirror each published passport's signed public view to a separate, public object-storage bucket, under a signed time bound saying how long that copy stands. A CDN or bucket website serves it at a stable path while the node is unreachable, and `odal snapshot verify` checks the time bound without needing the node. See [Proof files and verification](/guides/verification).
+A node can copy each published passport's signed public view to a separate, public object-storage bucket, with a signed time bound saying how long that copy is valid. A CDN or bucket website serves it at a stable path while the node is unreachable, and `odal snapshot verify` checks the time bound without the node. See [Proof files and verification](/guides/verification).
 
 ## Archive and back-up
 
 A node can also copy every passport version to private object storage (any S3-compatible service), kept apart from the public snapshot bucket. That archive is optional today, and a node without one says so in its trust posture.
 
-Article 10(4)'s back-up copy, held by a digital product passport service provider so that a passport survives an operator's insolvency or shutdown, is a separate obligation on the operator; Art. 11(e) requires availability to continue through insolvency, liquidation or cessation of activity. The node does not provide that service. The [proof-bound model](/getting-started/what-odal-can-and-cannot-see) makes it tractable for whoever does: what has to be preserved is the signed passport and its history, not a sprawling production dataset.
+Article 10(4)'s back-up copy, held by a digital product passport service provider so that a passport survives an operator's insolvency or shutdown, is a separate obligation on the operator; Art. 11(e) requires the passport to stay available through insolvency, liquidation or cessation of activity. The node does not provide that service. Whoever does has less to keep because of the [proof-bound model](/getting-started/what-odal-can-and-cannot-see): the signed passport and its history, not a large production dataset.
 
 ## Read next
 
-- [Operating a node securely](/engine/security) — how the database enforces these guarantees independently of application code.
-- [How the node works](/engine/architecture) — where retention sits in the passport pipeline.
-- [EU Central Registry](/regulatory/central-registry) — discovery, registration, and long-term continuity.
+- [Operating a node securely](/engine/security): how the database enforces these guarantees independently of the application code.
+- [How the node works](/engine/architecture): where retention sits in the passport pipeline.
+- [EU Central Registry](/regulatory/central-registry): discovery, registration and long-term continuity.

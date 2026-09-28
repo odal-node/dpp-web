@@ -31,7 +31,7 @@ A valid dossier proves the file is intact and was signed by the keys it names. I
 
 ## When the node is down
 
-A node can mirror each published passport's signed public view to a public object-storage bucket, under a signed time bound (`validUntil`) saying how long that copy stands. A CDN or bucket website serves it while the node is unreachable.
+A node can mirror each published passport's signed public view to a public object-storage bucket, with a signed time bound (`validUntil`) saying how long that copy is valid. A CDN or bucket website serves it while the node is unreachable.
 
 ```bash
 odal snapshot verify <path|url> --key <base64-public-key>

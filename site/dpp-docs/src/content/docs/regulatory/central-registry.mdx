@@ -9,7 +9,7 @@ ESPR Art. 13 establishes a central registry, run by the European Commission, as 
 
 ## A directory, not a store
 
-The registry holds identifiers and where each passport lives. It does not hold the passport's content: that stays with the issuer. Discovery is centralised; data is not.
+The registry holds identifiers and where each passport lives. It does not hold the passport's content, which stays with the issuer. Finding a passport goes through one central place; the data does not.
 
 ## What registering a passport involves
 
@@ -17,10 +17,10 @@ Under the implementing act, the economic operator uploads the passport's unique 
 
 ## How the node handles it
 
-Every published passport commits its registration to a durable queue in the same database transaction as the publish itself, and a background worker drains that queue with retries. Publishing never waits on the registry, a crash never loses a registration, and a backlog from an outage drains without a passport falling through. `odal registry` shows the sync state, operator-wide or for one passport.
+Every published passport commits its registration to a durable queue in the same database transaction as the publish itself, and a background worker drains that queue with retries. Publishing never waits on the registry, a crash never loses a registration, and after an outage the backlog is worked through without skipping any passport. `odal registry` shows the sync state, operator-wide or for one passport.
 
 <Aside type="caution" title="Not connected yet">
-The registration path is modelled and queued, but not connected to the live registry. Registering needs the operator's legal identity, and there is no registered company behind this project yet, the same step that holds back electronic seals with legal effect. The connection will be finished against the registry's official interface, not guessed at. See the [roadmap](https://odal-node.io/roadmap).
+The registration path is modelled and queued, but not connected to the live registry. Registering needs the operator's legal identity, and there is no registered company behind this project yet, the same step that holds back electronic seals with legal effect. The connection will be finished against the registry's official interface. See the [roadmap](https://odal-node.io/roadmap).
 </Aside>
 
 ## How long an identifier may be

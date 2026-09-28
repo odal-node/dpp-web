@@ -1,36 +1,36 @@
 ---
 title: Core Concepts
-description: The three ideas behind Odal Node — the proof-bound architecture, the open-core boundary, and the single seam through which new regulation enters.
+description: The three ideas behind Odal Node's design, namely the proof-bound architecture, the split between open core and engine, and the single extension point for new regulation.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Three ideas explain almost everything about how Odal Node is built and why. Understand these and the rest of the documentation, and the code, reads easily. Each idea links to its fuller treatment.
+Odal Node's design rests on three ideas. Each section below links to a fuller page.
 
 ## Proof-bound: the data stays yours
 
-The most important decision in the project is that the operator's raw source files never enter Odal's systems. The manufacturer validates a passport locally, signs it with their own key, and the node discards the import files it was built from. What the node keeps and serves is the signed passport itself — the product data the operator chose to publish, every field bound to a proof and filtered by the reader's access rights — not the raw exports, spreadsheets, or supply-chain detail behind it.
+The operator's raw source files never enter Odal's systems. The manufacturer validates a passport locally and signs it with their own key, and the node then discards the import files it was built from. The node keeps and serves only the signed passport: the product data the operator chose to publish, with every field bound to a proof and filtered by the reader's access rights. It does not keep the raw exports, spreadsheets or supply-chain detail behind it.
 
-This is a property of the software, not a promise about our conduct. Because the node discards the source files after signing, the uploaded file itself is gone. What survives is what the import produced: the passport, and a job record of what validated and what did not. Verification needs only the signed passport and the manufacturer's public identity; it does not need Odal to be online, or to exist.
+This is how the software works, so it does not depend on trusting us. After signing, the uploaded file is gone. What remains is the passport and a job record of what validated and what did not. Verifying a passport needs only the signed passport and the manufacturer's public identity. Odal does not need to be online, or to exist.
 
-A fuller treatment of the data boundary is in [What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see).
+[What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see) covers the data boundary in full.
 
-## Open-core: a clean line between regulation and business
+## Open core: regulation in one part, operation in the other
 
-Odal Node is two parts with two licences. The **core** is the regulatory standard, open under Apache-2.0 — the rules a compliant passport must satisfy. The **engine** is the service that runs those rules in production, source-available under BSL-1.1 with a self-host grant.
+Odal Node has two parts under two licences. The **core** is the regulatory library, open source under Apache-2.0: the rules a compliant passport must satisfy. The **engine** is the service that runs those rules in production, source-available under BSL-1.1 with a grant that allows self-hosting.
 
-One rule decides which side any change belongs on: *if it changes because an EU regulation changed, it belongs in the core; if it changes because of how the system is deployed or operated, it belongs in the engine.* The dependency only ever points one way — the engine uses the core; the core knows nothing of the engine.
+One rule decides where a change belongs. If it changes because an EU regulation changed, it goes in the core. If it changes because of how the system is deployed or operated, it goes in the engine. The engine depends on the core; the core does not know the engine exists.
 
-What each licence allows is on [Licensing](/getting-started/licensing).
+[Licensing](/getting-started/licensing) covers what each licence allows.
 
-## One seam for new regulation
+## One extension point for new regulation
 
-Regulation arrives product group by product group, and it keeps moving. So the core is built around a single extension point: each product group's compliance logic plugs in through one seam, and new product groups and revised rules enter there without changing anything around them. See [Product groups & plugins](/core/sectors).
+Regulation arrives one product group at a time, and it keeps changing. The core therefore has a single extension point: each product group's compliance logic plugs in there, and new product groups and revised rules are added without changing anything around them. See [Product groups & plugins](/core/sectors).
 
-<Aside type="note" title="The seam is technical, not commercial">
-That extension point is an architectural boundary, never a paywall. The built-in product groups and any added later use the same mechanism, and all of it is open: new regulatory coverage is never a paid unlock.
+<Aside type="note" title="Not a paywall">
+The extension point is part of the architecture, not a pricing tier. The built-in product groups and any added later use the same mechanism, and all of it is open. New regulatory coverage is never a paid add-on.
 </Aside>
 
 ## Where to go next
 
-To run a node, start with the [Quick Start](/quick-start). To understand what Odal Node can and cannot see, read [What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see). To check regulatory alignment, start with the [ESPR Overview](/regulatory/espr).
+To run a node, start with the [Quick Start](/quick-start). To see what Odal Node can and cannot see, read [What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see). To see how the software maps to the law, start with the [ESPR Overview](/regulatory/espr).

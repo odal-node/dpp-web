@@ -5,7 +5,7 @@ description: Why a node refuses to start, what each refusal means, and how to fi
 
 import { Aside } from "@astrojs/starlight/components";
 
-A node would rather not start than run unsafely, so most start-up failures are deliberate checks. The message names the setting; this page says why it matters and how to fix it. Every setting is on the [configuration reference](/engine/configuration).
+A node refuses to start rather than run unsafely, so most start-up failures are deliberate checks. The message names the setting; this page says why it matters and how to fix it. Every setting is on the [configuration reference](/engine/configuration).
 
 ## The node will not start
 
@@ -20,7 +20,7 @@ A node would rather not start than run unsafely, so most start-up failures are d
 | `NODE_PROFILE=production refuses to boot: required trust port(s) […]` | A service the production profile requires is a stand-in or a sandbox | See [Node profiles](/engine/security#node-profiles); run without the production profile until those services are real |
 | `RESOLVER_BASE_URL` | Required, with no default | Set it to your resolver's public address, decided once ([Production deployment](/engine/deployment)) |
 | The database connects as a superuser | A superuser owns the audit table, so the append-only protection could not hold | Point `DATABASE_URL` at the application role |
-| An unrecognised `SEAL_PROVIDER` or `SEAL_CONFORMANCE_LEVEL` | A typo must not quietly seal lower than you intended, or not at all | Use `local`, or unset/`none`; and `B`, `T`, `LT` or `LTA` |
+| An unrecognised `SEAL_PROVIDER` or `SEAL_CONFORMANCE_LEVEL` | A typo must not make the node seal at a lower level than you intended, or not at all, without telling you | Use `local`, or unset/`none`; and `B`, `T`, `LT` or `LTA` |
 | `NATS_URL` is set but unreachable | With an event bus configured, the node fails fast rather than dropping events | Start NATS, or unset `NATS_URL` to run without an event bus |
 
 <Aside type="caution" title="The development overrides">

@@ -5,7 +5,7 @@ description: What to back up on a node, how often, where to keep the key-store p
 
 import { Aside } from "@astrojs/starlight/components";
 
-A node's passports are permanent, so its backups have to be too. Two things matter above everything else: the database and the signing key.
+A node's passports are permanent, so its backups need to last as long. The two things that matter most are the database and the signing key.
 
 <Aside type="danger" title="The key store and its passphrase">
 Every passport is signed with the key in the key store. **Lose the key store or its passphrase and the node can no longer sign, and the identity that verifies its published passports goes with it. Leak them and passports can be forged.** Keep the passphrase in a password manager *and* as a sealed offline copy, and never in the same place as the backups.
@@ -26,7 +26,7 @@ Send backups **off the machine**, to object storage in a region you choose, with
 
 ## Prove the restore
 
-A backup you have never restored is a hope. Once a month, on a scratch machine:
+You only know a backup works once you have restored it. Once a month, on a scratch machine:
 
 1. restore the database dump and copy in the key store;
 2. start the node with the same passphrase and `DID_WEB_BASE_URL`;

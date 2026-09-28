@@ -43,7 +43,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Odal Node',
-      description: 'EU Digital Product Passport infrastructure — open-source core, sovereign by design, built for ESPR compliance.',
+      description: 'Documentation for Odal Node, software for issuing and serving EU Digital Product Passports under ESPR, with an open-source core.',
       logo: {
         light: './src/assets/logo-light.svg',
         dark: './src/assets/logo-dark.svg',

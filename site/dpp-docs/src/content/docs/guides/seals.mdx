@@ -19,11 +19,11 @@ SEAL_PROVIDER=local
 
 The local sealer makes a real CAdES seal (ETSI EN 319 122-1) over each passport's signature, at the long-term archival level (`LTA`): a signature time stamp, revocation material and an archive time stamp, from a local time-stamping authority the node sets up beside its sealing key. Every path that reads a seal (the seal routes, the background seal check, the evidence dossier and its verifier) works on these seals exactly as it would on a qualified one.
 
-What it is not is qualified. The node generates its own key and certificate, and the certificate says so in its organisation field: **NOT A QUALIFIED SEAL**. Its time-stamping certificate says **NOT A QUALIFIED TIMESTAMP**. Anyone inspecting a seal sees that, not only whoever reads the node's log.
+It is not qualified. The node generates its own key and certificate, and the certificate says so in its organisation field: **NOT A QUALIFIED SEAL**. Its time-stamping certificate says **NOT A QUALIFIED TIMESTAMP**. Anyone inspecting a seal sees that, not only whoever reads the node's log.
 
 The key and certificate persist at `SEAL_LOCAL_KEY_PATH` (default `./.seal-local`; in the bundled container that is the data volume), so a seal made yesterday still verifies today. Back it up with the rest of the node; see [Backup, restore and key custody](/engine/backup).
 
-Leave `SEAL_PROVIDER` unset, or set it to `none`, for no sealing; the node then reports that sealing is not configured. An unrecognised value stops the node rather than quietly leaving passports unsealed.
+Leave `SEAL_PROVIDER` unset, or set it to `none`, for no sealing; the node then reports that sealing is not configured. An unrecognised value stops the node, so passports are never left unsealed without warning.
 
 <Aside type="note" title="Production profile">
 The local sealer counts as a stand-in for a qualified seal, so a node started with `NODE_PROFILE=production` will not accept it. See [Operating a node securely](/engine/security#node-profiles).
