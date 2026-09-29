@@ -19,8 +19,8 @@
               "line": "Every passport is signed on your servers, with a key that never leaves them, under an identity on a web domain you control. The key can be rotated without invalidating anything it already signed."
             },
             {
-              "title": "Releases you can inspect",
-              "line": "Published releases now carry a list of the components inside them and a record of how they were built, so you can check what you are running."
+              "title": "Releases that list their contents",
+              "line": "Each release's container images carry a list of the components inside them and a record of how they were built, so you can check what you are running. The images are not public yet."
             }
           ]
         },
