@@ -1,7 +1,7 @@
 {
   "_comment": "Provenance for everything this site vendors from dpp-core. One commit backs every source, so the product groups and the regulations on the site can never describe two different states of the library. `pnpm run sync:core` copies each source at this commit; `pnpm run check:core` fails the build when a vendored copy differs from it. Pinning to a commit rather than to core's main keeps this repository's CI deterministic: an unrelated merge in core cannot turn a pull request here red, and a change that must land in both repositories cannot deadlock on which merges first. Bumping the commit is a deliberate, reviewable line in a diff.",
   "repository": "odal-node/dpp-core",
-  "commit": "81f70871481e97d50a584c4a8d6c32aefd616b20",
+  "commit": "b60317cf50b73a2e6c33d661654b7f288293f7a4",
   "sources": {
     "product-groups": {
       "path": "crates/dpp-domain/product-groups",
