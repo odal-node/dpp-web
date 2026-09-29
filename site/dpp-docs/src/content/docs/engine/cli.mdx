@@ -15,10 +15,10 @@ import { Aside } from "@astrojs/starlight/components";
 
 | Command | What it does |
 |---|---|
-| `odal init` | Save connection settings and scaffold the compose file and an example `.env` (for scripting; people can just run `odal`) |
-| `odal up` · `down` | Start or stop the services. Inside a clone it builds from source; otherwise it pulls the published images |
+| `odal init` | Save connection settings and scaffold the compose file (for scripting; people can just run `odal`) |
+| `odal up` · `down` | Start or stop the services. Inside a clone it builds from source. Outside one it pulls the ready-made images, which are not public yet |
 | `odal status` | Health of every service, and the node's trust posture: which services are real and which are stand-ins |
-| `odal update` | Download the images for the version you run (inside a clone, rebuild from source instead) |
+| `odal update` | Rebuild the node and resolver from the source in your clone and restart them |
 | `odal bootstrap` | Onboard the operator and mint the first API key |
 | `odal whoami` | What the configured API key actually is: its identity and scope |
 | `odal profile` | Named connection profiles for more than one node (`list`, `show`, `use`, `create`, `remove`, `rename`) |

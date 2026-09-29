@@ -44,11 +44,11 @@ dpp.example.com { reverse_proxy 127.0.0.1:8003 }
 
 ## 4. Fill in the environment
 
-Start from `.env.example`, which is in the engine repository and which `odal init` writes for you outside a clone; every variable is on the [configuration reference](/engine/configuration). Then:
+The ready-made images are not public yet, so the machine runs a clone of the engine repository and builds the node from it. Start from that clone's `.env.example`; every variable is on the [configuration reference](/engine/configuration). Then:
 
 - generate the database passwords and the key-store passphrase, and store the passphrase as [Backup, restore and key custody](/engine/backup) describes;
 - set `ADMIN_USERNAME` and `ADMIN_PASSWORD` only for `odal bootstrap`, then unset them;
-- **pin the image version** (`ODAL_VERSION`) to a release number written without the leading `v` (the release tagged `v1.4.2` is image `1.4.2`), never `latest`;
+- **run a release, not the latest source**: check out a release tag in the clone (for example `v1.4.2`) and set `ODAL_VERSION` to the same number without the leading `v` (`1.4.2`), never `latest`;
 - `chmod 600 .env`.
 
 <Aside type="note" title="About the production profile">

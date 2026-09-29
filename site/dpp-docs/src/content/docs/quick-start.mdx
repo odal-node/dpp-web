@@ -52,8 +52,8 @@ odal
 
 To script it instead, run `odal up` (build and start) and then `odal bootstrap` (onboard and mint the key).
 
-<Aside type="tip" title="Built from source, or pulled ready-made">
-Inside a clone of the repository, the first `up` compiles the node from source, which takes a few minutes; later starts are immediate. Outside a clone, `odal init` writes the compose file and an example environment file: copy `.env.example` to `.env`, fill it in, and `odal up` then downloads the published images.
+<Aside type="tip" title="Built from source">
+The first `up` compiles the node from the source in your clone, which takes a few minutes; later starts are immediate. Ready-made images of the node and resolver are not public yet, so for now a node runs from a clone of the repository.
 </Aside>
 
 ## 5. Drive it from the Console
@@ -78,7 +78,7 @@ Move to a section with the arrow keys and press Enter. Every section is also a d
 
 | Console section | What it does | Scripted equivalent |
 |---|---|---|
-| **Infrastructure** | Start, stop, check status, update container images | `odal up` · `odal down` · `odal status` · `odal update` |
+| **Infrastructure** | Start, stop, check status, update the node | `odal up` · `odal down` · `odal status` · `odal update` |
 | **Passports** | The full lifecycle: import, validate, publish, export | `odal passport` · `import` · `validate` · `publish` · `export` |
 | **Operator** | View and edit your operator identity and branding | `odal operator show` · `set` |
 | **Registry identity** | The facilities and operator identifiers stamped on new passports | `odal facility` · `odal operator-id` |

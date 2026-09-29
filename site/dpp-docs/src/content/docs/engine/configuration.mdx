@@ -5,7 +5,7 @@ description: Every environment variable the node and the resolver read, what it 
 
 import { Aside } from "@astrojs/starlight/components";
 
-A node is configured entirely through environment variables. The engine repository's `.env.example` is the template, and `odal init` writes a copy for installs outside a clone: copy it to `.env` and fill it in. This page lists every variable, grouped by what it controls.
+A node is configured entirely through environment variables. The engine repository's `.env.example` is the template: copy it to `.env` and fill it in. This page lists every variable, grouped by what it controls.
 
 <Aside type="caution" title="Two settings you cannot change later">
 - **`RESOLVER_BASE_URL`** is printed onto every product: it is signed into each passport's carrier URL at publication. Set it to your resolver's public address **before** publishing anything real; changing it afterwards means reissuing labels.
@@ -30,7 +30,7 @@ Read by Docker Compose when it starts the stack, not by the node.
 
 | Variable | Default | What it does |
 |---|---|---|
-| `ODAL_VERSION` | `latest` | Which release of the node and resolver images to run, written without the leading `v`: the release tagged `v1.4.2` is image `1.4.2`. Pin it in production. Inside a clone of the engine the images are built from source instead, and this only names the result |
+| `ODAL_VERSION` | `latest` | Which release of the node and resolver images to run, written without the leading `v`: the release tagged `v1.4.2` is image `1.4.2`. The ready-made images are not public yet, so for now a node runs from a clone of the engine: the images are built from its source, and this only names the result |
 
 ## Profile and development overrides
 
@@ -108,7 +108,7 @@ The operator's legal name and country for a registration come from `odal operato
 
 ## Storage
 
-The published image includes object-storage support; any S3-compatible service works.
+The node's container image includes object-storage support; any S3-compatible service works.
 
 | Variable | What it does |
 |---|---|

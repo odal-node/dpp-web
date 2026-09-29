@@ -8,7 +8,7 @@ import { Aside } from "@astrojs/starlight/components";
 ## The routine
 
 1. **Back up first**: the database and the key store. Migrations run forward only, so this backup is your rollback. See [Backup, restore and key custody](/engine/backup).
-2. **Upgrade a staging node first**: change the pinned `ODAL_VERSION` (the release number without its leading `v`), then run `odal update` and `odal up`.
+2. **Upgrade a staging node first**: check out the new release tag in its clone, set `ODAL_VERSION` to match (the release number without its leading `v`), then run `odal update`, which rebuilds the node from that source and restarts it.
 3. **Check it**: `odal status`, the trust posture on `/vault/api/v1/node/state`, and publish, resolve and verify a test passport.
 4. **Upgrade production the same way**, and record the version and date.
 
@@ -26,7 +26,7 @@ The signing key, the DID document and every published passport stay as they are.
 - **Second-life lineage is `derivedFrom`**, an array of `{ reference, operation }`. Clients that sent `parentPassportRef` must send `derivedFrom` instead.
 - **A component reference is an object**, not a bare passport reference. Clients building `componentRefs` must send the new shape.
 - **`SEAL_CONFORMANCE_LEVEL` defaults to `LTA`**, the sealer's own level. Nothing to do unless you pinned a lower level on purpose.
-- Published images now carry a software bill of materials and build provenance.
+- The release's container images now carry a software bill of materials and build provenance.
 
 Every change, with its reasoning, is in the engine's [changelog](https://github.com/odal-node/dpp-engine/blob/main/CHANGELOG.md).
 
