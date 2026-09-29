@@ -76,7 +76,7 @@ const count = (r: Register) => r.themes.reduce((n, t) => n + t.items.length, 0);
 
 <div class="space-y-16">
   {registers.map((reg) => (
-    <section id={reg.status} aria-labelledby={`reg-${reg.status}`} class="scroll-mt-24">
+    <section id={reg.status} aria-labelledby={`reg-${reg.status}`}>
       <header class={`border-b pb-4 ${tone[reg.status].rule}`}>
         <h3 id={`reg-${reg.status}`} class="m-0 flex items-center gap-2.5 text-xl font-bold text-neutral-900">
           <span class={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${tone[reg.status].dot}`} aria-hidden="true"></span>

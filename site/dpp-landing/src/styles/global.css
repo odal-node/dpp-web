@@ -239,6 +239,11 @@
   .link-arrow:hover::after { transform: none; }
 }
 
+/* The nav is sticky and 4rem tall; without this every anchor, and every
+   scrollIntoView, lands underneath it. One rule here replaces per-target
+   scroll-mt classes, which would stack on top of it. */
+html { scroll-padding-top: 5rem; }
+
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
 }

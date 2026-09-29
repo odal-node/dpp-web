@@ -59,7 +59,7 @@ const termSetLd = {
     <dl class="not-prose m-0 grid gap-4 md:grid-cols-2">
       {terms.map((t) => {
         return (
-          <div id={slug(t.term)} class="card m-0 scroll-mt-24 p-5">
+          <div id={slug(t.term)} class="card m-0 p-5">
             <dt class="text-base font-semibold text-neutral-900">{t.term}</dt>
             <dd class="m-0 mt-1.5 text-sm leading-relaxed text-neutral-700">{t.definition}</dd>
             {t.link && (
