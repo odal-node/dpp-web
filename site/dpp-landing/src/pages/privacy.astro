@@ -4,110 +4,190 @@ import Section from "../components/Section.astro";
 
 const title = "Privacy Policy | Odal Node";
 const description =
-  "How the Odal Node website handles your data: no cookies, no analytics, no third-party trackers. Hosted on Cloudflare Pages, which sees only the request details any web host must.";
+  "How the Odal Node websites handle your data: no cookies, no analytics, no third-party trackers. Who is responsible, what the host sees, what happens to an email you send, and your rights.";
 
-// This policy covers the website at odal-node.io only — a static site with no
-// backend. How the Odal Node software handles product data is a separate,
-// architectural question; see /trust.
+// This policy covers both websites, odal-node.io and docs.odal-node.io. Both
+// are static sites with no backend. How the Odal Node software handles product
+// data is a separate, architectural question; see /trust.
+//
+// GDPR Art. 13 is the checklist this page follows: who the controller is and
+// how to reach them (13(1)(a)), each purpose with its legal basis (13(1)(c)),
+// recipients (13(1)(e)), transfers outside the EU (13(1)(f)), how long data is
+// kept (13(2)(a)), the rights including objection, which Art. 21(4) says must
+// be shown separately (13(2)(b)), consent withdrawal (13(2)(c)), complaint
+// (13(2)(d)), whether giving data is required (13(2)(e)) and automated
+// decisions (13(2)(f)).
+//
+// 🔒 Name the controller and the mailbox, never a location: a name and a way
+// to reach them are what 13(1)(a) asks for. Do not add a country, city or
+// address here or anywhere public. When the company is registered it becomes
+// the controller: put its registered name here instead.
+const CONTROLLER = "Aleksandar Temelkov";
 const MAILBOX = "contact@odal-node.io";
 
-const updated = "2026-09-27";
+const updated = "2026-09-29";
 const updatedText = new Date(`${updated}T00:00:00Z`).toLocaleDateString("en-GB", {
   day: "numeric",
   month: "long",
   year: "numeric",
   timeZone: "UTC",
 });
-
-// TODO(legal): once a registered entity exists, name the data controller and
-// its jurisdiction here and in the "Who is responsible" section below.
 ---
 
 <Base title={title} description={description}>
   <Section h1 eyebrow="Privacy Policy" title="No cookies, no analytics, no trackers.">
+    <p>
+      This policy covers both Odal Node websites: this one and the
+      documentation site.
+    </p>
     <ul>
-      <li>The site sets <strong>no cookies</strong> and uses no local storage to track you.</li>
+      <li>The sites set <strong>no cookies</strong>.</li>
       <li>There is <strong>no analytics</strong>: no Google Analytics, Plausible, Fathom, or any equivalent.</li>
       <li>There are <strong>no third-party trackers, advertising pixels, or social embeds</strong>.</li>
-      <li>We do not build a profile of you, and we do not sell or share data. There is nothing to sell.</li>
-      <li>The only data that exists is what your browser unavoidably sends to load a web page, and anything you choose to email us.</li>
+      <li>We do not build a profile of you, and we do not sell or share data.</li>
+      <li>The only personal data involved is what your browser sends to load a page, and anything you choose to email us.</li>
     </ul>
     <p class="text-sm text-neutral-600">
       Last updated <time datetime={updated}>{updatedText}</time>.
     </p>
   </Section>
 
-  <Section eyebrow="Hosting" title="What the host sees." tone="tinted">
+  <Section eyebrow="Who is responsible" title="Who looks after your data." tone="tinted">
     <p>
-      The site is served as static files by <strong>Cloudflare Pages</strong>.
-      As with any website, your browser must connect to a server to load a page,
-      and that connection is visible to the host. To deliver the site and protect
-      it from abuse, Cloudflare processes standard request metadata: your{" "}
-      <strong>IP address</strong>, the time of the request, the page requested,
-      your browser's user-agent string, and similar technical details.
+      Odal Node is run by <strong>{CONTROLLER}</strong>, who is responsible
+      for these websites and for the personal data described on this page
+      (the "controller" under the GDPR). Odal Node is not a registered company
+      yet. When it is, the company takes over this role and is named here.
     </p>
     <p>
-      We use this for nothing. We do not run analytics over it and we do not
-      receive it as an identifiable record of you. It is processed by Cloudflare
-      as our hosting provider (acting as a data processor on our behalf) for
-      content delivery, TLS, and security (such as DDoS protection), under
-      Cloudflare's own terms. See{" "}
-      <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.
-      Our legal basis for this processing is our legitimate interest in serving
-      and securing the site.
+      For anything about your data, write to{" "}
+      <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a>.
     </p>
   </Section>
 
-  <Section eyebrow="Email" title="What happens to an email you send us.">
+  <Section eyebrow="Hosting" title="What the host sees.">
+    <p>
+      Both sites are served as static files by <strong>Cloudflare Pages</strong>.
+      As with any website, your browser must connect to a server to load a page,
+      and that connection is visible to the host. Cloudflare processes standard
+      request data: your <strong>IP address</strong>, the time of the request,
+      the page requested, your browser's user-agent string, and similar
+      technical details.
+    </p>
+    <p>
+      This is needed to deliver the pages and to protect them from abuse, such
+      as attacks that try to overload them. Our legal basis is our legitimate
+      interest in serving and securing the sites (GDPR Article 6(1)(f)). We do
+      not run analytics over this data and do not receive it as a record of you.
+    </p>
+    <p>
+      Cloudflare processes this data on our behalf as our hosting provider,
+      under its data processing terms. How long it keeps its logs is set out in{" "}
+      <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.
+      Cloudflare may process the data in the United States. It is certified
+      under the EU-US Data Privacy Framework, which the European Commission has
+      found to protect personal data adequately (Implementing Decision (EU)
+      2023/1795).
+    </p>
+  </Section>
+
+  <Section eyebrow="Email" title="What happens to an email you send us." tone="tinted">
     <p>
       If you write to us, for example to join the waitlist, we receive your
       email address, your name if you give it, and whatever your message says.
-      We use it to reply to you and, if you asked to hear from us, to write
-      when something you asked about is ready. We do not add you to a mailing
-      list, and nobody but us and the provider that hosts our email handles
-      what you send.
+      Writing to us is up to you. Without your email we cannot reply.
+    </p>
+    <p>We use it for two things:</p>
+    <ul>
+      <li>
+        <strong>To reply to you.</strong> The legal basis is our legitimate
+        interest in answering the people who write to us, or, when you ask
+        about using Odal Node, taking the steps you asked for before any
+        agreement (GDPR Article 6(1)(f) and 6(1)(b)).
+      </li>
+      <li>
+        <strong>To write to you later</strong> when something you asked about
+        is ready, such as your product group. We do this only if you ask us to,
+        and that request is your consent (Article 6(1)(a)). You can withdraw it
+        at any time by telling us, and we stop.
+      </li>
+    </ul>
+    <p>
+      We do not add you to a mailing list. Nobody but us and the provider that
+      hosts our email handles what you send. That provider processes it on our
+      behalf and may do so in the United States, under the EU-US Data Privacy
+      Framework.
     </p>
     <p>
-      We keep your emails until you ask us to delete them. Ask at any time and
-      we delete the whole correspondence.
+      We keep your emails for two years after our last exchange, then delete
+      them. If you ask us to delete them sooner, we do.
     </p>
   </Section>
 
-  <Section eyebrow="Off-site links" title="Where the site sends you." tone="tinted">
+  <Section eyebrow="Your browser" title="What stays on your device.">
     <p>
-      Some links lead off this site: the <a href="https://docs.odal-node.io" rel="noopener">documentation</a>,
-      our <a href="https://github.com/odal-node" rel="noopener">GitHub organisation</a>,
-      and a few cited standards. Once you follow them you are on someone else's
-      property, governed by their privacy practices, not this one. We have no
-      control over what those services collect.
+      The documentation site remembers whether you chose a light or dark
+      display, in your browser's local storage. It is never sent to us, and
+      you can clear it in your browser's settings.
+    </p>
+    <p>
+      The documentation's API reference can send a test request to a node
+      address you enter. That request goes straight from your browser to that
+      address. It does not pass through us.
+    </p>
+  </Section>
+
+  <Section eyebrow="Off-site links" title="Where the sites send you." tone="tinted">
+    <p>
+      Some links lead to other websites: our{" "}
+      <a href="https://github.com/odal-node" rel="noopener">GitHub organisation</a>,
+      the official texts of EU law, and a few cited standards. Once you follow
+      them you are on someone else's website, governed by its own privacy
+      practices, not this one. We have no control over what those services
+      collect.
     </p>
   </Section>
 
   <Section eyebrow="Your rights" title="What you can ask of us.">
+    <p>Under the GDPR you can ask us to:</p>
+    <ul>
+      <li>tell you what personal data we hold about you, and give you a copy;</li>
+      <li>correct it;</li>
+      <li>delete it;</li>
+      <li>limit how we use it while a question about it is settled;</li>
+      <li>send it to you, or to someone you name, in a common format.</li>
+    </ul>
     <p>
-      Under the GDPR and equivalent laws you can ask us to confirm what personal
-      data we hold about you, to correct it, to send you a copy, or to delete it.
-      Because the only personal data we hold is whatever you have emailed us, a
-      request usually amounts to "delete our correspondence", which we will do.
+      <strong>Your right to object.</strong> Where we use your data on the basis
+      of our legitimate interest, you can object at any time, for reasons
+      relating to your situation. We then stop, unless we have compelling
+      legitimate grounds that override your interests, rights and freedoms.
     </p>
     <p>
-      To exercise any of these rights, or to ask a privacy question, write to{" "}
-      <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a>. If you believe we have handled
-      your data improperly, you also have the right to lodge a complaint with your
-      local data protection authority.
+      Where we rely on your consent, you can withdraw it at any time. This does
+      not affect what we did before you withdrew it.
     </p>
+    <p>
+      To use any of these rights, write to{" "}
+      <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a>. We reply within one month.
+      Because the only personal data we hold is what you have emailed us, a
+      request usually means "delete our correspondence", which we will do.
+    </p>
+    <p>
+      You also have the right to complain to a data protection authority, in
+      particular in the EU country where you live or work, or where you think
+      the problem arose.
+    </p>
+    <p>We make no automated decisions about you and do not profile you.</p>
   </Section>
 
-  <Section eyebrow="Responsibility & changes" title="Who is responsible, and how this page changes." tone="tinted">
+  <Section eyebrow="Changes" title="How this page changes." tone="tinted">
     <p>
-      <strong>Odal Node</strong> is responsible for this website and for the
-      personal data described above. For any data or privacy matter, the contact
-      is <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a>.
-    </p>
-    <p>
-      Changes to this policy are made in public. The website's source, with
+      Changes to this policy are made in public. The websites' source, with
       every earlier version of this page, is in its{" "}
       <a href="https://github.com/odal-node/dpp-web" rel="noopener">public repository</a>.
+      For who runs Odal Node and what the information on these sites is and is
+      not, see the <a href="/legal">legal notice</a>.
     </p>
   </Section>
 </Base>
