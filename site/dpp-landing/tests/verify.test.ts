@@ -79,15 +79,43 @@ test("a one-character edit to a signed payload is caught, and only where it happ
 // 0xD83D 0xDE00 and "Ａ" (fullwidth A) the single unit 0xFF21, so by code unit
 // the emoji comes first and by code point it comes last.
 //
-// The dossier file lists the two the other way round. That is not a fault: the
-// file is the node's readable copy, and its key order is not what was signed.
-// This reads the signed bytes themselves, which is what the page checks.
+// This reads the signed bytes themselves, which is what the page checks, not
+// the readable copies beside them (see the next test for those).
 test("keys are canonicalised by UTF-16 code unit, as the engine signed them", () => {
   assert.equal(jcs({ "Ａ": 6, "😀": 5 }), '{"😀":5,"Ａ":6}');
   const dossier = JSON.parse(readFileSync(`${dir}04-valid-full-lifecycle.json`, "utf8"));
   const signed = new TextDecoder().decode(b64urlDecode(dossier.fullView.jws.split(".")[1]));
   assert.ok(signed.indexOf('"😀"') < signed.indexOf('"Ａ"'), "the engine signed the emoji first");
   assert.equal(jcs(JSON.parse(signed)), signed, "canonicalising the signed payload again reproduces its bytes");
+});
+
+// A dossier carries each signed view twice: the JWS, and a readable copy of its
+// payload that the page shows when an example is loaded. The engine writes the
+// readable copies in code-point order (a serde_json map sorts by UTF-8 bytes),
+// so on the pair above they disagreed with the signed bytes and read as the
+// very ordering bug the pair exists to catch (dpp-engine #430). The examples
+// here have that pair swapped by hand in all four copies per file: a text edit
+// that leaves every other byte, every JWS included, as the engine wrote it, and
+// changes no verdict, since the page canonicalises before it checks anything.
+// This fails if a re-copy from the engine brings the old order back before
+// #430 is fixed there.
+test("every object in the examples lists its keys in the order they are signed in", () => {
+  const unordered: string[] = [];
+  const walk = (value: unknown, at: string): void => {
+    if (Array.isArray(value)) return value.forEach((v, i) => walk(v, `${at}[${i}]`));
+    if (!value || typeof value !== "object") return;
+    const keys = Object.keys(value);
+    // An integer-like key is listed first by any JavaScript object whatever the
+    // file says, so an object holding one cannot be read for order here.
+    if (!keys.some((k) => /^(0|[1-9]\d*)$/.test(k)) && keys.join("\u0000") !== [...keys].sort().join("\u0000")) {
+      unordered.push(at);
+    }
+    for (const k of keys) walk((value as Record<string, unknown>)[k], `${at}.${k}`);
+  };
+  for (const file of files.filter((f) => f.endsWith(".json"))) {
+    walk(JSON.parse(readFileSync(`${dir}${file}`, "utf8")), file);
+  }
+  assert.deepEqual(unordered, [], "objects whose keys are not in UTF-16 code-unit order");
 });
 
 test("an integer beyond 2^53 is refused, not approximated", async () => {
