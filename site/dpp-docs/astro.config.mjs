@@ -1,6 +1,8 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
 import { sidebar } from './src/sidebar.mjs';
+import { lastmodFor } from './sitemap-sources.mjs';
 
 export default defineConfig({
   site: 'https://docs.odal-node.io',
@@ -41,6 +43,17 @@ export default defineConfig({
     optimizeDeps: { include: ['@scalar/api-reference'] },
   },
   integrations: [
+    // Starlight adds a plain sitemap only when none is configured, so this one
+    // replaces it. The site has one language, so Starlight's own version would
+    // have set no options; this adds <lastmod>, the last commit that changed
+    // the page's content (sitemap-sources.mjs), never the build time.
+    sitemap({
+      serialize(item) {
+        const lastmod = lastmodFor(new URL(item.url).pathname);
+        if (lastmod) item.lastmod = lastmod;
+        return item;
+      },
+    }),
     starlight({
       title: 'Odal Node',
       description: 'Documentation for Odal Node, software for issuing and serving EU Digital Product Passports under ESPR, with an open-source core.',

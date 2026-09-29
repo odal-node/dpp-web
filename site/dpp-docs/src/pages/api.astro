@@ -38,6 +38,10 @@ import logoDark from '../assets/logo-dark.svg';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>API Reference | Odal Node</title>
     <link rel="icon" href="/favicon.svg" />
+    <!-- This page sits outside Starlight, which writes every other page's
+         canonical. Same form as the sitemap's entry for it, trailing slash
+         included. -->
+    <link rel="canonical" href={new URL('/api/', Astro.site).toString()} />
     <meta
       name="description"
       content="OpenAPI reference for the Odal Node API, the software that issues and serves EU Digital Product Passports on your own infrastructure."

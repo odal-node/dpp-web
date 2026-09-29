@@ -14,6 +14,7 @@
     "check:openapi": "node scripts/sync-openapi.mjs --check"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "@astrojs/starlight": "^0.41.7",
     "@odal/brand-tokens": "workspace:*",
     "@scalar/api-reference": "^1.62.5",

@@ -8,11 +8,20 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
+import { lastmodFor } from "./sitemap-sources.mjs";
 
 export default defineConfig({
   site: "https://odal-node.io",
   integrations: [
-    sitemap(),
+    // <lastmod> is the last commit that changed the page's content, never the
+    // build time; see sitemap-sources.mjs for which files count as content.
+    sitemap({
+      serialize(item) {
+        const lastmod = lastmodFor(new URL(item.url).pathname);
+        if (lastmod) item.lastmod = lastmod;
+        return item;
+      },
+    }),
   ],
   vite: {
     plugins: [
