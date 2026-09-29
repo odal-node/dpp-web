@@ -155,7 +155,8 @@ export const menus: Menu[] = [
 /** Pages reached from the footer's bottom line and the waitlist button rather than a menu. */
 export const footerLinks: Entry[] = [
   { href: "/waitlist", label: "Join the waitlist", line: "Tell us what you make, and hear when your product group is ready", icon: "" },
-  { href: "/privacy", label: "Privacy policy", line: "How this website handles your data", icon: "" },
+  { href: "/legal", label: "Legal notice", line: "Who runs Odal Node, and why the information here is not legal advice", icon: "" },
+  { href: "/privacy", label: "Privacy policy", line: "How these websites handle your data", icon: "" },
   { href: "/sitemap", label: "Site map", line: "Every page on this site, in one list", icon: "" },
 ];
 

@@ -159,6 +159,9 @@ export default defineConfig({
       ],
       sidebar,
       customCss: ['./src/styles/custom.css'],
+      // Starlight's footer plus a line of legal links (privacy, legal notice,
+      // not legal advice) on every page. See the component for why.
+      components: { Footer: './src/components/Footer.astro' },
     }),
   ],
   output: 'static',
