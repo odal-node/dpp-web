@@ -12,13 +12,17 @@ import example from "../data/example-passport.json";
 
 const title = "Example battery passport | Odal Node";
 const description =
-  "A complete example of an electric-vehicle battery passport, sorted into what anyone can read, what authorities and readers with a legitimate interest can read, and what only one of them can.";
+  "An example of an electric-vehicle battery passport, sorted into what anyone can read, what authorities and readers with a legitimate interest can read, and what only one of them can.";
 
 type Json = null | boolean | number | string | Json[] | { [k: string]: Json };
 const p = example.passport as unknown as Record<string, Json> & { productGroupData: Record<string, Json> };
 const disclosure = (battery as { disclosure: Record<string, string> }).disclosure;
 
 // The envelope fields every passport carries, then the battery's own data.
+// The engine's demo data also carries `repairabilityScore`, which is left off
+// here: no EU act defines a repairability score for batteries, so showing one on
+// an example battery passport would suggest the law asks for it. The data file
+// stays a verbatim copy of the engine's (see its _comment).
 const envelope: [string, Json][] = [
   ["productName", p.productName],
   ["manufacturer", p.manufacturer],
@@ -26,7 +30,6 @@ const envelope: [string, Json][] = [
   ["placedOnMarketDate", p.placedOnMarketDate],
   ["commodityCode", p.commodityCode],
   ["materials", p.materials],
-  ["repairabilityScore", p.repairabilityScore],
 ];
 const groupData = Object.entries(p.productGroupData).filter(([k]) => k !== "productGroup");
 
@@ -73,10 +76,18 @@ const flat = (o: Record<string, Json>) =>
 <Base title={title} description={description}>
   <Section h1 eyebrow="Example" title="An example battery passport." wide>
     <p>
-      This is a complete passport for an electric-vehicle battery, from the
-      software's own example data. The company, <strong>Musterzelle GmbH</strong>,
-      is invented, and the page shows the data a company submits before it is
+      This is a passport for an electric-vehicle battery, from the software's
+      own example data. The company, <strong>Musterzelle GmbH</strong>, is
+      invented, and the page shows the data a company submits before it is
       signed, sorted the way a node shows it to each reader.
+    </p>
+    <p>
+      Some public values are placeholders. For passports from February 2027,
+      the Commission's guidance says to leave the carbon footprint and the
+      shares of recycled cobalt, lithium, nickel and lead empty until the rules
+      for calculating and showing them apply. The software still asks for
+      them, and that is being changed. Information on responsible sourcing is
+      due from August 2027, so it is not shown here.
     </p>
     <p>
       To see a signed proof file checked in your browser, use{" "}

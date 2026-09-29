@@ -47,7 +47,7 @@ export const menus: Menu[] = [
       {
         href: "/example-passport",
         label: "Example passport",
-        line: "A complete battery passport, sorted by who may read it",
+        line: "A battery passport, sorted by who may read it",
         icon: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>',
       },
     ],
