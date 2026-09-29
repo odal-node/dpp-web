@@ -22,8 +22,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Full history: each sitemap <lastmod> is the last commit that changed its
+      # page (scripts/git-lastmod.mjs), and a shallow clone knows one commit.
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
 
       # The vendored OpenAPI spec is a copy of the engine's. Without the source
       # beside it there is nothing to compare against, and a drift check that
@@ -92,6 +96,12 @@ jobs:
       # holds every on-site URL in the built file to a page or file in dist/.
       - name: llms.txt points only at pages that were built
         run: pnpm run check:llms
+
+      # The XML sitemaps list exactly the indexable pages, each under its own
+      # canonical address, and every entry carries a <lastmod> read from git.
+      # Only crawlers read a sitemap, so nothing else would show it is wrong.
+      - name: Sitemaps list every indexable page, with its canonical and last change
+        run: pnpm run check:sitemaps
 
       # The /verify rate limit is a Cloudflare zone rule written by a script,
       # not by a deploy. This holds the rule inside the Free plan's limits and

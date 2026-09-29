@@ -24,6 +24,7 @@
     "preview:docs": "pnpm --filter dpp-docs preview",
     "clean": "pnpm -r exec rm -rf dist .astro node_modules && rm -rf node_modules",
     "check:llms": "node scripts/check-llms-txt.mjs site/dpp-landing https://odal-node.io && node scripts/check-llms-txt.mjs site/dpp-docs https://docs.odal-node.io",
+    "check:sitemaps": "node scripts/check-sitemaps.mjs site/dpp-landing https://odal-node.io && node scripts/check-sitemaps.mjs site/dpp-docs https://docs.odal-node.io",
     "check:external": "node scripts/check-external-links.mjs",
     "test:scripts": "node --test scripts/cloudflare-rate-limit.test.mjs scripts/check-external-links.test.mjs",
     "rate-limit:verify": "node scripts/cloudflare-rate-limit.mjs"
