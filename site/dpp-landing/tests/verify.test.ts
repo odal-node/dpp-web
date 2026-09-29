@@ -74,16 +74,18 @@ test("a one-character edit to a signed payload is caught, and only where it happ
 // RFC 8785 §3.2.3 sorts object keys by UTF-16 code unit, not by code point and
 // not by UTF-8 byte. The three agree for almost every key, so a verifier that
 // sorts the wrong way passes almost everything, and the golden verdicts above
-// would only report it as a bad signature. The engine's example payload carries
-// a pair on which they disagree (engine #429): "😀" is the surrogate pair
-// 0xD83D 0xDE00 and "Ａ" (fullwidth A) the single unit 0xFF21, so by code unit
-// the emoji comes first and by code point it comes last.
+// would only report it as a bad signature. The engine's canonicalisation dossier
+// carries a pair on which they disagree (engine #429): "😀" is the surrogate
+// pair 0xD83D 0xDE00 and "Ａ" (fullwidth A) the single unit 0xFF21, so by code
+// unit the emoji comes first and by code point it comes last. That dossier, 11,
+// is not a passport and the page never offers it as one; the example passports
+// carry only what a real battery passport carries (engine #431).
 //
 // This reads the signed bytes themselves, which is what the page checks, not
 // the readable copies beside them (see the next test for those).
 test("keys are canonicalised by UTF-16 code unit, as the engine signed them", () => {
   assert.equal(jcs({ "Ａ": 6, "😀": 5 }), '{"😀":5,"Ａ":6}');
-  const dossier = JSON.parse(readFileSync(`${dir}04-valid-full-lifecycle.json`, "utf8"));
+  const dossier = JSON.parse(readFileSync(`${dir}11-canonicalisation-vectors.json`, "utf8"));
   const signed = new TextDecoder().decode(b64urlDecode(dossier.fullView.jws.split(".")[1]));
   assert.ok(signed.indexOf('"😀"') < signed.indexOf('"Ａ"'), "the engine signed the emoji first");
   assert.equal(jcs(JSON.parse(signed)), signed, "canonicalising the signed payload again reproduces its bytes");
@@ -118,7 +120,11 @@ test("every object in the examples lists its keys in the order they are signed i
 });
 
 test("an integer beyond 2^53 is refused, not approximated", async () => {
-  const text = readFileSync(`${dir}01-valid-simple.json`, "utf8").replace('"ratedCapacityAh": 20', '"ratedCapacityAh": 9007199254740993');
+  const raw = readFileSync(`${dir}01-valid-simple.json`, "utf8");
+  const text = raw.replace('"expectedLifetimeCycles": 1200', '"expectedLifetimeCycles": 9007199254740993');
+  // An edit that finds nothing leaves a valid dossier behind, and the test
+  // would then fail for the wrong reason, or pass for one after a corpus change.
+  assert.notEqual(text, raw, "01 carries the integer this test enlarges");
   const got = await verifyDossierText(text);
   assert.equal(got.kind, "unsupported");
 });
