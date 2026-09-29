@@ -7,7 +7,7 @@ Self-hosting is the standard way to run Odal Node. You run the engine on infrast
 
 ## What you need
 
-Docker and the `odal` CLI. The node and resolver are published as container images (`ghcr.io/odal-node/dpp-node` and `dpp-resolver`), each with a software bill of materials and build provenance attached; you only need a clone of the engine repository to build from source.
+Docker and the `odal` CLI. The node and resolver are published as container images, `ghcr.io/odal-node/dpp-node` and `ghcr.io/odal-node/dpp-resolver`, each with a software bill of materials and build provenance attached. You build the `odal` CLI once from the engine repository; the node itself can come from those images or be built from the same source.
 
 ## The steps
 
@@ -24,7 +24,7 @@ Your signing key is generated and held on your own infrastructure, encrypted at 
 
 ## Keeping current
 
-The engine and the product-group rules change as the regulation does. `odal update` pulls the latest images, with the latest product-group schemas and fixes, and a new signed plugin can be installed on a running node with `odal plugin install`. A node you never update keeps working, but falls behind the regulation over time.
+The engine and the product-group rules change as the regulation does. `odal update` downloads the images for the version your node runs (the newest release, or the one you pinned with `ODAL_VERSION`), with its product-group schemas and fixes; run `odal up` afterwards to restart on them. A new signed plugin can be installed on a running node with `odal plugin install`. A node you never update keeps working, but falls behind the regulation over time.
 
 ## Read next
 

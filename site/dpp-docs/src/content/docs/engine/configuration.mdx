@@ -5,7 +5,7 @@ description: Every environment variable the node and the resolver read, what it 
 
 import { Aside } from "@astrojs/starlight/components";
 
-A node is configured entirely through environment variables. The engine repository's `.env.example` is the template: copy it to `.env` and fill it in. This page lists every variable, grouped by what it controls.
+A node is configured entirely through environment variables. The engine repository's `.env.example` is the template, and `odal init` writes a copy for installs outside a clone: copy it to `.env` and fill it in. This page lists every variable, grouped by what it controls.
 
 <Aside type="caution" title="Two settings you cannot change later">
 - **`RESOLVER_BASE_URL`** is printed onto every product: it is signed into each passport's carrier URL at publication. Set it to your resolver's public address **before** publishing anything real; changing it afterwards means reissuing labels.
@@ -23,6 +23,14 @@ A node is configured entirely through environment variables. The engine reposito
 | `RESOLVER_BASE_URL` | The resolver's public origin, printed onto products. Required by the node and the resolver, with no default |
 
 With the bundled compose file, `DATABASE_POSTGRES_PASS` (superuser, used for container setup and migrations) and `DATABASE_APP_PASS` (the node's role) are set once and the connection URLs are built from them.
+
+## Images
+
+Read by Docker Compose when it starts the stack, not by the node.
+
+| Variable | Default | What it does |
+|---|---|---|
+| `ODAL_VERSION` | `latest` | Which release of the node and resolver images to run, written without the leading `v`: the release tagged `v1.4.2` is image `1.4.2`. Pin it in production. Inside a clone of the engine the images are built from source instead, and this only names the result |
 
 ## Profile and development overrides
 

@@ -8,7 +8,7 @@ import { Aside } from "@astrojs/starlight/components";
 ## The routine
 
 1. **Back up first**: the database and the key store. Migrations run forward only, so this backup is your rollback. See [Backup, restore and key custody](/engine/backup).
-2. **Upgrade a staging node first**: change the pinned `ODAL_VERSION`, then `odal update` and `odal up`.
+2. **Upgrade a staging node first**: change the pinned `ODAL_VERSION` (the release number without its leading `v`), then run `odal update` and `odal up`.
 3. **Check it**: `odal status`, the trust posture on `/vault/api/v1/node/state`, and publish, resolve and verify a test passport.
 4. **Upgrade production the same way**, and record the version and date.
 

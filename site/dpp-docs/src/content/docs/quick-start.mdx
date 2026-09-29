@@ -53,7 +53,7 @@ odal
 To script it instead, run `odal up` (build and start) and then `odal bootstrap` (onboard and mint the key).
 
 <Aside type="tip" title="Built from source, or pulled ready-made">
-Inside a clone of the repository, the first `up` compiles the node from source, which takes a few minutes; later starts are immediate. Outside a clone, `odal init` scaffolds a compose file and `odal up` pulls the published images instead.
+Inside a clone of the repository, the first `up` compiles the node from source, which takes a few minutes; later starts are immediate. Outside a clone, `odal init` writes the compose file and an example environment file: copy `.env.example` to `.env`, fill it in, and `odal up` then downloads the published images.
 </Aside>
 
 ## 5. Drive it from the Console
