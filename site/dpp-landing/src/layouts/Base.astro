@@ -32,7 +32,7 @@ const organizationLd = {
   url: "https://odal-node.io",
   logo: new URL("/favicon.svg", Astro.site).toString(),
   description:
-    "Open-source infrastructure for EU Digital Product Passports under the Ecodesign for Sustainable Products Regulation (ESPR).",
+    "Self-hosted infrastructure for EU Digital Product Passports under the Ecodesign for Sustainable Products Regulation (ESPR), built on an open-source core.",
   sameAs: ["https://github.com/odal-node"],
 };
 
@@ -47,34 +47,53 @@ const websiteLd = {
 // `WebSite` says the site exists; neither describes the software, which is the
 // thing anyone is searching for.
 //
-// `SoftwareSourceCode`, not `SoftwareApplication`: this is a library and a
-// self-hosted engine, not an installable end-user application with an operating
-// system and a price. `SoftwareApplication` would imply the second and invite
-// the "free / paid" question the licence answers differently for each half.
-const softwareLd = {
+// Two entities, because the project has two licences. The node (dpp-engine) is
+// source-available under BSL-1.1; the core library it is built on (dpp-core) is
+// Apache-2.0. They once shared one `@id`, which merged both licences and both
+// repositories onto a single thing a crawler or an assistant would then quote.
+// Each now carries one licence, and the node points at the core with
+// `isBasedOn`. The home page adds its `SoftwareApplication` view to `#node`.
+//
+// `SoftwareSourceCode` here, not `SoftwareApplication`: this layout describes
+// the source, on every page; only the home page describes the deployable node.
+const nodeLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
-  "@id": "https://odal-node.io/#software",
+  "@id": "https://odal-node.io/#node",
   name: "Odal Node",
   alternateName: "Odal Node DPP infrastructure",
   description:
-    "Open-source EU Digital Product Passport (DPP) infrastructure. Self-hosted software for issuing, signing, holding and serving the product logbooks required by the Ecodesign for Sustainable Products Regulation (ESPR) and the Battery Regulation.",
-  codeRepository: "https://github.com/odal-node/dpp-core",
+    "Self-hosted infrastructure for EU Digital Product Passports (DPP): software for issuing, signing, holding and serving the product logbooks required by the Ecodesign for Sustainable Products Regulation (ESPR) and the Battery Regulation. Source-available under the Business Source License 1.1, with a grant that makes self-hosting for your own compliance free. Built on the open-source Odal Node core library.",
+  codeRepository: "https://github.com/odal-node/dpp-engine",
   programmingLanguage: "Rust",
-  license: "https://www.apache.org/licenses/LICENSE-2.0",
+  license: "https://github.com/odal-node/dpp-engine/blob/main/LICENSE",
   url: "https://odal-node.io",
+  isBasedOn: { "@id": "https://odal-node.io/#core" },
   keywords: [
     "digital product passport",
     "DPP",
     "product logbook",
     "ESPR",
     "battery passport",
-    "open source",
     "self-hosted",
     "EU compliance",
     "EN 18219",
     "GS1 Digital Link",
   ],
+  publisher: { "@id": "https://odal-node.io/#organization" },
+};
+
+const coreLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "@id": "https://odal-node.io/#core",
+  name: "Odal Node core library (dpp-core)",
+  description:
+    "The open-source Rust library Odal Node is built on: the EU Digital Product Passport model and its versioned schemas, validation and product-group rules, signing and verification, GS1 Digital Link parsing, the Asset Administration Shell export and the EU registry types. Apache-2.0; anyone may use it.",
+  codeRepository: "https://github.com/odal-node/dpp-core",
+  programmingLanguage: "Rust",
+  license: "https://www.apache.org/licenses/LICENSE-2.0",
+  keywords: ["digital product passport", "DPP", "ESPR", "open source", "Rust library"],
   publisher: { "@id": "https://odal-node.io/#organization" },
 };
 ---
@@ -116,7 +135,8 @@ const softwareLd = {
     <!-- Structured Data -->
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(softwareLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(nodeLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(coreLd)} />
     {jsonLd.map((block) => (
       <script is:inline type="application/ld+json" set:html={JSON.stringify(block)} />
     ))}

@@ -60,6 +60,12 @@ export default defineConfig({
         // this documents a library and an engine, not a SaaS product, so
         // `SoftwareApplication` (which implies an installable end-user app with
         // an operating system and a price) would overstate what is here.
+        //
+        // Two entities, one licence each, under the landing site's ids so both
+        // sites describe the same things: the node (dpp-engine, BSL-1.1) and
+        // the core library it is built on (dpp-core, Apache-2.0). One shared
+        // entity used to carry the core's licence and repository while being
+        // described as the self-hosted node, which a reader would then quote.
         {
           tag: 'script',
           attrs: { type: 'application/ld+json' },
@@ -68,22 +74,22 @@ export default defineConfig({
             '@graph': [
               {
                 '@type': 'SoftwareSourceCode',
-                '@id': 'https://docs.odal-node.io/#software',
+                '@id': 'https://odal-node.io/#node',
                 name: 'Odal Node',
                 alternateName: 'Odal Node DPP infrastructure',
                 description:
-                  'Open-source EU Digital Product Passport (DPP) infrastructure. Self-hosted software for issuing, signing, holding and serving the product logbooks required by the Ecodesign for Sustainable Products Regulation and the Battery Regulation.',
-                codeRepository: 'https://github.com/odal-node/dpp-core',
+                  'Self-hosted infrastructure for EU Digital Product Passports (DPP): software for issuing, signing, holding and serving the product logbooks required by the Ecodesign for Sustainable Products Regulation and the Battery Regulation. Source-available under the Business Source License 1.1, with a grant that makes self-hosting for your own compliance free. Built on the open-source Odal Node core library.',
+                codeRepository: 'https://github.com/odal-node/dpp-engine',
                 programmingLanguage: 'Rust',
-                license: 'https://www.apache.org/licenses/LICENSE-2.0',
+                license: 'https://github.com/odal-node/dpp-engine/blob/main/LICENSE',
                 url: 'https://odal-node.io/',
+                isBasedOn: { '@id': 'https://odal-node.io/#core' },
                 keywords: [
                   'digital product passport',
                   'DPP',
                   'product logbook',
                   'ESPR',
                   'battery passport',
-                  'open source',
                   'self-hosted',
                   'EU compliance',
                   'EN 18219',
@@ -91,10 +97,21 @@ export default defineConfig({
                 ],
               },
               {
+                '@type': 'SoftwareSourceCode',
+                '@id': 'https://odal-node.io/#core',
+                name: 'Odal Node core library (dpp-core)',
+                description:
+                  'The open-source Rust library Odal Node is built on: the EU Digital Product Passport model and its versioned schemas, validation and product-group rules, signing and verification, GS1 Digital Link parsing, the Asset Administration Shell export and the EU registry types. Apache-2.0; anyone may use it.',
+                codeRepository: 'https://github.com/odal-node/dpp-core',
+                programmingLanguage: 'Rust',
+                license: 'https://www.apache.org/licenses/LICENSE-2.0',
+                keywords: ['digital product passport', 'DPP', 'ESPR', 'open source', 'Rust library'],
+              },
+              {
                 '@type': 'TechArticle',
                 '@id': 'https://docs.odal-node.io/#docs',
                 name: 'Odal Node documentation',
-                about: { '@id': 'https://docs.odal-node.io/#software' },
+                about: [{ '@id': 'https://odal-node.io/#node' }, { '@id': 'https://odal-node.io/#core' }],
                 inLanguage: 'en',
                 isAccessibleForFree: true,
                 // Named so a reader — human or machine — can tell what the
