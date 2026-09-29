@@ -56,7 +56,7 @@ const examples = [
           <input id="file" type="file" accept=".json,application/json" class="sr-only" />
         </label>
 
-        <details class="mt-4 rounded-lg border border-neutral-200 bg-white">
+        <details id="paste-panel" class="mt-4 rounded-lg border border-neutral-200 bg-white">
           <summary class="cursor-pointer px-4 py-3 text-sm font-medium text-neutral-800">Or paste its contents</summary>
           <div class="border-t border-neutral-200 p-4">
             <textarea
@@ -82,9 +82,13 @@ const examples = [
               <button
                 type="button"
                 data-example={e.file}
-                class="w-full rounded-md bg-white/5 px-3 py-2 text-left text-sm font-medium text-white ring-1 ring-white/10 transition-colors hover:bg-white/10"
+                aria-pressed="false"
+                class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-md bg-white/5 px-3 py-2 text-left text-sm font-medium text-white ring-1 ring-white/10 transition-colors hover:bg-white/10"
               >
                 {e.label}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="tick h-4 w-4 shrink-0" aria-hidden="true">
+                  <path d="m5 12 5 5 9-10" />
+                </svg>
               </button>
             </li>
           ))}
@@ -141,6 +145,15 @@ const examples = [
     outline: 2px solid var(--odal-action-600);
     outline-offset: 2px;
   }
+
+  /* The example whose text is in the box. A tick as well as the ring, so the
+     state does not rest on a change of colour alone. */
+  [data-example] .tick { opacity: 0; }
+  [data-example][aria-pressed="true"] {
+    background-color: rgb(255 255 255 / 0.15);
+    box-shadow: 0 0 0 2px #fff;
+  }
+  [data-example][aria-pressed="true"] .tick { opacity: 1; }
 </style>
 
 <script>
@@ -304,12 +317,33 @@ const examples = [
     render(await verifyDossierText(text), source);
   }
 
+  // Show what is being checked: the text lands in the paste box, which is
+  // opened, so the visitor can read it and edit it to see a check fail. A
+  // proof file is a few hundred kilobytes; a much larger one would make the
+  // box sluggish, so it is checked without being shown.
+  const SHOW_MAX_CHARS = 2_000_000;
+  function showInPasteBox(text: string): void {
+    // Cleared rather than left alone: the old text would read as the thing checked.
+    paste.value = text.length > SHOW_MAX_CHARS ? "" : text;
+    if (paste.value) (document.getElementById("paste-panel") as HTMLDetailsElement).open = true;
+  }
+
+  // Which example, if any, is what the box holds. Any other source of text, or
+  // an edit to the box, clears it.
+  const exampleButtons = document.querySelectorAll<HTMLButtonElement>("[data-example]");
+  function select(chosen: HTMLButtonElement | null): void {
+    for (const b of exampleButtons) b.setAttribute("aria-pressed", String(b === chosen));
+  }
+
   async function checkFile(file: File) {
     if (file.size > MAX_BYTES) {
       result.replaceChildren(banner("warn", "That file is too large.", "A proof file is a few hundred kilobytes at most; this one is over 20 MB."));
       return;
     }
-    await check(await file.text(), file.name);
+    const text = await file.text();
+    select(null);
+    showInPasteBox(text);
+    await check(text, file.name);
   }
 
   // Without Ed25519 in WebCrypto, a signature cannot be checked at all; say so
@@ -322,6 +356,7 @@ const examples = [
       }
     });
 
+  const paste = document.getElementById("paste") as HTMLTextAreaElement;
   const input = document.getElementById("file") as HTMLInputElement;
   input.addEventListener("change", () => input.files?.[0] && checkFile(input.files[0]));
 
@@ -342,11 +377,13 @@ const examples = [
   });
 
   document.getElementById("check-paste")!.addEventListener("click", () => {
-    const text = (document.getElementById("paste") as HTMLTextAreaElement).value;
+    const text = paste.value;
     if (text.trim()) check(text, "pasted text");
   });
 
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-example]")) {
+  paste.addEventListener("input", () => select(null));
+
+  for (const button of exampleButtons) {
     button.addEventListener("click", async () => {
       const name = button.dataset.example!;
       // A failed fetch must not reach the checker: the error page it returns
@@ -367,7 +404,10 @@ const examples = [
         );
         return;
       }
-      await check(await res.text(), `example: ${button.textContent?.trim()}`);
+      const text = await res.text();
+      select(button);
+      showInPasteBox(text);
+      await check(text, `example: ${button.textContent?.trim()}`);
     });
   }
 </script>
