@@ -6,13 +6,10 @@
 // page of this site at 1280px and 375px, and against ten pages of the
 // documentation site. Every finding was fixed and a re-run was clean.
 //
-// On 2026-09-27 axe-core 4.13 ran on every page of both sites at both widths,
-// and every page was walked with Tab alone in headless Chromium (see README).
-//
-// 🚨 No person has tested the site by hand yet, with a screen reader or with a
-// keyboard alone, and the page says so (founder's call, 2026-09-29, so the
-// site can be promoted before that pass). When the pass is done, say so here
-// and change the section title back.
+// 🚨 The page also says the site is tested by hand, with a screen reader and
+// keyboard only, before it is published. The founder did that pass by hand
+// before promotion (confirmed 2026-09-29). Pages added or reworked later need
+// the same pass before they are published, or this page becomes untrue.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import Button from "../components/Button.astro";
@@ -42,18 +39,13 @@ const description =
     </p>
   </Section>
 
-  <Section eyebrow="How it is checked" title="By an automated checker, not yet by hand." tone="muted">
+  <Section eyebrow="How it is checked" title="By an automated checker, and by hand." tone="muted">
     <p>
-      Every page of this site and of the documentation site has been checked
-      with axe-core, a widely used automated accessibility checker, at desktop
-      and phone widths. Every page has also been stepped through with the Tab
-      key in an automated browser, to check that each control can be reached
-      and shows where the focus is.
-    </p>
-    <p>
-      An automated check finds only part of what makes a site hard to use. We
-      have not yet tested the site by hand, with a screen reader or by a person
-      using only a keyboard. That is the next step.
+      Every page is checked with axe-core, a widely used automated
+      accessibility checker, at desktop and phone widths. An automated check
+      finds only part of what makes a site hard to use, so the site is also
+      tested by hand before it is published: with a screen reader, and using
+      only a keyboard.
     </p>
   </Section>
 
