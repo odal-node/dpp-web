@@ -26,7 +26,7 @@ This standard sets out how a product's unique identifier is built. It allows sev
 
 | Topic | Status | Odal Node |
 |---|---|---|
-| Identification scheme (clause 5) | In place | The node identifies products with a GS1 Digital Link (`/01/{gtin}/21/{serial}`), one of the routes in scheme 1. The next release of the core library adds an identification link (scheme 2, EN IEC 61406) and a decentralised identifier (scheme 3), so a company without a GS1 membership can issue passports too. For scheme 2 the library only checks that the value is a web address, not that it follows EN IEC 61406. |
+| Identification scheme (clause 5) | In place | The node identifies products with a GS1 Digital Link (`/01/{gtin}/21/{serial}`), one of the routes in scheme 1. The core library now also supports an identification link (scheme 2, EN IEC 61406) and a decentralised identifier (scheme 3), which let a company without a GS1 membership issue passports; the node does not use them yet. For scheme 2 the library only checks that the value is a web address, not that it follows EN IEC 61406. |
 | Length and characters (clause 4.3) | In place | The standard sets no length limit. The 20-character serial number follows GS1's rule for AI 21. Every identifier the node creates is plain ASCII, percent-encoded according to RFC 3986. |
 | Granularity (clause 4.4) | In place | Once a passport is published, its level (model, batch or item) cannot be changed. |
 | GS1 Digital Link version (scheme 1) | Open | Scheme 1 requires a named version of the GS1 Digital Link URI syntax, and EN 18219 names 1.6.0 (2022). We have not yet compared our parser and builder with that version. |

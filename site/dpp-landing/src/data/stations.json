@@ -39,7 +39,7 @@
       "title": "Resolve",
       "who": "Consumer, retailer",
       "lead": "Scan the code, see the public passport. No login, no fee.",
-      "body": "The code on the product leads straight to its passport. Products with a barcode number resolve through GS1 Digital Link; products without one get a plain web address, so nobody needs a GS1 membership to take part."
+      "body": "The code on the product leads straight to its passport, through GS1 Digital Link. For now that needs a barcode number (a GTIN). The open library already supports identifiers that need no GS1 membership; the node does not use them yet."
     },
     {
       "n": 6,

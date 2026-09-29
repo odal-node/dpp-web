@@ -209,7 +209,7 @@
           "items": [
             {
               "title": "More ways to identify a product",
-              "line": "Every identifier scheme the European standard allows, not only a barcode number. It arrives with the next release of the open library."
+              "line": "Every identifier scheme the European standard allows, not only a barcode number. The open library supports them now; the node does not use them yet."
             },
             {
               "title": "Carbon and repairability figures in the passport",

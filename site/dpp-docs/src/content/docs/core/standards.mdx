@@ -3,13 +3,13 @@ title: Standards & interoperability
 description: The open standards Odal Node is built on, what each one is used for, and where the software stands against the six harmonised European passport standards.
 ---
 
-Odal Node builds on published, open standards, so existing tools can read its passports and nothing depends on a format only we understand. This page lists the standards the code relies on and what each is used for. Where something is not in a release yet, the entry says so. The full list, with every EU act the code applies and the articles it relies on, is in [Acts and standards](/regulatory/acts-and-standards).
+Odal Node builds on published, open standards, so existing tools can read its passports and nothing depends on a format only we understand. This page lists the standards the code relies on and what each is used for. Where the node does not use something yet, the entry says so. The full list, with every EU act the code applies and the articles it relies on, is in [Acts and standards](/regulatory/acts-and-standards).
 
 ## Identifying a product and resolving its passport
 
 - **GS1 Digital Link**: the web address behind the QR code. A scan resolves to the passport, and the same link can serve different views and link types; a request for `linkset` returns an RFC 9264 linkset.
 - **ISO/IEC 18004**: the QR code itself. The node renders it with the four-module quiet zone the standard requires.
-- **EN 18219** (unique identifiers): three of the product identifier schemes it allows, a GS1 Digital Link, the IEC 61406 identification link and a decentralised identifier (DID). The last two come with the next release of the core library; until then a node identifies products by GTIN. See [Harmonised standards](/regulatory/harmonised-standards).
+- **EN 18219** (unique identifiers): three of the product identifier schemes it allows, a GS1 Digital Link, the IEC 61406 identification link and a decentralised identifier (DID). The core library supports all three; the node does not use the last two yet and identifies products by GTIN. See [Harmonised standards](/regulatory/harmonised-standards).
 - **ISO 3166-1** country codes, and **ISO 17442** legal entity identifiers with their **ISO 7064** check characters.
 
 ## Signing a passport and proving access
@@ -18,7 +18,7 @@ Odal Node builds on published, open standards, so existing tools can read its pa
 - **`did:web`**: the issuer's identity, anchored in their own web domain. Verifying a passport is an ordinary web lookup, with no central registry and no dependency on Odal.
 - **JSON Canonicalization Scheme** (RFC 8785): the byte-exact form data is hashed in, so a check gives the same answer on every machine.
 - **W3C Verifiable Credentials 2.0**: the access credentials a reader presents to see restricted parts of a passport. The node checks an issuer's **W3C Bitstring Status List** for revocation where the issuer publishes one; credentials the node issues itself carry no status list and are limited to 90 days instead (see [Access credentials](/guides/credentials)).
-- **SD-JWT** (RFC 9901): a passport issued as a credential its holder can present in part. It comes with the next release of the core library, and the node does not issue it yet.
+- **SD-JWT** (RFC 9901): a passport issued as a credential its holder can present in part. The core library has it; the node does not issue it yet.
 
 ## Electronic seals
 
