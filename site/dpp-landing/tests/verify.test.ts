@@ -90,15 +90,14 @@ test("keys are canonicalised by UTF-16 code unit, as the engine signed them", ()
 });
 
 // A dossier carries each signed view twice: the JWS, and a readable copy of its
-// payload that the page shows when an example is loaded. The engine writes the
-// readable copies in code-point order (a serde_json map sorts by UTF-8 bytes),
-// so on the pair above they disagreed with the signed bytes and read as the
-// very ordering bug the pair exists to catch (dpp-engine #430). The examples
-// here have that pair swapped by hand in all four copies per file: a text edit
-// that leaves every other byte, every JWS included, as the engine wrote it, and
-// changes no verdict, since the page canonicalises before it checks anything.
-// This fails if a re-copy from the engine brings the old order back before
-// #430 is fixed there.
+// payload that the page shows when an example is loaded. The node used to write
+// the readable copies in code-point order (a serde_json map sorts by UTF-8
+// bytes), so on the pair above they disagreed with the signed bytes and read as
+// the very ordering bug the pair exists to catch (dpp-engine #430). The engine
+// now writes every object in signed key order (dpp-engine #431), and these
+// examples are its regenerated corpus, byte for byte. Order changes no verdict,
+// since the page canonicalises before it checks anything; this fails if a
+// re-copy from an engine without that fix brings code-point order back.
 test("every object in the examples lists its keys in the order they are signed in", () => {
   const unordered: string[] = [];
   const walk = (value: unknown, at: string): void => {
