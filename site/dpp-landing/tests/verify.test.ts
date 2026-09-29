@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { verifyDossierText } from "../src/lib/verify/verify.ts";
+import { b64urlDecode, jcs } from "../src/lib/verify/canonical.ts";
 
 type Expected =
   | { exit: 0 | 1; checks: { name: string; status: "pass" | "fail" | "absent" }[] }
@@ -68,6 +69,25 @@ test("a one-character edit to a signed payload is caught, and only where it happ
     const failed = got.checks.filter((c) => c.status === "fail").map((c) => c.name);
     assert.deepEqual(failed, ["content_integrity", "full_view_signature"]);
   }
+});
+
+// RFC 8785 §3.2.3 sorts object keys by UTF-16 code unit, not by code point and
+// not by UTF-8 byte. The three agree for almost every key, so a verifier that
+// sorts the wrong way passes almost everything, and the golden verdicts above
+// would only report it as a bad signature. The engine's example payload carries
+// a pair on which they disagree (engine #429): "😀" is the surrogate pair
+// 0xD83D 0xDE00 and "Ａ" (fullwidth A) the single unit 0xFF21, so by code unit
+// the emoji comes first and by code point it comes last.
+//
+// The dossier file lists the two the other way round. That is not a fault: the
+// file is the node's readable copy, and its key order is not what was signed.
+// This reads the signed bytes themselves, which is what the page checks.
+test("keys are canonicalised by UTF-16 code unit, as the engine signed them", () => {
+  assert.equal(jcs({ "Ａ": 6, "😀": 5 }), '{"😀":5,"Ａ":6}');
+  const dossier = JSON.parse(readFileSync(`${dir}04-valid-full-lifecycle.json`, "utf8"));
+  const signed = new TextDecoder().decode(b64urlDecode(dossier.fullView.jws.split(".")[1]));
+  assert.ok(signed.indexOf('"😀"') < signed.indexOf('"Ａ"'), "the engine signed the emoji first");
+  assert.equal(jcs(JSON.parse(signed)), signed, "canonicalising the signed payload again reproduces its bytes");
 });
 
 test("an integer beyond 2^53 is refused, not approximated", async () => {
