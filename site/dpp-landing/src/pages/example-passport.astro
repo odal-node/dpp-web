@@ -1,41 +1,15 @@
 ---
 // /example-passport — one realistic battery passport, sorted by who may read
-// each part. The data is the engine's own demo EV battery (fictional company),
-// copied with provenance into src/data/example-passport.json. The sorting uses
-// the battery disclosure map vendored from dpp-core, the same map the software
-// and /visibility use: a field it does not list is public.
+// each part. The data and the sorting live in lib/example-passport.ts, shared
+// with the home page's passport preview.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import { fieldLabel, categoryLabel } from "../lib/product-groups";
-import battery from "../data/product-groups/battery.json";
-import example from "../data/example-passport.json";
+import { buckets, flat, isObj, scalar } from "../lib/example-passport";
 
 const title = "Example battery passport | Odal Node";
 const description =
   "An example of an electric-vehicle battery passport, sorted into what anyone can read, what authorities and readers with a legitimate interest can read, and what only one of them can.";
-
-type Json = null | boolean | number | string | Json[] | { [k: string]: Json };
-const p = example.passport as unknown as Record<string, Json> & { productGroupData: Record<string, Json> };
-const disclosure = (battery as { disclosure: Record<string, string> }).disclosure;
-
-// The envelope fields every passport carries, then the battery's own data.
-// The engine's demo data also carries `repairabilityScore`, which is left off
-// here: no EU act defines a repairability score for batteries, so showing one on
-// an example battery passport would suggest the law asks for it. The data file
-// stays a verbatim copy of the engine's (see its _comment).
-const envelope: [string, Json][] = [
-  ["productName", p.productName],
-  ["manufacturer", p.manufacturer],
-  ["batchId", p.batchId],
-  ["placedOnMarketDate", p.placedOnMarketDate],
-  ["commodityCode", p.commodityCode],
-  ["materials", p.materials],
-];
-const groupData = Object.entries(p.productGroupData).filter(([k]) => k !== "productGroup");
-
-const classOf = (field: string) => disclosure[field] ?? "public";
-const buckets: Record<string, [string, Json][]> = { public: [...envelope], restricted: [], conformity: [], individual: [] };
-for (const [k, v] of groupData) (buckets[classOf(k)] ??= []).push([k, v]);
 
 const SECTIONS = [
   {
@@ -64,13 +38,6 @@ const SECTIONS = [
   },
 ];
 
-const isObj = (v: Json): v is Record<string, Json> => !!v && typeof v === "object" && !Array.isArray(v);
-const scalar = (v: Json) => (v === true ? "Yes" : v === false ? "No" : typeof v === "number" ? v.toLocaleString("en-GB") : String(v));
-const flat = (o: Record<string, Json>) =>
-  Object.entries(o)
-    .filter(([, v]) => v !== null && !(Array.isArray(v) && v.length === 0))
-    .map(([k, v]) => `${fieldLabel(k)}: ${Array.isArray(v) ? `${v.length} entries` : isObj(v) ? "…" : scalar(v)}`)
-    .join(" · ");
 ---
 
 <Base title={title} description={description}>
