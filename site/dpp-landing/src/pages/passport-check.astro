@@ -14,32 +14,18 @@
 // `data-shown`, not by the `hidden` attribute: Tailwind's reset hides
 // `[hidden]` with !important inside a cascade layer, and a layered !important
 // beats any unlayered override, so the <noscript> style could never reveal an
-// answer that carried it.
+// answer that carried it. The answer card and the script are shared with the
+// home page's hero (components/CheckAnswer.astro, lib/checker-client.ts).
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
-import BasisMark from "../components/BasisMark.astro";
 import Button from "../components/Button.astro";
-import { choices, type Answer } from "../lib/checker";
-import { basisLabel } from "../lib/regulations";
+import CheckAnswer from "../components/CheckAnswer.astro";
+import { cards, choices } from "../lib/checker";
 
 const title = "Does my product need a Digital Product Passport? | Odal Node";
 const description =
   "Pick what you make or sell and see whether EU law requires a Digital Product Passport for it, from when, and where that date comes from.";
 
-type Card = { key: string; label: string; answer: Answer };
-const cards: Card[] = choices.flatMap((c) =>
-  c.follow
-    ? c.follow.options.map((o) => ({ key: `${c.key}:${o.key}`, label: `${c.label}: ${o.label}`, answer: o.answer }))
-    : c.answer
-      ? [{ key: c.key, label: c.label, answer: c.answer }]
-      : [],
-);
-
-const tone = {
-  yes: "border-regulatory-border bg-regulatory-bg",
-  later: "border-primary-200 bg-primary-50",
-  no: "border-neutral-200 bg-white",
-};
 const selectClass =
   "mt-2 block w-full max-w-md rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-base text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200";
 ---
@@ -79,17 +65,7 @@ const selectClass =
       </form>
 
       <ul id="pc-answers" class="m-0 mt-6 grid list-none gap-4 p-0" aria-live="polite">
-        {cards.map((c) => (
-          <li data-answer={c.key} class:list={["m-0 max-w-2xl rounded-md border p-5", tone[c.answer.verdict]]}>
-            <p class="m-0 text-xs font-semibold uppercase tracking-wide text-neutral-500">{c.label}</p>
-            <p class="m-0 mt-1.5 text-xl font-semibold leading-snug text-neutral-900">{c.answer.headline}</p>
-            <p class="m-0 mt-2 text-sm leading-body text-neutral-700">{c.answer.detail}</p>
-            <p class="m-0 mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-              {c.answer.basis && <BasisMark basis={c.answer.basis} label={basisLabel(c.answer.basis)} />}
-              {c.answer.links.map((l) => <a href={l.href} class="link-arrow">{l.label}</a>)}
-            </p>
-          </li>
-        ))}
+        {cards.map((c) => <CheckAnswer card={c} />)}
       </ul>
     </div>
   </Section>
@@ -127,45 +103,6 @@ const selectClass =
 </style>
 
 <script>
-  const root = document.getElementById("pc");
-  const form = document.getElementById("pc-form");
-  const group = document.getElementById("pc-group") as HTMLSelectElement | null;
-  if (root && form && group) {
-    const follows = [...root.querySelectorAll<HTMLElement>("[data-follow]")];
-    const answers = [...root.querySelectorAll<HTMLElement>("[data-answer]")];
-    const followSelect = (f: HTMLElement) => f.querySelector("select") as HTMLSelectElement;
-
-    const show = () => {
-      let key = group.value;
-      for (const f of follows) {
-        const on = f.dataset.follow === group.value;
-        f.hidden = !on;
-        if (on) key = followSelect(f).value ? `${group.value}:${followSelect(f).value}` : "";
-      }
-      for (const a of answers) a.toggleAttribute("data-shown", a.dataset.answer === key);
-      history.replaceState(null, "", key ? `#${key}` : location.pathname);
-    };
-
-    // An answer shared by its address opens on that answer. A mangled address
-    // (a stray "%" that is not an escape) opens on the empty picker instead:
-    // decodeURIComponent throws on it, and an uncaught throw here would leave
-    // the picker with no listeners, so nothing could be chosen at all.
-    let shared = "";
-    try {
-      shared = decodeURIComponent(location.hash.slice(1));
-    } catch {
-      /* not a valid escape sequence: ignore it */
-    }
-    const [g, sub] = shared.split(":");
-    if (g && [...group.options].some((o) => o.value === g)) {
-      group.value = g;
-      const f = follows.find((x) => x.dataset.follow === g);
-      if (f && sub) followSelect(f).value = sub;
-    }
-
-    form.addEventListener("submit", (e) => e.preventDefault());
-    group.addEventListener("change", show);
-    for (const f of follows) followSelect(f).addEventListener("change", show);
-    show();
-  }
+  import { mountChecker } from "../lib/checker-client";
+  mountChecker("pc", { syncHash: true });
 </script>
