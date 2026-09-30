@@ -13,7 +13,7 @@ import BasisMark from "./BasisMark.astro";
 import Button from "./Button.astro";
 import { basisLabel } from "../lib/regulations";
 import { MAILBOX, mailto } from "../lib/lead";
-import type { Card } from "../lib/checker";
+import { checklistFor, type Card } from "../lib/checker";
 
 interface Props {
   card: Card;
@@ -35,7 +35,7 @@ const darkRule = {
   later: "border-l-primary-300",
   no: "border-l-primary-300/30",
 };
-const checklist = card.group && a.verdict !== "no" ? `/product-groups/${card.group}/checklist` : undefined;
+const checklist = checklistFor(card);
 ---
 
 {tone === "light" ? (
@@ -51,7 +51,7 @@ const checklist = card.group && a.verdict !== "no" ? `/product-groups/${card.gro
 ) : (
   <li
     data-answer={card.key}
-    class:list={["m-0 rounded-lg border border-l-4 border-primary-300/20 bg-primary-900/70 p-5", darkRule[a.verdict]]}
+    class:list={["m-0 mt-5 rounded-lg border border-l-4 border-primary-300/20 bg-primary-900/70 p-5", darkRule[a.verdict]]}
   >
     <p class="m-0 text-xs font-semibold uppercase tracking-wide text-primary-300">{card.label}</p>
     <p class="m-0 mt-1.5 text-lg font-semibold leading-snug text-white">{a.headline}</p>
@@ -75,3 +75,13 @@ const checklist = card.group && a.verdict !== "no" ? `/product-groups/${card.gro
     </p>
   </li>
 )}
+
+<!-- Global, not scoped: a scoped rule only reaches elements of the component
+     that declares it, and the pages that list these answers are other
+     components. The script reveals the chosen answer by marking it
+     `data-shown` (lib/checker-client.ts); a <noscript> style may override. -->
+<style is:global>
+  [data-answer]:not([data-shown]) {
+    display: none;
+  }
+</style>

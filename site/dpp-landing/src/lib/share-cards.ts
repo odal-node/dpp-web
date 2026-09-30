@@ -7,6 +7,7 @@
 //
 // A page with no card here keeps the site-wide image, public/og-image.png.
 import { groups, unsoldGoods } from "./product-groups";
+import { checklistGroups } from "./checker";
 import { instruments, displayTitle, kindLabel, passportView } from "./regulations";
 
 export type Card = {
@@ -48,6 +49,13 @@ const groupCards: Card[] = [...groups, unsoldGoods].map((g) => ({
   line: g.line,
 }));
 
+const checklistCards: Card[] = checklistGroups.map((g) => ({
+  path: `/product-groups/${g.key}/checklist`,
+  eyebrow: "Checklist",
+  title: `${g.name}: getting ready for the passport.`,
+  line: "Whether one is required and from when, what it carries, and the questions to settle first.",
+}));
+
 const actCards: Card[] = instruments.map((i) => {
   const view = passportView(i);
   return {
@@ -58,7 +66,7 @@ const actCards: Card[] = instruments.map((i) => {
   };
 });
 
-export const cards: Card[] = [...pages, ...groupCards, ...actCards];
+export const cards: Card[] = [...pages, ...groupCards, ...checklistCards, ...actCards];
 
 const byPath = new Map(cards.map((c) => [c.path, c]));
 

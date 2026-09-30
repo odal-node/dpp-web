@@ -7,6 +7,7 @@
 import type { APIRoute } from "astro";
 import { menus, footerLinks } from "../lib/site-map";
 import { groups, unsoldGoods } from "../lib/product-groups";
+import { checklistGroups } from "../lib/checker";
 import { instruments, displayTitle, passportView } from "../lib/regulations";
 
 export const GET: APIRoute = ({ site }) => {
@@ -34,6 +35,12 @@ export const GET: APIRoute = ({ site }) => {
     "",
     item("/product-groups", "All product groups", "What the software can build passports for"),
     ...[...groups, unsoldGoods].map((g) => item(`/product-groups/${g.key}`, g.name, g.line)),
+    "",
+    "## Checklists",
+    "",
+    ...checklistGroups.map((g) =>
+      item(`/product-groups/${g.key}/checklist`, `${g.name} passport checklist`, "Whether one is required and from when, what it carries, and the questions to settle first"),
+    ),
     "",
     "## EU acts",
     "",

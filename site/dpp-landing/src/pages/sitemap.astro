@@ -9,6 +9,7 @@ import Section from "../components/Section.astro";
 import ExternalArrow from "../components/ExternalArrow.astro";
 import { menus, footerLinks } from "../lib/site-map";
 import { groups, unsoldGoods } from "../lib/product-groups";
+import { checklistGroups } from "../lib/checker";
 import { instruments, displayTitle, passportView } from "../lib/regulations";
 
 const title = "Site map: every page on odal-node.io | Odal Node";
@@ -23,6 +24,15 @@ const sections = [
       { href: "/product-groups", label: "All product groups", line: "What the software can build passports for", external: false },
       ...[...groups, unsoldGoods].map((g) => ({ href: `/product-groups/${g.key}`, label: g.name, line: g.line, external: false })),
     ],
+  },
+  {
+    label: "Checklists",
+    items: checklistGroups.map((g) => ({
+      href: `/product-groups/${g.key}/checklist`,
+      label: `${g.name} passport checklist`,
+      line: "What to have ready, on one printable page",
+      external: false,
+    })),
   },
   {
     label: "The acts, one page each",

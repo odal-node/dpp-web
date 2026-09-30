@@ -189,3 +189,17 @@ export function choiceFor(groupKey: string): Choice {
   if (!c) throw new Error(`checker has no choice for product group "${groupKey}"`);
   return c;
 }
+
+/**
+ * The product groups that get a checklist page: every group the check does
+ * not answer "no passport" for. A "getting ready for the passport" page for a
+ * product that needs none would contradict its own answer.
+ */
+export const checklistGroups = groups.filter((g) => strongest(choiceFor(g.key)) !== "no");
+const checklistKeys = new Set(checklistGroups.map((g) => g.key));
+
+/** The checklist page behind an answer, if its product group has one and it needs a passport. */
+export const checklistFor = (card: Card): string | undefined =>
+  card.group && card.answer.verdict !== "no" && checklistKeys.has(card.group)
+    ? `/product-groups/${card.group}/checklist`
+    : undefined;

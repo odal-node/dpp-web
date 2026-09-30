@@ -10,7 +10,7 @@
 // form. Without JavaScript, the <noscript> style below lists every answer and
 // hides the picker, which cannot work without the script.
 //
-// An answer is hidden by the page style below until the script marks it
+// An answer is hidden by CheckAnswer's style until the script marks it
 // `data-shown`, not by the `hidden` attribute: Tailwind's reset hides
 // `[hidden]` with !important inside a cascade layer, and a layered !important
 // beats any unlayered override, so the <noscript> style could never reveal an
@@ -100,12 +100,6 @@ const selectClass =
     </p>
   </Section>
 </Base>
-
-<style>
-  [data-answer]:not([data-shown]) {
-    display: none;
-  }
-</style>
 
 <script>
   import { mountChecker } from "../lib/checker-client";
