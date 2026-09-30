@@ -38,9 +38,22 @@ const extra = {
 /** The files behind one URL path, such as "/regulations/espr/". */
 function sources(pathname) {
   const slug = pathname.replace(/^\/|\/$/g, "");
-  const [section, key] = slug.split("/");
+  const [section, key, sub] = slug.split("/");
   if (section === "regulations" && key) {
     return ["src/pages/regulations/[id].astro", `src/data/instruments/${key}.json`, ...regulations];
+  }
+  if (section === "product-groups" && key && sub === "checklist") {
+    return [
+      "src/pages/product-groups/[key]/checklist.astro",
+      `src/data/product-groups/${key}.json`,
+      "src/data/product-group-copy.json",
+      "src/data/readiness.json",
+      "src/data/access.json",
+      "src/lib/checker.ts",
+      "src/lib/product-groups.ts",
+      "src/data/instruments",
+      ...regulations,
+    ];
   }
   if (section === "product-groups" && key) {
     return [

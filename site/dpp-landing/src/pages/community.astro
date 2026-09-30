@@ -1,0 +1,128 @@
+---
+// /community — where to ask, suggest and share, in public.
+//
+// The public board is GitHub Discussions at the organisation level
+// (github.com/orgs/odal-node/discussions, backed by the dpp-core repository),
+// one board for the library and the node. What goes where follows the
+// organisation's SUPPORT.md, so the site and the repositories give the same
+// answer: questions and ideas on the board, bugs as issues on the repository
+// they belong to, security reports privately, anything confidential by email.
+//
+// The page invites people in and says plainly that it is early days, without
+// implying a community that does not exist yet, and it promises no reply
+// time, because SUPPORT.md promises none.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import Button from "../components/Button.astro";
+import ExternalArrow from "../components/ExternalArrow.astro";
+import { MAILBOX, mailto } from "../lib/lead";
+
+const BOARD = "https://github.com/orgs/odal-node/discussions";
+const CONDUCT = "https://github.com/odal-node/.github/blob/main/CODE_OF_CONDUCT.md";
+
+const title = "Community | Odal Node";
+const description =
+  "Ask questions, suggest features and share what you build on Odal Node in its public discussions on GitHub, and find where bugs, security reports and confidential questions go instead.";
+
+type Place = { title: string; body: string; links: { href: string; label: string; external?: boolean }[]; icon: string };
+
+const places: Place[] = [
+  {
+    title: "A question",
+    body: "How to run a node, use the library, or read a passport. Ask it in Q&A, where the answer stays for the next person with the same question.",
+    links: [{ href: `${BOARD}/categories/q-a`, label: "Ask in Q&A", external: true }],
+    icon: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7"/><path d="M12 17h.01"/>',
+  },
+  {
+    title: "An idea",
+    body: "A feature you need, a product group, an integration with a system you use. Say what you would use it for.",
+    links: [{ href: `${BOARD}/categories/ideas`, label: "Share an idea", external: true }],
+    icon: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z"/>',
+  },
+  {
+    title: "Something you built",
+    body: "A plugin, an integration or a tool around Odal Node. Show it, and say what it does.",
+    links: [{ href: `${BOARD}/categories/show-and-tell`, label: "Show and tell", external: true }],
+    icon: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M13.5 5l-3 14"/>',
+  },
+  {
+    title: "A bug",
+    body: "Something that does not work as described. Open an issue on the repository it belongs to, with what you did and what happened.",
+    links: [
+      { href: "https://github.com/odal-node/dpp-engine/issues", label: "The node", external: true },
+      { href: "https://github.com/odal-node/dpp-core/issues", label: "The library", external: true },
+    ],
+    icon: '<rect x="7" y="7" width="10" height="13" rx="5"/><path d="M12 11v5M9 4l1.5 2.5M15 4l-1.5 2.5M4 12h3M17 12h3M5 18l2.5-1.5M19 18l-2.5-1.5"/>',
+  },
+  {
+    title: "A security problem",
+    body: "Never in public. Report it privately, and we work on a fix before anything is published.",
+    links: [{ href: "/security", label: "How to report it" }],
+    icon: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="M12 8v5M12 16h.01"/>',
+  },
+  {
+    title: "Your company's plans",
+    body: "The board is public, so keep confidential detail out of it. Write to us instead.",
+    links: [{ href: mailto("community"), label: `Email ${MAILBOX}` }],
+    icon: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/>',
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Community" title="Help shape Odal Node." wide>
+    <p>
+      Odal Node is built in the open, and so is the conversation around it.
+      Ask a question, suggest a feature, or show what you are working on. One
+      board on GitHub covers both the core library and the node, so it all
+      happens in one place.
+    </p>
+    <p>
+      <strong>It is early days, so you would be among the first voices
+      there.</strong> The questions and ideas people bring now help decide what
+      gets built next, and every answer stays on the board for the next person
+      who asks.
+    </p>
+    <div class="not-prose mt-8 flex flex-wrap gap-3">
+      <Button href={BOARD} external>Open the discussions</Button>
+      <Button href={CONDUCT} variant="secondary" external>Code of conduct</Button>
+    </div>
+  </Section>
+
+  <Section eyebrow="What goes where" title="Where each kind of message belongs." tone="muted" wide>
+    <ul class="not-prose m-0 grid list-none gap-5 p-0 md:grid-cols-2 lg:grid-cols-3">
+      {places.map((p) => (
+        <li class="card m-0 flex flex-col p-6">
+          <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-50 text-primary-700 ring-1 ring-primary-100">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-6 w-6" set:html={p.icon} />
+          </span>
+          <h2 class="m-0 mt-4 text-lg font-semibold text-neutral-900">{p.title}</h2>
+          <p class="m-0 mt-2 text-sm leading-relaxed text-neutral-600">{p.body}</p>
+          <p class="m-0 mt-auto flex flex-wrap gap-x-5 gap-y-2 pt-4 text-sm">
+            {p.links.map((l) => (
+              <a href={l.href} rel={l.external ? "noopener" : undefined} class="font-medium">
+                {l.label}{l.external && <ExternalArrow class="ml-1" />}
+              </a>
+            ))}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section eyebrow="Good to know" title="What the board can and cannot give you." wide>
+    <p>
+      Nothing said on the board is legal advice, and no answer there is
+      evidence that a product complies with anything.
+    </p>
+    <p>
+      If you think the software reads an EU act wrongly, say which text you
+      read it against. That is the most useful report the project can get.
+    </p>
+    <p>
+      Everyone who takes part agrees to the{" "}
+      <a href={CONDUCT} rel="noopener">code of conduct</a>: criticise the work,
+      not the person, and say what you think and why.
+    </p>
+  </Section>
+</Base>

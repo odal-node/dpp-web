@@ -8,13 +8,12 @@
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import Button from "../components/Button.astro";
+import { MAILBOX, mailto } from "../lib/lead";
 
 const title = "Join the Waitlist | Odal Node";
 const description =
   "Join the Odal Node waitlist by email: tell us what you make and how you keep product data today, and hear when your product group and the tools you need are ready.";
 
-const MAILBOX = "contact@odal-node.io";
-const mailto = `mailto:${MAILBOX}?subject=${encodeURIComponent("Odal Node waitlist")}`;
 ---
 
 <Base title={title} description={description}>
@@ -26,7 +25,7 @@ const mailto = `mailto:${MAILBOX}?subject=${encodeURIComponent("Odal Node waitli
       takes shape.
     </p>
     <p class="not-prose mt-8">
-      <Button href={mailto} size="lg">Email {MAILBOX}</Button>
+      <Button href={mailto("waitlist")} size="lg">Email {MAILBOX}</Button>
     </p>
     <p class="mt-8 text-sm text-neutral-600">
       No form and no tracking: your email goes straight to our inbox, and we

@@ -1,0 +1,251 @@
+---
+// /product-groups/[key]/checklist — what to have ready for one product
+// group's passport, on one printable page.
+//
+// This is the home page's lead magnet, and it is deliberately not gated: no
+// form, nothing stored by us, and the browser's own "Save as PDF" is the PDF.
+// The next step is an email the reader chooses to send (lib/lead.ts).
+//
+// Nothing here is new law. The answer and its date come from lib/checker.ts,
+// the same answer as /passport-check, so a date can still only be wrong in one
+// place (the instrument records). What the passport carries comes from the
+// Batteries Regulation's Annex XIII for batteries (data/access.json) and, for
+// every other group, from the software's own model, said as such. The
+// questions at the end come from data/readiness.json and describe how the
+// software works, not what the law asks.
+import Base from "../../../layouts/Base.astro";
+import Section from "../../../components/Section.astro";
+import BasisMark from "../../../components/BasisMark.astro";
+import Button from "../../../components/Button.astro";
+import { categoryLabel, fieldLabel, type Group } from "../../../lib/product-groups";
+import { checklistGroups, choiceFor, type Answer } from "../../../lib/checker";
+import { actsFor, basisLabel, displayTitle } from "../../../lib/regulations";
+import { MAILBOX, mailto } from "../../../lib/lead";
+import access from "../../../data/access.json";
+import readiness from "../../../data/readiness.json";
+
+export function getStaticPaths() {
+  return checklistGroups.map((g) => ({ params: { key: g.key }, props: { group: g } }));
+}
+
+const { group } = Astro.props as { group: Group };
+const name = group.name.toLowerCase();
+const choice = choiceFor(group.key);
+
+// One answer for most groups. Batteries answer per type of battery, and the
+// types that get the same answer are listed together rather than repeated.
+const answers: { labels: string[]; answer: Answer }[] = [];
+for (const o of choice.follow?.options ?? [{ label: "", answer: choice.answer! }]) {
+  const same = answers.find((x) => x.answer.headline === o.answer.headline && x.answer.detail === o.answer.detail);
+  if (same) same.labels.push(o.label);
+  else answers.push({ labels: o.label ? [o.label] : [], answer: o.answer });
+}
+
+const acts = actsFor(group.key).map((a) => a.instrument);
+
+// Batteries: the four parts of the passport the Regulation itself names, and
+// who reads each (Art. 77(2), Annex XIII). No other group has adopted rules
+// like these, so for them the page shows the software's model instead.
+const isBattery = group.key === "battery";
+const readers = (point: string) => {
+  const who = access.audiences.filter((a) => a.sees.includes(point));
+  return who.some((a) => a.key === "public") ? "Anyone" : who.map((a) => a.label).join("; ");
+};
+const notPublic = Object.keys(group.disclosure ?? {}).map(fieldLabel).sort();
+
+const title = `${group.name} passport checklist | Odal Node`;
+const description = `What to have ready before issuing Digital Product Passports for ${name}: whether they are required and from when, what they carry, and the questions to settle first. Printable.`;
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Checklist" title={`${group.name}: getting ready for the passport.`} wide>
+    <p>
+      What to have ready before issuing passports for {name}, from the same
+      records as the rest of this site. Print it or save it as a PDF. It is a starting point,
+      not legal advice.
+    </p>
+    <p class="not-prose no-print mt-6 flex flex-wrap gap-3">
+      <span data-print hidden>
+        <Button variant="secondary">Print or save as PDF</Button>
+      </span>
+      <Button href={`/product-groups/${group.key}`} variant="ghost">About {name} in Odal</Button>
+    </p>
+
+    <ol class="not-prose m-0 mt-10 grid list-none gap-6 p-0">
+      <li class="checklist-item card p-6">
+        <h2 class="m-0 text-lg font-semibold text-neutral-900"><span class="step" aria-hidden="true">1</span>Does it need a passport, and from when?</h2>
+        <ul class="m-0 mt-4 grid list-none gap-4 p-0">
+          {answers.map(({ labels, answer }) => (
+            <li class="m-0">
+              {labels.length > 0 && <p class="m-0 text-xs font-semibold uppercase tracking-wide text-neutral-500">{labels.join(" · ")}</p>}
+              <p class="m-0 mt-1 font-semibold text-neutral-900">{answer.headline}</p>
+              <p class="m-0 mt-1 text-sm leading-body text-neutral-700">{answer.detail}</p>
+              {answer.basis && (
+                <p class="m-0 mt-2"><BasisMark basis={answer.basis} label={basisLabel(answer.basis)} /></p>
+              )}
+            </li>
+          ))}
+        </ul>
+        {acts.length > 0 && (
+          <p class="m-0 mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+            {acts.map((i) => <a href={`/regulations/${i.id}`} class="link-arrow">{displayTitle(i)}</a>)}
+          </p>
+        )}
+      </li>
+
+      <li class="checklist-item card p-6">
+        <h2 class="m-0 text-lg font-semibold text-neutral-900"><span class="step" aria-hidden="true">2</span>Who is responsible</h2>
+        <p class="m-0 mt-3 text-sm leading-body text-neutral-700">
+          The duty sits with whoever places the product on the EU market,
+          usually the manufacturer. Where a passport is required, it has to
+          exist before the product is sold, and stay available for years
+          afterwards.
+        </p>
+      </li>
+
+      <li class="checklist-item card p-6">
+        <h2 class="m-0 text-lg font-semibold text-neutral-900"><span class="step" aria-hidden="true">3</span>What the passport carries</h2>
+        {isBattery ? (
+          <>
+            <p class="m-0 mt-3 text-sm leading-body text-neutral-700">
+              The Batteries Regulation splits the passport into four parts, and
+              says who may read each.
+            </p>
+            <ul class="m-0 mt-4 grid list-none gap-4 p-0">
+              {access.points.map((p) => (
+                <li class="m-0">
+                  <p class="m-0 font-semibold text-neutral-900">{p.title}</p>
+                  <p class="m-0 mt-1 text-sm leading-body text-neutral-700">{p.note}</p>
+                  <p class="m-0 mt-1 text-xs text-neutral-500">Read by: {readers(p.id)}</p>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            <p class="m-0 mt-3 text-sm leading-body text-neutral-700">
+              This is the passport as the software builds it for {name}. It
+              describes what is modelled, not what the law requires: the act
+              for this product group sets that.
+            </p>
+            {group.productCategories?.length ? (
+              <p class="m-0 mt-4 text-sm text-neutral-700">
+                <span class="font-semibold text-neutral-900">Kinds of product it tells apart:</span>{" "}
+                {group.productCategories.map(categoryLabel).join(", ")}.
+              </p>
+            ) : null}
+            <p class="m-0 mt-3 text-sm text-neutral-700">
+              <span class="font-semibold text-neutral-900">Parts not shown to the public:</span>{" "}
+              {notPublic.length ? `${notPublic.join(", ")}.` : "none yet; everything is public for now."}
+            </p>
+          </>
+        )}
+      </li>
+
+      <li class="checklist-item card p-6">
+        <h2 class="m-0 text-lg font-semibold text-neutral-900"><span class="step" aria-hidden="true">4</span>On the product</h2>
+        <p class="m-0 mt-3 text-sm leading-body text-neutral-700">
+          A data carrier, such as a QR code, that links to the passport. The
+          act for the product group says which carrier to use and where it
+          goes.
+        </p>
+      </li>
+
+      <li class="checklist-item card p-6">
+        <h2 class="m-0 text-lg font-semibold text-neutral-900"><span class="step" aria-hidden="true">5</span>Questions to settle inside your company</h2>
+        <ul class="m-0 mt-4 grid list-none gap-4 p-0">
+          {readiness.questions.map((r) => (
+            <li class="m-0 flex gap-3">
+              <span class="tick mt-1 h-4 w-4 shrink-0 rounded border border-neutral-400" aria-hidden="true"></span>
+              <span>
+                <span class="block font-semibold text-neutral-900">{r.q}</span>
+                <span class="mt-0.5 block text-sm leading-body text-neutral-700">{r.why}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </li>
+    </ol>
+  </Section>
+
+  <Section eyebrow="Next step" title={`Talk to us about ${name}.`} tone="tinted" wide>
+    <p>
+      Odal Node is software you run yourself to issue, sign and publish your
+      passports. Tell us what you make and how you keep its data today, and we
+      will tell you where the software stands for {name}.
+    </p>
+    <div class="not-prose no-print mt-6 flex flex-wrap gap-3">
+      <Button href={mailto("checklist", `${group.name} checklist`)} arrow>Email us about {name}</Button>
+      <Button href="/passport-check" variant="secondary">Check another product</Button>
+    </div>
+    <p class="mt-4 text-sm text-neutral-600">
+      Or write to {MAILBOX}. We aim to reply within a week.
+    </p>
+    <p class="print-only mt-4 text-sm text-neutral-600">
+      From odal-node.io/product-groups/{group.key}/checklist. Not legal advice.
+    </p>
+  </Section>
+</Base>
+
+<style>
+  .step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-right: 0.75rem;
+    border-radius: 9999px;
+    border: 2px solid var(--color-primary-500);
+    color: var(--color-primary-700);
+    font-size: 0.875rem;
+  }
+  .print-only {
+    display: none;
+  }
+</style>
+
+<style is:global>
+  @media print {
+    @page {
+      size: A4;
+      margin: 14mm;
+    }
+    body > header,
+    body > footer,
+    body > a[href="#main"],
+    .no-print {
+      display: none !important;
+    }
+    .print-only {
+      display: block !important;
+    }
+    main section {
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+      background: none !important;
+    }
+    .checklist-item {
+      break-inside: avoid;
+      box-shadow: none !important;
+      padding: 0.75rem 0 !important;
+      border: 0 !important;
+      border-top: 1px solid #ccc !important;
+      border-radius: 0 !important;
+    }
+    .checklist-item a[href^="/"]::after {
+      content: " (odal-node.io" attr(href) ")";
+      font-weight: 400;
+      font-size: 0.8em;
+    }
+  }
+</style>
+
+<script>
+  // Printing needs the script, so the button stays hidden without it.
+  const wrap = document.querySelector<HTMLElement>("[data-print]");
+  if (wrap) {
+    wrap.hidden = false;
+    wrap.querySelector("button")?.addEventListener("click", () => window.print());
+  }
+</script>

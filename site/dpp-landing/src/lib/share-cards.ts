@@ -7,6 +7,7 @@
 //
 // A page with no card here keeps the site-wide image, public/og-image.png.
 import { groups, unsoldGoods } from "./product-groups";
+import { checklistGroups } from "./checker";
 import { instruments, displayTitle, kindLabel, passportView } from "./regulations";
 
 export type Card = {
@@ -26,6 +27,7 @@ const pages: Card[] = [
   { path: "/passport-check", eyebrow: "Passport check", title: "Does my product need a passport?", line: "Pick what you make or sell, and see which date applies and where it comes from." },
   { path: "/timeline", eyebrow: "Timeline", title: "When passports arrive, year by year.", line: "From batteries in 2027 to vehicles in 2032, with where every date comes from." },
   { path: "/regulations", eyebrow: "Regulations", title: "The EU acts behind the passports.", line: "Every act, the passport date it sets, and where that date comes from." },
+  { path: "/community", eyebrow: "Community", title: "Help shape Odal Node.", line: "Ask a question, suggest a feature or show what you built, on GitHub Discussions." },
   { path: "/build-on-odal", eyebrow: "Build on Odal", title: "Write rules and integrations that run on other people's nodes.", line: "Libraries, plugins and the licence line." },
   { path: "/roadmap", eyebrow: "Roadmap", title: "What is built, what is waiting, and what comes next.", line: "Capabilities, not tasks, and where each one stands." },
   { path: "/faq", eyebrow: "FAQ", title: "Questions people ask first.", line: "Which products need a passport, where your data lives and who can read it." },
@@ -48,6 +50,13 @@ const groupCards: Card[] = [...groups, unsoldGoods].map((g) => ({
   line: g.line,
 }));
 
+const checklistCards: Card[] = checklistGroups.map((g) => ({
+  path: `/product-groups/${g.key}/checklist`,
+  eyebrow: "Checklist",
+  title: `${g.name}: getting ready for the passport.`,
+  line: "Whether one is required and from when, what it carries, and the questions to settle first.",
+}));
+
 const actCards: Card[] = instruments.map((i) => {
   const view = passportView(i);
   return {
@@ -58,7 +67,7 @@ const actCards: Card[] = instruments.map((i) => {
   };
 });
 
-export const cards: Card[] = [...pages, ...groupCards, ...actCards];
+export const cards: Card[] = [...pages, ...groupCards, ...checklistCards, ...actCards];
 
 const byPath = new Map(cards.map((c) => [c.path, c]));
 

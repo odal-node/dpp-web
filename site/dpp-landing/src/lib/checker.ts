@@ -134,3 +134,25 @@ export const choices: Choice[] = [
     },
   },
 ];
+
+const RANK: Record<Verdict, number> = { yes: 0, later: 1, no: 2 };
+
+/** A choice's strongest verdict: batteries count as "yes" because some types need a passport. */
+function strongest(c: Choice): Verdict {
+  const verdicts = c.follow ? c.follow.options.map((o) => o.answer.verdict) : [c.answer!.verdict];
+  return verdicts.sort((a, b) => RANK[a] - RANK[b])[0];
+}
+
+/** The choice for a modelled product group, which every such group has. */
+export function choiceFor(groupKey: string): Choice {
+  const c = choices.find((x) => x.key === groupKey);
+  if (!c) throw new Error(`checker has no choice for product group "${groupKey}"`);
+  return c;
+}
+
+/**
+ * The product groups that get a checklist page: every group the check does
+ * not answer "no passport" for. A "getting ready for the passport" page for a
+ * product that needs none would contradict its own answer.
+ */
+export const checklistGroups = groups.filter((g) => strongest(choiceFor(g.key)) !== "no");

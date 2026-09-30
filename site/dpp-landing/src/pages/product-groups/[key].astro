@@ -17,6 +17,7 @@ import Base from "../../layouts/Base.astro";
 import Section from "../../components/Section.astro";
 import ProductGroupIcon from "../../components/ProductGroupIcon.astro";
 import { allPages, categoryLabel, fieldLabel, type Group } from "../../lib/product-groups";
+import { checklistGroups } from "../../lib/checker";
 import { actsFor, displayTitle, kindLabel, bindingLabel } from "../../lib/regulations";
 
 export function getStaticPaths() {
@@ -60,6 +61,9 @@ const classes = [...byClass.entries()].sort(
   (a, b) => ORDER.indexOf(a[0]) - ORDER.indexOf(b[0]),
 );
 
+// Groups that need a passport, now or later, have a printable checklist.
+const hasChecklist = checklistGroups.some((g) => g.key === group.key);
+
 const title = `${group.name}: product group | Odal Node`;
 const description = isUnsold
   ? "How Odal Node records the disclosure of discarded unsold products: a yearly report by the operator, not a product passport."
@@ -87,6 +91,11 @@ const description = isUnsold
         This page shows the passport exactly as the software builds and checks
         it for this group. It describes{" "}
         <strong>what is modelled</strong>, not what the law requires.
+      </p>
+    )}
+    {hasChecklist && (
+      <p>
+        <a href={`/product-groups/${group.key}/checklist`} class="link-arrow">What to have ready: the printable checklist</a>
       </p>
     )}
   </Section>

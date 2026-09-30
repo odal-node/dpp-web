@@ -1,8 +1,11 @@
 ---
 // Hero.astro — the highest-stakes block on the entire site.
-// Navy band with the brand mark as a quiet watermark, ice text and a single
-// call to action. One action on purpose: a lone outline button on a navy band
-// reads as a secondary choice with nothing to be secondary to.
+// Navy band with the brand mark as a quiet watermark and ice text. The main
+// action is a solid button; an optional second action sits beside it as an
+// outline, which reads as the second choice it is (a lone outline on navy
+// read as secondary to nothing, which is why the band once had one action).
+// `trust` lines sit under the actions and must each already be true on the
+// site; they are facts, not slogans.
 import StatusBadge from "./StatusBadge.astro";
 import Button from "./Button.astro";
 
@@ -12,10 +15,24 @@ interface Props {
   subtitle: string;
   ctaHref: string;
   ctaLabel: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+  /** Short facts under the actions, each already stated elsewhere on the site. */
+  trust?: string[];
   /** Show the alpha / in-development status badge in the eyebrow row. */
   status?: boolean;
 }
-const { eyebrow, title, subtitle, ctaHref, ctaLabel, status = false } = Astro.props;
+const {
+  eyebrow,
+  title,
+  subtitle,
+  ctaHref,
+  ctaLabel,
+  secondaryHref,
+  secondaryLabel,
+  trust = [],
+  status = false,
+} = Astro.props;
 ---
 
 <section class="relative overflow-hidden bg-primary-900 text-primary-100 min-h-120">
@@ -47,9 +64,28 @@ const { eyebrow, title, subtitle, ctaHref, ctaLabel, status = false } = Astro.pr
       <p class="mb-10 max-w-2xl text-lg leading-body text-primary-200">
         {subtitle}
       </p>
-      <Button href={ctaHref} tone="dark" variant="primary" size="lg" arrow>
-        {ctaLabel}
-      </Button>
+      <div class="flex flex-wrap gap-3">
+        <Button href={ctaHref} tone="dark" variant="primary" size="lg" arrow>
+          {ctaLabel}
+        </Button>
+        {secondaryHref && secondaryLabel && (
+          <Button href={secondaryHref} tone="dark" variant="secondary" size="lg">
+            {secondaryLabel}
+          </Button>
+        )}
+      </div>
+      {trust.length > 0 && (
+        <ul class="m-0 mt-6 flex list-none flex-col gap-2 p-0 text-sm text-primary-200 sm:flex-row sm:flex-wrap sm:gap-x-6">
+          {trust.map((t) => (
+            <li class="m-0 flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 text-primary-300">
+                <path d="m5 12 4.5 4.5L19 7" />
+              </svg>
+              {t}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   </div>
 </section>
