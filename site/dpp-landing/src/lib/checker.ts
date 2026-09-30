@@ -135,53 +135,13 @@ export const choices: Choice[] = [
   },
 ];
 
-/** One renderable answer: a choice, or one option of its follow-up question. */
-export type Card = {
-  key: string;
-  label: string;
-  /** The modelled product group behind the answer, if any, for its checklist. */
-  group?: string;
-  answer: Answer;
-};
-
-// Vehicles, packaging and "something else" are choices but not modelled
-// product groups, so their answers link to no checklist.
-const modelled = new Set(groups.map((g) => g.key));
-
-/** Every answer the check can give, in the order of `choices`. */
-export const cards: Card[] = choices.flatMap((c) => {
-  const group = modelled.has(c.key) ? c.key : undefined;
-  if (c.follow) {
-    return c.follow.options.map((o) => ({ key: `${c.key}:${o.key}`, label: `${c.label}: ${o.label}`, group, answer: o.answer }));
-  }
-  return c.answer ? [{ key: c.key, label: c.label, group, answer: c.answer }] : [];
-});
-
 const RANK: Record<Verdict, number> = { yes: 0, later: 1, no: 2 };
 
 /** A choice's strongest verdict: batteries count as "yes" because some types need a passport. */
-export function strongest(c: Choice): Verdict {
+function strongest(c: Choice): Verdict {
   const verdicts = c.follow ? c.follow.options.map((o) => o.answer.verdict) : [c.answer!.verdict];
   return verdicts.sort((a, b) => RANK[a] - RANK[b])[0];
 }
-
-const GROUP_LABEL: Record<Verdict, string> = {
-  yes: "Passport date set in law",
-  later: "Passport coming, no date yet",
-  no: "No passport",
-};
-
-/**
- * The choices sorted into option groups by verdict, strongest first, so a
- * visitor sees at a glance which products already have a date in law.
- * "Something else" stays last, on its own.
- */
-export const grouped: { label: string; choices: Choice[] }[] = [
-  ...(["yes", "later", "no"] as Verdict[])
-    .map((v) => ({ label: GROUP_LABEL[v], choices: choices.filter((c) => c.key !== "other" && strongest(c) === v) }))
-    .filter((g) => g.choices.length > 0),
-  { label: "Other", choices: choices.filter((c) => c.key === "other") },
-];
 
 /** The choice for a modelled product group, which every such group has. */
 export function choiceFor(groupKey: string): Choice {
@@ -196,10 +156,3 @@ export function choiceFor(groupKey: string): Choice {
  * product that needs none would contradict its own answer.
  */
 export const checklistGroups = groups.filter((g) => strongest(choiceFor(g.key)) !== "no");
-const checklistKeys = new Set(checklistGroups.map((g) => g.key));
-
-/** The checklist page behind an answer, if its product group has one and it needs a passport. */
-export const checklistFor = (card: Card): string | undefined =>
-  card.group && card.answer.verdict !== "no" && checklistKeys.has(card.group)
-    ? `/product-groups/${card.group}/checklist`
-    : undefined;

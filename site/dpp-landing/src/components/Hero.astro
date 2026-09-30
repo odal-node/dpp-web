@@ -1,15 +1,11 @@
 ---
 // Hero.astro — the highest-stakes block on the entire site.
-// Navy band with ice text. The main action is a solid button; an optional
-// second action sits beside it as an outline, which reads as the second
-// choice it is (a lone outline on navy read as secondary to nothing, which is
-// why the band once had a single action).
-//
-// An `aside` slot takes the right-hand columns from lg up; the home page puts
-// the passport check there, so the first thing a visitor can do is find out
-// whether their product needs a passport. Without an aside the band keeps the
-// brand mark as a quiet watermark. `trust` lines sit under the actions and
-// must each already be true on the site; they are facts, not slogans.
+// Navy band with the brand mark as a quiet watermark and ice text. The main
+// action is a solid button; an optional second action sits beside it as an
+// outline, which reads as the second choice it is (a lone outline on navy
+// read as secondary to nothing, which is why the band once had one action).
+// `trust` lines sit under the actions and must each already be true on the
+// site; they are facts, not slogans.
 import StatusBadge from "./StatusBadge.astro";
 import Button from "./Button.astro";
 
@@ -37,10 +33,9 @@ const {
   trust = [],
   status = false,
 } = Astro.props;
-const aside = Astro.slots.has("aside");
 ---
 
-<section class="relative overflow-hidden bg-primary-900 text-primary-100">
+<section class="relative overflow-hidden bg-primary-900 text-primary-100 min-h-120">
   <!-- thin accent line at the very top of the band: definition without imagery -->
   <div class="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary-300/50 to-transparent" aria-hidden="true"></div>
   <!-- soft radial depth behind the headline; decorative and static -->
@@ -49,17 +44,10 @@ const aside = Astro.slots.has("aside");
     style="background: radial-gradient(closest-side, rgba(94,143,199,0.18), transparent);"
     aria-hidden="true"
   ></div>
-  {!aside && (
-    <img src="/favicon.svg" alt="" width="480" height="480" class="pointer-events-none absolute -right-16 top-1/2 hidden h-120 w-120 -translate-y-1/2 opacity-[0.07] lg:block" />
-  )}
+  <img src="/favicon.svg" alt="" width="480" height="480" class="pointer-events-none absolute -right-16 top-1/2 hidden h-120 w-120 -translate-y-1/2 opacity-[0.07] lg:block" />
 
-  <div
-    class:list={[
-      "relative mx-auto grid max-w-6xl gap-10 px-4 pb-16 pt-16 sm:px-6 md:pt-24 lg:grid-cols-12 lg:gap-12 lg:px-8",
-      aside ? "lg:items-start lg:pb-20" : "min-h-120 lg:pb-20",
-    ]}
-  >
-    <div class:list={[aside ? "lg:col-span-7" : "lg:col-span-9"]}>
+  <div class="relative mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:px-8">
+    <div class="max-w-3xl">
       {(eyebrow || status) && (
         <div class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
           {eyebrow && (
@@ -73,7 +61,7 @@ const aside = Astro.slots.has("aside");
       <h1 class="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl">
         {title}
       </h1>
-      <p class="mb-8 max-w-2xl text-lg leading-body text-primary-200">
+      <p class="mb-10 max-w-2xl text-lg leading-body text-primary-200">
         {subtitle}
       </p>
       <div class="flex flex-wrap gap-3">
@@ -99,10 +87,5 @@ const aside = Astro.slots.has("aside");
         </ul>
       )}
     </div>
-    {aside && (
-      <div class="lg:col-span-5">
-        <slot name="aside" />
-      </div>
-    )}
   </div>
 </section>
