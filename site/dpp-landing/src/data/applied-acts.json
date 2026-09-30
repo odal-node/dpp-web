@@ -6,7 +6,7 @@
       "acts": [
         {
           "name": "eIDAS Regulation",
-          "ref": "Regulation (EU) No 910/2014",
+          "ref": "Regulation (EU) No 910/2014, as amended by Regulation (EU) 2024/1183",
           "celex": "32014R0910",
           "what": "The EU's rules for electronic seals and trust services. The node seals published passports in a format the EU recognises and reports whether each seal carries legal effect; legal effect needs a qualified certificate held by a company."
         },
@@ -24,7 +24,7 @@
         },
         {
           "name": "EU trusted lists",
-          "ref": "Implementing Decision (EU) 2015/1505",
+          "ref": "Implementing Decision (EU) 2015/1505, as amended by Implementing Decision (EU) 2025/2164",
           "celex": "32015D1505",
           "what": "The format of the lists of trusted providers that EU countries publish. The node reads and verifies them to check who issued a seal's certificate."
         }

@@ -11,10 +11,14 @@ import BasisMark from "../../components/BasisMark.astro";
 import ExternalArrow from "../../components/ExternalArrow.astro";
 import { creatingPassports, shapingPassports, instruments, displayTitle, eurLex } from "../../lib/regulations";
 import appliedActs from "../../data/applied-acts.json";
+import upcomingActs from "../../data/upcoming-acts.json";
+
+// An adopted act or a proposal links by its CELEX number; a draft has none.
+const actHref = (a: { celex?: string; url?: string }) => (a.celex ? eurLex(a.celex) : a.url);
 
 const title = "Regulations: the EU acts behind the passports | Odal Node";
 const description =
-  "The EU acts that create Digital Product Passports, and related acts that do not, with the date each passport is required from and where that date comes from, and the other acts the software applies.";
+  "The EU acts that create Digital Product Passports, and related acts that do not, with the date each passport is required from and where that date comes from, the other acts the software applies, and the acts it is preparing for.";
 
 const itemListLd = {
   "@context": "https://schema.org",
@@ -35,7 +39,8 @@ const itemListLd = {
       The first two sections show each act exactly as the software records it,
       with every date the software relies on, and each act's own page says when
       it was last confirmed to be in force. A third section lists the other
-      acts the software applies. The <a href="/timeline">timeline</a> puts the
+      acts the software applies, and a fourth the acts it does not apply yet
+      but is preparing for. The <a href="/timeline">timeline</a> puts the
       same dates in order, year by year, with the Commission's planned acts.
     </p>
     <p class="mb-2">Every date says where it comes from:</p>
@@ -97,11 +102,38 @@ const itemListLd = {
     </p>
   </Section>
 
+  <Section eyebrow="Preparing for" title="Acts the software does not apply yet." wide>
+    <p>
+      Each of these binds a product group the software models, a feature on
+      the <a href="/roadmap">roadmap</a>, or the software itself, but the
+      software does not apply it today. Some are drafts or proposals, so they
+      may still change before they become law.
+    </p>
+    <div class="not-prose mt-8 grid gap-6 lg:grid-cols-2">
+      {upcomingActs.groups.map((g) => (
+        <section class="card p-6" aria-label={g.title}>
+          <h3 class="m-0 text-base font-semibold text-neutral-900">{g.title}</h3>
+          <ul class="m-0 mt-4 list-none space-y-4 p-0">
+            {g.acts.map((a) => (
+              <li class="m-0">
+                <p class="m-0 text-sm font-semibold text-neutral-900">
+                  <a href={actHref(a)} rel="noopener">{a.name}<ExternalArrow class="ml-1" /></a>
+                </p>
+                <p class="m-0 text-xs text-neutral-500">{a.ref}</p>
+                <p class="m-0 mt-1 text-sm leading-snug text-neutral-600">{a.what}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </Section>
+
   <Section eyebrow="Read this first" title="What this list is, and what it is not." tone="tinted" wide>
     <p>
       <strong>It is not legal advice</strong>, and it is not a complete list of
       what applies to your product. It is the set of acts the software models
-      and applies.
+      and applies, and the ones it is preparing for.
       An act can reach products that were never modelled as a product group, so
       the absence of an act here is not evidence that none applies.
     </p>

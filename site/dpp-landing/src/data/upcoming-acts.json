@@ -1,0 +1,67 @@
+{
+  "_comment": "The fourth section of /regulations: acts the software does not apply yet, each of which binds a product group it models, a feature on the roadmap, or the software itself. Hand-written and landing-owned, like applied-acts.json. An adopted act or a proposal links by `celex`; a draft has no CELEX number and links to its EUR-Lex page by `url`. Status of each checked on EUR-Lex on 2026-09-30: the two battery drafts are still drafts, COM(2025) 504 is still a proposal (listed as 'amendment proposed by' on both the Batteries Regulation and ESPR), and 2025/1943, 2016/650, 2023/1115 and 2024/2847 are in force. Tyres are in 2023/1115 Annex I (ex 4011), which is why it is here.",
+  "groups": [
+    {
+      "title": "Drafts and proposals that would change passports",
+      "acts": [
+        {
+          "name": "Battery carbon footprint method",
+          "ref": "Draft Commission Delegated Regulation under Regulation (EU) 2023/1542",
+          "url": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=PI_COM:Ares(2024)3131389",
+          "what": "How an electric vehicle battery's carbon footprint is calculated. Battery passports carry that figure, and the software will not calculate one before this method is adopted."
+        },
+        {
+          "name": "Carbon footprint declaration format",
+          "ref": "Draft Commission Implementing Regulation under Regulation (EU) 2023/1542",
+          "url": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=PI_COM:Ares(2024)3131449",
+          "what": "The form a battery's carbon footprint declaration takes. It would apply alongside the calculation method."
+        },
+        {
+          "name": "Digital product rules",
+          "ref": "Commission proposal COM(2025) 504",
+          "celex": "52025PC0504",
+          "what": "Not yet law. Where a product needs a digital passport, its EU declaration of conformity and its instructions would be provided in that passport. It would also amend the Batteries Regulation and ESPR."
+        }
+      ]
+    },
+    {
+      "title": "Needed for features on the roadmap",
+      "acts": [
+        {
+          "name": "Qualified certificates for seals",
+          "ref": "Implementing Regulation (EU) 2025/1943",
+          "celex": "32025R1943",
+          "what": "The standards a qualified certificate for electronic seals is issued under. A company needs such a certificate before the node's seals can carry legal effect."
+        },
+        {
+          "name": "Secure devices for seal keys",
+          "ref": "Implementing Decision (EU) 2016/650",
+          "celex": "32016D0650",
+          "what": "The standards for the secure devices that hold the key behind a qualified seal. They matter for seals with legal effect and for keeping keys in hardware, both on the roadmap."
+        }
+      ]
+    },
+    {
+      "title": "Rules for products the software models",
+      "acts": [
+        {
+          "name": "Deforestation Regulation",
+          "ref": "Regulation (EU) 2023/1115",
+          "celex": "32023R1115",
+          "what": "Before products such as new rubber tyres are placed on the EU market, a due diligence statement must be filed. Tyres are a product group the software models; it does not record that statement today."
+        }
+      ]
+    },
+    {
+      "title": "About the software itself",
+      "acts": [
+        {
+          "name": "Cyber Resilience Act",
+          "ref": "Regulation (EU) 2024/2847",
+          "celex": "32024R2847",
+          "what": "Security requirements for software and connected products placed on the EU market, applying in stages. It concerns the software itself, not what goes into a passport."
+        }
+      ]
+    }
+  ]
+}

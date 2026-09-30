@@ -1,14 +1,14 @@
 ---
 title: Acts and standards
-description: Every EU act and standard the Odal Node code relies on, the articles it relies on them for, and what the software does with each.
+description: Every EU act and standard the Odal Node code relies on, the articles it relies on them for, what the software does with each, and the acts it is preparing for.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-This is the reference behind the website's [regulations page](https://odal-node.io/regulations): every EU act and standard the code cites, grouped by what the software does with it, with the articles it relies on.
+This is the reference behind the website's [regulations page](https://odal-node.io/regulations): every EU act and standard the code cites, grouped by what the software does with it, with the articles it relies on, and then the acts it does not apply yet but is preparing for.
 
 <Aside type="note" title="How this list was made">
-We searched the core library and the engine for every act and standard cited in source, schemas and rules, and kept only those the code acts on. Acts cited only for background are listed separately at the end. It is not legal advice, and it is not a list of everything that applies to a product.
+We searched the core library and the engine for every act and standard cited in source, schemas and rules, and kept only those the code acts on. We then checked EUR-Lex for every act adopted or proposed under the Batteries Regulation and ESPR, and under the other acts that create a passport, and kept those that bind a product group the software models, a feature on the roadmap, or the software itself. Acts cited only for background are listed separately at the end. It is not legal advice, and it is not a list of everything that applies to a product.
 </Aside>
 
 ## Acts that create or displace a passport
@@ -75,11 +75,34 @@ These are records in the core library's instrument catalog, and the website's re
 | Waste Framework Directive 2008/98/EC | Art. 3(15)–(19): recovery, preparing for reuse, recycling, disposal | Treatment categories in the unsold-goods disclosure; a product's waste status at end of life |
 | Company Law Directive (EU) 2017/1132 | The European unique identifier (EUID) | Identifies the undertaking in the unsold-goods disclosure |
 
+## Acts the software is preparing for
+
+The code applies none of these today. Each binds a product group the software models, a feature on the [roadmap](https://odal-node.io/roadmap), or the software itself. Drafts and proposals are listed as they stand on EUR-Lex and may change before adoption.
+
+| Act | Status | Why it is here |
+|---|---|---|
+| [Draft Delegated Regulation on the carbon footprint of electric vehicle batteries](https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=PI_COM:Ares(2024)3131389), Ares(2024)3131389 | Draft, under Batteries Regulation Art. 7(1), fourth subparagraph, point (a) | The calculation method behind the carbon footprint a battery passport carries. The software calculates no battery carbon footprint before it is adopted |
+| [Draft Implementing Regulation on the format of the carbon footprint declaration](https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=PI_COM:Ares(2024)3131449), Ares(2024)3131449 | Draft, under Art. 7(1), fourth subparagraph, point (b) | The declaration format that goes with the method |
+| Commission proposal COM(2025) 504, amending Regulations (EU) 2023/1542, (EU) 2024/1781 and others as regards digitalisation and common specifications | Proposal, procedure 2025/0134(COD) | Where other Union law requires a digital product passport, the EU declaration of conformity and the instructions would be provided in it |
+| Implementing Regulation (EU) 2025/1943 | In force | Annex II: the reference standards for qualified certificates for electronic seals, including ETSI EN 319 412-3. A seal can be qualified only with such a certificate |
+| Implementing Decision (EU) 2016/650 | In force | Security assessment standards for qualified seal creation devices, for qualified seals and for keys held in hardware |
+| Deforestation Regulation (EU) 2023/1115 | In force | Annex I covers new pneumatic tyres of rubber (ex 4011), and Art. 4(2) requires a due diligence statement before they are placed on the market. The tyre product group does not record it |
+| Cyber Resilience Act, Regulation (EU) 2024/2847 | In force; Art. 14 reporting applies from 11 September 2026 and the rest from 11 December 2027 (Art. 71(2)) | Cybersecurity requirements for products with digital elements. It concerns the software itself, not passport content |
+
+## Commission guidance the code follows
+
+Guidance is not law, but the code follows these documents where the acts leave the detail open, so the version matters.
+
+- **Digital Product Passport Registry User Guide, version 1.02 (24 August 2026).** The identifier and field rules of the registry model.
+- **Digital battery passport data points by category.** The battery rules follow version 1.0 (28 July 2026). Version 2.0 (15 August 2026) is current and is not yet reflected in them.
+- **Ecodesign for Sustainable Products and Energy Labelling Working Plan 2025-2030, COM(2025) 187.** The order and indicative years of the product groups still to come.
+
 ## Cited for background, not applied
 
 - **Carbon Border Adjustment Mechanism, Regulation (EU) 2023/956.** The steel and aluminium checks use reference carbon values as warnings only. CBAM sets no per-product limit a passport is checked against.
 - **Accounting Directive 2013/34/EU, Arts. 19a and 29a.** Implementing Regulation (EU) 2026/2 Art. 2(2) lets an undertaking point its unsold-goods disclosure at its sustainability reporting instead. The software does not model that route yet.
-- **Superseded acts**, cited so the history reads correctly: Directive 2006/66/EC (batteries), Directive 2009/48/EC (toys), Regulation (EC) No 648/2004 (detergents), Regulation (EU) No 305/2011 (construction), Directive 2009/125/EC (ecodesign), Regulation (EC) No 1222/2009 (tyre labels) and Directive 1999/93/EC (electronic signatures).
+- **Earlier acts being replaced.** Each is still in force while the act replacing it takes over in stages: Directive 2006/66/EC (batteries, by Regulation (EU) 2023/1542), Directive 2009/48/EC (toys, by Regulation (EU) 2025/2509), Regulation (EC) No 648/2004 (detergents, by Regulation (EU) 2026/405), Regulation (EU) No 305/2011 (construction, by Regulation (EU) 2024/3110), Directive 2009/125/EC (ecodesign, by Regulation (EU) 2024/1781) and Directive 2000/53/EC (end-of-life vehicles, by Regulation (EU) 2026/1738).
+- **Repealed acts**, cited so the history reads correctly: Regulation (EC) No 1222/2009 (tyre labels) and Directive 1999/93/EC (electronic signatures).
 
 ## Standards
 
