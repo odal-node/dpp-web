@@ -13,8 +13,8 @@ const description =
 
 const guarantees = [
   {
-    title: "Raw inputs are discarded",
-    body: "The node discards the import file once the passport is signed. It keeps the signed passport and a record of what the import found in each row. No setting keeps the file itself.",
+    title: "Every field carries your signature",
+    body: "Each published passport is signed with your key, so a change made after signing fails verification. Anyone can check that without us.",
   },
   {
     title: "We cannot reach your node",
@@ -30,11 +30,11 @@ const guarantees = [
 <Base title={title} description={description}>
   <Section h1 eyebrow="Data and trust" title="What Odal Node can and cannot see." wide>
     <p>
-      Odal Node is built on a proof-bound architecture: the manufacturer's raw
-      production data is validated and signed locally, on infrastructure the
-      manufacturer controls, and the import file is then discarded. The node
-      stores and serves only the signed passport. This is how the software
-      works, whoever operates the node.
+      Odal Node is built on a proof-bound architecture: the manufacturer's
+      product data is validated, signed and stored on infrastructure the
+      manufacturer controls, and every published field carries the
+      manufacturer's signature. This is how the software works, whoever
+      operates the node.
     </p>
   </Section>
 
@@ -78,7 +78,7 @@ const guarantees = [
       <li>
         <strong>Publish.</strong> The signed passport's public part becomes
         readable through its QR code and GS1 Digital Link; other parts are
-        shown only to readers with a credential. The import file is discarded.
+        shown only to readers with a credential.
       </li>
       <li>
         <strong>Verify.</strong> Any consumer, authority or recycler checks the

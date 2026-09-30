@@ -3,7 +3,7 @@ title: What Odal can and cannot see
 description: "What data Odal can and cannot reach on a self-hosted node, and how the proof-bound design makes that so."
 ---
 
-On a proof-bound node, the import files are read once on the operator's infrastructure: validated, used to sign the passport, then discarded. The node stores and serves the signed passport, which carries the full product data across its disclosure classes. This page lists what Odal can see, what it cannot see, and what it could see but does not.
+On a proof-bound node, product data is validated, signed and stored on the operator's infrastructure. The node serves the signed passport, which carries the full product data across its disclosure classes. This page lists what Odal can see, what it cannot see, and what the node records when a passport is resolved.
 
 It describes a self-hosted node, which is the only way Odal Node runs today. A node run for you is an option on the [roadmap](https://odal-node.io/roadmap), not something that exists. If it ever does, this page will describe it separately.
 
@@ -18,15 +18,13 @@ The same as anyone: the public part of the passports you publish, and your DID d
 - **The restricted parts of your passports**: they are released only to readers presenting a credential your node accepts.
 - **Your import files, raw production data and supply-chain detail** beyond what you publish in a passport.
 
-## What we could see but do not
+## What stays on your node
 
-Nobody keeps the contents of an import file, the operator included. The software reads it once, validates the data, signs the passport and discards the file. No setting, configuration or code path keeps the uploaded file after signing. This is how the software works for everyone, not a choice made per customer.
-
-The *file* is not kept. Records *derived* from it during the import are: the passport, and a job record with the validation findings for each row.
+Everything the node stores stays on your infrastructure, including your passports and drafts, their history, the report of each import, and the scan counts described below. Whoever operates the node holds what it stores; on a self-hosted node, that is you.
 
 ## What the node records about resolution
 
-One thing is recorded rather than discarded: when a published passport is resolved, the node can count it.
+When a published passport is resolved, the node can count it.
 
 The count is an aggregate per passport, per day and per surface, and nothing more. Nothing about the person who scanned is recorded: no IP address, device, location, identity or session. The database has no column for any of it, so none of it can be stored. Generating a QR-code image is counted separately and never added to the scan total, because it measures label printing rather than readers.
 
@@ -35,7 +33,7 @@ The count is an aggregate per passport, per day and per surface, and nothing mor
 1. **Import**: product data arrives at your node (CSV, Excel or an ERP export) on infrastructure you control.
 2. **Validate**: locally, against the product group's versioned schema and rules. Validation is a pure function: no network calls.
 3. **Sign**: your Ed25519 key, held on your infrastructure, signs the validated passport as a JSON Web Signature bound to your `did:web` identity.
-4. **Publish**: the signed passport becomes resolvable and the import file is discarded. Public fields are served to anyone; restricted fields only against a verified credential.
+4. **Publish**: the signed passport becomes resolvable. Public fields are served to anyone; restricted fields only against a verified credential.
 5. **Verify**: anyone verifies against your public DID document. Odal is not involved.
 
 ## Read next

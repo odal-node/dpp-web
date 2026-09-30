@@ -61,10 +61,10 @@ const description =
   <Section eyebrow="Philosophy" title="Why the project is built the way it is.">
     <p>
       Two principles govern every architectural decision. The first is the{" "}
-      <strong>proof-bound architecture</strong>: raw production data never enters
-      Odal's systems. The manufacturer signs locally with their own key, and
-      only the proof leaves their infrastructure — proof-bound describes the
-      mechanism, not a promise. The second is the{" "}
+      <strong>proof-bound architecture</strong>: product data is validated,
+      signed and stored on the manufacturer's own infrastructure, with their own
+      key, and every published field carries that signature. Proof-bound
+      describes the mechanism, not a promise. The second is the{" "}
       <strong>open-core boundary</strong>: code that implements regulation is
       Apache-2.0 in <code>dpp-core</code>; code that implements the commercial
       operational layer is BSL-1.1 in <code>dpp-engine</code>. These principles

@@ -36,7 +36,7 @@
         {
           "q": "Where is my data kept?",
           "a": [
-            "On your own node, on servers you choose. Your product data is checked and signed there with your own key, and the signed passport is stored and served from there. The spreadsheet you imported is not kept once the passport is signed."
+            "On your own node, on servers you choose. Your product data is checked, signed with your own key and stored there, and the signed passport is served from there."
           ],
           "link": { "href": "https://docs.odal-node.io/getting-started/what-odal-can-and-cannot-see", "label": "What Odal can and cannot see" }
         },

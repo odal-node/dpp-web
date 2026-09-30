@@ -11,7 +11,7 @@ A node does five things, in order:
 
 1. **Take data in**: product data arrives from a spreadsheet or an existing system, and each row becomes a draft.
 2. **Check it**: the node validates the draft against its product group's schema and runs that group's sandboxed rules, with plausibility warnings alongside.
-3. **Sign it**: the operator's own key signs the passport, once in full and once as its public view. The import file is discarded; what the import found in each row is kept.
+3. **Sign it**: the operator's own key signs the passport, once in full and once as its public view.
 4. **Keep it**: the signed passport and its history are stored in full, and a published passport can never be deleted.
 5. **Serve it**: the passport becomes resolvable, so a scan returns the right view to the right reader, and anyone can verify it.
 

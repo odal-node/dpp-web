@@ -9,9 +9,9 @@ Odal Node's design rests on three ideas. Each section below links to a fuller pa
 
 ## Proof-bound: the data stays yours
 
-The operator's raw source files never enter Odal's systems. The manufacturer validates a passport locally and signs it with their own key, and the node then discards the import files it was built from. The node keeps and serves only the signed passport: the product data the operator chose to publish, with every field bound to a proof and filtered by the reader's access rights. It does not keep the raw exports, spreadsheets or supply-chain detail behind it.
+The operator's product data never reaches Odal. The manufacturer validates a passport on their own node and signs it with their own key, and the node stores it there. What the node serves is the signed passport: the product data the operator chose to publish, with every field bound to a proof and filtered by the reader's access rights.
 
-This is how the software works, so it does not depend on trusting us. After signing, the uploaded file is gone. What remains is the passport and a job record of what validated and what did not. Verifying a passport needs only the signed passport and the manufacturer's public identity. Odal does not need to be online, or to exist.
+This is how the software works, so it does not depend on trusting us. Verifying a passport needs only the signed passport and the manufacturer's public identity. Odal does not need to be online, or to exist.
 
 [What Odal Node can and cannot see](/getting-started/what-odal-can-and-cannot-see) covers the data boundary in full.
 

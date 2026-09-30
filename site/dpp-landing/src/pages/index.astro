@@ -63,7 +63,7 @@ const steps = [
     eyebrow="EU Digital Product Passports"
     status
     title="Signed by you. Verified by anyone."
-    subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated and signed on your infrastructure, with your keys. The raw import files are discarded; the signed passport is stored and served. Anyone can verify it."
+    subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated, signed and stored on your infrastructure, with your keys, and the signed passport is served from there. Anyone can verify it."
     ctaHref="https://docs.odal-node.io"
     ctaLabel="Read the docs"
   />
@@ -97,9 +97,9 @@ const steps = [
   <Section eyebrow="How it works" title="Proof-bound: your data stays with you, and every published field is signed." tone="tinted">
     <p>
       Manufacturers have trade secrets to protect. Regulators and customers need
-      data they can trust. Odal Node handles both: the raw import files are read
-      once and discarded, and the node stores and serves the signed passport they
-      produce, which carries the full product data with every field signed. Each
+      data they can trust. Odal Node handles both: your product data is validated
+      and signed on your own infrastructure, and the node serves the signed
+      passport, which carries the full product data with every field signed. Each
       reader sees the parts their access rights allow.
     </p>
     <div class="not-prose my-6">
@@ -123,11 +123,8 @@ const steps = [
     <p>
       Public fields are readable by all; restricted fields (for repairers,
       recyclers and market-surveillance authorities) are released only against a
-      verified credential. What the node stores: the whole signed passport, its
-      audit trail, and a row-by-row record of each import. What it never stores:
-      the import files themselves, or supply-chain detail beyond the passport's
-      content. Your signing key stays on your own infrastructure, encrypted at
-      rest.
+      verified credential. Everything the node stores stays on your
+      infrastructure, and so does your signing key, encrypted at rest.
     </p>
     <ul class="not-prose m-0 mt-6 flex list-none flex-wrap gap-x-8 gap-y-3 p-0 text-sm">
       <li class="m-0"><a href="/example-passport" class="link-arrow">See an example passport</a></li>
@@ -142,7 +139,7 @@ const steps = [
       {[
         {
           k: "Proof-bound",
-          v: "The raw import files are discarded after signing, and only the signed passport is stored and served. The software works this way for everyone, so you do not have to rely on our word.",
+          v: "Your product data is validated, signed and stored on your own infrastructure, and every published field carries your signature. The software works this way for everyone, so you do not have to rely on our word.",
         },
         {
           k: "Open standards",
@@ -176,8 +173,8 @@ const steps = [
 
   <Section eyebrow="Data and trust" title="What Odal Node can and cannot see." tone="tinted" wide>
     <p>
-      The node reads your import files once and discards them, so we never have
-      access to the raw production data behind a passport. This comes from how the
+      Your node runs on your infrastructure and we are not part of it, so we have
+      no access to the production data behind a passport. This comes from how the
       software works, not from a policy. In detail:
     </p>
     <div class="not-prose mt-8 grid gap-6 md:grid-cols-3">
@@ -195,10 +192,10 @@ const steps = [
         </p>
       </div>
       <div class="card p-6">
-        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">Nobody keeps</h3>
+        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We cannot change</h3>
         <p class="m-0 text-sm leading-body text-neutral-600">
-          The contents of your import files. The node reads them once and
-          discards them after validation.
+          Your published passports. Every field carries your signature, so a
+          change made without your key fails verification.
         </p>
       </div>
     </div>

@@ -39,7 +39,7 @@ Validation runs the product group's schema and its sandboxed rules. Plausibility
 
 ## What the node keeps
 
-The import **file** is discarded once the passport is signed; no setting keeps it. What the import produced is kept: the draft passports, and a job record with each row's validation findings. See [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see).
+An import creates the draft passports and a job record with each row's validation findings; the node deletes the job record after 30 days. See [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see).
 
 <Aside type="tip" title="Stamped automatically">
 New passports carry your default facility and primary operator identifier without a column for them. See [Your operator identity](/guides/operator-identity).
