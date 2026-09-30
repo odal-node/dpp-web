@@ -1,5 +1,5 @@
 {
-  "_comment": "Example data for /example-passport: a fictional EV battery from the engine demo set, copied from odal-node/dpp-engine ops/demo/passports/04-battery-ev-nmc.json at v0.14.0 (5e43ab6) with one change: the engine demo's company name is also a real company's, so the company, its product name and its domain are renamed here to Musterzelle GmbH, musterzelle.example (invented; \"Muster\" is the German word for a sample). Everything else is unchanged. This is the body a company submits before signing, not a signed passport; the page says so. Refresh it from the engine and re-apply the rename, rather than editing it here.",
+  "_comment": "Example data for /example-passport: a fictional EV battery from the engine demo set, copied from odal-node/dpp-engine ops/demo/passports/04-battery-ev-nmc.json on main after #358 (04f1a52) with one change: the engine demo's company name is also a real company's, so the company, its product name and its domain are renamed here to Musterzelle GmbH, musterzelle.example (invented; \"Muster\" is the German word for a sample). Everything else is unchanged. This is the body a company submits before signing, not a signed passport; the page says so. Refresh it from the engine and re-apply the rename, rather than editing it here.",
   "source": {
     "repository": "odal-node/dpp-engine",
     "path": "ops/demo/passports/04-battery-ev-nmc.json",
@@ -38,7 +38,7 @@
     "repairabilityScore": 5.5,
     "productGroupData": {
       "productGroup": "battery",
-      "gtin": "09590000000045",
+      "productIdentifier": { "scheme": "gs1", "gtin": "09590000000045" },
       "batteryType": "ev",
       "batteryChemistry": "NMC",
       "co2ePerUnitKg": 61.2,

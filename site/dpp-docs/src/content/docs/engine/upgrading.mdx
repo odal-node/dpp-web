@@ -20,6 +20,16 @@ The signing key, the DID document and every published passport stay as they are.
 
 ## Changes that need action
 
+### Next release
+
+These are on the engine's main branch and ship with its next tagged release. The rest of this documentation already describes them.
+
+- **Retire replaces archive.** `POST /dpp/{dppId}/archive` is now `POST /dpp/{dppId}/retire`, the status it sets is `"retired"` and the event is `dpp.passport.retired`. `odal passport archive` is now `odal passport retire`, and `trustMode.archive` on `/vault/api/v1/node/state` is `trustMode.backup`. `"archived"` is refused, not aliased: update clients, and resubscribe webhooks and NATS consumers that filter on `dpp.passport.archived`. A migration rewrites stored statuses on upgrade.
+- **Rename `ARCHIVE_S3_*` to `BACKUP_S3_*`.** The variables are otherwise unchanged; see [Configuration reference](/engine/configuration).
+- **Product group data carries a `productIdentifier`, not a `gtin`.** `"gtin": "09506000134352"` becomes `"productIdentifier": { "scheme": "gs1", "gtin": "09506000134352" }`, and an identification link or a DID is accepted where a GTIN was required. `GET /vault/api/v1/dpp/by-identity` takes `identifier` instead of `gtin`. Stored passports are not rewritten.
+- **The printed carrier follows the passport's stated level.** A model-level passport prints `/01/{gtin}`, a batch-level one `/01/{gtin}/10/{batch}`, and an item-level one, or one that states no level, `/01/{gtin}/21/{serial}`. Anything that parses `qrCodeUrl` should expect all three.
+- **A production or sandbox node refuses `ALLOW_UNSIGNED_PLUGINS=true`.** Remove the variable and set `PLUGIN_SIGNING_KEY` to the plugin publisher's Ed25519 public key.
+
 ### v0.14.0
 
 - **`RESOLVER_BASE_URL` is required** by the node and the resolver, with no default. Set it to your resolver's public address before starting the new version.
