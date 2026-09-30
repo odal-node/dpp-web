@@ -13,8 +13,6 @@ interface Props {
   eyebrow?: string;
   title: string;
   subtitle: string;
-  /** One short line under the subtitle, set a step brighter: the reason to care. */
-  claim?: string;
   ctaHref: string;
   ctaLabel: string;
   secondaryHref?: string;
@@ -28,7 +26,6 @@ const {
   eyebrow,
   title,
   subtitle,
-  claim,
   ctaHref,
   ctaLabel,
   secondaryHref,
@@ -64,14 +61,9 @@ const {
       <h1 class="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl">
         {title}
       </h1>
-      <p class:list={["max-w-2xl text-lg leading-body text-primary-200", claim ? "mb-4" : "mb-10"]}>
+      <p class="mb-10 max-w-2xl text-lg leading-body text-primary-200">
         {subtitle}
       </p>
-      {claim && (
-        <p class="mb-10 max-w-2xl text-lg font-semibold leading-body text-white">
-          {claim}
-        </p>
-      )}
       <div class="flex flex-wrap gap-3">
         <Button href={ctaHref} tone="dark" variant="primary" size="lg" arrow>
           {ctaLabel}

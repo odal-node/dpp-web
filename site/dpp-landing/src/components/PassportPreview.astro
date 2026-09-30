@@ -11,7 +11,9 @@
 //
 // A part the reader may not see shows as withheld: its values are hidden from
 // sight and from assistive technology alike, and grey bars stand in for them.
-// The card keeps one height whichever reader is picked.
+// The card keeps one height whichever reader is picked: values and the
+// withheld line share one slot, and so do the words "Visible" and "Withheld",
+// so neither a shorter part nor a narrower label can move anything.
 // The page arrives showing the first reader, so it reads correctly before (or
 // without) the script. Battery only, and the card says so: other product
 // groups get their access rules from their own acts.
@@ -77,7 +79,10 @@ const company = String((passport.manufacturer as { name?: string })?.name ?? "")
               <span class="text-sm font-semibold text-neutral-900">
                 <span class="text-neutral-500">Part {part.point}.</span> {pointTitle[part.point]}
               </span>
-              <span class="pp-state shrink-0 rounded px-2 py-0.5 text-xs font-semibold">{shown ? "Visible" : "Withheld"}</span>
+              <span class="pp-state pp-slot shrink-0 rounded px-2 py-0.5 text-center text-xs font-semibold">
+                <span class="pp-on">Visible</span>
+                <span class="pp-off">Withheld</span>
+              </span>
             </p>
             <div class="pp-slot mt-2">
             <dl class="pp-values m-0 grid gap-x-6 gap-y-1 sm:grid-cols-2">
@@ -124,7 +129,9 @@ const company = String((passport.manufacturer as { name?: string })?.name ?? "")
     grid-area: 1 / 1;
   }
   .pp-part[data-visible="false"] .pp-values,
-  .pp-part[data-visible="true"] .pp-withheld {
+  .pp-part[data-visible="true"] .pp-withheld,
+  .pp-part[data-visible="false"] .pp-on,
+  .pp-part[data-visible="true"] .pp-off {
     visibility: hidden;
   }
   .pp-part[data-visible="false"] {
@@ -159,8 +166,6 @@ const company = String((passport.manufacturer as { name?: string })?.name ?? "")
       for (const p of parts) {
         const shown = sees.has(p.dataset.point ?? "");
         p.dataset.visible = String(shown);
-        const state = p.querySelector(".pp-state");
-        if (state) state.textContent = shown ? "Visible" : "Withheld";
       }
     };
     for (const b of buttons) b.addEventListener("click", () => apply(b));
