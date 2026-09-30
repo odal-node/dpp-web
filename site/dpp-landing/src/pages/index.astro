@@ -5,6 +5,7 @@
 // ahead of shipped code, "proof-bound" never "no-touch").
 import DeadlineCards from "../components/DeadlineCards.astro";
 import Hero from "../components/Hero.astro";
+import HeroCheck from "../components/HeroCheck.astro";
 import Section from "../components/Section.astro";
 import StandardsRow from "../components/StandardsRow.astro";
 import { datedPassports } from "../lib/regulations";
@@ -59,14 +60,26 @@ const steps = [
 ---
 
 <Base title={title} description={description} jsonLd={[softwareAppLd]}>
+  {/* The trust lines restate facts the page proves further down: the
+      licence grant (Open core card), no caps (Self-host card) and public
+      source. Change them together. */}
   <Hero
     eyebrow="EU Digital Product Passports"
     status
     title="Signed by you. Verified by anyone."
-    subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated, signed and stored on your infrastructure, with your keys, and the signed passport is served from there. Anyone can verify it."
-    ctaHref="https://docs.odal-node.io"
-    ctaLabel="Read the docs"
-  />
+    subtitle="Issue EU Digital Product Passports from your own infrastructure. Odal Node checks your product data against its product group's rules, signs it with your key and publishes the passport behind the product's QR code. Anyone can check it, even offline."
+    ctaHref="/waitlist"
+    ctaLabel="Tell us what you make"
+    secondaryHref="https://docs.odal-node.io"
+    secondaryLabel="Read the docs"
+    trust={[
+      "Free to self-host for your own products",
+      "No licence keys, no passport limits",
+      "Source code public on GitHub",
+    ]}
+  >
+    <HeroCheck slot="aside" />
+  </Hero>
 
   <Section eyebrow="Why now" title="Know which date applies to your products." wide>
     <p>
@@ -220,7 +233,7 @@ const steps = [
       takes shape.
     </p>
     <div class="not-prose mt-6 flex flex-wrap gap-3">
-      <Button href="/waitlist">Join the waitlist</Button>
+      <Button href="/waitlist">Tell us what you make</Button>
       <Button href="/passport-check" variant="secondary">Check if you need a passport</Button>
       <Button href="/product-groups" variant="secondary">Find your product group</Button>
     </div>

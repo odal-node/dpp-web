@@ -1,0 +1,67 @@
+---
+// HeroCheck.astro — the passport check, sized for the hero's side column.
+//
+// The same answers and the same card as /passport-check (lib/checker.ts,
+// CheckAnswer.astro), so the home page cannot say something the check page
+// does not. What differs: the choices are grouped by verdict, so the products
+// with a date in law come first, and the page's address is never written;
+// each answer links to /passport-check for sharing instead.
+//
+// No countdowns and no readiness score. Only the dated obligations have a
+// date to count towards, and any score would be made up.
+import CheckAnswer from "./CheckAnswer.astro";
+import { cards, choices, grouped } from "../lib/checker";
+
+const select =
+  "mt-2 block min-h-11 w-full rounded-md border border-primary-300/40 bg-primary-900 px-3 py-2.5 " +
+  "text-base text-white [color-scheme:dark] focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-300/60";
+---
+
+<div id="hc" class="rounded-xl border border-primary-300/20 bg-primary-800/60 p-5 shadow-lg sm:p-6">
+  <h2 id="hc-title" class="m-0 text-lg font-semibold text-white">Does your product need a passport?</h2>
+  <p class="m-0 mt-1 text-sm leading-body text-primary-200">
+    Pick what you make or sell. Where the law sets a date, you see it with
+    where it comes from.
+  </p>
+
+  <noscript>
+    <style is:inline>
+      #hc-form { display: none !important; }
+    </style>
+    <p class="m-0 mt-4 text-sm">
+      <a href="/passport-check" class="link-arrow text-primary-100">Open the passport check</a>
+    </p>
+  </noscript>
+
+  <form id="hc-form" class="mt-5 space-y-4" aria-labelledby="hc-title">
+    <div>
+      <label for="hc-group" class="text-sm font-medium text-primary-100">What do you make or sell?</label>
+      <select id="hc-group" class={select}>
+        <option value="">Choose one</option>
+        {grouped.map((g) => (
+          <optgroup label={g.label}>
+            {g.choices.map((c) => <option value={c.key}>{c.label}</option>)}
+          </optgroup>
+        ))}
+      </select>
+    </div>
+    {choices.filter((c) => c.follow).map((c) => (
+      <div data-follow={c.key} hidden>
+        <label for={`hc-follow-${c.key}`} class="text-sm font-medium text-primary-100">{c.follow!.question}</label>
+        <select id={`hc-follow-${c.key}`} class={select}>
+          <option value="">Choose one</option>
+          {c.follow!.options.map((o) => <option value={o.key}>{o.label}</option>)}
+        </select>
+      </div>
+    ))}
+  </form>
+
+  <ul class="m-0 grid list-none gap-3 p-0" aria-live="polite">
+    {cards.map((c) => <CheckAnswer card={c} tone="dark" />)}
+  </ul>
+</div>
+
+<script>
+  import { mountChecker } from "../lib/checker-client";
+  mountChecker("hc", { syncHash: false });
+</script>
