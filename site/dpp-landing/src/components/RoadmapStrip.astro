@@ -1,0 +1,23 @@
+---
+// RoadmapStrip.astro — how many roadmap items sit in each status, each
+// linking to its place on /roadmap. Counted from src/data/roadmap.json, the
+// roadmap's one source, so the home page cannot disagree with it.
+import data from "../data/roadmap.json";
+
+const registers = data.registers.map((r) => ({
+  status: r.status,
+  title: r.title,
+  count: r.themes.reduce((n, t) => n + t.items.length, 0),
+}));
+---
+
+<ul class="not-prose m-0 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-5">
+  {registers.map((r) => (
+    <li class="m-0">
+      <a href={`/roadmap#${r.status}`} class="card flex h-full flex-col p-4 no-underline hover:no-underline">
+        <span class="text-3xl font-bold text-neutral-900">{r.count}</span>
+        <span class="mt-1 text-sm font-medium text-neutral-700">{r.title}</span>
+      </a>
+    </li>
+  ))}
+</ul>

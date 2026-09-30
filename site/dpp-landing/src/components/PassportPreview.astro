@@ -1,0 +1,168 @@
+---
+// PassportPreview.astro — the example battery passport, read three ways.
+//
+// A reader switch over a few fields of each part of the example passport
+// (lib/example-passport.ts), with the readers and what each may read taken
+// from the Batteries Regulation's Art. 77(2) record (data/access.json), the
+// same one /visibility operates. Three readers, not "public or restricted":
+// authorities read the evidence of conformity and not the battery's own
+// history, and a reader with a legitimate interest the other way round, so
+// no two-level switch could show it.
+//
+// A part the reader may not see shows as withheld: its values are hidden from
+// sight and from assistive technology alike, and grey bars stand in for them.
+// The card keeps one height whichever reader is picked.
+// The page arrives showing the first reader, so it reads correctly before (or
+// without) the script. Battery only, and the card says so: other product
+// groups get their access rules from their own acts.
+//
+// The data is the engine's unsigned example, so the card makes no claim about
+// a signature; checking one is what /verify is for.
+import access from "../data/access.json";
+import { passport, previewParts } from "../lib/example-passport";
+
+const first = access.audiences[0];
+// Short names for the four parts of Annex XIII; /visibility carries the full ones.
+const pointTitle: Record<string, string> = {
+  "1": "Public information",
+  "2": "Model detail, not public",
+  "3": "Evidence of conformity",
+  "4": "This battery's own history",
+};
+const name = String(passport.productName);
+const company = String((passport.manufacturer as { name?: string })?.name ?? "");
+---
+
+<div data-pp class="not-prose grid gap-8 lg:grid-cols-5 lg:gap-12">
+  <div class="lg:col-span-2">
+    <p class="m-0 text-sm font-semibold text-neutral-900" id="pp-readers">Read it as</p>
+    <div role="group" aria-labelledby="pp-readers" class="mt-3 grid gap-2">
+      {access.audiences.map((a, i) => (
+        <button
+          type="button"
+          data-sees={a.sees.join(",")}
+          data-basis={a.basis}
+          aria-pressed={i === 0 ? "true" : "false"}
+          class="pp-reader card px-4 py-3 text-left"
+        >
+          <span class="block text-sm font-semibold">{a.label}</span>
+          <span class="block text-xs opacity-75">{a.sub}</span>
+        </button>
+      ))}
+    </div>
+    <p class="m-0 mt-4 text-sm text-neutral-600">
+      Legal basis: <span data-pp-basis>{first.basis}</span> of the Batteries Regulation.
+    </p>
+    <p class="m-0 mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+      <a href="/example-passport" class="link-arrow">See the full example</a>
+      <a href="/visibility" class="link-arrow">Why it is not a ladder</a>
+    </p>
+  </div>
+
+  <article class="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm lg:col-span-3" aria-label="Example battery passport">
+    <header class="flex flex-wrap items-start justify-between gap-3 bg-primary-900 px-5 py-4 text-white">
+      <div>
+        <p class="m-0 text-base font-semibold">{name}</p>
+        <p class="m-0 mt-0.5 text-sm text-primary-200">{company} (an invented company)</p>
+      </div>
+      <span class="rounded-full border border-regulatory-border bg-regulatory-bg px-2.5 py-0.5 text-xs font-medium text-regulatory-text">Example data</span>
+    </header>
+
+    <ol class="m-0 list-none divide-y divide-neutral-200 p-0">
+      {previewParts.map((part) => {
+        const shown = first.sees.includes(part.point);
+        return (
+          <li class="pp-part m-0 px-5 py-4" data-point={part.point} data-visible={shown ? "true" : "false"}>
+            <p class="m-0 flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold text-neutral-900">
+                <span class="text-neutral-500">Part {part.point}.</span> {pointTitle[part.point]}
+              </span>
+              <span class="pp-state shrink-0 rounded px-2 py-0.5 text-xs font-semibold">{shown ? "Visible" : "Withheld"}</span>
+            </p>
+            <div class="pp-slot mt-2">
+            <dl class="pp-values m-0 grid gap-x-6 gap-y-1 sm:grid-cols-2">
+              {part.fields.map((f) => (
+                <div class="min-w-0">
+                  <dt class="text-xs text-neutral-500">{f.label}</dt>
+                  <dd class="m-0 truncate text-sm font-medium text-neutral-900" title={f.value}>{f.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div class="pp-withheld flex items-center gap-3 self-start">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0 text-neutral-500" aria-hidden="true">
+                <rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" />
+              </svg>
+              <span class="text-sm text-neutral-600">Withheld from this reader</span>
+              <span class="ml-auto hidden gap-2 sm:flex" aria-hidden="true">
+                <span class="h-2.5 w-16 rounded-full bg-neutral-200"></span>
+                <span class="h-2.5 w-10 rounded-full bg-neutral-200"></span>
+              </span>
+            </div>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+
+    <p class="m-0 border-t border-neutral-200 bg-neutral-50 px-5 py-3 text-xs text-neutral-600">
+      Battery passport only. Other product groups get their access rules from
+      their own acts.
+    </p>
+  </article>
+</div>
+
+<style>
+  /* One part shows its values or the withheld line, never both. Both sit in
+     the same grid cell, and the one not showing is made invisible rather than
+     removed, so every part keeps the height of its values and the card keeps
+     one height whichever reader is picked. Invisible also takes a withheld
+     value out of the tab order and the accessibility tree. */
+  .pp-slot {
+    display: grid;
+  }
+  .pp-slot > * {
+    grid-area: 1 / 1;
+  }
+  .pp-part[data-visible="false"] .pp-values,
+  .pp-part[data-visible="true"] .pp-withheld {
+    visibility: hidden;
+  }
+  .pp-part[data-visible="false"] {
+    background: var(--color-neutral-50);
+  }
+  .pp-part[data-visible="true"] .pp-state {
+    background: var(--color-primary-100);
+    color: var(--color-primary-800);
+  }
+  .pp-part[data-visible="false"] .pp-state {
+    background: var(--color-neutral-100);
+    color: var(--color-neutral-700);
+  }
+  .pp-reader[aria-pressed="true"] {
+    border-color: var(--color-primary-500);
+    box-shadow: inset 0 0 0 1px var(--color-primary-500);
+    background: var(--color-primary-50);
+  }
+</style>
+
+<script>
+  // Each reader button carries the parts it may read (data-sees) and its legal
+  // basis (data-basis), so the script needs no data of its own.
+  for (const root of document.querySelectorAll<HTMLElement>("[data-pp]")) {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>(".pp-reader")];
+    const parts = [...root.querySelectorAll<HTMLElement>(".pp-part")];
+    const basis = root.querySelector<HTMLElement>("[data-pp-basis]");
+    const apply = (active: HTMLButtonElement) => {
+      const sees = new Set((active.dataset.sees ?? "").split(","));
+      for (const b of buttons) b.setAttribute("aria-pressed", String(b === active));
+      if (basis) basis.textContent = active.dataset.basis ?? "";
+      for (const p of parts) {
+        const shown = sees.has(p.dataset.point ?? "");
+        p.dataset.visible = String(shown);
+        const state = p.querySelector(".pp-state");
+        if (state) state.textContent = shown ? "Visible" : "Withheld";
+      }
+    };
+    for (const b of buttons) b.addEventListener("click", () => apply(b));
+  }
+</script>

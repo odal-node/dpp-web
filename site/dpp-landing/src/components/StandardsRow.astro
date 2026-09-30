@@ -1,15 +1,19 @@
 ---
 // StandardsRow.astro — text badges only (no third-party logos without rights).
 // Data: src/data/standards.json. An entry with an `href` links its name to the
-// page that details it, marked as leaving the site when it does.
+// page that details it, marked as leaving the site when it does. Each entry
+// says how far the software has it, in plain words: "In place" or "Partly in
+// place". The words carry the meaning; the colour only echoes them.
 import ExternalArrow from "./ExternalArrow.astro";
 import data from "../data/standards.json";
-const standards: { name: string; role: string; href?: string }[] = data.standards;
+const standards: { name: string; role: string; status: string; href?: string }[] = data.standards;
+const tone = (status: string) =>
+  status === "In place" ? "bg-status-released/10 text-neutral-800" : "bg-amber-100 text-amber-900";
 ---
 
 <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
   {standards.map((s) => (
-    <li class="rounded-md border border-neutral-200 bg-neutral-0 p-4 transition-colors hover:border-primary-300">
+    <li class="flex flex-col rounded-md border border-neutral-200 bg-neutral-0 p-4 transition-colors hover:border-primary-300">
       <p class="m-0 text-sm font-semibold text-neutral-900">
         {s.href ? (
           <a href={s.href}>{s.name}{!s.href.startsWith("/") && <ExternalArrow class="ml-1" />}</a>
@@ -18,6 +22,9 @@ const standards: { name: string; role: string; href?: string }[] = data.standard
         )}
       </p>
       <p class="m-0 mt-1 text-xs leading-body text-neutral-600">{s.role}</p>
+      <p class="m-0 mt-auto pt-3">
+        <span class:list={["inline-flex rounded-full px-2 py-0.5 text-xs font-medium", tone(s.status)]}>{s.status}</span>
+      </p>
     </li>
   ))}
 </ul>
