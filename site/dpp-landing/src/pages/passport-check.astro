@@ -21,6 +21,7 @@ import Section from "../components/Section.astro";
 import Button from "../components/Button.astro";
 import CheckAnswer from "../components/CheckAnswer.astro";
 import { cards, choices } from "../lib/checker";
+import { MAILBOX, mailto } from "../lib/lead";
 
 const title = "Does my product need a Digital Product Passport? | Odal Node";
 const description =
@@ -86,13 +87,17 @@ const selectClass =
   <Section eyebrow="Next step" title="Getting ready before the date." tone="tinted">
     <p>
       Odal Node is software you run yourself to issue, sign and publish your
-      passports. Join the waitlist to hear when it is ready for your product
-      group.
+      passports. Tell us what you make, and we will let you know when it is
+      ready for your product group.
     </p>
     <div class="not-prose mt-6 flex flex-wrap gap-3">
-      <Button href="/waitlist">Join the waitlist</Button>
+      <Button href={mailto("check")}>Email us about your product</Button>
       <Button href="/faq" variant="secondary">Read the FAQ</Button>
     </div>
+    <p class="mt-4 text-sm text-neutral-600">
+      Or write to {MAILBOX}. The <a href="/waitlist">waitlist page</a> says
+      what helps us reply well.
+    </p>
   </Section>
 </Base>
 
