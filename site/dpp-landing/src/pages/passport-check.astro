@@ -1,0 +1,171 @@
+---
+// /passport-check — "Does my product need a passport?"
+//
+// Every answer is worked out at build time in lib/checker.ts from the same
+// records as /regulations and /timeline. The page arrives as the picker, with
+// every answer hidden, and the script only reveals the one chosen, keeping the
+// choice in the address so an answer can be shared. It used to arrive the other
+// way round (every answer listed, the picker hidden) and the script swapped the
+// two once it loaded, so the page drew a long list and then collapsed it into a
+// form. Without JavaScript, the <noscript> style below lists every answer and
+// hides the picker, which cannot work without the script.
+//
+// An answer is hidden by the page style below until the script marks it
+// `data-shown`, not by the `hidden` attribute: Tailwind's reset hides
+// `[hidden]` with !important inside a cascade layer, and a layered !important
+// beats any unlayered override, so the <noscript> style could never reveal an
+// answer that carried it.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import BasisMark from "../components/BasisMark.astro";
+import Button from "../components/Button.astro";
+import { choices, type Answer } from "../lib/checker";
+import { basisLabel } from "../lib/regulations";
+
+const title = "Does my product need a Digital Product Passport? | Odal Node";
+const description =
+  "Pick what you make or sell and see whether EU law requires a Digital Product Passport for it, from when, and where that date comes from.";
+
+type Card = { key: string; label: string; answer: Answer };
+const cards: Card[] = choices.flatMap((c) =>
+  c.follow
+    ? c.follow.options.map((o) => ({ key: `${c.key}:${o.key}`, label: `${c.label}: ${o.label}`, answer: o.answer }))
+    : c.answer
+      ? [{ key: c.key, label: c.label, answer: c.answer }]
+      : [],
+);
+
+const tone = {
+  yes: "border-regulatory-border bg-regulatory-bg",
+  later: "border-primary-200 bg-primary-50",
+  no: "border-neutral-200 bg-white",
+};
+const selectClass =
+  "mt-2 block w-full max-w-md rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-base text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200";
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Passport check" title="Does my product need a passport?" wide>
+    <p>
+      Pick what you make or sell. The answer comes from the same legal records
+      as the rest of this site, and says where its date comes from. It is a
+      first answer to point you to the right act, not legal advice.
+    </p>
+
+    <div id="pc" class="not-prose mt-6">
+      <noscript>
+        <style is:inline>
+          #pc-form { display: none !important; }
+          #pc-answers [data-answer] { display: block !important; }
+        </style>
+      </noscript>
+      <form id="pc-form" class="space-y-5">
+        <div>
+          <label for="pc-group" class="text-sm font-semibold text-neutral-900">What do you make or sell?</label>
+          <select id="pc-group" class={selectClass}>
+            <option value="">Choose one</option>
+            {choices.map((c) => <option value={c.key}>{c.label}</option>)}
+          </select>
+        </div>
+        {choices.filter((c) => c.follow).map((c) => (
+          <div data-follow={c.key} hidden>
+            <label for={`pc-follow-${c.key}`} class="text-sm font-semibold text-neutral-900">{c.follow!.question}</label>
+            <select id={`pc-follow-${c.key}`} class={selectClass}>
+              <option value="">Choose one</option>
+              {c.follow!.options.map((o) => <option value={o.key}>{o.label}</option>)}
+            </select>
+          </div>
+        ))}
+      </form>
+
+      <ul id="pc-answers" class="m-0 mt-6 grid list-none gap-4 p-0" aria-live="polite">
+        {cards.map((c) => (
+          <li data-answer={c.key} class:list={["m-0 max-w-2xl rounded-md border p-5", tone[c.answer.verdict]]}>
+            <p class="m-0 text-xs font-semibold uppercase tracking-wide text-neutral-500">{c.label}</p>
+            <p class="m-0 mt-1.5 text-xl font-semibold leading-snug text-neutral-900">{c.answer.headline}</p>
+            <p class="m-0 mt-2 text-sm leading-body text-neutral-700">{c.answer.detail}</p>
+            <p class="m-0 mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+              {c.answer.basis && <BasisMark basis={c.answer.basis} label={basisLabel(c.answer.basis)} />}
+              {c.answer.links.map((l) => <a href={l.href} class="link-arrow">{l.label}</a>)}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Section>
+
+  <Section eyebrow="What the answer means" title="Who the passport is for, and what comes next." tone="muted">
+    <p>
+      The duty sits with whoever places the product on the EU market, usually
+      the manufacturer. Where a passport is required, it has to exist before
+      the product is sold, and stay available for years afterwards.
+    </p>
+    <p>
+      Where the answer is "not yet", the Commission has not adopted the act
+      that sets the rules. The <a href="/timeline">timeline</a> shows when each
+      act is planned, and the answer here changes when one is adopted.
+    </p>
+  </Section>
+
+  <Section eyebrow="Next step" title="Getting ready before the date." tone="tinted">
+    <p>
+      Odal Node is software you run yourself to issue, sign and publish your
+      passports. Join the waitlist to hear when it is ready for your product
+      group.
+    </p>
+    <div class="not-prose mt-6 flex flex-wrap gap-3">
+      <Button href="/waitlist">Join the waitlist</Button>
+      <Button href="/faq" variant="secondary">Read the FAQ</Button>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  [data-answer]:not([data-shown]) {
+    display: none;
+  }
+</style>
+
+<script>
+  const root = document.getElementById("pc");
+  const form = document.getElementById("pc-form");
+  const group = document.getElementById("pc-group") as HTMLSelectElement | null;
+  if (root && form && group) {
+    const follows = [...root.querySelectorAll<HTMLElement>("[data-follow]")];
+    const answers = [...root.querySelectorAll<HTMLElement>("[data-answer]")];
+    const followSelect = (f: HTMLElement) => f.querySelector("select") as HTMLSelectElement;
+
+    const show = () => {
+      let key = group.value;
+      for (const f of follows) {
+        const on = f.dataset.follow === group.value;
+        f.hidden = !on;
+        if (on) key = followSelect(f).value ? `${group.value}:${followSelect(f).value}` : "";
+      }
+      for (const a of answers) a.toggleAttribute("data-shown", a.dataset.answer === key);
+      history.replaceState(null, "", key ? `#${key}` : location.pathname);
+    };
+
+    // An answer shared by its address opens on that answer. A mangled address
+    // (a stray "%" that is not an escape) opens on the empty picker instead:
+    // decodeURIComponent throws on it, and an uncaught throw here would leave
+    // the picker with no listeners, so nothing could be chosen at all.
+    let shared = "";
+    try {
+      shared = decodeURIComponent(location.hash.slice(1));
+    } catch {
+      /* not a valid escape sequence: ignore it */
+    }
+    const [g, sub] = shared.split(":");
+    if (g && [...group.options].some((o) => o.value === g)) {
+      group.value = g;
+      const f = follows.find((x) => x.dataset.follow === g);
+      if (f && sub) followSelect(f).value = sub;
+    }
+
+    form.addEventListener("submit", (e) => e.preventDefault());
+    group.addEventListener("change", show);
+    for (const f of follows) followSelect(f).addEventListener("change", show);
+    show();
+  }
+</script>

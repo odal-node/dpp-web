@@ -11,12 +11,23 @@ on:
 permissions:
   contents: read
 
+# Cancel a superseded run rather than paying for it — a rebase or a follow-up
+# push makes the in-flight run answer a question nobody is asking any more.
+# `main` is excluded: the post-merge run is the record for that commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Full history: each sitemap <lastmod> is the last commit that changed its
+      # page (scripts/git-lastmod.mjs), and a shallow clone knows one commit.
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
 
       # The vendored OpenAPI spec is a copy of the engine's. Without the source
       # beside it there is nothing to compare against, and a drift check that
@@ -26,10 +37,20 @@ jobs:
       # openapi-source.json rather than at whatever is currently on main. See
       # that script's header for why the pin exists.
       - name: Checkout dpp-engine (source of the vendored API spec)
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: odal-node/dpp-engine
           path: .dpp-engine
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Same reasoning as the engine checkout above, for the vendored
+      # product-group manifests the landing site's pages are generated from.
+      - name: Checkout dpp-core (source of the vendored product groups)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: odal-node/dpp-core
+          path: .dpp-core
           fetch-depth: 0
           persist-credentials: false
 
@@ -37,7 +58,7 @@ jobs:
         run: corepack enable
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 24.18.0
           cache: pnpm
@@ -62,6 +83,47 @@ jobs:
       # `public/`, which is served verbatim.
       - name: Check for internal-vocabulary leakage
         run: pnpm run check:leakage
+
+      # Astro trims whitespace where a text node meets an element, so prose
+      # that reads correctly in the source can publish as "Seethe project
+      # board". Valid HTML, resolving links, clean type-check — invisible to
+      # every other gate here.
+      - name: Check inline spacing
+        run: pnpm run check:spacing
+
+      # Each site's llms.txt is generated from its page lists, and nothing else
+      # parses it: it is plain text, so the link checker never reaches it. This
+      # holds every on-site URL in the built file to a page or file in dist/.
+      - name: llms.txt points only at pages that were built
+        run: pnpm run check:llms
+
+      # The XML sitemaps list exactly the indexable pages, each under its own
+      # canonical address, and every entry carries a <lastmod> read from git.
+      # Only crawlers read a sitemap, so nothing else would show it is wrong.
+      - name: Sitemaps list every indexable page, with its canonical and last change
+        run: pnpm run check:sitemaps
+
+      # The /verify rate limit is a Cloudflare zone rule written by a script,
+      # not by a deploy. This holds the rule inside the Free plan's limits and
+      # proves a write keeps every rule it does not own. It also tests the
+      # weekly external-link check's parsing and verdicts.
+      - name: Test the scripts
+        run: pnpm run test:scripts
+
+      # The product-group and regulation pages are generated from data vendored
+      # out of dpp-core. This fails if a vendored copy no longer matches the
+      # commit recorded in core-source.json, so a page cannot describe a product
+      # group or a legal act differently from the library.
+      - name: Check the vendored product groups and regulations against core
+        run: pnpm --filter dpp-landing run check:core
+        env:
+          DPP_CORE_DIR: ${{ github.workspace }}/.dpp-core
+
+      # /verify re-implements the node's dossier verifier in the browser. This
+      # holds it to the engine's own verdicts on engine-built dossiers, check
+      # by check, so the two cannot drift apart unnoticed.
+      - name: Test the browser verifier against the engine's verdicts
+        run: pnpm --filter dpp-landing run test:verify
 
       - name: Check the vendored API spec against the engine
         run: pnpm run check:openapi
@@ -88,10 +150,10 @@ jobs:
             git --no-pager log --oneline "$PIN"..origin/main -- api/openapi.yaml || true
           fi
 
-      # Fails on a high-severity advisory. The remaining advisories are all
-      # build-time or dev-server issues in transitive dependencies, which do not
-      # reach a static deploy — so this is set to fail on `critical` today and
-      # should be tightened to `high` once those clear. The point is that a new
-      # advisory becomes visible on the pull request that introduces it.
+      # Fails on a high or critical advisory. It was set to `critical` while
+      # high-severity advisories in transitive build-time dependencies were
+      # open; those cleared (2026-09-27: 2 low, 2 moderate, all build- or
+      # dev-time), so it is at `high` now. The point is that a new advisory
+      # becomes visible on the pull request that introduces it.
       - name: Audit dependencies
-        run: pnpm audit --audit-level critical
+        run: pnpm audit --audit-level high

@@ -1,0 +1,91 @@
+---
+// /sitemap — every page on the site in one list, grouped as the nav groups
+// them, with a line on what each page is for. Built from lib/site-map.ts, the
+// product-group records and the act records, so it cannot miss a page the nav
+// has. The machine-readable forms (the XML sitemap and /llms.txt) are linked at
+// the end.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import ExternalArrow from "../components/ExternalArrow.astro";
+import { menus, footerLinks } from "../lib/site-map";
+import { groups, unsoldGoods } from "../lib/product-groups";
+import { instruments, displayTitle, passportView } from "../lib/regulations";
+
+const title = "Site map: every page on odal-node.io | Odal Node";
+const description =
+  "Every page on the Odal Node website in one list, grouped by topic, with a line on what each page is for, plus links to the XML sitemap and the index for AI agents.";
+
+const sections = [
+  ...menus.map((m) => ({ label: m.label, items: m.items.map((e) => ({ href: e.href, label: e.label, line: e.line, external: e.external })) })),
+  {
+    label: "Product groups",
+    items: [
+      { href: "/product-groups", label: "All product groups", line: "What the software can build passports for", external: false },
+      ...[...groups, unsoldGoods].map((g) => ({ href: `/product-groups/${g.key}`, label: g.name, line: g.line, external: false })),
+    ],
+  },
+  {
+    label: "The acts, one page each",
+    items: instruments.map((i) => ({ href: `/regulations/${i.id}`, label: displayTitle(i), line: passportView(i).label, external: false })),
+  },
+  {
+    label: "Also on this site",
+    items: [
+      { href: "/", label: "Home", line: "What Odal Node is, in one page", external: false },
+      ...footerLinks.filter((e) => e.href !== "/sitemap").map((e) => ({ ...e, external: false })),
+    ],
+  },
+];
+
+const machine = [
+  { href: "/sitemap-index.xml", label: "XML sitemap", line: "For search engines" },
+  { href: "/llms.txt", label: "llms.txt", line: "A plain-text index of this site for AI agents" },
+  { href: "https://docs.odal-node.io/llms.txt", label: "Documentation llms.txt", line: "The same index for the documentation site" },
+  { href: "https://docs.odal-node.io/openapi.yaml", label: "OpenAPI document", line: "Every route a node serves, machine-readable" },
+  { href: "/.well-known/security.txt", label: "security.txt", line: "Where to report a security issue" },
+];
+const external = (href: string) => /^https?:\/\//.test(href);
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Site map" title="Every page on this site." wide>
+    <p>
+      Grouped as the menus group them, with a line on what each page is for.
+      The technical documentation lives on its own site, at{" "}
+      <a href="https://docs.odal-node.io" rel="noopener">docs.odal-node.io<ExternalArrow class="ml-1" /></a>.
+    </p>
+  </Section>
+
+  <Section eyebrow="Pages" title="By topic." tone="muted" wide>
+    <div class="not-prose grid gap-10 md:grid-cols-2 xl:grid-cols-3">
+      {sections.map((s) => (
+        <section aria-label={s.label}>
+          <h3 class="m-0 text-base font-semibold text-neutral-900">{s.label}</h3>
+          <ul class="m-0 mt-3 list-none space-y-3 p-0">
+            {s.items.map((e) => (
+              <li class="m-0">
+                <a href={e.href} rel={e.external ? "noopener" : undefined} class="font-medium">
+                  {e.label}{e.external && <ExternalArrow class="ml-1" />}
+                </a>
+                <span class="block text-sm text-neutral-600">{e.line}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </Section>
+
+  <Section eyebrow="For machines" title="The same, for search engines and agents.">
+    <ul class="not-prose m-0 list-none space-y-3 p-0">
+      {machine.map((e) => (
+        <li class="m-0">
+          <a href={e.href} rel={external(e.href) ? "noopener" : undefined} class="font-medium">
+            {e.label}{external(e.href) && <ExternalArrow class="ml-1" />}
+          </a>
+          <span class="block text-sm text-neutral-600">{e.line}</span>
+        </li>
+      ))}
+    </ul>
+  </Section>
+</Base>

@@ -4,6 +4,7 @@
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import { shareImageFor } from "../lib/share-cards";
 
 interface Props {
   title: string;
@@ -18,17 +19,20 @@ interface Props {
 
 const { title, description, canonical, jsonLd = [], noindex = false } = Astro.props;
 const canonicalHref = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
-const ogImage = new URL("/og-image.png", Astro.site).toString();
+// Each page's own share card where it has one (lib/share-cards.ts).
+const share = shareImageFor(Astro.url.pathname);
+const ogImage = new URL(share.src, Astro.site).toString();
 
 // Base structured data — present on every page.
 const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": "https://odal-node.io/#organization",
   name: "Odal Node",
   url: "https://odal-node.io",
   logo: new URL("/favicon.svg", Astro.site).toString(),
   description:
-    "Open-source infrastructure for EU Digital Product Passports under the Ecodesign for Sustainable Products Regulation (ESPR).",
+    "Self-hosted infrastructure for EU Digital Product Passports under the Ecodesign for Sustainable Products Regulation (ESPR), built on an open-source core.",
   sameAs: ["https://github.com/odal-node"],
 };
 
@@ -37,6 +41,60 @@ const websiteLd = {
   "@type": "WebSite",
   name: "Odal Node",
   url: "https://odal-node.io",
+};
+
+// What the project actually is. `Organization` says who publishes the site and
+// `WebSite` says the site exists; neither describes the software, which is the
+// thing anyone is searching for.
+//
+// Two entities, because the project has two licences. The node (dpp-engine) is
+// source-available under BSL-1.1; the core library it is built on (dpp-core) is
+// Apache-2.0. They once shared one `@id`, which merged both licences and both
+// repositories onto a single thing a crawler or an assistant would then quote.
+// Each now carries one licence, and the node points at the core with
+// `isBasedOn`. The home page adds its `SoftwareApplication` view to `#node`.
+//
+// `SoftwareSourceCode` here, not `SoftwareApplication`: this layout describes
+// the source, on every page; only the home page describes the deployable node.
+const nodeLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "@id": "https://odal-node.io/#node",
+  name: "Odal Node",
+  alternateName: "Odal Node DPP infrastructure",
+  description:
+    "Self-hosted infrastructure for EU Digital Product Passports (DPP): software for issuing, signing, holding and serving the product logbooks required by the Ecodesign for Sustainable Products Regulation (ESPR) and the Battery Regulation. Source-available under the Business Source License 1.1, with a grant that makes self-hosting for your own compliance free. Built on the open-source Odal Node core library.",
+  codeRepository: "https://github.com/odal-node/dpp-engine",
+  programmingLanguage: "Rust",
+  license: "https://github.com/odal-node/dpp-engine/blob/main/LICENSE",
+  url: "https://odal-node.io",
+  isBasedOn: { "@id": "https://odal-node.io/#core" },
+  keywords: [
+    "digital product passport",
+    "DPP",
+    "product logbook",
+    "ESPR",
+    "battery passport",
+    "self-hosted",
+    "EU compliance",
+    "EN 18219",
+    "GS1 Digital Link",
+  ],
+  publisher: { "@id": "https://odal-node.io/#organization" },
+};
+
+const coreLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "@id": "https://odal-node.io/#core",
+  name: "Odal Node core library (dpp-core)",
+  description:
+    "The open-source Rust library Odal Node is built on: the EU Digital Product Passport model and its versioned schemas, validation and product-group rules, signing and verification, GS1 Digital Link parsing, the Asset Administration Shell export and the EU registry types. Apache-2.0; anyone may use it.",
+  codeRepository: "https://github.com/odal-node/dpp-core",
+  programmingLanguage: "Rust",
+  license: "https://www.apache.org/licenses/LICENSE-2.0",
+  keywords: ["digital product passport", "DPP", "ESPR", "open source", "Rust library"],
+  publisher: { "@id": "https://odal-node.io/#organization" },
 };
 ---
 
@@ -49,8 +107,10 @@ const websiteLd = {
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonicalHref} />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    {/* iOS does not use an SVG here; it wants a 180px PNG. */}
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#080C2C" />
 
     <!-- Open Graph -->
@@ -61,6 +121,7 @@ const websiteLd = {
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={share.alt} />
     <meta property="og:site_name" content="Odal Node" />
     <meta property="og:locale" content="en_US" />
 
@@ -69,12 +130,15 @@ const websiteLd = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={share.alt} />
 
     <!-- Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
-    <script type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(nodeLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(coreLd)} />
     {jsonLd.map((block) => (
-      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(block)} />
     ))}
   </head>
   <body class="min-h-screen flex flex-col bg-neutral-0 text-neutral-900">

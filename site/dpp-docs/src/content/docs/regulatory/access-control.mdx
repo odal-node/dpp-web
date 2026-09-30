@@ -1,9 +1,9 @@
 ---
 title: Access Control
-description: Who may read which parts of a Digital Product Passport — what ESPR actually says, what the Battery Regulation adds, and how Odal enforces it.
+description: Who may read which parts of a Digital Product Passport, what ESPR actually says, what the Battery Regulation adds, and how Odal enforces it.
 ---
 
-Access to a Digital Product Passport is differentiated: not every reader sees every field. But the rules are not where they are commonly assumed to be, and getting that wrong produces confident, incorrect compliance claims.
+Not every reader of a Digital Product Passport sees every field. The rules on who sees what are often attributed to the wrong provisions, and that leads to compliance claims that are confident and wrong. This page sets out where the rules actually are.
 
 ## What ESPR actually says
 
@@ -11,15 +11,15 @@ ESPR (Regulation (EU) 2024/1781) **does not itself define access tiers.** Articl
 
 > customers, manufacturers, importers, distributors, dealers, professional repairers, independent operators, refurbishers, remanufacturers, recyclers, market surveillance authorities and customs authorities, civil society organisations, trade unions and other relevant actors shall have **free of charge** and easy access to the digital product passport **based on their respective access rights set out in the applicable delegated act adopted pursuant to Article 4**
 
-Two things follow. First, ESPR names a broad **list of actors** — some fourteen classes — and assigns them nothing. Second, the actor-to-data mapping is delegated: Article 9(2)(f) requires each product-group delegated act to specify "the actors that are to have access to data in the digital product passport and to what data they are to have access".
+Two things follow. First, ESPR names a broad **list of actors**, about fourteen classes, and assigns them nothing. Second, deciding which actor sees which data is left to delegated acts: Article 9(2)(f) requires each product-group delegated act to specify "the actors that are to have access to data in the digital product passport and to what data they are to have access".
 
-**No such delegated act has been adopted for any ESPR product group yet.** For textiles, furniture, steel, aluminium and tyres, the access mapping is not merely unimplemented — it does not yet legally exist.
+**No such delegated act has been adopted for any ESPR product group yet.** For textiles, furniture, steel, aluminium and tyres, the access rules are not just unimplemented; they do not exist in law yet.
 
-Article 10, sometimes cited as the source of a three-tier model, is titled "Requirements for the digital product passport" and establishes no access categories.
+Article 10, sometimes cited as the source of a three-tier model, is titled "Requirements for the digital product passport" and sets up no access categories.
 
-## Where a specified model does exist: batteries
+## Where a full model exists: batteries
 
-The Battery Regulation (EU) 2023/1542, Article 77(2), is currently the only fully specified access model. It assigns three audiences to four Annex XIII data sets:
+Article 77(2) of the Battery Regulation (EU) 2023/1542 is currently the only fully specified access model. It assigns three audiences to four Annex XIII data sets:
 
 | Audience | Annex XIII points |
 |---|---|
@@ -27,38 +27,40 @@ The Battery Regulation (EU) 2023/1542, Article 77(2), is currently the only full
 | Notified bodies, market surveillance authorities, the Commission | 2 and 3 |
 | Persons with a legitimate interest | 2 and 4 |
 
-**This is a lattice, not a ranking.** Point 3 (conformity test reports) is authority-only; point 4 (individual-battery data — cycle counts, state of health, use history) is legitimate-interest-only. Neither audience contains the other, so no ordered "public → restricted → private" scale can express it: any such ordering necessarily either hands authorities data the regulation withholds, or hides data from someone entitled to it.
+**The audiences are not ranked.** Point 3 (conformity test reports) is for authorities only; point 4 (data on the individual battery, such as cycle counts, state of health and use history) is for persons with a legitimate interest only. Neither audience sees everything the other sees, so no single "public → restricted → private" scale can express it. Any such scale would either give authorities data the regulation withholds from them, or hide data from someone entitled to it.
 
-Odal models this directly — audiences and disclosure classes as separate vocabularies, with an explicit table of which audience may see which class — rather than as a tier number.
+Odal models this as it is written: audiences and disclosure classes are separate lists, with an explicit table of which audience may see which class, rather than a tier number.
 
-One detail is still pending: the delegated act under Article 77(9), which fixes the access rights for Annex XIII points 2 and 4, has not been adopted.
+One detail is still pending. Article 77(9) required the Commission to adopt, by 18 August 2026, implementing acts naming who counts as a person with a legitimate interest for points 2 and 4, and which of that information they are entitled to. We hold no adopted text of them. Article 77(2)(c) itself grants legitimate interest for two purposes only: dismantling and composition work by repairers, remanufacturers, second-life operators and recyclers, and, for an individual battery, its purchaser (or someone acting for them) making it available to energy aggregators or market participants.
 
-## Constraints that apply everywhere
+## Rules that apply everywhere
 
-Read from the primary texts of ESPR, the Battery Regulation, the Toy Safety Regulation (EU) 2025/2509, the Detergents Regulation (EU) 2026/405 and the Construction Products Regulation (EU) 2024/3110:
+From the primary texts of ESPR, the Battery Regulation, the Toy Safety Regulation (EU) 2025/2509, the Detergents Regulation (EU) 2026/405 and the Construction Products Regulation (EU) 2024/3110:
 
-- **Access is free of charge.** Every one of these instruments requires it. Charging a reader for passport access is not a lawful model.
-- **Consumers must not be required to register or supply a password.** The toy and detergent regulations state this outright. The public view stays frictionless — no account, no sign-up, no gate.
-- **Passports must remain available for years, surviving the operator.** Ten years after placing on the market under the toy, detergent and construction rules, "including in cases of insolvency, liquidation or cessation of activity"; ESPR ties the period to at least the product's expected lifetime.
+- **Access is free of charge.** Every one of these acts requires it. Charging a reader for passport access is not lawful.
+- **Consumers must not be required to register or supply a password.** The toy and detergent regulations say so explicitly. The public view needs no account and no sign-up.
+- **Passports must remain available for years, including after the operator is gone.** Ten years after placing on the market under the toy, detergent and construction rules, "including in cases of insolvency, liquidation or cessation of activity"; ESPR ties the period to at least the product's expected lifetime.
 
-## How Odal enforces the boundaries
+## How Odal enforces it
 
-Every field carries a disclosure classification drawn from the sector's own definition rather than hard-coded. A request arrives with a credential — a W3C Verifiable Credential asserting the holder's role — and the node resolves that role to an audience, then filters the passport to the disclosure classes that audience may see.
+Every field has a disclosure classification taken from the product group's own definition, not hard-coded. A request arrives with a credential in the `X-DPP-Credential` header, a W3C Verifiable Credential stating the holder's role. The node maps that role to an audience and filters the passport to the disclosure classes that audience may see.
 
-The filtering step is a **pure function**: no network, no database. The credential check verifies the signature, the expiry, the issuer's trust status and the revocation list.
+The filtering is a **pure function**: no network, no database. The credential check verifies the signature, the expiry, whether the issuer is trusted and, where the issuer publishes one, its revocation list. How a node issues credentials of its own, and their limits, is on [Access credentials](/guides/credentials).
 
-Durable artefacts — stored signatures, audit records — are keyed by the **disclosure classes** they cover, never by an audience name. That is deliberate: ESPR's eventual actor vocabulary differs from the Battery Regulation's, and anything keyed to today's audience names would need migrating when the first ESPR delegated act lands.
+For product groups without an adopted delegated act, the software's own model holds a few fields back for credential holders, such as disassembly instructions or substances of concern. Those splits are our modelling choices, not law, and they will change to follow each delegated act once it exists.
+
+Stored records such as signatures and audit entries are keyed by the **disclosure classes** they cover, never by an audience name. ESPR's eventual list of actors will differ from the Battery Regulation's, and records keyed to today's audience names would need migrating when the first ESPR delegated act is adopted.
 
 ## Why credentials and not API keys
 
-The natural alternative — issuing API keys to recyclers and authorities — fails on three counts. API keys are bearer secrets that get reused, leaked or sold. They carry no verifiable identity assertion: possession is proof of access, not proof of who holds it. And they bind to a single issuer's authentication system, so every regulator would have to integrate with every platform separately.
+The obvious alternative is to give recyclers and authorities API keys. That has three problems. API keys are bearer secrets that get reused, leaked or sold. They carry no verifiable statement of identity: holding one proves access, not who holds it. And they are tied to one issuer's login system, so every regulator would have to integrate with every platform separately.
 
-Verifiable Credentials address all three. They are non-bearer, they carry a signed issuer assertion, and any platform that can verify them can accept them.
+Verifiable Credentials solve the second and third problems: they carry a signed statement from the issuer, and any platform that can verify them can accept them. The first is not solved yet. The node accepts a credential on its own, without proof that the person presenting it is its holder, so a copied credential works until it expires or is revoked. That is one reason credentials a node issues itself are limited to 90 days.
 
-This is also where the regulation is heading. ESPR Article 11 empowers the Commission to adopt implementing acts on procedures to issue and verify "the digital credentials of economic operators and other relevant actors that have access rights", and the toy and detergent regulations both defer their credential procedures to that same provision. Those implementing acts are not yet adopted, so no conformance claim is available — but the direction is legislated rather than speculative.
+The regulation is moving in the same direction. ESPR Article 11 empowers the Commission to adopt implementing acts on procedures to issue and verify "the digital credentials of economic operators and other relevant actors that have access rights", and the toy and detergent regulations both leave their credential procedures to that same provision. Those implementing acts are not adopted yet, so no conformance claim is possible, but the direction is set in law.
 
 ## Read next
 
-[What the core does](/core/overview) — how passports are signed and verified.
-[ESPR Overview](/regulatory/espr) — the framework regulation these provisions sit inside.
-[How the node works](/engine/architecture) — the public read path.
+[What the core does](/core/overview): how passports are signed and verified.
+[ESPR Overview](/regulatory/espr): the framework regulation these provisions sit in.
+[How the node works](/engine/architecture): the public read path.

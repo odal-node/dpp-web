@@ -1,0 +1,38 @@
+---
+title: Construction product DPP
+description: What the Construction Products Regulation (EU) 2024/3110 requires of a construction product passport, why it has no date yet, and what the software carries.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The Construction Products Regulation (EU) 2024/3110 creates its own passport system for construction products. It is based on ESPR's system but may set different rules.
+
+## When: no date yet
+
+**Art. 22(7)**: "By 18 months after the entry into force of the delegated act referred to in Article 75(1) the manufacturer shall make available a digital product passport." That delegated act, which sets up the construction passport system, has not been adopted. So there is no construction passport date today.
+
+<Aside type="note" title="Two dates that are not the passport date">
+8 January 2026 is the date from which most of the Regulation applies (Art. 96). 8 January 2027 is the date for Art. 92, on penalties. Neither starts the passport duty.
+</Aside>
+
+## What it requires
+
+- **Art. 75**: a construction passport system, set up by delegated act. It must be compatible and interoperable with ESPR's passport and with Building Information Modelling, and it may lay down more detailed or alternative rules on identifiers, data carriers, credentials and the registry. The system stays accessible for 25 years after the last product of a type is placed on the market, and the economic operator makes each passport available for at least 10 years (Art. 75(2)(i)).
+- **Art. 76(2)(a)**: the passport includes the declaration of performance and conformity, general product information with instructions for use and safety information, the technical documentation, the label, the unique identifiers, documentation required by other Union law, and the data carriers of key parts that have their own passport.
+- **Art. 76(2)(d)–(g)**: the passport corresponds to a product type, is free of charge to economic operators, clients, users and authorities, gives different levels of access, and lets the actors the system names add or update information.
+- **Art. 76(4)**: products exempted under Art. 14 need no passport.
+
+The Regulation organises products by **product family**, a closed list of 36 in its Annex VII (from precast concrete and doors and windows to cables, fixings and attached ladders), then by category and type. It does not use product groups.
+
+## What the software carries
+
+A construction passport in the released software records the barcode number, product family, country of origin, carbon footprint per functional unit, the functional unit, recycled content, a link to the environmental product declaration, and CE marking. It is checked by the construction plugin.
+
+<Aside type="caution" title="Not yet the Regulation's families">
+The construction product group is provisional. The categories it tells apart today (cement, concrete, structural steel, glass) are the software's own and do not follow Annex VII's family list, and the passport does not yet carry the declaration of performance. Both will follow the delegated act.
+</Aside>
+
+## Read next
+
+- [ESPR Overview](/regulatory/espr): the framework the construction system is based on.
+- [Acts and standards](/regulatory/acts-and-standards): every act the code relies on.

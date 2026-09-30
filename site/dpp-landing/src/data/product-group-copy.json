@@ -1,0 +1,181 @@
+{
+  "_comment": "Landing-owned wording for the product groups: the short name and one plain line each page, menu and card uses. The manifests beside it are vendored from dpp-core and gated against drift, so they are never edited here; this file is the only place the site words a group for a general reader. Each line describes what the passport carries, taken from the fields of that group's current schema, and never states a legal obligation or a date. 'order' is the order every list on the site shows them in. 'unsold-goods' is kept out of 'order' on purpose: its own manifest says it is not a product group and imposes no passport, so it is listed separately wherever it appears.",
+  "order": [
+    "battery",
+    "textile",
+    "steel",
+    "aluminium",
+    "tyre",
+    "furniture",
+    "mattress",
+    "electronics",
+    "toy",
+    "detergent",
+    "construction"
+  ],
+  "groups": {
+    "battery": {
+      "name": "Batteries",
+      "line": "Composition, carbon footprint and state of health"
+    },
+    "textile": {
+      "name": "Textiles",
+      "line": "Fibre composition, origin, care and repair"
+    },
+    "steel": {
+      "name": "Iron and steel",
+      "line": "Production route, scrap content and carbon per tonne"
+    },
+    "aluminium": {
+      "name": "Aluminium",
+      "line": "Alloy, production route and recycled content"
+    },
+    "tyre": {
+      "name": "Tyres",
+      "line": "Fuel efficiency, wet grip and rolling noise"
+    },
+    "furniture": {
+      "name": "Furniture",
+      "line": "Materials, repairability and end of life"
+    },
+    "mattress": {
+      "name": "Mattresses",
+      "line": "Materials, recycled content and end of life"
+    },
+    "electronics": {
+      "name": "Phones and tablets",
+      "line": "Repairability, spare parts and energy class"
+    },
+    "toy": {
+      "name": "Toys",
+      "line": "Age group, materials and substances of concern"
+    },
+    "detergent": {
+      "name": "Detergents",
+      "line": "Surfactants, dosage and biodegradability"
+    },
+    "construction": {
+      "name": "Construction products",
+      "line": "Product family, carbon footprint and environmental declaration"
+    },
+    "unsold-goods": {
+      "name": "Unsold goods disclosure",
+      "line": "What was discarded, and why. A report, not a passport"
+    }
+  },
+  "_labels_comment": "Human labels for the manifests' raw category values and non-public field names, so no page shows a key like 'lmt' or 'stateOfHealthPct'. A value missing here falls back to a generic humaniser, so a new field in dpp-core never breaks a page; it just reads less well until it is added here.",
+  "categoryLabels": {
+    "ev": "Electric vehicle",
+    "lmt": "Light means of transport",
+    "starting-lighting-ignition": "Starting, lighting and ignition",
+    "structural-steel": "Structural steel",
+    "surface-cleaner": "Surface cleaner",
+    "personal-care": "Personal care",
+    "other-mobile-phone": "Other mobile phone",
+    "cordless-phone": "Cordless phone",
+    "flat": "Flat products",
+    "long": "Long products",
+    "tube": "Tubes",
+    "C1": "C1: passenger car tyres",
+    "C2": "C2: light commercial vehicle tyres",
+    "C3": "C3: heavy vehicle tyres"
+  },
+  "fieldLabels": {
+    "disassemblyInstructionsUrl": "Disassembly instructions",
+    "disassemblyInstructions": "Disassembly instructions",
+    "cathodeMaterial": "Cathode material",
+    "anodeMaterial": "Anode material",
+    "electrolyteMaterial": "Electrolyte material",
+    "sohMethodology": "How state of health is measured",
+    "stateOfHealth": "State of health",
+    "stateOfHealthPct": "State of health as a percentage",
+    "expectedLifetime": "Expected lifetime",
+    "dynamicPerformance": "Performance over time",
+    "batteryStatus": "Battery status",
+    "usageHistory": "Usage history",
+    "componentPartNumbers": "Component part numbers",
+    "sparePartsContacts": "Spare-part sources",
+    "safetyMeasures": "Safety measures",
+    "testReportResults": "Test report results",
+    "epdUrl": "Environmental product declaration",
+    "svhcSubstances": "Substances of very high concern",
+    "repairManualUrl": "Repair manual",
+    "criticalRawMaterials": "Critical raw materials",
+    "sparePartsAvailable": "Spare-part availability",
+    "productName": "Product name",
+    "batchId": "Batch",
+    "manufacturer": "Manufacturer",
+    "name": "Name",
+    "address": "Address",
+    "didWebUrl": "Identity document",
+    "placedOnMarketDate": "Placed on the market",
+    "commodityCode": "Customs code",
+    "materials": "Materials",
+    "weightKg": "Weight (kg)",
+    "recycledPct": "Recycled share (%)",
+    "countryOfOrigin": "Country of origin",
+    "repairabilityScore": "Repairability score",
+    "gtin": "Barcode number (GTIN)",
+    "batteryType": "Battery category",
+    "batteryChemistry": "Chemistry",
+    "co2ePerUnitKg": "Carbon footprint (kg CO2e)",
+    "batteryPassportNumber": "Passport number",
+    "batteryModelId": "Model",
+    "manufacturingPlace": "Place of manufacture",
+    "manufacturingDate": "Date of manufacture",
+    "batteryWeightKg": "Weight (kg)",
+    "nominalVoltageV": "Nominal voltage (V)",
+    "minimalVoltageV": "Minimum voltage (V)",
+    "maximumVoltageV": "Maximum voltage (V)",
+    "nominalCapacityAh": "Nominal capacity (Ah)",
+    "ratedCapacityKwh": "Rated capacity (kWh)",
+    "ratedEnergyWh": "Rated energy (Wh)",
+    "originalPowerCapabilityW": "Original power capability (W)",
+    "powerLimitMinW": "Lowest power limit (W)",
+    "powerLimitMaxW": "Highest power limit (W)",
+    "renewableContentPct": "Renewable content (%)",
+    "recycledContentCobaltPct": "Recycled cobalt (%)",
+    "recycledContentLithiumPct": "Recycled lithium (%)",
+    "recycledContentNickelPct": "Recycled nickel (%)",
+    "recycledContentLeadPct": "Recycled lead (%)",
+    "recycledContentReportingYear": "Recycled content reported for",
+    "capacityThresholdForExhaustionPct": "Capacity at which it counts as worn out (%)",
+    "expectedLifetimeCycles": "Expected lifetime (cycles)",
+    "expectedLifetimeReferenceTest": "Lifetime test used",
+    "initialRoundTripEfficiencyPct": "Round-trip efficiency when new (%)",
+    "roundTripEfficiencyAtHalfCycleLifePct": "Round-trip efficiency at half its cycle life (%)",
+    "cycleLifeTestCRate": "Cycle-life test rate (C)",
+    "internalCellResistanceMohm": "Cell internal resistance (mΩ)",
+    "internalPackResistanceMohm": "Pack internal resistance (mΩ)",
+    "notInUseTemperatureRange": "Storage temperature range",
+    "minC": "Minimum (°C)",
+    "maxC": "Maximum (°C)",
+    "notInUseTemperatureReferenceTest": "Storage temperature test used",
+    "commercialWarrantyPeriodMonths": "Commercial warranty (months)",
+    "hazardSymbol": "Hazard symbol",
+    "hazardousSubstances": "Hazardous substances",
+    "casNumber": "CAS number",
+    "concentrationPct": "Concentration (%)",
+    "usableExtinguishingAgent": "Extinguishing agent",
+    "weightGrams": "Weight (g)",
+    "weightPct": "Share by weight (%)",
+    "markingInformation": "Markings",
+    "euDeclarationOfConformity": "EU declaration of conformity",
+    "wasteBatteryInformation": "Waste battery information",
+    "ratedCapacityAh": "Rated capacity (Ah)",
+    "capacityFadePct": "Capacity fade (%)",
+    "powerW": "Power (W)",
+    "powerFadePct": "Power fade (%)",
+    "internalResistanceMohm": "Internal resistance (mΩ)",
+    "internalResistanceIncreasePct": "Internal resistance increase (%)",
+    "roundTripEfficiencyPct": "Round-trip efficiency (%)",
+    "expectedLifetimeYears": "Expected lifetime (years)",
+    "parameterSet": "Measured as",
+    "socePct": "State of certified energy (%)",
+    "chargeDischargeCycles": "Charge and discharge cycles",
+    "negativeEvents": "Negative events",
+    "stateOfCharge": "State of charge readings",
+    "recordedAt": "Recorded",
+    "stateOfChargePct": "State of charge (%)"
+  }
+}

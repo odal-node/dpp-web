@@ -1,0 +1,41 @@
+---
+title: Toy DPP
+description: What the Toy Safety Regulation (EU) 2025/2509 requires of a toy passport, from when, and what the software carries today.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The Toy Safety Regulation (EU) 2025/2509 creates a passport for every toy placed on the EU market. Its date is set by the Regulation itself, not by a later act.
+
+## When
+
+- **In force** since 1 January 2026. Articles 28 to 44 and 49 to 55 already apply, including the Commission's power to set the passport's technical requirements (Art. 49).
+- **The passport applies from 1 August 2030**, when the rest of the Regulation applies (Art. 59).
+- Toys placed on the market under the Toy Safety Directive 2009/48/EC before that date may still be made available afterwards (Art. 57(1)).
+
+## What it requires
+
+- **Art. 19(1)**: "Before placing a toy on the market, the manufacturer shall create a digital product passport for the toy."
+- **Art. 19(2)**: the passport corresponds to a toy model, states that compliance has been demonstrated, contains at least Annex VI Part I, is available in the language the Member State requires, is accessible to consumers, authorities, customs, notified bodies, the Commission and other operators according to their access rights, and stays available for ten years after placing on the market, including through insolvency.
+- **Annex VI Part I**: fourteen items, among them a colour image of the toy, references to the Union law it complies with, the notified body and its certificate, and the CE marking.
+- **Art. 19(5)**: where the passport holds everything an EU declaration of conformity needs under the other acts that apply to the toy (such as the rules for radio equipment, electrical safety or hazardous substances), the manufacturer is deemed to have drawn up that declaration.
+- **Art. 19(9)**: where other Union law also requires a passport, there is one passport carrying both.
+- **Art. 19(11)**: a link to the EU Safety Gate portal, for reporting unsafe toys, is displayed whenever the passport is opened.
+- **Art. 20**: consumers must not be asked to register or give a password (20(4)), and usage information may not be tracked, analysed or used beyond what serving the passport strictly needs (20(10)).
+- **Art. 22(1)**: the product and operator identifiers are uploaded to the EU registry before the toy is placed on the market.
+
+The data carrier, its layout, the standards to use and who may see what are set by a delegated act under Art. 49(1), which has not been adopted.
+
+## What the software carries
+
+A toy passport in the released software records the barcode number, age group, primary material, CE marking, country of origin, substances of very high concern, whether the toy contains a battery, and repair information. It is checked by the toy plugin.
+
+<Aside type="caution" title="Not yet the full Annex">
+The toy product group is provisional. It carries few of Annex VI's fourteen items, and the passport model has no place yet for a product **image** or for a **language**. Both are on the [roadmap](https://odal-node.io/roadmap), and the toy passport will be completed against the Annex before 2030.
+</Aside>
+
+## Read next
+
+- [Detergent DPP](/regulatory/detergents): the same regime with a 2029 date.
+- [Access control](/regulatory/access-control): access rights and the no-registration rule.
+- [Acts and standards](/regulatory/acts-and-standards): every act the code relies on.

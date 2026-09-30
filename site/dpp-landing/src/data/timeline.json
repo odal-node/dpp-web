@@ -1,0 +1,66 @@
+{
+  "passports": {
+    "battery-reg-2023-1542": {
+      "what": "Batteries",
+      "detail": "For electric-vehicle batteries, light-transport batteries and industrial batteries over 2 kWh."
+    },
+    "detergents-2026-405": {
+      "what": "Detergents",
+      "detail": "For the first year, products that meet the old rules may still be placed on the market without one."
+    },
+    "toy-safety-2025-2509": {
+      "what": "Toys",
+      "detail": "For every toy placed on the EU market."
+    },
+    "elv-2026-1738": {
+      "what": "Vehicles",
+      "detail": "Each new vehicle needs a vehicle passport of its own, which must work with its battery passport."
+    }
+  },
+  "milestones": [
+    {
+      "date": "2024-07-18",
+      "title": "The EU passport framework comes into force",
+      "detail": "The Ecodesign for Sustainable Products Regulation sets up digital product passports. Each product group gets its own rules, and its passport date, through a later Commission act.",
+      "source": "Regulation (EU) 2024/1781, Article 80",
+      "href": "/regulations/espr"
+    },
+    {
+      "date": "2026-07-15",
+      "title": "Six European passport standards are cited",
+      "detail": "Following them gives a presumption that the requirements they cover are met.",
+      "source": "Implementing Decision (EU) 2026/1736"
+    },
+    {
+      "date": "2026-07-19",
+      "title": "Large companies may no longer destroy unsold clothes and shoes",
+      "detail": "The ban covers unsold clothing, clothing accessories and footwear. It needs no passport.",
+      "source": "Regulation (EU) 2024/1781, Article 25",
+      "href": "/product-groups/unsold-goods"
+    },
+    {
+      "date": "2026-07-19",
+      "title": "The EU registry of passports is due",
+      "detail": "The Commission's directory records where each registered passport lives, not what it says. The Commission set it up in July 2026.",
+      "source": "Regulation (EU) 2024/1781, Article 13"
+    },
+    {
+      "date": "2030-07-19",
+      "title": "The unsold goods rules reach medium-sized companies",
+      "detail": "The ban on destroying unsold clothes and shoes, and the yearly report on discarded unsold goods, apply to medium-sized companies too.",
+      "source": "Regulation (EU) 2024/1781, Articles 24 and 25",
+      "href": "/product-groups/unsold-goods"
+    }
+  ],
+  "plan": {
+    "source": "Ecodesign and Energy Labelling Working Plan 2025 to 2030, COM(2025) 187",
+    "groups": [
+      { "group": "steel", "year": "2026" },
+      { "group": "textile", "year": "2027" },
+      { "group": "tyre", "year": "2027" },
+      { "group": "aluminium", "year": "2027" },
+      { "group": "furniture", "year": "2028" },
+      { "group": "mattress", "year": "2029" }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "@odal/brand-tokens",
-  "description": "Shared brand tokens (colour, typography, spacing) for odal-node.io and docs.odal-node.io.",
+  "description": "Shared brand tokens (colour, typography, spacing) for odal-node.io and docs.odal-node.io, as CSS custom properties, a Tailwind 4 theme, and TypeScript constants.",
   "version": "0.1.0",
   "license": "Apache-2.0",
   "private": true,
@@ -11,7 +11,8 @@
     "./colors": "./src/colors.ts",
     "./typography": "./src/typography.ts",
     "./spacing": "./src/spacing.ts",
-    "./tokens.css": "./src/tokens.css"
+    "./tokens.css": "./src/tokens.css",
+    "./theme.css": "./src/theme.css"
   },
   "files": [
     "src"

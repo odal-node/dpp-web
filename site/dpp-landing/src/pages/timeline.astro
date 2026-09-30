@@ -1,0 +1,122 @@
+---
+// /timeline — when passports and the rules around them arrive, year by year.
+// Entries come from lib/timeline.ts: passport dates from the core instrument
+// records (the same ones /regulations shows), milestones stated in legal texts,
+// and the Commission's working plan, checked against the core records at build
+// time. Every entry says which of the three it is.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import BasisMark from "../components/BasisMark.astro";
+import { years, undated, planSource } from "../lib/timeline";
+import { basisLabel, formatDate } from "../lib/regulations";
+
+const title = "Timeline: when Digital Product Passports arrive | Odal Node";
+const description =
+  "When each EU Digital Product Passport is required, year by year, from batteries in 2027 to vehicles in 2032, with the Commission's planned acts and where every date comes from.";
+
+const todayIso = new Date().toISOString().slice(0, 10);
+const todayText = formatDate(todayIso);
+const thisYear = todayIso.slice(0, 4);
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Timeline" title="When passports arrive, year by year." wide>
+    <p>
+      Batteries come first, in February 2027. Detergents, toys and vehicles
+      follow on dates their own laws set, and the Commission plans acts for more
+      product groups, each of which will set its own passport date.
+    </p>
+    <p class="mb-2">Every entry says where it comes from:</p>
+    <ul class="not-prose m-0 flex list-none flex-wrap gap-x-6 gap-y-2 p-0 text-sm text-neutral-700">
+      <li class="flex items-center gap-2"><BasisMark basis="sourced" label={basisLabel("sourced")} /> stated in the law's text</li>
+      <li class="flex items-center gap-2"><BasisMark basis="assumed" label={basisLabel("assumed")} /> our reading, with no text that states it</li>
+      <li class="flex items-center gap-2">
+        <span class="inline-flex items-center rounded-full border border-dashed border-primary-400 px-2 py-0.5 text-xs font-medium text-primary-700">Commission plan</span>
+        an indicative year, not a law
+      </li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="Year by year" title="From the framework to the last dated passport." tone="muted" wide>
+    <ol class="not-prose m-0 list-none p-0">
+      {years.map(({ year, entries }) => {
+        const split = year === thisYear ? entries.findIndex((e) => !e.past) : -1;
+        return (
+          <li class="m-0 grid gap-4 border-t border-neutral-200 py-8 first:border-t-0 first:pt-0 md:grid-cols-[8rem_1fr]">
+            <h3 class="m-0 text-3xl font-semibold tracking-tight text-neutral-900 md:sticky md:top-24 md:self-start">{year}</h3>
+            <ol class="m-0 list-none space-y-4 p-0">
+              {entries.map((e, n) => (
+                <>
+                  {n === split && (
+                    <li class="m-0 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-primary-700">
+                      <span class="h-px flex-1 bg-primary-300" aria-hidden="true" />
+                      Today, {todayText}
+                      <span class="h-px flex-1 bg-primary-300" aria-hidden="true" />
+                    </li>
+                  )}
+                  <li
+                    class:list={[
+                      "m-0 rounded-md border p-5",
+                      e.mark === "plan"
+                        ? "border-dashed border-primary-300 bg-transparent"
+                        : e.past
+                          ? "border-neutral-200 bg-neutral-50"
+                          : "border-neutral-200 bg-white",
+                    ]}
+                  >
+                    <p class="m-0 text-sm font-semibold uppercase tracking-wide text-regulatory-text">
+                      {e.whenText}
+                    </p>
+                    <p class="m-0 mt-1.5 text-lg font-semibold leading-snug text-neutral-900">
+                      {e.href ? <a href={e.href} class="text-neutral-900 hover:text-primary-700">{e.title}</a> : e.title}
+                    </p>
+                    <p class="m-0 mt-1.5 text-sm leading-body text-neutral-700">{e.detail}</p>
+                    <p class="m-0 mt-3 flex flex-wrap items-center gap-2">
+                      {e.mark === "plan" ? (
+                        <span class="inline-flex items-center rounded-full border border-dashed border-primary-400 px-2 py-0.5 text-xs font-medium text-primary-700">Commission plan</span>
+                      ) : (
+                        <BasisMark basis={e.mark} label={basisLabel(e.mark)} />
+                      )}
+                      <span class="text-xs text-neutral-500">{e.source}</span>
+                    </p>
+                  </li>
+                </>
+              ))}
+            </ol>
+          </li>
+        );
+      })}
+    </ol>
+  </Section>
+
+  {undated.length > 0 && (
+    <Section eyebrow="No date yet" title="Passports the law requires, with no date to act on yet.">
+      <ul class="not-prose m-0 list-none space-y-4 p-0">
+        {undated.map((u) => (
+          <li class="card m-0 p-5">
+            <p class="m-0 text-lg font-semibold text-neutral-900">
+              <a href={u.href} class="text-neutral-900 hover:text-primary-700">{u.title}</a>
+            </p>
+            <p class="m-0 mt-1.5 text-sm leading-body text-neutral-700">{u.detail}</p>
+            <p class="m-0 mt-2 text-xs text-neutral-500">{u.act}</p>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )}
+
+  <Section eyebrow="Reading a plan year" title="A planned act is not a passport date." tone="tinted">
+    <p>
+      The Commission's working plan gives an indicative year for adopting each
+      product group's act. The act then sets the rules and the passport date,
+      which as a rule falls at least 18 months after the act comes into force.
+      So a group whose act is planned for 2027 would, as a rule, need passports
+      no earlier than the second half of 2028. Plan years can also move.
+    </p>
+    <p>
+      The plan years here are from the {planSource}. Each act, once adopted,
+      appears on the <a href="/regulations">regulations</a> page with its date,
+      and this timeline updates with it.
+    </p>
+  </Section>
+</Base>

@@ -1,15 +1,21 @@
-name: Deploy
+name: Purge Cloudflare cache
 
+# Cloudflare Pages builds and publishes both sites itself, from its own Git
+# integration; nothing here deploys. This only purges the zone's cache.
+#
+# Manual on purpose. It used to run on every push to main, which is the moment
+# Pages *starts* building, so the purge landed before the new build was live
+# and cleared nothing that mattered. Run it after a Pages deployment has
+# finished, and only if a page still shows old content. The hashed files under
+# /_astro get new names with every build; whether Pages also serves fresh HTML
+# after each deployment without a purge is worth confirming once, after one
+# promotion to main, and if it does this workflow can go.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'site/**'
-      - 'packages/**'
-      - 'public/**'
-      - '.github/workflows/deploy.yml'
+
+# Every call goes to Cloudflare with its own token; the job reads nothing from
+# this repository, so its GitHub token gets no permissions at all.
+permissions: {}
 
 jobs:
   purge-cloudflare-cache-landing:

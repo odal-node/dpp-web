@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Odal Node API
-  version: 0.13.0
+  version: 0.14.0
   description: |
     **Sovereign Digital Product Passport Infrastructure**
 
@@ -403,16 +403,114 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+  /vault/api/v1/dpp/{dppId}/versions:
+    get:
+      operationId: getDppVersions
+      summary: List a DPP's archived versions, or reconstitute one
+      description: |
+        Returns every archived version of a passport, oldest first — or, with
+        `asOf`, the single version that was current at that instant.
+
+        ✅ EN 18221:2026 clause 4.2: *"the archived version corresponding to a given
+        point in time shall be retrievable by authenticated and authorized actors"*.
+
+        🚨 **Not `POST /dpp/{dppId}/archive`.** That moves a passport to the terminal
+        `archived` lifecycle status after its retention period has elapsed. This is
+        the standard's sense of the word — historical versions of a passport that is
+        still live — and the two are unrelated.
+
+        Archiving begins at the **first change** to a passport, as the clause
+        requires, so a passport that has never changed has no archived versions and
+        returns an empty list. That is not a gap: the live record is the state at
+        every moment before the first change.
+
+        Each version is the complete record, so a reader reconstitutes rather than
+        replays. Versions are append-only and are kept for the passport's lifetime.
+      tags:
+        - DPP Management
+      security:
+        - BearerApiKey: []
+        - BasicAuth: []
+      parameters:
+        - name: dppId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/DppId'
+        - name: asOf
+          in: query
+          required: false
+          description: |
+            An RFC 3339 instant. Returns the single version that was current then,
+            rather than the whole list.
+
+            `404` when no archived version covers that moment, in two distinct cases
+            that the response body tells apart:
+
+            - the passport had not changed by then, or the moment is after its most
+              recent change. The **live** record is the state at that time, which
+              `GET /dpp/{dppId}` already serves; this route does not return it, so
+              that "which version is this" stays answerable.
+            - the moment is **before the passport was created**, where nothing was
+              its state — not an archived version, and not the live record either.
+
+            🚨 The second case is a `404` rather than the initial version. Asking for
+            a version at a time before the record existed is a question with no true
+            answer, and answering with the initial one would assert that the passport
+            existed then.
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: |-
+            The archived versions, oldest first. With `asOf`, the one that was current then, as a one-element array.
+
+            Always an array, with or without `asOf`: one response shape is simpler to consume than two, and a client that parses an array does not have to remember which query it sent to know what it is holding.
+
+            An **empty** array is reachable only without `asOf`, and it says the passport has never changed — archiving begins at the first change, so there is nothing historical to return and the live record is the state at every moment so far. With `asOf`, a moment no archived version covers is a `404` rather than an empty array, because the answer there is the live record and this route deliberately does not serve it.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PassportVersion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: '`asOf` was given and is not an RFC 3339 timestamp.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/dpp/{dppId}/lint:
     post:
       operationId: relintDpp
       summary: Re-check plausibility-lint findings
       description: |
-        Recomputes the `dpp-rules` plausibility lint pack against the DPP's
-        current product group data and persists the refreshed `lintResult` (pack
-        version, findings, assessed-at timestamp). Findings are non-binding —
+        Recomputes the plausibility lint and persists the refreshed `lintResult`
+        (pack version, findings, assessed-at timestamp). Findings are non-binding —
         arithmetic and physical-plausibility checks distinct from binding
         compliance rules — and never gate publish or any other transition.
+
+        Two sets of checks run. The `dpp-rules` plausibility **pack** runs against
+        the DPP's current product group data, and `packVersion` names its version.
+        The **envelope** checks run against fields every product group carries, so
+        they apply to a DPP with no product group data at all: today that is
+        `lineage.life_status_unsupported`, which reports a `lifeStatus` that the
+        record's own `derivedFrom` edges do not support — a unit claiming
+        `remanufactured` whose only edge says `repurposing`, or an `original` that
+        claims a predecessor at all.
+
+        The status is stored and then checked rather than derived from the edges.
+        Regulation (EU) 2023/1542 Art. 77(7) permits several predecessors with
+        nothing forcing them to share an operation, so a unit built from one
+        repurposed and one remanufactured predecessor has no unambiguous derived
+        status; the check asks that **at least one** edge support the claim.
 
         Works regardless of DPP status, including `active` (published):
         re-checking does not retroactively affect the passport's JWS
@@ -559,6 +657,82 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+  /vault/api/v1/dpp/{dppId}/seal/repair:
+    post:
+      operationId: repairDppSeal
+      summary: Re-seal a passport whose stored seal does not verify
+      description: |
+        Queues a replacement seal for a passport whose stored seal is broken, and
+        refuses unless it demonstrably is.
+
+        **This buys a second seal for a digest already paid for.** The node's own
+        repair sweep deliberately cannot do that — it only queues passports
+        carrying *no seal at all*, which is what lets it run unattended without
+        spending money twice. A broken seal is the case where spending it again is
+        right: the row was paid for and carries nothing, so the passport is
+        published and, in substance, unsealed. That is a decision for whoever pays,
+        taken per passport, which is why it is a route rather than a background
+        loop.
+
+        **The seal is opened and checked at the moment of the request**, never read
+        from the audit's list. A stale finding would buy a seal for a passport that
+        has since been repaired or re-published.
+
+        Not idempotency-keyed, and does not need to be: a seal row is keyed by
+        `(passportId, payloadHash)`, so a retried request re-arms a row that is
+        already queued, which is a no-op. A second repair after the replacement
+        lands is refused, because the new seal verifies.
+
+        The replacement covers the passport's **current** signature. Where the
+        passport was re-published since the broken seal was made, that signature has
+        never been sealed, so nothing is re-bought and `action` is `queued` rather
+        than `rearmed`.
+      tags:
+        - DPP Management
+      security:
+        - BearerApiKey: []
+        - BasicAuth: []
+      parameters:
+        - name: dppId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/DppId'
+      responses:
+        '200':
+          description: A replacement seal has been queued.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SealRepairResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No passport with that id. Distinct from `422`, which means the passport
+            exists and is not in a state this repairs.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: |
+            The passport exists and there is nothing here to repair. The detail says
+            which: the seal verifies; it is intact but covers a superseded signature,
+            whose replacement is already queued by the re-publish that caused it;
+            there is no seal at all, which the node's own sweep covers at no extra
+            cost; the seal could not be read, so it cannot be shown to be broken;
+            this node has no sealing backend, so a queued repair would never drain;
+            or the passport carries a seal and no signature, which should not occur
+            and for which a replacement would cover nothing.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/seal:
     get:
       operationId: getSealSummary
@@ -2419,6 +2593,9 @@ paths:
       description: |
         Unauthenticated read of a published passport. Used by the resolver
         service internally. Returns 404 for drafts, 410 for suspended.
+
+        A passport that has been superseded serves the record that replaced it,
+        so the body's `id` is not always `dppId` — see the 200 below.
       tags:
         - Public (Vault)
       security: []
@@ -2437,7 +2614,22 @@ paths:
           example: 2.0.0
       responses:
         '200':
-          description: Published passport record. With `?schema_view`, the body is instead `{ passport, schemaView }`.
+          description: |-
+            Published passport record. With `?schema_view`, the body is instead `{ passport, schemaView }`.
+
+            🚨 **The body's `id` is not always the `dppId` that was asked for.** A passport in the `superseded` status serves the published record that replaced it. ESPR Art. 9(1) has the data carrier link to *the* passport for the product, and a carrier is printed on a physical thing and cannot be recalled — so this door has to keep landing on whichever record is current, which is what `/01/{gtin}` beside it has always done.
+
+            What is served is the successor's own signed public view, and its `supersedesId` names the passport that was asked for: the pointer is part of a document the reader can verify rather than a claim beside one. The chain is followed rather than stepped once, so `A → B → C` serves `C` when `A` is scanned.
+
+            A superseded passport whose successor is **not published yet** keeps serving its own frozen view, as does one retired or deactivated with no replacement at all. In that view `status` reads as it did at publish, because the body is the payload `publicJwsSignature` was computed over.
+
+            When — and only when — the body is a different record from the one asked for, the response carries `Content-Location` naming where that record lives (RFC 9110 §8.7). Its **presence** is the signal: a client can tell "this is your record" from "this is the record that replaced it" without comparing `id` against what it sent. It is a relative reference, so it resolves correctly wherever this API is mounted.
+          headers:
+            Content-Location:
+              description: Present only on a superseded read, naming the record actually served, relative to the request URI (e.g. `./0b6b…`). Absent on an ordinary read.
+              required: false
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -3218,7 +3410,7 @@ paths:
                   payload and its proof.
 
                   `resolverBase` is per-deployment (`RESOLVER_BASE_URL`,
-                  default `https://id.odal-node.io`). Error responses carry no
+                  required, no default). Error responses carry no
                   `Link` — an error is not a representation of the passport.
         '404':
           description: |
@@ -3905,6 +4097,15 @@ components:
           type:
             - string
             - 'null'
+        serialNumber:
+          type:
+            - string
+            - 'null'
+          description: |-
+            The serial of the physical unit this passport covers, as the manufacturer stamps or records it. Meaningful where `granularity` is `item` — "one passport per physical unit".
+            **Not the serial in the resolver URL.** A GS1 Digital Link carrier is `/01/{gtin}/21/{serial}` and AI 21 is a serial number, but the value there is derived from this passport's own UUID to fit GS1's length cap. That value identifies the *record*; this identifies the *product*, and nothing reconciles the two.
+            Absent means not stated — and today it is always absent: no route accepts one until an adopted delegated act makes a passport cover a single unit.
+          example: NW-48V-000123
         productName:
           type: string
           example: EcoCell Pro 48V
@@ -3950,7 +4151,9 @@ components:
             - $ref: '#/components/schemas/LintResult'
           description: Advisory plausibility findings. Absent until a lint pass has run, and recomputable after publish — unlike `complianceResult`.
         productGroupData:
-          description: Explicitly `null` — not omitted — for a passport whose product group data has not been supplied yet, which is every draft created without it. The field has no `skip_serializing_if`, so it is always present on the wire.
+          description: |-
+            On an **authenticated full read**, explicitly `null` rather than omitted for a passport whose product group data has not been supplied yet, which is every draft created without it: the field has no `skip_serializing_if`.
+            On a **redacted read** — the public routes, the resolver, and an audience-scoped credential read — the key is **absent** instead. A view should not carry a key whose value says "there is nothing here", so the redaction drops it. Read an absent key and a `null` as the same answer; neither is in `required`, and which one arrives depends on the route.
           anyOf:
             - $ref: '#/components/schemas/ProductGroupData'
             - type: 'null'
@@ -3961,7 +4164,7 @@ components:
             - string
             - 'null'
           format: uri
-          description: 'GS1 Digital Link the carrier (QR) encodes, set on publish: {resolverBase}/01/{gtin}/21/{serial} for a trade item, else {resolverBase}/dpp/{id}. resolverBase is per-deployment (RESOLVER_BASE_URL, default https://id.odal-node.io).'
+          description: 'GS1 Digital Link the carrier (QR) encodes, set on publish: {resolverBase}/01/{gtin}/21/{serial} for a trade item, else {resolverBase}/dpp/{id}. resolverBase is per-deployment (RESOLVER_BASE_URL, required, no default).'
         jwsSignature:
           type:
             - string
@@ -4007,15 +4210,22 @@ components:
           allOf:
             - $ref: '#/components/schemas/DppId'
           description: The passport this record supersedes. Absent for first versions.
-        parentPassportRef:
-          allOf:
-            - $ref: '#/components/schemas/PassportRef'
-          description: Cross-operator reference to the predecessor this passport derives from (second-life successor linkage).
+        derivedFrom:
+          type: array
+          description: |-
+            Cross-operator references to the predecessors this passport derives from (second-life successor linkage), each naming the operation that produced this unit from it.
+            A list rather than the single `parentPassportRef` it replaces: Regulation (EU) 2023/1542 Art. 77(7) is plural on both sides — "linked to the battery passport or passports of the original battery or batteries" — so one second-life unit may derive from several predecessors.
+          items:
+            $ref: '#/components/schemas/DerivationRef'
         componentRefs:
           type: array
-          description: 'Cross-operator references to the constituent passports this product is assembled from — its bill of materials. The inverse edge of `parentPassportRef`: these point down to many constituents, that points up to one predecessor.'
+          description: |-
+            Cross-operator references to the constituent passports this product is assembled from — its bill of materials, each qualified by how much and in what role. The inverse edge of `derivedFrom`: these point down to the constituents, those point up to the predecessors.
+            Distinct from `materials`, which lists substances by weight. These point at other products that have passports of their own.
           items:
-            $ref: '#/components/schemas/PassportRef'
+            $ref: '#/components/schemas/ComponentRef'
+        lifeStatus:
+          $ref: '#/components/schemas/LifeStatus'
         retentionUntil:
           type: string
           format: date-time
@@ -4032,6 +4242,12 @@ components:
           type: string
           description: 'EORI or national economic-operator identifier for the responsible party (Regulation (EU) 2024/1781 Annex III(k); issuance mechanics in Art. 12). **Frozen at publish — this is the operator that published the passport, not necessarily the one responsible for it now.** A transfer of responsibility does not rewrite it and cannot: published content is immutable and covered by the signature over it. For current responsibility, read the transfer chain.'
           example: DE123456789
+        responsibleOperator:
+          allOf:
+            - $ref: '#/components/schemas/ResponsibleOperatorSnapshot'
+          description: |-
+            Who is answerable for this product and under which law (Regulation (EU) 2024/1781 Annex III(k)). Frozen at publish for the same reason as `operatorIdentifier`: published content is covered by the signature over it, so a later transfer mints a new version rather than rewriting this one.
+            **Nothing writes this yet**, so it is always absent: the snapshot needs the operator's role and the legal basis that makes them answerable, and neither is operator configuration today.
         facility:
           allOf:
             - $ref: '#/components/schemas/FacilitySnapshot'
@@ -4106,6 +4322,25 @@ components:
         address:
           type: string
           example: Hauptstraße 1, 10115 Berlin
+        registeredTradeName:
+          type:
+            - string
+            - 'null'
+          description: Registered trade name or trade mark, where it differs from `name`. Art. 27(6) names it separately from the legal name — "name, registered trade name or registered trade mark" — because the two routinely differ, and the one a reader holding the product sees is the trading one. Absent means not stated, including the common case where the legal name is the trading name.
+          example: Nordwerk
+        electronicAddress:
+          type:
+            - string
+            - 'null'
+          description: 'Electronic means of contact — an email address or a contact URL. Not `didWebUrl`: a DID document resolves keys, and nothing in it need be a mailbox or a form, so treating it as one would satisfy Art. 27(6) on paper while leaving a reader with no way to reach anybody.'
+          example: compliance@nordwerk.example
+        country:
+          type:
+            - string
+            - 'null'
+          pattern: ^[A-Z]{2}$
+          description: 'ISO 3166-1 alpha-2 country of the manufacturer, upper case. Structural rather than descriptive: whether an operator is established in the Union separates a manufacturer from an importer or an authorised representative, and that decides who carries the passport obligation. Before this field existed the country was written into `address`, where nothing downstream could tell it apart from a postal address. Absent means not stated — never stateless.'
+          example: DE
         didWebUrl:
           type: string
           format: uri
@@ -4212,6 +4447,85 @@ components:
           type: string
           pattern: ^[0-9a-f]{64}$
           description: Lowercase hex SHA-256 of the referenced passport's public JWS.
+    Quantity:
+      type: object
+      required:
+        - value
+      description: How much of a constituent an assembly contains.
+      properties:
+        value:
+          type: number
+          minimum: 0
+          description: The amount, in `unit`. Refused on create and update when it is negative or not finite — a non-finite number cannot be serialised into the signed publish payload, so an unchecked one fails much later with an error that names serialisation rather than the field that caused it.
+          example: 2
+        unit:
+          type:
+            - string
+            - 'null'
+          description: The unit `value` is expressed in. A free string because the vocabulary is the product group's to define, not the passport envelope's. Absent where the declaring operator stated a bare count.
+          example: kg
+    ComponentRef:
+      type: object
+      required:
+        - reference
+      description: |-
+        One entry in a bill of materials: a cross-operator reference to a constituent passport, qualified by how much of it the assembly contains and in what role.
+        Readers must also accept the earlier shape this replaced — a bare `PassportRef` (`uri` and `publicJwsHash` at the top level, with no `reference` key). The two are disjoint, so accepting both requires no guessing. The tolerance is not optional: `componentRefs` is part of the **signed public view** that other operators' nodes fetch, those passports are signed and cannot be rewritten by anyone, and a reader that refuses the older shape reports a correct, unforgeable document as a malformed reference — which verification grades as an integrity violation. Nodes are independent per-operator deployments, so version skew is the steady state rather than a migration window. Writers emit only this shape.
+      properties:
+        reference:
+          allOf:
+            - $ref: '#/components/schemas/PassportRef'
+          description: Where to fetch the constituent's passport, and the hash pinning its signed public view.
+        quantity:
+          allOf:
+            - $ref: '#/components/schemas/Quantity'
+          description: How much of this constituent the assembly contains. Absent where the declaring operator did not state one.
+        role:
+          type:
+            - string
+            - 'null'
+          description: What part this constituent plays, in whatever terms the product group uses — "cell", "outer shell", "warp yarn". A free string because the vocabulary is the product group's to define.
+          example: cell
+    SecondLifeOperation:
+      type: string
+      description: |-
+        Which second-life operation produced a unit from a predecessor, as Regulation (EU) 2023/1542 defines them.
+        Required on every derivation edge: Art. 77(7) attaches different legal consequences to each operation, so an edge that does not say which one occurred records less than the article asks for.
+      enum:
+        - preparationForReuse
+        - preparationForRepurposing
+        - repurposing
+        - remanufacturing
+      x-enum-descriptions:
+        preparationForReuse: Art. 3(29) — preparing for re-use as defined in Art. 3, point (16), of Directive 2008/98/EC.
+        preparationForRepurposing: Art. 3(30) — a waste battery, or parts thereof, prepared so that it can be used for a different purpose than the one it was designed for.
+        repurposing: Art. 3(31) — a battery that is not a waste battery, or parts thereof, used for a purpose other than the one it was designed for. Differs from `preparationForRepurposing` by the waste status of the input.
+        remanufacturing: Art. 3(32) — disassembly and evaluation of all cells and modules, and re-use of a number of them, to restore capacity to at least 90 % of the original rated capacity, for the same purpose as originally designed.
+    DerivationRef:
+      type: object
+      required:
+        - reference
+        - operation
+      description: One predecessor a second-life unit derives from, and the operation that produced this unit from it.
+      properties:
+        reference:
+          allOf:
+            - $ref: '#/components/schemas/PassportRef'
+          description: Where to fetch the predecessor's passport, and the hash pinning its signed public view.
+        operation:
+          $ref: '#/components/schemas/SecondLifeOperation'
+    LifeStatus:
+      type: string
+      description: |-
+        Where a unit sits in its product life — original, or the second-life operation that produced it, or waste. Regulation (EU) 2023/1542, Annex XIII point 4(c).
+        Orthogonal to `status`, which is the passport record's own lifecycle (draft/published/…). A published passport can be `waste`; a draft cannot be `superseded`.
+        Not derived from `derivedFrom`. Art. 77(7) permits several predecessors with nothing forcing them to share an operation, so a unit built from one repurposed and one remanufactured predecessor has no unambiguous derived status. The claim is stored and then checked: at least one derivation edge must support it.
+      enum:
+        - original
+        - repurposed
+        - re-used
+        - remanufactured
+        - waste
     CarbonFootprint:
       type: object
       description: A CO₂-equivalent figure with the LCA context needed to read it. A bare number is not comparable across products — the lifecycle stage and system boundary are what make two figures mean the same thing.
@@ -4449,6 +4763,13 @@ components:
         signingCertRef:
           type: string
           description: Reference to the signing certificate chain.
+        conformanceLevel:
+          allOf:
+            - $ref: '#/components/schemas/SealConformanceLevel'
+          description: |-
+            The baseline level this seal was **requested** at.
+            A record of what was asked for, not proof of what arrived — the same standing as `signingCertRef`, which names the certificate the seal claims rather than one anybody verified. What the bytes actually carry is read out of the envelope by a validator, and the two agreeing is the cross-check.
+            Absent means **not recorded** — an envelope written before this field existed, or a seal restored from a backup or produced elsewhere. It never means the level was low.
         sealedAt:
           type: string
           format: date-time
@@ -4463,6 +4784,21 @@ components:
         - PADES
         - CADES
         - XADES
+    SealConformanceLevel:
+      type: string
+      description: |-
+        How much validation material a seal carries with it — the AdES baseline levels, named as the CSC API names them. They are cumulative: each adds to the one before.
+        The level decides whether a verifier years from now can still establish that the seal was valid when it was made. A `baseline-b` seal stops verifying when its signing certificate expires, ESPR retention outlives certificate lifetimes comfortably, the seal is bought once, and the document it covers is retention-locked — so the choice cannot be corrected afterwards by re-sealing.
+      enum:
+        - baseline-b
+        - baseline-t
+        - baseline-lt
+        - baseline-lta
+      x-enum-descriptions:
+        baseline-b: '`AdES-B-B` — the signature alone. No timestamp, no validation material. Verifiable only while the signing certificate is valid and its status is still resolvable. Adequate for a short-lived attestation, not for a passport.'
+        baseline-t: '`AdES-B-T` — adds a trusted timestamp, so the signing time is established independently of the signer''s clock.'
+        baseline-lt: '`AdES-B-LT` — adds the certificates and revocation data a verifier needs, so the seal remains verifiable after the signing certificate expires. The first level that survives certificate expiry, and therefore the first that suits a retention-locked document.'
+        baseline-lta: '`AdES-B-LTA` — adds archival timestamps, extending validity past the cryptographic lifetime of the algorithms themselves.'
     CreatePassportRequest:
       type: object
       required:
@@ -4541,13 +4877,29 @@ components:
             in either case, so a differing declaration is already false about the
             body it accompanies.
           example: 2.6.0
-        parentPassportRef:
-          $ref: '#/components/schemas/PassportRef'
+        derivedFrom:
+          type: array
+          items:
+            $ref: '#/components/schemas/DerivationRef'
+          description: Cross-operator predecessors this passport derives from (second-life successor linkage), each naming the operation that produced this unit from it. A list rather than the single `parentPassportRef` it replaces, because Regulation (EU) 2023/1542 Art. 77(7) permits several predecessors.
+        lifeStatus:
+          allOf:
+            - $ref: '#/components/schemas/CreateLifeStatus'
+          description: |-
+            Where this unit sits in its **product** life — Annex XIII point 4(c) of Regulation (EU) 2023/1542.
+
+            Orthogonal to `status`, which is the *publication* lifecycle: a `repurposed` unit's passport is `active` like any other. Omit it for any product group but battery — only Reg. (EU) 2023/1542 defines this vocabulary, and a textile passport asserting `original` would be borrowing a battery term for a question its own instrument does not ask. Sending it for another product group is refused.
+
+            **This is the only way to set it.** `lifeStatus` is protected from patching, because it is part of a body that gets signed and rewriting it after publication would change what a proof covers.
+
+            🚨 **`waste` is refused here.** The other four describe how a unit came to be, and Art. 77(7) makes each operation produce a *new* passport — so a repurposed unit is created as `repurposed`. `waste` is the one value that happens to a record which continues, and under that article's second subparagraph it moves responsibility as well, so it belongs to a versioning event on the passport becoming waste rather than to the creation of a new one.
+
+            Omitting it is lawful everywhere. For a battery it reads as *not stated* rather than *not applicable*, and publish does not refuse it — the lint result says so instead, because a default would put a claim about a unit onto a record that is about to be signed.
         componentRefs:
           type: array
           items:
-            $ref: '#/components/schemas/PassportRef'
-          description: Cross-operator references to this product's constituent passports (its bill of materials). Local cycles / over-depth are refused at create/update; immutable after publish.
+            $ref: '#/components/schemas/ComponentRef'
+          description: Cross-operator references to this product's constituent passports (its bill of materials), each optionally qualified by how much and in what role. Local cycles / over-depth are refused at create/update; immutable after publish.
         commodityCode:
           type: string
           description: Customs tariff classification — HS-6, CN-8 or TARIC-10 (6, 8 or 10 digits, no separators). Registration data the EU registry verifies against the ranges its product group permits.
@@ -4688,6 +5040,8 @@ components:
         - remanufacturing
         - repurposing
         - preparationForReuse
+        - preparationForRepurposing
+        - wasteHandover
         - import
         - insolvencySuccession
     PassportListResponse:
@@ -4920,6 +5274,24 @@ components:
             - string
             - 'null'
           description: Scheme euOperatorId is expressed in — "vat", "lei", "eori", "duns".
+        registeredTradeName:
+          type:
+            - string
+            - 'null'
+          description: Registered trade name or trade mark, where it differs from `name`.
+          example: Nordwerk
+        postalAddress:
+          type:
+            - string
+            - 'null'
+          description: Postal address at which the operator can be contacted. Distinct from `country`, which is the establishment country the registry matches on.
+          example: Hauptstrasse 1, 10115 Berlin, DE
+        electronicAddress:
+          type:
+            - string
+            - 'null'
+          description: Electronic means of contact — an email address or a contact URL.
+          example: compliance@nordwerk.example
         country:
           type: string
           pattern: ^[A-Z]{2}$
@@ -4942,11 +5314,53 @@ components:
         - importer
         - distributor
         - authorisedRepresentative
+        - fulfilmentServiceProvider
         - remanufacturer
         - repurposer
         - preparerForReuse
         - repairer
         - recycler
+    ResponsibilityBasis:
+      description: |-
+        Which law makes an operator the responsible one.
+        Carried beside the operator rather than on it: the same company can be an Art. 4 responsible operator for one product and a general product-safety responsible person for another, so the basis is a property of the pairing.
+        Stated rather than inferred. Inferring it from the product group works for two groups and is a guess for every other.
+      oneOf:
+        - type: string
+          enum:
+            - marketSurveillanceArt4
+          description: Article 4 of Regulation (EU) 2019/1020 (market surveillance). Applies only to products subject to the instruments listed in Art. 4(5). The tasks are those in Art. 4(3).
+        - type: string
+          enum:
+            - generalProductSafety
+          description: Regulation (EU) 2023/988 (general product safety).
+        - type: object
+          required:
+            - otherUnionLaw
+          description: '"Similar tasks pursuant to other Union law applicable to the product" — Annex III(k)''s own catch-all.'
+          properties:
+            otherUnionLaw:
+              type: object
+              required:
+                - citation
+              properties:
+                citation:
+                  type: string
+                  description: The instrument and provision, as it would be cited. Carried because the point of this variant is that the law is not one of the two named, and a basis that cannot say which law it is says nothing at all.
+                  example: Article 7 of Regulation (EU) 2017/745
+    ResponsibleOperatorSnapshot:
+      type: object
+      required:
+        - operator
+        - basis
+      description: |-
+        Annex III(k)'s elements as the passport carries them: who is answerable for the product, and under which law.
+        A snapshot, not a live pointer. A published passport is signed, so the operator recorded in it is the one that version was issued under — a later transfer of responsibility mints a new version rather than rewriting this.
+      properties:
+        operator:
+          $ref: '#/components/schemas/ResponsibleOperator'
+        basis:
+          $ref: '#/components/schemas/ResponsibilityBasis'
     SealResponse:
       type: object
       description: The eIDAS seal, plus what is needed to check it — and an explicit statement of what this node did **not** check.
@@ -4959,6 +5373,9 @@ components:
         - currentJws
         - currentPayloadHash
         - coverage
+        - binding
+        - validation
+        - archival
         - verification
       properties:
         declaredBy:
@@ -4979,6 +5396,38 @@ components:
             - string
             - 'null'
           description: Hex SHA-256 of the certificate the seal names as its signer, **as reported by the seal** — read out of the CAdES, never verified. It answers *which* certificate to ask about, not whether that certificate was qualified or on the EU Trusted List. Null when the seal predates extraction or could not be parsed.
+        attestedSealedAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: |-
+            **When a timestamp authority attests the seal was made.**
+
+            `sealedAt` is the sealing node's own clock and an unattested claim by the party that bought the seal. This is a third party's statement, read out of the time-stamp token inside `sealValue` — the only place in a seal an attested time can be.
+
+            Checked rather than merely read: the token's own signature is verified and its imprint is matched against this seal's signature. The attribute carrying the token is *unsigned*, so a genuine token lifted from another seal would otherwise be accepted and report someone else's time as this one's.
+
+            `null` for a `B-B` seal, which carries no token, and for a token that failed either check.
+
+            **Attested is not trusted.** A qualified electronic time stamp is a QTSP's service (Art. 42) and the presumption of accuracy attaches to that (Art. 41(2)); establishing it is a Trusted List question about the `TSA/QTST` service type, which this node cannot yet ask. A self-signed authority's token verifies perfectly and means nothing.
+        conformanceLevel:
+          oneOf:
+            - $ref: '#/components/schemas/SealConformanceLevel'
+            - type: 'null'
+          description: The baseline level this node **asked** for, recorded on the envelope. A record of intent; `null` for a seal stored before the field existed.
+        evidencedLevel:
+          oneOf:
+            - $ref: '#/components/schemas/SealConformanceLevel'
+            - type: 'null'
+          description: |-
+            The baseline level the seal's **bytes** carry.
+
+            The pair is the point. A provider enabled for a weaker profile than was paid for returns a seal that is correct in every record this node keeps and stops verifying when its signing certificate expires — years later, on a passport that is retention-locked and cannot be re-sealed. Serving both makes that answerable from the seal rather than from a log nobody kept.
+
+            A floor, not a conformance verdict: it reports that the distinguishing material for a level is present, never that the material was validated. `null` when the bytes could not be read.
+        archival:
+          $ref: '#/components/schemas/ArchivalFreshness'
         placeholder:
           type: boolean
           description: True when this is a placeholder with no legal validity.
@@ -4995,6 +5444,36 @@ components:
           description: 'Hex SHA-256 this node **asked** the backend to seal. A record, not proof: it says what was requested, while the validator''s extracted message digest says what the CAdES actually covers. The two agreeing is the cross-check. Null for a seal restored from a backup or produced elsewhere.'
         coverage:
           $ref: '#/components/schemas/SealCoverage'
+        binding:
+          $ref: '#/components/schemas/SealBinding'
+        validation:
+          $ref: '#/components/schemas/SealValidationStatus'
+        certificate:
+          oneOf:
+            - $ref: '#/components/schemas/CertificateStanding'
+            - type: 'null'
+        origin:
+          oneOf:
+            - $ref: '#/components/schemas/SealOrigin'
+            - type: 'null'
+          description: |-
+            What **this seal's own certificate** says about who issued it: did a provider issue it, or did the node sign it itself?
+
+            Null means **not read** — a placeholder seal, a format this node does not parse, unreadable bytes, or a deployment with no inspector wired. Never read null as "not self-issued": that is a finding, and it only comes from a certificate that was actually examined.
+
+            For what the *currently configured* backend produces, which is a different question, see `trustMode` on `GET /api/v1/seal`.
+        qualification:
+          oneOf:
+            - $ref: '#/components/schemas/SealQualification'
+            - type: 'null'
+          description: |-
+            What Regulation (EU) No 910/2014 Art. 32(1) says about this seal, read against the EU Trusted Lists this node holds. Art. 40 applies Art. 32 to seals *mutatis mutandis*.
+
+            🚨 **Read `qualification.issuer.consulted` and `.unchecked` before acting on a `notListed` standing.** That verdict is the only one claiming an absence, and an absence is only as wide as what was looked at. `consulted: 0` means no list was loaded — the answer is about nothing, and it is what a node that loaded no trusted-list cache at boot reports for every provider seal, qualified or not.
+
+            Even at its widest this is **not** "not qualified in law": a provider can be qualified and its Member State's list wrong, which is that state's problem and not something this node can see.
+
+            Null means **not read** — a placeholder seal, a format this node does not parse, unreadable bytes, or a deployment with no inspector wired. Never read null as "not qualified": that is a finding, and it only comes from a certificate that was actually examined.
         verification:
           type: string
           description: 'Stated, not implied: this node did not cryptographically validate the CAdES. A detached CAdES must be checked by an independent AdES validator against the EU Trusted List.'
@@ -5020,6 +5499,31 @@ components:
           description: Rows that gave up after exhausting their retries.
         sealingConfigured:
           type: boolean
+        audit:
+          oneOf:
+            - $ref: '#/components/schemas/SealAuditReport'
+            - type: 'null'
+          description: |-
+            What the last completed pass over every stored seal found.
+
+            **`null` means no pass has completed**, not that nothing is wrong. The pass walks the estate in bounded batches and starts over, so this is empty until the first one finishes, and absent entirely on a deployment that runs no audit. Reporting a zero here for a check that has not run would be the one answer worse than reporting nothing.
+
+            A node that keeps its audit state restores the last completed report at boot, so a restart no longer empties this. Where it is still `null` after a deployment, the honest reading is that no pass has ever finished against this database — on a large estate, check the audit's cadence before concluding anything about the seals.
+        trustMode:
+          type:
+            - string
+            - 'null'
+          enum:
+            - ghost
+            - sandbox
+            - live
+            - null
+          description: |-
+            The tier the **currently configured** sealing backend resolved to. The counts say how much sealing is outstanding; this says whether the sealing that does happen is worth anything — a node can sit at `unsealedPublished: 0` while every one of those seals was signed by a key it generated itself, and no count would show it.
+
+            A different question from the per-passport `origin`, and neither substitutes for the other: this describes the backend running now, that describes the certificate inside one stored seal. A node moved from a local backend to a QTSP last week reports `live` here and `selfIssued: true` on everything sealed before the move, and both are correct.
+
+            Null on a deployment that resolved no seal port at all. That is **not** `ghost`: a port nobody wired and a port that landed on a placeholder are different states, and only the second blocks a production boot.
     SealDeclarer:
       type: object
       description: |
@@ -5069,6 +5573,29 @@ components:
         - current
         - superseded
         - unknown
+    SealRepairResponse:
+      type: object
+      description: The outcome of repairing one passport's seal.
+      required:
+        - action
+        - payloadHash
+        - note
+      properties:
+        action:
+          type: string
+          enum:
+            - rearmed
+            - queued
+          description: |-
+            `rearmed`: a `sealed` row was re-armed — the one path that buys a second seal for a digest already paid for, justified because the first does not verify.
+
+            `queued`: a row was queued the ordinary way. The passport was re-published since the broken seal was made, so the signature now needing a seal has never been sealed and nothing is being re-bought.
+        payloadHash:
+          type: string
+          description: Hex SHA-256 the replacement seal will cover — the passport's **current** signature, not whatever the broken seal covered.
+        note:
+          type: string
+          description: 'Stated rather than implied, like every other note on this surface: what was queued, what it will cost, and why spending it is right here.'
     EvidenceDossier:
       type: object
       description: |
@@ -5216,10 +5743,11 @@ components:
 
         ⚠️ **This shape is described here but not enforced anywhere.** The field is
         held as untyped JSON on the dossier record, so no Rust type declares these
-        three members and the OpenAPI contract test has nothing to compare them
-        against. Treat the property list as documentation of intent, not as a
-        guarantee. Giving the dossier a real type for this member would close that,
-        and is the only thing that would.
+        members and the OpenAPI contract test has nothing to compare them against.
+        Treat the property list as documentation of intent, not as a guarantee. Giving
+        the dossier a real type for this member would close that, and is the only thing
+        that would — and it is worth doing: this list had fallen five fields behind
+        what the dossier actually carries before anyone read the two side by side.
       properties:
         seal:
           type: object
@@ -5231,6 +5759,32 @@ components:
           type: string
           pattern: ^[0-9a-f]{64}$
           description: SHA-256 of the sealed payload, lowercase hex.
+        binding:
+          $ref: '#/components/schemas/SealBinding'
+        validation:
+          $ref: '#/components/schemas/SealValidationStatus'
+        certificate:
+          oneOf:
+            - $ref: '#/components/schemas/CertificateStanding'
+            - type: 'null'
+        origin:
+          oneOf:
+            - $ref: '#/components/schemas/SealOrigin'
+            - type: 'null'
+          description: What the seal's own certificate says about who issued it — the one fact that decides whether anything else in this member carries weight.
+        evidencedLevel:
+          type:
+            - string
+            - 'null'
+          description: The baseline level the seal's **bytes** carry, which is not necessarily the level this node asked for. A seal weaker than ordered is otherwise visible only in a drain log no dossier reader has.
+        attestedSealedAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: A timestamp authority's statement of when the seal was made, read out of the token inside the CAdES and checked. `seal.sealedAt` beside it is the sealing node's own clock, which is an unattested claim by the party that bought the seal.
+        archival:
+          $ref: '#/components/schemas/ArchivalFreshness'
     EvidenceDossierRecord:
       type: object
       description: A stored dossier snapshot — the dossier plus its persistence envelope.
@@ -7032,6 +7586,52 @@ components:
         reaching act is `provisional` or `watch`, the requirement is a reading of
         instruments that have not yet bound anything.
       example: provisional
+    CreateLifeStatus:
+      type: string
+      description: |-
+        The subset of `LifeStatus` a passport may be **created** in — Regulation (EU) 2023/1542, Annex XIII point 4(c), less `waste`.
+
+        A separate schema rather than a note on the full one, because a generated client must not be able to offer a value `POST /dpp` always refuses: `waste` is a transition of an existing record and is rejected here with `422`. The field's own description says why; the full vocabulary a passport can be *read* in is `LifeStatus`.
+      enum:
+        - original
+        - repurposed
+        - re-used
+        - remanufactured
+    PassportVersion:
+      type: object
+      description: |-
+        One archived version of a passport: the record as it stood, and the moment it stopped standing.
+
+        ✅ EN 18221:2026 clause 4.2 (archiving), one of the six standards cited by Commission Implementing Decision (EU) 2026/1736.
+
+        🚨 **Not the `archived` lifecycle status**, which is a terminal state reached after the ESPR retention period and says the record has stopped changing. This is the standard's sense of the word — historical versions of a passport that is still live — and the two are unrelated.
+      required:
+        - id
+        - passportId
+        - doc
+        - supersededAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Row identifier, UUID v7, so versions sort by when they were taken.
+        passportId:
+          type: string
+          format: uuid
+          description: The passport this is a version of.
+        doc:
+          type: object
+          description: |-
+            The complete record as it stood at the time, not a diff.
+
+            Whole rather than differential so that retrieval is a read rather than a replay: a chain of diffs makes every historical version depend on every one before it, and one corrupt link loses everything after it. The clause asks that the version be retrievable, and a stored version is retrievable where a derived one is computed and hoped for.
+        supersededAt:
+          type: string
+          format: date-time
+          description: |-
+            When this version stopped being current — the instant the change that replaced it was applied.
+
+            One timestamp rather than a validity range: the previous version's `supersededAt` is this one's start, and two fields that must agree are two fields that can disagree.
     PublishBlocker:
       type: object
       description: |
@@ -7067,9 +7667,9 @@ components:
         is the operator's own artefact rather than a discharged duty.
 
         Reported **beside** the gates, never instead of them. This node applies the
-        category content gate whatever this says, and for a voluntary passport that
-        makes it stricter than the article requires — which the `note` admits rather
-        than hides.
+        category content gate whatever this says, and for a passport outside the
+        article that makes it stricter than the law requires — which the `note` admits
+        rather than hides.
 
         Two details the article turns on: the threshold is **energy** (kWh), not the
         ampere-hour "rated capacity" defined for the purposes of an annex; and unlike
@@ -7081,11 +7681,38 @@ components:
           type: string
           enum:
             - required
-            - voluntary
+            - notCovered
+            - belowThreshold
+            - capacityUnknown
+            - notYetBinding
             - notApplicable
           description: |
+            Deliberately not a boolean, and deliberately not collapsed into one
+            "voluntary". "This category never owes one", "this unit is under the
+            threshold", "we cannot tell yet" and "not yet" are four different sentences
+            to put in front of an operator, and only some of them describe something
+            they can change.
+
             `required` — Art. 77(1) reaches this record.
-            `voluntary` — it does not; a passport is still permitted.
+
+            `notCovered` — the article does not name this category. Portable and SLI
+            batteries owe no passport, ever.
+
+            `belowThreshold` — an industrial battery at or below 2 kWh. The category
+            *is* in scope; this unit is under the threshold, which is a different thing
+            to be told than that industrial batteries are outside the article.
+
+            `capacityUnknown` — an industrial battery that declares no
+            `ratedCapacityKwh`, so the threshold cannot be applied. **Not an
+            exemption**: the obligation turns on a number this record does not carry,
+            and the node treats it as in scope. Declaring a capacity of 2 kWh or less
+            is what moves it to `belowThreshold`.
+
+            `notYetBinding` — in scope by type and capacity, but placed on the market
+            before 18 February 2027. A record stating no `placedOnMarketDate` at all is
+            treated as inside the period instead, because an unstated date is not
+            evidence of an earlier one.
+
             `notApplicable` — not a battery, so this article has nothing to say. Other
             instruments may still require a passport.
           example: required
@@ -7093,9 +7720,8 @@ components:
           type: string
           description: |
             Present when the answer needs justifying — an industrial battery that
-            declares no `ratedCapacityKwh` (treated as in scope, because an undeclared
-            capacity is not evidence of a small one), or a voluntary passport this node
-            nonetheless gates.
+            declares no `ratedCapacityKwh`, a record the article does not reach, or a
+            passport this node nonetheless gates.
     PublishReadiness:
       type: object
       description: |
@@ -7128,6 +7754,512 @@ components:
             $ref: '#/components/schemas/PublishBlocker'
         passportScope:
           $ref: '#/components/schemas/PassportScopeReport'
+    ArchivalFreshness:
+      type: object
+      description: |-
+        Whether a seal's archival protection is still live.
+
+        `evidencedLevel` reports `baseline-lta` from the **presence** of the archival material, and is right to — the material is there. This reports whether it still means anything.
+
+        An archival timestamp is what keeps a `B-LTA` seal verifiable after its signing certificate expires, which is the whole point for a retention-locked passport that outlives every certificate involved. **It expires too**: its own timestamping authority's certificate has a validity period, and ETSI's long-term profiles expect re-timestamping before that. Without this field a seal whose archival protection lapsed years ago reads exactly as it did the day it was bought.
+
+        **A signal, not a verdict.** A seal nearing its renewal date still verifies, and that window is the only chance to renew without an outage. No threshold is applied — how much notice is enough is a policy question for the reader.
+      required:
+        - state
+      properties:
+        state:
+          type: string
+          enum:
+            - notArchived
+            - current
+            - lapsed
+            - unknown
+          description: |-
+            `notArchived`: no archival timestamp — a seal below `B-LTA`. Nothing to renew, which is a different thing from a renewal that has lapsed: such a seal was never promised long-term protection.
+
+            `current`: the archival timestamp's authority certificate is still valid.
+
+            `lapsed`: it has expired. The seal may still verify today; what is gone is the thing meant to keep it verifying once its signing certificate goes.
+
+            `unknown`: an archival timestamp is present and could not be read. **Not `current`** — a token that cannot be checked is not a fresh one, and reporting it as current is how a staleness signal goes quiet at the moment it matters.
+        expires:
+          type: string
+          format: date-time
+          description: 'When the archival timestamp''s authority certificate expires — the date by which re-timestamping must have happened, read from before or after it depending on `state`. One value, so one name: `current` and `lapsed` are the same date seen from either side. Absent for `notArchived` and `unknown`.'
+    SealBinding:
+      type: object
+      description: |-
+        Whether the seal's **own bytes** say it covers this passport's current signature.
+
+        A detached CAdES states what it covers in exactly one place — the `messageDigest` signed attribute, RFC 5652 §11.2 — and that attribute sits *inside* the signature. This reports what it says, after checking the signature over it. That ordering is the whole point: the attribute is plain DER and trivial to rewrite, but rewriting it breaks the signature, so a seal cannot be retargeted at another passport by editing what it claims to cover.
+
+        Read it beside `coverage`, which answers the same question from this node's own outbox records. Those records survive a seal that will not parse and need no cryptography; this needs both and is evidence. **Where the two disagree, the disagreement is the finding** — the records and the bytes are describing different things, which neither source could have revealed alone.
+      required:
+        - result
+      properties:
+        result:
+          type: string
+          enum:
+            - coversThisSignature
+            - coversAnotherDigest
+            - notIntact
+            - unknown
+          description: |-
+            `coversThisSignature`: the seal names this exact signature and its attributes verify under the certificate it carries. The strongest statement this node can make without an external validator — whatever is true of the seal's *trust*, it is demonstrably a seal over this passport and not over anything else.
+
+            `coversAnotherDigest`: the seal is intact and names a different digest. Ordinary after a re-publish, since the passport re-signed. It is also what a seal stored against the wrong passport looks like, and the two are indistinguishable from the bytes alone; what separates them is whether an outbox row says this digest was ever requested for this passport.
+
+            `notIntact`: the signature over the seal's attributes does not verify, so nothing the seal says about what it covers can be relied on.
+
+            `unknown`: the bytes could not be read, or carry no digest at all — a placeholder, an unparsed format, or a signature with no signed attributes. **Never** to be read as a mismatch.
+        covered:
+          type: string
+          description: |-
+            Hex SHA-256 the seal actually covers. Present only with `coversAnotherDigest`, so a caller holding it can find which version of the passport it belongs to.
+
+            Deliberately absent from `notIntact`: the attribute naming it sits inside a signature that failed, so reporting it would hand the caller a number that nothing vouches for.
+    SealValidationStatus:
+      type: object
+      description: |-
+        `binding` restated in the vocabulary of ETSI EN 319 102-1 clause 5.1.3 — the procedures standard CIR (EU) 2025/1945 points at for validating a qualified electronic seal.
+
+        A translation, not a second opinion: it is derived from `binding` and adds no checking of its own. It is here because these findings travel to readers whose validation tooling speaks this vocabulary, and because the translation makes explicit something our own field names let a reader assume.
+
+        **`totalPassed` is not among the values, and cannot be.** That indication requires, among other conditions, that the constraints applicable to the signer's certificate have been positively validated — a certificate path built and validated to a trust anchor, under a policy.
+
+        This node checks the certificate's validity window and whatever revocation material the seal carries (see `certificate`), and it checks one issuer signature against a Trusted List entry. It builds no path and applies no policy constraints. So a seal that demonstrably covers this signature reports `indeterminate`: nothing has failed, and not everything has been checked. Reading `coversThisSignature` as a validation pass is the misreading this object exists to prevent.
+      required:
+        - indication
+      properties:
+        indication:
+          type: string
+          enum:
+            - totalFailed
+            - indeterminate
+          description: |-
+            `totalFailed`: the signature is demonstrably not valid. The standard makes this **stable** — the same inputs always yield the same answer, and additional validation data cannot lift it to a pass; only additional proofs of existence can change a result at all. That stability is what makes a broken seal safe to spend a replacement on.
+
+            `indeterminate`: the available information is insufficient to decide. Not a weaker `totalFailed` — under CIR (EU) 2025/1945 it is its own technical outcome, "neither an EU qualified electronic signature, nor an EU qualified electronic seal", to be reported as such rather than collapsed into either neighbour.
+        subIndication:
+          type:
+            - string
+            - 'null'
+          enum:
+            - sigCryptoFailure
+            - hashFailure
+            - null
+          description: |-
+            The table 6 value qualifying the indication, where one applies.
+
+            `sigCryptoFailure`: the signature value could not be verified with the public key in the signing certificate — a seal this node reports as `notIntact`.
+
+            `hashFailure`: a hash of signed data does not match. Reported for a seal that is intact over a *different* digest, because validating **this passport's current signature** against it fails on the hash. The seal remains a sound attestation of the signature it does cover, which is why the node counts it apart and refuses to repair it.
+
+            `null` is the standard's own custom-diagnostic case: no table 6 value fits, so `binding` carries the diagnostic instead of stretching one that nearly does. The two `null` cases are different diagnostics — "the certificate was never checked" and "these bytes could not be read" — and `binding` keeps them apart.
+    ValidityWindow:
+      type: object
+      description: |-
+        A certificate's validity window, and where the sealing moment falls in it.
+
+        The window travels with the verdict so a reader can check the arithmetic rather than take it on trust — and because the two dates are what an auditor compares against a Trusted List entry when asking the other half of Art. 32(1)(b).
+      required:
+        - notBefore
+        - notAfter
+        - standing
+      properties:
+        notBefore:
+          type: string
+          format: date-time
+          description: The certificate's `notBefore`.
+        notAfter:
+          type: string
+          format: date-time
+          description: The certificate's `notAfter`.
+        standing:
+          type: string
+          enum:
+            - inside
+            - expired
+            - notYetValid
+          description: Where the judged moment falls in the window. `expired` and `notYetValid` are findings only when that moment is attested — see `judgedAt`.
+    JudgedTime:
+      type: object
+      description: |-
+        The moment a certificate's standing was judged against, and whether anything proves it.
+
+        Regulation (EU) No 910/2014 Art. 32(1)(b), reached for seals by Art. 40, asks whether the certificate was valid **at the time of signing**. The whole verdict therefore turns on which moment is used and what that moment is worth.
+      required:
+        - at
+        - attested
+      properties:
+        at:
+          type: string
+          format: date-time
+          description: The moment used.
+        attested:
+          type: boolean
+          description: |-
+            True when the moment came from a timestamp token inside the seal, whose signature and imprint were both checked. False means it is the node's own clock — the validation time, not the signing time.
+
+            This separates a failure from an open question. ETSI EN 319 102-1 treats a time nothing proves as no time at all, which is why a verdict resting on an unattested moment is reported with a `NO_POE` sub-indication rather than as `totalFailed`. Without it, every seal whose certificate has since expired — eventually all of them — would read as invalid.
+    RevocationStanding:
+      type: object
+      description: |-
+        What the seal's own revocation material says about its signing certificate.
+
+        **Read from the seal, never fetched.** A CRL distribution point is a URL inside a certificate an operator was handed, and following one would have this node issue requests to an address chosen by whoever produced the seal. ETSI EN 319 122-1 puts revocation values in `SignedData.crls` from `B-LT` upward for exactly this reason: a seal meant to be checkable years later carries what is needed to check it, offline.
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - notRevoked
+            - revoked
+            - notAvailable
+            - unusable
+          description: |-
+            `notRevoked` — a CRL from this certificate's issuer, whose own signature verifies under a certificate the seal carries, does not list it.
+
+            `revoked` — that CRL lists it, and `at` says when. Whether this condemns the seal depends on `judgedAt`: a certificate revoked *after* a seal was made does not unmake it.
+
+            `notAvailable` — the seal carries no revocation material for this certificate. Ordinary below `B-LT` and **not a defect**.
+
+            `unusable` — material was present and could not be relied on: an unparseable list, or one whose signature does not verify. Distinct from `notAvailable` because something claiming to be authoritative failed, which is worth looking at. A CRL wearing the issuer's name but signed by another key lands here and never on `notRevoked` — an unsigned list could otherwise *clear* a revoked certificate.
+        asOf:
+          type: string
+          format: date-time
+          description: With `notRevoked`, the CRL's `thisUpdate` — the moment its statement is about. A list issued before the seal was made cannot rule out a later revocation, and this is here so a reader can see which question was actually answered.
+        at:
+          type: string
+          format: date-time
+          description: With `revoked`, when the issuer says it was revoked.
+        reason:
+          type: string
+          description: With `unusable`, what failed.
+    CertificateStanding:
+      type: object
+      description: |-
+        **Was the seal's signing certificate valid when the seal was made?**
+
+        The second limb of Regulation (EU) No 910/2014 Art. 32(1)(b), reached for seals by Art. 40. The first limb — whether a qualified trust service provider issued it — is a Trusted List question, and is answered in `qualification.issuer` on the same response rather than here. Read the two together: a certificate can be well within its window and issued by nobody any list names.
+
+        Two findings and the moment they were judged against, because the moment is what decides them: a certificate outside its window is a failure when a timestamp proves the seal was made outside it, and merely unproven otherwise. Certificates expire, sealed passports outlive them by years, and an expired certificate today says nothing about a seal made while it was good.
+      required:
+        - validity
+        - judgedAt
+        - revocation
+      properties:
+        validity:
+          $ref: '#/components/schemas/ValidityWindow'
+        judgedAt:
+          $ref: '#/components/schemas/JudgedTime'
+        revocation:
+          $ref: '#/components/schemas/RevocationStanding'
+    CreationDevice:
+      type: string
+      enum:
+        - declaresQualifiedDevice
+        - noQualifiedDevice
+        - notAQualifiedCertificate
+      description: |-
+        What the certificate declares about the device holding its private key — a declaration, never a verification.
+
+        `declaresQualifiedDevice`: the certificate carries the Annex III(j) indication that Regulation (EU) No 910/2014 Art. 32(1)(f), reached for seals through Art. 40, requires.
+
+        `noQualifiedDevice`: it carries qualified-certificate statements but not that one. Lawful, and enough for Art. 40a — validation of an *advanced* seal based on a qualified certificate, which omits the device leg — but not for the Art. 32/40 pair.
+
+        `notAQualifiedCertificate`: it carries no qualified-certificate statements at all, so it is not presenting itself as a qualified certificate in the first place. A self-signed development certificate lands here.
+    SealOrigin:
+      type: object
+      description: |-
+        What a stored seal's own certificate says about who issued it — read out of the seal's bytes, never from this node's configuration. The two are different facts: configuration records what the operator intended, and a seal restored from a backup or made before a backend change was not produced by whatever is configured now.
+
+        **Not a qualification verdict.** Establishing that a seal is qualified needs the issuer matched against an EU Trusted List *and* the issuer's signature over this certificate verified; neither is done to produce this. What it does answer completely, and without a network, is whether anybody issued the certificate at all.
+      required:
+        - subject
+        - issuer
+        - selfIssued
+        - creationDevice
+      properties:
+        subject:
+          type: string
+          description: The certificate's subject distinguished name, RFC 4514.
+        issuer:
+          type: string
+          description: The certificate's issuer distinguished name, RFC 4514.
+        selfIssued:
+          type: boolean
+          description: 'Whether issuer and subject are the same name — the structural test for "nobody issued this to us", and a property of the certificate that no environment variable can change. True means the seal attests that a key this node holds signed a digest and **nothing else**: it carries no legal weight, and no Trusted List would give it any.'
+        creationDevice:
+          $ref: '#/components/schemas/CreationDevice'
+    TrustServiceStatus:
+      oneOf:
+        - type: 'null'
+        - type: string
+          enum:
+            - granted
+            - withdrawn
+        - type: object
+          required:
+            - other
+          properties:
+            other:
+              type: string
+              description: The trusted-list status URI, verbatim.
+      description: |-
+        The status a trusted list records for a service — ETSI TS 119 612 Annex D.5.
+
+        🚨 **Three shapes, not two.** `granted` and `withdrawn` are the pair that answers whether a service holds qualified status. Every other status a list can carry — `undersupervision`, `recognisedatnationallevel`, and whatever a Member State publishes next — arrives as an **object**, `{"other": "<the status URI>"}`.
+
+        They are kept apart deliberately. Folding them into the same string vocabulary as `granted` would invite the reading that `undersupervision` is a lesser kind of qualified, or `recognisedatnationallevel` a weaker `granted`. Neither is true: they answer a different question, asked of a different kind of service.
+
+        A client that assumes a string here breaks on the first list entry it meets that is neither granted nor withdrawn. `granted` is the only value that means qualified.
+
+        `null` where it appears on a verdict means the list's history does not reach back to the moment asked about — the list is *silent* about it rather than negative, which is a different finding from a recorded non-granted status.
+    IssuerStanding:
+      type: object
+      description: |-
+        What the EU Trusted Lists say about the certificate's issuer — Regulation (EU) No 910/2014 Art. 32(1)(a)–(b), reached for seals by Art. 40.
+
+        **"At sealing" throughout, never "now."** A provider granted qualified status in 2029 was not qualified in 2027, and a present-tense check would certify a seal that never was; a provider withdrawn last week did not retroactively unmake the seals it issued. Art. 32(1)(b) asks about the time of signing, and trusted lists carry the history to answer it.
+
+        Discriminated by `standing`. The shape of the rest depends on which one it is.
+      required:
+        - standing
+      properties:
+        standing:
+          type: string
+          enum:
+            - selfIssued
+            - notListed
+            - chainIncomplete
+            - signatureNotFromListedCa
+            - pathUnverifiable
+            - notQualifiedAtSealing
+            - qualifiedAtSealing
+          description: |-
+            `selfIssued`: the certificate is its own issuer — nobody issued it to this node. What the local development backend produces. A seal here carries **no legal weight whatsoever**; it attests that a key this node holds signed a digest.
+
+            `notListed`: some provider issued it, and no list consulted names that issuer as a qualified CA. 🚨 The only verdict claiming an **absence** — read `consulted` and `unchecked` before acting on it.
+
+            `chainIncomplete`: the seal did not carry enough certificates to reach a root, and no list names any issuer it does refer to. **Weaker than `notListed` deliberately**: the walk ran out of links, so a listed CA may sit above the gap and reporting an unlisted provider would be an accusation drawn from a certificate nobody shipped.
+
+            `signatureNotFromListedCa`: a listed CA carries this name and **did not sign this certificate**. The forgery finding. Every listed certificate under that name was tried — a CA mid-rotation publishes several — and none verifies the signature over this certificate's `tbsCertificate`.
+
+            `pathUnverifiable`: a listed CA carries this name and the signature could not be checked — usually a key algorithm this build does not verify. **Not an accusation, and never to be read as one.**
+
+            `notQualifiedAtSealing`: a listed CA issued it, and its status at the sealing moment was not granted.
+
+            `qualifiedAtSealing`: a granted qualified CA issued this certificate and was granted when the seal was made, and its signature over the certificate verifies under a key the list publishes.
+        issuer:
+          type: string
+          description: The issuer distinguished name the certificate carries.
+        subject:
+          type: string
+          description: '`selfIssued` only — the subject name, which is also the issuer name.'
+        consulted:
+          type: integer
+          description: |-
+            `notListed` only. How many territories' verified lists were searched.
+
+            🚨 `0` means **nothing was looked at**: the answer is about nothing, and it is what a node with no trusted lists loaded reports for every provider seal, qualified or not.
+        unchecked:
+          type: integer
+          description: '`notListed` only. How many territories the EU list of trusted lists names could not be verified, and so were not searched. Above zero, a provider listed *there* is indistinguishable from one listed nowhere — see the `unchecked` array on `SealQualification`, which names them.'
+        missingIssuer:
+          type: string
+          description: |-
+            `chainIncomplete` only. The name the walk needed next and the seal did not carry. Equal to `issuer` when the seal carries only its signing certificate.
+
+            ETSI EN 319 122-1 clause 5.2.1 asks generators to include those intermediates where the signature is to be validated through a Trusted List, which is the remedy an operator seeing this should ask their provider for.
+        provider:
+          type:
+            - string
+            - 'null'
+          description: The listed provider, where one was matched.
+        territory:
+          type:
+            - string
+            - 'null'
+          description: The list carrying that name.
+        status:
+          allOf:
+            - $ref: '#/components/schemas/TrustServiceStatus'
+          description: |-
+            `notQualifiedAtSealing` only — the status in force at the sealing time.
+
+            Null means the list's history does not reach back that far, which is a **different finding** from a recorded non-granted status: the list is silent about that moment rather than negative about it.
+
+            🚨 **Three shapes, not two.** `granted` and `withdrawn` are the two the supervisory body's vocabulary distinguishes for a qualified service; every other status a trusted list can carry — `undersupervision`, `recognisedatnationallevel` and the rest — arrives as an **object**, `{"other": "<the status URI>"}`. Core keeps them readable without making them comparable to `granted`, because they answer a different question asked of a different kind of service, and folding them in would invite the reading that one of them is a lesser kind of qualified.
+
+            A client that assumes a string here will break on the first list entry it meets that is neither granted nor withdrawn.
+        reason:
+          type: string
+          description: |-
+            `pathUnverifiable` only — why the issuer's signature over this certificate could not be checked. Usually a key algorithm this build does not verify; a CA certificate that will not parse is the other.
+
+            🚨 Read it as a limit of the reader, never as a finding about the seal. Reporting this as `signatureNotFromListedCa` would call a possibly-genuine seal a forgery on the strength of a check that never ran.
+        remoteQscdManagement:
+          type: boolean
+          description: '`qualifiedAtSealing` only. Whether the listed service declares the additional-information qualifier for a QSCD managed on the signer''s behalf — Art. 39a''s second grant.'
+    UncheckedTerritory:
+      type: object
+      description: |-
+        A territory the EU list of trusted lists names and this node could not consult.
+
+        Carried rather than dropped because the two states a caller must tell apart — *this issuer is on no list* and *the list it would be on could not be read* — are otherwise identical at the point of the verdict.
+      required:
+        - territory
+        - reason
+      properties:
+        territory:
+          type: string
+          description: The `SchemeTerritory` the list of trusted lists names — the two-letter country code.
+        reason:
+          type: string
+          description: |-
+            Why this node could not consult it, in terms an operator can act on.
+
+            Free text on purpose. What stops a list being consulted is not an enumerable set: a signature that does not verify, a document over a parser ceiling, a fetch that failed, a scheme operator mid-rotation whose entry has not caught up. An operator needs the sentence; a caller deciding what to do needs only that the territory is absent.
+    SealQualification:
+      type: object
+      description: |-
+        What Regulation (EU) No 910/2014 Art. 32(1) says about a seal, read off the seal and the EU Trusted Lists this node holds. Art. 40 applies Art. 32 to seals *mutatis mutandis*.
+
+        Two legs, and they are independent — a seal can hold either without the other, which is why they are two fields rather than one ladder:
+
+        * **Art. 32(1)(a)–(b)** — the certificate was a qualified certificate issued by
+          a qualified trust service provider. A Trusted List question (Art. 22),
+          answered by `issuer`.
+        * **Art. 32(1)(f)** — the seal was created by a qualified electronic seal
+          creation device, which Annex III(j) requires the certificate to declare in
+          machine-processable form. Answered by `creationDevice`.
+
+
+        🚨 **This is not a qualified validation result.** Under Art. 33, reached for seals by Art. 40, a *qualified* validation service is itself a provider service whose result carries that provider's seal. Nothing here is signed and nothing here is qualified — this is a reading of published lists, and conditions (c), (d) and (h) of Art. 32(1) are not checked at all.
+      required:
+        - issuer
+        - creationDevice
+        - unchecked
+      properties:
+        issuer:
+          $ref: '#/components/schemas/IssuerStanding'
+        creationDevice:
+          $ref: '#/components/schemas/CreationDevice'
+        unchecked:
+          type: array
+          items:
+            $ref: '#/components/schemas/UncheckedTerritory'
+          description: |-
+            The territories the EU list of trusted lists names and this node could not consult, with the reason for each.
+
+            🚨 **Read this before acting on a `notListed` issuer.** The two states a caller must tell apart — *this issuer is on no list* and *the list it would be on could not be read* — are otherwise identical at the point of the verdict. Empty means every territory the list of lists names was read.
+    SealAuditReport:
+      type: object
+      description: |-
+        What the last completed pass over **every stored seal** found.
+
+        The counts beside this describe outbox rows and passports carrying *no* seal. This describes seals that exist and do not stand up — a condition neither can see, because both ask the database whether the seal member is absent, and a worthless seal is present.
+
+        Whether a stored seal stands up is cryptographic rather than relational: open the CAdES, verify the signature, read the digest it covers. So it is found by a background pass that walks the estate in bounded batches and starts over, not by a query.
+      required:
+        - completedAt
+        - checked
+        - sound
+        - superseded
+        - broken
+        - certificateFailed
+        - unreadable
+        - archivalLapsed
+        - archivalDue
+        - archivalUnverifiable
+        - brokenPassports
+        - renewalPassports
+        - truncated
+        - renewalTruncated
+      properties:
+        completedAt:
+          type: string
+          format: date-time
+          description: When the pass finished. The age of this is the age of every number below it — a pass takes as long as the estate divided by the audit's throughput, so on a large deployment these are hours old by construction. Fine for a condition that does not appear suddenly, and stated rather than implied.
+        checked:
+          type: integer
+          description: Seals opened.
+        sound:
+          type: integer
+          description: |-
+            Seals covering their passport's current signature.
+
+            In EN 319 102-1's terms this is `indeterminate`, **not** `totalPassed`: nothing about these seals has failed, and their certificates have not been validated by this node. See `validation` on `GET /api/v1/dpp/{dppId}/seal`.
+        superseded:
+          type: integer
+          description: |-
+            Seals over a different digest. Ordinarily a passport re-published after sealing, which is **not** a defect — the seal remains a valid attestation of the signature it covers, and `GET /api/v1/dpp/{dppId}/seal` reports it per passport as `coverage`.
+
+            `totalFailed` / `hashFailure` when the question asked is about the passport's *current* signature, which is the question this walk asks.
+        broken:
+          type: integer
+          description: |-
+            Seals whose own signature does not verify. **The finding.** Those passports are published and, in substance, unsealed — and invisible to `unsealedPublished`, which asks only whether a seal is present.
+
+            `totalFailed` / `sigCryptoFailure`, and EN 319 102-1 makes that verdict stable: no additional validation data can lift it. That is what makes a replacement seal worth buying for these and for nothing else here — `POST /api/v1/dpp/{dppId}/seal/repair`.
+        certificateFailed:
+          type: integer
+          description: |-
+            Seals whose signature is sound and whose **certificate** was not, at the moment they were made — revoked before sealing, or outside its validity window, with an attested time to prove the order. `totalFailed` with a certificate sub-indication.
+
+            Counted apart from `broken` because the two need opposite responses. A broken seal is worth replacing; a seal made under a revoked certificate would only be replaced by another from the same certificate, so `POST /api/v1/dpp/{dppId}/seal/repair` refuses it and says why.
+
+            Where nothing attests when the seal was made, the same observation is *indeterminate* rather than a failure and the seal stays in `sound`: a certificate that has expired since is the ordinary state of an old seal.
+        unreadable:
+          type: integer
+          description: |-
+            Seals this node could not read — a placeholder, or a format it does not parse. **Not a finding.** Treating "cannot check" as "broken" would make every seal from a backend emitting an unparsed format look like corruption.
+
+            `indeterminate` with a custom diagnostic: a limit of the reader, not a defect in the seal.
+        archivalLapsed:
+          type: integer
+          description: |-
+            `B-LTA` seals whose archival protection has already gone — the archive timestamp's own authority certificate has expired.
+
+            **Not a defect in the seal**, which still verifies. It is the protection `B-LTA` exists to provide, having run out while nothing renewed it. A seal here is past the window in which renewing was routine.
+        archivalDue:
+          type: integer
+          description: |-
+            `B-LTA` seals whose archival protection expires soon.
+
+            A reporting threshold rather than a purchase trigger: nothing on this node buys a renewal. The window between "due" and "gone" is the only one in which renewing is routine rather than an incident, which is why it is reported separately from `archivalLapsed`.
+        archivalUnverifiable:
+          type: integer
+          description: |-
+            `B-LTA` seals carrying an archive timestamp this node cannot use — either it does not parse, or it is not a timestamp of *this* seal.
+
+            **Not a renewal candidate.** Renewing carries existing protection forward, and here there is none: the seal claims a level it does not have. Read this beside `broken` rather than beside `archivalDue`.
+        brokenPassports:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: The passports carrying a broken seal, so an operator can act rather than search a log. Capped — see `truncated`. A node with thousands of broken seals has one problem, not thousands; `broken` states its size, and a list long enough to prove that is a list nobody reads.
+        renewalPassports:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: |-
+            The passports whose archival protection has lapsed or is due, capped the same way `brokenPassports` is.
+
+            Lapsed and due share one list because they share one action — renew — and `archivalLapsed` and `archivalDue` already say how many are in each state.
+        truncated:
+          type: boolean
+          description: True when `brokenPassports` was cut short. Stated rather than left to be inferred from the length matching the cap, which is an inference that is right until the cap changes.
+        renewalTruncated:
+          type: boolean
+          description: |-
+            True when `renewalPassports` was cut short.
+
+            🚨 A separate flag from `truncated`, not a shared one. Two capped lists fill independently: a pass can name every renewal candidate while cutting the broken list short, or the reverse. One flag covering both would report a complete list as truncated, or — worse — a truncated one as complete.
     AmendRequest:
       type: object
       description: |

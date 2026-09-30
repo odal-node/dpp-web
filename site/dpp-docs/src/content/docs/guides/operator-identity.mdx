@@ -1,0 +1,51 @@
+---
+title: Your operator identity
+description: The operator details, economic-operator identifiers and facilities a node records once and stamps onto every new passport.
+---
+
+A passport has to say who is responsible for it and where the product was made. A node records those details once and stamps them onto every new passport, so an import does not need a column for them.
+
+## Operator details
+
+```bash
+odal operator show
+odal operator set --legal-name "Example GmbH" --country DE --contact-email dpp@example.com
+```
+
+Operator settings include the legal and trade name, postal address, country, contact email, the domain behind your `did:web` identity, and a retention period.
+
+## Economic-operator identifiers
+
+ESPR asks for a unique operator identifier. A node holds as many as you have, one of them primary:
+
+```bash
+odal operator-id add --scheme lei --value 5299009N55YRQC69CN08 --primary
+odal operator-id list
+```
+
+Schemes include `vat`, `lei`, `eori` and `duns`. The primary identifier is stamped on new passports; changing it does not rewrite passports already issued.
+
+## Facilities
+
+Where the product was made, identified for example by a GS1 Global Location Number:
+
+```bash
+odal facility add --name "Plant 1" --scheme gln --value 4012345000009 --country DE --default
+odal facility list
+```
+
+The default facility is stamped on new passports.
+
+## Nothing is silently overwritten
+
+Retiring, restoring or changing the primary identifier or default facility is recorded on an append-only provenance trail:
+
+```bash
+odal operator-id audit <id>
+odal facility audit <id>
+```
+
+## Read next
+
+- [Importing product data](/guides/import): the passports these details are stamped onto.
+- [Handing over responsibility](/guides/transfer): when another operator takes over a passport.

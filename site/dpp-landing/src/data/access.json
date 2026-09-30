@@ -1,0 +1,63 @@
+{
+  "_comment": "Art. 77(2) access lattice for the battery passport. Verified verbatim against the consolidated OJ text CELEX_02023R1542-20250731 on 2026-09-19. SCOPE: batteries only — ESPR Art. 11(b) defers access rights to each product group's delegated act under Art. 4, and none is adopted for the other product groups. Do not generalise this table. Re-read against the same text on 2026-09-25: the legitimate-interest audience is named for the two purposes Art. 77(2)(c) allows, not as a list of trades, and point 2 now lists everything Annex XIII point 2 does.",
+  "instrument": "Regulation (EU) 2023/1542",
+  "article": "Art. 77(2)",
+  "annex": "Annex XIII",
+  "audiences": [
+    {
+      "key": "public",
+      "label": "Anyone",
+      "sub": "No credential, no login, no fee",
+      "basis": "Art. 77(2)(a)",
+      "sees": [
+        "1"
+      ]
+    },
+    {
+      "key": "legitimate",
+      "label": "Reader with a legitimate interest",
+      "sub": "A repairer, recycler or the battery's buyer, on a credential",
+      "basis": "Art. 77(2)(c)",
+      "sees": [
+        "1",
+        "2",
+        "4"
+      ]
+    },
+    {
+      "key": "authority",
+      "label": "Notified body, market surveillance, the Commission",
+      "sub": "Access named in the Regulation itself",
+      "basis": "Art. 77(2)(b)",
+      "sees": [
+        "1",
+        "2",
+        "3"
+      ]
+    }
+  ],
+  "points": [
+    {
+      "id": "1",
+      "title": "Point 1: public information about the battery model",
+      "note": "Material composition, carbon footprint, recycled content, rated capacity, expected lifetime, declaration of conformity, waste management information."
+    },
+    {
+      "id": "2",
+      "title": "Point 2: model information for readers with a legitimate interest, and the Commission",
+      "note": "Detailed composition, part numbers and where to get spare parts, dismantling information, and safety measures."
+    },
+    {
+      "id": "3",
+      "title": "Point 3: evidence of conformity",
+      "note": "\"Results of test reports proving compliance with the requirements laid down in this Regulation\".",
+      "only": "authority"
+    },
+    {
+      "id": "4",
+      "title": "Point 4: the individual battery's own history",
+      "note": "State of health, battery status, and \"data resulting from its use, including the number of charging and discharging cycles and negative events, such as accidents, as well as periodically recorded information on the operating environmental conditions, including temperature, and on the state of charge\".",
+      "only": "legitimate"
+    }
+  ]
+}

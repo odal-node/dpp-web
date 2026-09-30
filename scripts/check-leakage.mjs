@@ -27,6 +27,9 @@ const SKIP_DIRS = new Set([
   '.astro',
   '.pnpm-store',
   '.dpp-engine',
+  // CI checks dpp-core out here for the product-group drift gate. It is
+  // another repository's content, not this one's, so it is not ours to scan.
+  '.dpp-core',
   'deprecated',
 ]);
 // This file necessarily contains the patterns it searches for.
@@ -43,6 +46,10 @@ const RULES = [
   { pattern: /DESIGN_SPEC/g, why: 'a private-repo document path' },
   { pattern: /\bBRAND\.md\b/g, why: 'a private-repo document path' },
   { pattern: /\.\.\/\.\.\/docs\//g, why: 'a relative path into the private repo' },
+  // The private docs repository's reference tree, named in a source comment on
+  // the home page until 2026-09-27. Comments are public too: the repository is.
+  { pattern: /\breference\/regulatory\//g, why: 'a path into the private docs repository' },
+  { pattern: /DPP-SECTOR-INVENTORY/g, why: 'a private-repo document name' },
 ];
 
 const walk = (dir, out = []) => {

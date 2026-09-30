@@ -1,14 +1,22 @@
 ---
 // StandardsRow.astro — text badges only (no third-party logos without rights).
-// Data: src/data/standards.json.
+// Data: src/data/standards.json. An entry with an `href` links its name to the
+// page that details it, marked as leaving the site when it does.
+import ExternalArrow from "./ExternalArrow.astro";
 import data from "../data/standards.json";
-const { standards } = data;
+const standards: { name: string; role: string; href?: string }[] = data.standards;
 ---
 
-<ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-5">
+<ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
   {standards.map((s) => (
     <li class="rounded-md border border-neutral-200 bg-neutral-0 p-4 transition-colors hover:border-primary-300">
-      <p class="m-0 text-sm font-semibold text-neutral-900">{s.name}</p>
+      <p class="m-0 text-sm font-semibold text-neutral-900">
+        {s.href ? (
+          <a href={s.href}>{s.name}{!s.href.startsWith("/") && <ExternalArrow class="ml-1" />}</a>
+        ) : (
+          s.name
+        )}
+      </p>
       <p class="m-0 mt-1 text-xs leading-body text-neutral-600">{s.role}</p>
     </li>
   ))}
