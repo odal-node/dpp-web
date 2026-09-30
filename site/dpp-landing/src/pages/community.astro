@@ -8,9 +8,9 @@
 // answer: questions and ideas on the board, bugs as issues on the repository
 // they belong to, security reports privately, anything confidential by email.
 //
-// The page says the board is new and quiet, and promises no reply time,
-// because SUPPORT.md promises none: an ecosystem page is the easiest place on
-// a site to imply a community that does not exist yet.
+// The page invites people in and says plainly that it is early days, without
+// implying a community that does not exist yet, and it promises no reply
+// time, because SUPPORT.md promises none.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import Button from "../components/Button.astro";
@@ -70,15 +70,18 @@ const places: Place[] = [
 ---
 
 <Base title={title} description={description}>
-  <Section h1 eyebrow="Community" title="Ask, suggest and share in public." wide>
+  <Section h1 eyebrow="Community" title="Help shape Odal Node." wide>
     <p>
-      Odal Node's public discussions are on GitHub, on one board for both the
-      core library and the node. A question answered there is answered once
-      and read by everyone who has it next.
+      Odal Node is built in the open, and so is the conversation around it.
+      Ask a question, suggest a feature, or show what you are working on. One
+      board on GitHub covers both the core library and the node, so it all
+      happens in one place.
     </p>
     <p>
-      <strong>The board is new and still quiet.</strong> The project's
-      maintainer reads it, but there is no promise about when an answer comes.
+      <strong>It is early days, so you would be among the first voices
+      there.</strong> The questions and ideas people bring now help decide what
+      gets built next, and every answer stays on the board for the next person
+      who asks.
     </p>
     <div class="not-prose mt-8 flex flex-wrap gap-3">
       <Button href={BOARD} external>Open the discussions</Button>
