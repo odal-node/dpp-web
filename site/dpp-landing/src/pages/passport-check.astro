@@ -19,7 +19,7 @@ import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import BasisMark from "../components/BasisMark.astro";
 import Button from "../components/Button.astro";
-import { choices, type Answer } from "../lib/checker";
+import { checklistGroups, choices, type Answer } from "../lib/checker";
 import { basisLabel } from "../lib/regulations";
 import { MAILBOX, mailto } from "../lib/lead";
 
@@ -35,6 +35,14 @@ const cards: Card[] = choices.flatMap((c) =>
       ? [{ key: c.key, label: c.label, answer: c.answer }]
       : [],
 );
+
+// An answer that says a passport is needed, or is coming, links to its
+// product group's printable checklist of what to have ready.
+const checklists = new Set(checklistGroups.map((g) => g.key));
+const checklistOf = (c: Card) => {
+  const group = c.key.split(":")[0];
+  return c.answer.verdict !== "no" && checklists.has(group) ? `/product-groups/${group}/checklist` : undefined;
+};
 
 const tone = {
   yes: "border-regulatory-border bg-regulatory-bg",
@@ -88,6 +96,7 @@ const selectClass =
             <p class="m-0 mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
               {c.answer.basis && <BasisMark basis={c.answer.basis} label={basisLabel(c.answer.basis)} />}
               {c.answer.links.map((l) => <a href={l.href} class="link-arrow">{l.label}</a>)}
+              {checklistOf(c) && <a href={checklistOf(c)} class="link-arrow">What to have ready</a>}
             </p>
           </li>
         ))}
