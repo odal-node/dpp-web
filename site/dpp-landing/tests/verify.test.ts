@@ -2,7 +2,8 @@
 //
 // public/verify/examples/ holds dossiers built with dpp-engine's own types and
 // Ed25519 signing; verify-expected.json holds what dpp-vault's
-// `verify_dossier_json` said about each one (engine #423, 2026-09-28). This
+// `verify_dossier_json` said about each one. Both are byte-identical to
+// ops/demo/dossiers on dpp-engine main as of #431 (2026-09-30). This
 // test fails if the TypeScript verifier disagrees with the Rust one on the
 // outcome or on any single check. A second implementation that is not held to
 // the first is two verifiers that will disagree one day without anyone
