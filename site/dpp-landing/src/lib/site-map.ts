@@ -99,6 +99,12 @@ export const menus: Menu[] = [
         icon: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M13.5 5l-3 14"/>',
       },
       {
+        href: "/community",
+        label: "Community",
+        line: "Ask questions and share ideas in public",
+        icon: '<path d="M20 11.5a7.5 7.5 0 0 1-10.6 6.8L4 20l1.7-5.1A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/>',
+      },
+      {
         href: "https://docs.odal-node.io",
         label: "Documentation",
         line: "Install, run and operate a node",

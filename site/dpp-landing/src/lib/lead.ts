@@ -7,7 +7,7 @@
 // waitlist page asks for.
 export const MAILBOX = "contact@odal-node.io";
 
-export type LeadSource = "home" | "check" | "checklist" | "waitlist";
+export type LeadSource = "check" | "checklist" | "community" | "waitlist";
 
 const BODY = [
   "What we make, and which EU markets we sell into:",
