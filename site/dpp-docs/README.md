@@ -21,7 +21,7 @@ site/dpp-docs/
 ├── astro.config.mjs                   # Starlight config: redirects, head (JSON-LD, share image), dev server on 4325
 ├── openapi-source.json                # the dpp-engine commit public/openapi.yaml is vendored from
 ├── public/
-│   ├── _headers                       # Cloudflare Pages headers: HSTS, CSP, caching
+│   ├── _headers                       # Cloudflare Pages headers: HSTS, CSP, caching, no-transform on HTML (root README)
 │   ├── favicon.svg                    # the brand mark
 │   └── openapi.yaml                   # the engine's API spec, vendored (do not edit here)
 ├── scripts/
