@@ -5,7 +5,7 @@ description: What the EU's passport registry is, what registering a passport req
 
 import { Aside } from "@astrojs/starlight/components";
 
-ESPR Art. 13 establishes a central registry, run by the European Commission, as the directory of registered passports. It lets authorities and others find a passport from a product without knowing which system issued it. The Commission set the registry up in July 2026, as Art. 13(1) required by 19 July, and Commission Implementing Regulation (EU) 2026/1778 sets out how registration works.
+ESPR Art. 13 establishes a central registry, run by the European Commission, as the directory of registered passports. It lets authorities and others find a passport from a product without knowing which system issued it. Art. 13(1) required the Commission to set it up by 19 July 2026, and Commission Implementing Regulation (EU) 2026/1778 sets out how registration works.
 
 ## A directory, not a store
 
@@ -20,12 +20,12 @@ Under the implementing act, the economic operator uploads the passport's unique 
 Every published passport commits its registration to a durable queue in the same database transaction as the publish itself, and a background worker drains that queue with retries. Publishing never waits on the registry, a crash never loses a registration, and after an outage the backlog is worked through without skipping any passport. `odal registry` shows the sync state, operator-wide or for one passport.
 
 <Aside type="caution" title="Not connected yet">
-The registration path is modelled and queued, but not connected to the live registry. Registering needs the operator's legal identity, and there is no registered company behind this project yet, the same step that holds back electronic seals with legal effect. The connection will be finished against the registry's official interface. See the [roadmap](https://odal-node.io/roadmap).
+The registration path is modelled and queued, but not connected to the live registry. Registering needs the operator's legal identity, the same legal step that qualified electronic seals wait on. The connection will be finished against the registry's official interface. See the [roadmap](https://odal-node.io/roadmap).
 </Aside>
 
 ## How long an identifier may be
 
-The limit on a unique product identifier comes from the Commission's registry user guide, not from law or from EN 18219. Version 1.01 of the guide (28 July 2026) said 50 characters, shorter than any GS1 Digital Link a node builds; version 1.02 (24 August 2026) says 2,000. The next core release checks a registration against the current figure, and because it lives in a user guide rather than in the Official Journal, it is treated as current rather than settled.
+The limit on a unique product identifier comes from the Commission's registry user guide, not from law or from EN 18219. Version 1.01 of the guide (28 July 2026) said 50 characters, shorter than any GS1 Digital Link a node builds; version 1.02 (24 August 2026) says 2,000. The core library checks a registration against the current figure, and because it lives in a user guide rather than in the Official Journal, it is treated as current rather than settled.
 
 ## Read next
 

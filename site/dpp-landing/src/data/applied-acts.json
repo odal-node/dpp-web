@@ -8,7 +8,7 @@
           "name": "eIDAS Regulation",
           "ref": "Regulation (EU) No 910/2014, as amended by Regulation (EU) 2024/1183",
           "celex": "32014R0910",
-          "what": "The EU's rules for electronic seals and trust services. The node seals published passports in a format the EU recognises and reports whether each seal carries legal effect; legal effect needs a qualified certificate held by a company."
+          "what": "The EU's rules for electronic seals and trust services. The node seals published passports in a format the EU recognises and reports whether each seal is qualified. A qualified seal needs a qualified certificate held by a company, and only a qualified seal carries the law's presumption that the data is intact and from its stated origin."
         },
         {
           "name": "Formats for electronic seals",
@@ -37,7 +37,7 @@
           "name": "Digital product passport registry",
           "ref": "Implementing Regulation (EU) 2026/1778",
           "celex": "32026R1778",
-          "what": "Sets up the EU's registry of passports. The software models registration as it requires, including the identifiers the registry checks. Connecting to the live registry needs a registered company first."
+          "what": "Sets up the EU's registry of passports. The software models registration as it requires, including the identifiers the registry checks. Registering in the live registry needs the operator's legal identity, and the connection is not finished yet."
         },
         {
           "name": "Harmonised standards for passports",
@@ -77,7 +77,7 @@
           "name": "RoHS Directive",
           "ref": "Directive 2011/65/EU",
           "celex": "32011L0065",
-          "what": "Restricts hazardous substances in electrical equipment. Passports for phones and tablets record whether a product complies."
+          "what": "Restricts hazardous substances in electrical equipment. The software's phone and tablet record notes whether a product complies."
         }
       ]
     },
@@ -94,13 +94,13 @@
           "name": "Energy Labelling Regulation",
           "ref": "Regulation (EU) 2017/1369",
           "celex": "32017R1369",
-          "what": "The energy label and the EU's EPREL database. Phone and tablet passports carry the energy class."
+          "what": "The energy label and the EU's EPREL database. The software's phone and tablet record carries the energy class."
         },
         {
           "name": "Critical Raw Materials Act",
           "ref": "Regulation (EU) 2024/1252",
           "celex": "32024R1252",
-          "what": "Names the EU's critical raw materials. Battery and electronics passports list which of them a product contains."
+          "what": "Names the EU's critical raw materials. Battery passports, and the software's phone and tablet record, list which of them a product contains."
         }
       ]
     },

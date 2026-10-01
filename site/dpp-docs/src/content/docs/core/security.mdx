@@ -19,7 +19,7 @@ Trust comes from DNS and HTTPS, the same infrastructure that secures the issuer'
 
 Signing keys change over time: one is retired and a new one takes over. Retired keys stay in the issuer's identity document, and every signature names the exact key that produced it. A new key signs new passports, and passports signed with an older key still verify against that older key.
 
-A passport has to stay verifiable for the regulation's full retention period, which is ten years or more. Rotating a key never invalidates anything already published, and never requires reprinting a label.
+A passport has to stay verifiable for as long as the law keeps it available: under ESPR at least the product's expected lifetime, and ten years after placing on the market under the toy, detergent and construction rules. Rotating a key never invalidates anything already published, and never requires reprinting a label.
 
 ## Keys are encrypted at rest
 
@@ -34,7 +34,7 @@ The encrypted key file is useless without the passphrase. Where the store lives 
 
 ## Product-group rules run in a sandbox
 
-The rules that decide whether a product's data is compliant change with each product group and each regulation, so they are kept out of the trusted core. Each product group's compliance logic is compiled to WebAssembly and runs in a sandbox with a short list of capabilities. It has no filesystem and no network: it cannot read or write a file or open a socket. Apart from computing on the data it is given, a plugin can only write a log line, read a clock fixed to one instant for the whole call, and draw OS randomness. None of that reaches the signing key, the database or any other passport. Execution is limited too, with a fixed memory cap and a metered CPU budget, so a plugin that misbehaves is stopped. Before loading a plugin, a node checks its signature against the pinned publisher key; the only way round that is an explicit development override, which logs a warning (see [Product groups & plugins](/core/sectors)).
+The rules that decide whether a product's data is compliant change with each product group and each regulation, so they are kept out of the trusted core. A product group's compliance logic is compiled to WebAssembly and runs in a sandbox with a short list of capabilities. It has no filesystem and no network: it cannot read or write a file or open a socket. Apart from computing on the data it is given, a plugin can only write a log line, read a clock fixed to one instant for the whole call, and draw OS randomness. None of that reaches the signing key, the database or any other passport. Execution is limited too, with a fixed memory cap and a metered CPU budget, so a plugin that misbehaves is stopped. Before loading a plugin, a node checks its signature against the pinned publisher key; the only way round that is an explicit override, honoured only on a development node and logged as a warning (see [Product groups & plugins](/core/sectors)).
 
 Judging data and signing it are therefore separate. A buggy or even hostile product-group rule can fail a validation, but it cannot touch the signing key, change a passport or forge a signature. New regulations arrive as new sandboxed plugins, and none of the guarantees on this page depends on trusting them. The exact runtime limits are in [Operating a node securely](/engine/security).
 

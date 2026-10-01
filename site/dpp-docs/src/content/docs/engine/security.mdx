@@ -38,11 +38,11 @@ A node refuses to start without its secrets: database credentials, the key-store
 | `sandbox` | Real or sandbox services (test authorities); refuses stand-ins |
 | `production` | Only real services; refuses sandboxes and stand-ins |
 
-Two development overrides exist, and no profile refuses them today: `ALLOW_DEV_CREDENTIALS=true` accepts the sample credentials, and `ALLOW_UNSIGNED_PLUGINS=true` loads plugins without a signature. Both log a warning. Never set either on a node anyone else can reach.
+Two development overrides exist, and both log a warning. `ALLOW_DEV_CREDENTIALS=true` accepts the sample credentials, under any profile. `ALLOW_UNSIGNED_PLUGINS=true` loads plugins without a signature, under the development profile only: a sandbox or production node refuses to start with it set, and a plugin loaded without a signature never counts as real rule checking in the trust posture. Never set either on a node anyone else can reach.
 
 ## Product-group logic is sandboxed
 
-Each product group's compliance logic runs in a Wasm sandbox with no filesystem and no network, capped at 64 MiB of memory and a fixed CPU budget (fuel metering). The plugin can read a clock and draw randomness. The clock is **pinned** to a single instant for the whole call, so a result cannot depend on when it ran. Randomness is real OS entropy and is not pinned: a fixed seed would make a plugin's hash iteration order predictable without making any result more reproducible. A buggy or hostile plugin runs out of budget and is stopped; it cannot reach the signing key, the database or the rest of the node. These are the concrete limits behind the sandbox described in [Security & cryptography](/core/security).
+A product group's compliance logic runs in a Wasm sandbox with no filesystem and no network, capped at 64 MiB of memory and a fixed CPU budget (fuel metering). The plugin can read a clock and draw randomness. The clock is **pinned** to a single instant for the whole call, so a result cannot depend on when it ran. Randomness is real OS entropy and is not pinned: a fixed seed would make a plugin's hash iteration order predictable without making any result more reproducible. A buggy or hostile plugin runs out of budget and is stopped; it cannot reach the signing key, the database or the rest of the node. These are the concrete limits behind the sandbox described in [Security & cryptography](/core/security).
 
 ## The database is the source of truth
 

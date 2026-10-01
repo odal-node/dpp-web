@@ -52,7 +52,7 @@ The ready-made images are not public yet, so the machine runs a clone of the eng
 - `chmod 600 .env`.
 
 <Aside type="note" title="About the production profile">
-`NODE_PROFILE=production` refuses to start while sealing or EU registry sync is a stand-in, and both wait on a registered company holding a qualified certificate. Until then, run without the profile, and watch the trust posture (below) so nothing is a stand-in by accident.
+`NODE_PROFILE=production` refuses to start while rule checking, sealing or EU registry sync is a stand-in. Rule checking needs signed plugins; sealing counts as real only with a qualified certificate held by the operator's company, since the node's own sealer is not qualified; and the live registry connection is not finished yet. Until all three are real, run without the profile, and watch the trust posture (below) so nothing is a stand-in by accident.
 </Aside>
 
 ## 5. Check before going live

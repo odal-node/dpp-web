@@ -4,8 +4,8 @@
 // with the home page's passport preview.
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
-import { fieldLabel, categoryLabel } from "../lib/product-groups";
-import { buckets, flat, isObj, scalar } from "../lib/example-passport";
+import { fieldLabel } from "../lib/product-groups";
+import { buckets, flat, isObj, scalar, shown } from "../lib/example-passport";
 
 const title = "Example battery passport | Odal Node";
 const description =
@@ -83,10 +83,8 @@ const SECTIONS = [
                   )
                 ) : isObj(v) ? (
                   flat(v)
-                ) : k === "batteryType" ? (
-                  categoryLabel(String(v))
                 ) : (
-                  scalar(v)
+                  shown(k, v)
                 )}
               </dd>
             </div>

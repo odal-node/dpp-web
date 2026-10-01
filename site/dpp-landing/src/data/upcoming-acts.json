@@ -31,13 +31,13 @@
           "name": "Qualified certificates for seals",
           "ref": "Implementing Regulation (EU) 2025/1943",
           "celex": "32025R1943",
-          "what": "The standards a qualified certificate for electronic seals is issued under. A company needs such a certificate before the node's seals can carry legal effect."
+          "what": "The standards a qualified certificate for electronic seals is issued under. A company needs such a certificate before the node's seals can be qualified."
         },
         {
           "name": "Secure devices for seal keys",
           "ref": "Implementing Decision (EU) 2016/650",
           "celex": "32016D0650",
-          "what": "The standards for the secure devices that hold the key behind a qualified seal. They matter for seals with legal effect and for keeping keys in hardware, both on the roadmap."
+          "what": "The standards for the secure devices that hold the key behind a qualified seal. They matter for qualified seals and for keeping keys in hardware, both on the roadmap."
         }
       ]
     },

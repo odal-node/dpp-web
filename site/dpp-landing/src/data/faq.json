@@ -99,8 +99,8 @@
         {
           "q": "Can it apply qualified electronic seals and register passports with the EU?",
           "a": [
-            "Sealing is built and tested end to end. Under EU law only a legal person, such as a registered company, can create an electronic seal with legal effect, so until then every seal says plainly that it carries none.",
-            "Registering passports in the EU registry needs the same legal identity. The connection will be finished against the registry's official interface."
+            "Sealing is built and tested end to end, and every seal the node makes today says plainly that it is not qualified. A qualified seal, which the law presumes intact and from its stated origin, needs a qualified certificate issued to the company that seals, and only a legal person, such as a registered company, can hold one.",
+            "Registering passports in the EU registry needs the operator's legal identity too. The connection will be finished against the registry's official interface."
           ],
           "link": { "href": "/roadmap", "label": "Built, waiting on a legal step" }
         }

@@ -33,7 +33,7 @@ These are records in the core library's instrument catalog, and the website's re
 
 | Act | Relied on for | What the code does |
 |---|---|---|
-| eIDAS, Regulation (EU) No 910/2014 as amended | Art. 3(27) qualified seal; Art. 22 trusted lists; Art. 32 applied to seals by Art. 40; Art. 42 qualified time stamps | Seals published passports (its local sealer makes full long-term seals, marked as not qualified) and reports whether a seal carries legal effect; without a legal person holding a qualified certificate, every seal says it carries none |
+| eIDAS, Regulation (EU) No 910/2014 as amended | Art. 3(27) qualified seal; Art. 22 trusted lists; Art. 32 applied to seals by Art. 40; Art. 42 qualified time stamps | Seals published passports (its local sealer makes full long-term seals, marked as not qualified) and reports whether a seal is qualified; until the operator's company holds a qualified certificate, every seal says it is not, and so carries none of the Art. 35(2) presumptions |
 | Implementing Regulation (EU) 2026/248 | Annex I reference formats; Annex II formats lawful until February 2028 | Makes seals in CAdES (ETSI EN 319 122-1); JAdES headers carry the certificate chain (`x5c`) |
 | Implementing Regulation (EU) 2025/1945 | Validation of qualified seals, including revocation freshness | The seal audit reports in ETSI EN 319 102-1 terms, and treats "cannot be read" as its own result, not a failure |
 | Implementing Decision (EU) 2015/1505, as amended by (EU) 2025/2164 | Annex I trusted-list signature profile | Reads and verifies the EU trusted lists to check who issued a seal's certificate |
@@ -42,8 +42,8 @@ These are records in the core library's instrument catalog, and the website's re
 
 | Act | Relied on for | What the code does |
 |---|---|---|
-| Implementing Regulation (EU) 2026/1778 | Art. 8(3) granularity; Art. 8(7)(c)–(d) fields the registry checks; Art. 9(2)(a) proof of registration; commodity codes | Models registration and the identifiers the registry checks; the live connection waits on a legal person |
-| Implementing Decision (EU) 2026/1736, with ESPR Art. 41(2) | The six harmonised passport standards and their presumption of conformity | Identifiers follow EN 18219, with two more of its schemes in the next core release, and earlier passport versions are kept as EN 18221 describes; see [Harmonised standards](/regulatory/harmonised-standards) |
+| Implementing Regulation (EU) 2026/1778 | Art. 8(3) granularity; Art. 8(7)(c)–(d) fields the registry checks; Art. 9(2)(a) proof of registration; commodity codes | Models registration and the identifiers the registry checks; registering for real needs the operator's legal identity, and the live connection is not finished yet |
+| Implementing Decision (EU) 2026/1736, with ESPR Art. 41(2) | The six harmonised passport standards and their presumption of conformity | Identifiers follow EN 18219, in three of its schemes, and earlier passport versions are kept as EN 18221 describes; see [Harmonised standards](/regulatory/harmonised-standards) |
 
 ### Who answers for a product
 
@@ -57,15 +57,15 @@ These are records in the core library's instrument catalog, and the website's re
 | Act | Relied on for | What the code does |
 |---|---|---|
 | REACH, Regulation (EC) No 1907/2006 | Art. 33(1), the 0.1 % w/w threshold | Records substances of very high concern and checks declarations against a compiled part of the candidate list (32 substances), flagging that the list is partial |
-| RoHS Directive 2011/65/EU | Annex II restricted substances | Phone and tablet passports record compliance |
+| RoHS Directive 2011/65/EU | Annex II restricted substances | The phone and tablet record notes compliance |
 
 ### Product information
 
 | Act | Relied on for | What the code does |
 |---|---|---|
 | Tyre Labelling Regulation (EU) 2020/740 | Annex I label classes; Part C noise bands against the Regulation (EC) No 661/2009 limits | Tyre passports carry fuel efficiency, wet grip and noise classes |
-| Energy Labelling Regulation (EU) 2017/1369 | Art. 12, the EPREL product database | Phone and tablet passports carry the energy class; EPREL is the system that displaces a passport for them |
-| Critical Raw Materials Act (EU) 2024/1252 | The list of critical raw materials | Battery and electronics passports list the ones a product contains |
+| Energy Labelling Regulation (EU) 2017/1369 | Art. 12, the EPREL product database | The phone and tablet record carries the energy class; EPREL is the system that displaces a passport for them |
+| Critical Raw Materials Act (EU) 2024/1252 | The list of critical raw materials | Battery passports and the phone and tablet record list the ones a product contains |
 
 ### Unsold goods and end of life
 

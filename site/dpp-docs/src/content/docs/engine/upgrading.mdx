@@ -22,7 +22,7 @@ The signing key, the DID document and every published passport stay as they are.
 
 ### Next release
 
-These are on the engine's main branch and ship with its next tagged release. The rest of this documentation already describes them.
+These are not in a release yet and ship with the next one. The rest of this documentation already describes them.
 
 - **Retire replaces archive.** `POST /dpp/{dppId}/archive` is now `POST /dpp/{dppId}/retire`, the status it sets is `"retired"` and the event is `dpp.passport.retired`. `odal passport archive` is now `odal passport retire`, and `trustMode.archive` on `/vault/api/v1/node/state` is `trustMode.backup`. `"archived"` is refused, not aliased: update clients, and resubscribe webhooks and NATS consumers that filter on `dpp.passport.archived`. A migration rewrites stored statuses on upgrade.
 - **Rename `ARCHIVE_S3_*` to `BACKUP_S3_*`.** The variables are otherwise unchanged; see [Configuration reference](/engine/configuration).

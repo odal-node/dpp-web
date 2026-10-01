@@ -16,6 +16,7 @@ A node refuses to start rather than run unsafely, so most start-up failures are 
 | `ADMIN_USERNAME/ADMIN_PASSWORD are still admin/admin` | That login is full admin over HTTP | Set both to values you generate, or unset them once your first API key exists |
 | `KEY_STORE_PATH is a 32-byte base64 value, which is a key and not a path` | The key-store path was given a secret instead of a file path | Set a file path, such as the data volume in the bundled compose file |
 | `found N Wasm plugin(s) but PLUGIN_SIGNING_KEY is not set` | Unsigned code would decide whether passports comply | Set `PLUGIN_SIGNING_KEY` to the publisher's public key, or remove the plugins |
+| `NODE_PROFILE=… refuses ALLOW_UNSIGNED_PLUGINS=true` | Unsigned plugins are honoured only on a development node | Remove `ALLOW_UNSIGNED_PLUGINS` and set `PLUGIN_SIGNING_KEY` to the publisher's public key |
 | `plugin for product_group '…' failed to load` | A plugin's signature, format or interface did not check out; running without it would publish that group unchecked | Replace the file with a correctly signed plugin, or remove it to run that group without rules deliberately |
 | `NODE_PROFILE=production refuses to boot: required trust port(s) […]` | A service the production profile requires is a stand-in or a sandbox | See [Node profiles](/engine/security#node-profiles); run without the production profile until those services are real |
 | `RESOLVER_BASE_URL` | Required, with no default | Set it to your resolver's public address, decided once ([Production deployment](/engine/deployment)) |

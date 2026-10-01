@@ -7,7 +7,7 @@
 // provenance into src/data/example-passport.json. The sorting uses the battery
 // disclosure map vendored from dpp-core, the same map the software and
 // /visibility use: a field it does not list is public.
-import { fieldLabel } from "./product-groups";
+import { categoryLabel, fieldLabel } from "./product-groups";
 import battery from "../data/product-groups/battery.json";
 import example from "../data/example-passport.json";
 
@@ -36,10 +36,22 @@ for (const [k, v] of groupData) (buckets[classOf(k)] ??= []).push([k, v]);
 export const isObj = (v: Json): v is Record<string, Json> => !!v && typeof v === "object" && !Array.isArray(v);
 export const scalar = (v: Json) =>
   v === true ? "Yes" : v === false ? "No" : typeof v === "number" ? v.toLocaleString("en-GB") : String(v);
+
+// Fields whose value is a code from a fixed list, shown by its label rather
+// than as the raw code ("electricVehicle" reads "Electric vehicle").
+const CODED = new Set(["batteryType", "batteryStatus", "parameterSet"]);
+
+/** One field's value for a reader: a year without a thousands separator, a code by its label. */
+export const shown = (key: string, v: Json) =>
+  typeof v === "number" && key.endsWith("Year")
+    ? String(v)
+    : typeof v === "string" && CODED.has(key)
+      ? categoryLabel(v)
+      : scalar(v);
 export const flat = (o: Record<string, Json>) =>
   Object.entries(o)
     .filter(([, v]) => v !== null && !(Array.isArray(v) && v.length === 0))
-    .map(([k, v]) => `${fieldLabel(k)}: ${Array.isArray(v) ? `${v.length} entries` : isObj(v) ? "…" : scalar(v)}`)
+    .map(([k, v]) => `${fieldLabel(k)}: ${Array.isArray(v) ? `${v.length} entries` : isObj(v) ? "…" : shown(k, v)}`)
     .join(" · ");
 
 /** The Annex XIII point each disclosure class holds (Batteries Regulation, Art. 77(2)). */

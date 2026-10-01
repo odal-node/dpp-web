@@ -32,7 +32,7 @@ A plugin is WebAssembly and runs in an isolated sandbox with no filesystem and n
 
 ## Signed, and installed without a restart
 
-A node runs a plugin only if it is signed by the publisher key its operator pins (`PLUGIN_SIGNING_KEY`). Without a key configured, a node refuses to start while unsigned plugins are present, unless `ALLOW_UNSIGNED_PLUGINS=true` is set; that override is meant for development and logs a warning.
+A node runs a plugin only if it is signed by the publisher key its operator pins (`PLUGIN_SIGNING_KEY`). Without a key configured, a node refuses to start while unsigned plugins are present, unless `ALLOW_UNSIGNED_PLUGINS=true` is set. That override is honoured only under the development profile and logs a warning: a sandbox or production node refuses to start with it set, and an unsigned plugin never counts as real rule checking.
 
 A new signed version can be installed on a running node:
 

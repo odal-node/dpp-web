@@ -14,9 +14,13 @@ const title = "Timeline: when Digital Product Passports arrive | Odal Node";
 const description =
   "When each EU Digital Product Passport is required, year by year, from batteries in 2027 to vehicles in 2032, with the Commission's planned acts and where every date comes from.";
 
+// The build day, which is only a first guess at "today": the page is built
+// when the site is published, not every day, so the script at the foot moves
+// the marker and its date to the reader's own day.
 const todayIso = new Date().toISOString().slice(0, 10);
 const todayText = formatDate(todayIso);
 const thisYear = todayIso.slice(0, 4);
+const marked = years.some(({ year, entries }) => year === thisYear && entries.some((e) => !e.past));
 ---
 
 <Base title={title} description={description}>
@@ -48,13 +52,15 @@ const thisYear = todayIso.slice(0, 4);
               {entries.map((e, n) => (
                 <>
                   {n === split && (
-                    <li class="m-0 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-primary-700">
+                    <li data-today class="m-0 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-primary-700">
                       <span class="h-px flex-1 bg-primary-300" aria-hidden="true" />
-                      Today, {todayText}
+                      <span data-today-text>Today, {todayText}</span>
                       <span class="h-px flex-1 bg-primary-300" aria-hidden="true" />
                     </li>
                   )}
                   <li
+                    data-when={e.when}
+                    data-plan={e.mark === "plan" ? "" : undefined}
                     class:list={[
                       "m-0 rounded-md border p-5",
                       e.mark === "plan"
@@ -86,6 +92,13 @@ const thisYear = todayIso.slice(0, 4);
           </li>
         );
       })}
+      {!marked && (
+        <li data-today hidden class="m-0 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-primary-700">
+          <span class="h-px flex-1 bg-primary-300" aria-hidden="true" />
+          <span data-today-text>Today</span>
+          <span class="h-px flex-1 bg-primary-300" aria-hidden="true" />
+        </li>
+      )}
     </ol>
   </Section>
 
@@ -120,3 +133,28 @@ const thisYear = todayIso.slice(0, 4);
     </p>
   </Section>
 </Base>
+
+<script>
+  // Place the "Today" marker for the reader's own day: before this year's
+  // first entry still to come (a dated one after today, or a plan year), and
+  // nowhere when this year has none, as the build does. An entry dated today
+  // counts as past, as it does at build time.
+  const mark = document.querySelector<HTMLElement>("[data-today]");
+  const text = mark?.querySelector<HTMLElement>("[data-today-text]");
+  if (mark && text) {
+    const now = new Date();
+    const iso = now.toISOString().slice(0, 10);
+    const year = iso.slice(0, 4);
+    const next = [...document.querySelectorAll<HTMLElement>("[data-when]")].find((el) => {
+      const when = el.dataset.when ?? "";
+      return when.startsWith(year) && ("plan" in el.dataset || when > iso);
+    });
+    if (next) {
+      next.before(mark);
+      text.textContent = `Today, ${now.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}`;
+      mark.hidden = false;
+    } else {
+      mark.hidden = true;
+    }
+  }
+</script>

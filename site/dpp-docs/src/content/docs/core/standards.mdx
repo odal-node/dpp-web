@@ -9,7 +9,7 @@ Odal Node builds on published, open standards, so existing tools can read its pa
 
 - **GS1 Digital Link**: the web address behind the QR code. A scan resolves to the passport, and the same link can serve different views and link types; a request for `linkset` returns an RFC 9264 linkset.
 - **ISO/IEC 18004**: the QR code itself. The node renders it with the four-module quiet zone the standard requires.
-- **EN 18219** (unique identifiers): three of the product identifier schemes it allows, a GS1 Digital Link, the IEC 61406 identification link and a decentralised identifier (DID). The core library supports all three; the node does not use the last two yet and identifies products by GTIN. See [Harmonised standards](/regulatory/harmonised-standards).
+- **EN 18219** (unique identifiers): three of the product identifier schemes it allows, a GS1 Digital Link, the IEC 61406 identification link and a decentralised identifier (DID). The core library and the node accept all three. A passport identified by a GTIN gets a GS1 Digital Link carrier; one identified by a link or a DID gets a carrier that opens the passport at the operator's own resolver address. See [Harmonised standards](/regulatory/harmonised-standards).
 - **ISO 3166-1** country codes, and **ISO 17442** legal entity identifiers with their **ISO 7064** check characters.
 
 ## Signing a passport and proving access

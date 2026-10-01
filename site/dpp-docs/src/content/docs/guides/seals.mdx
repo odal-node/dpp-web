@@ -1,14 +1,14 @@
 ---
 title: Electronic seals
-description: How a node seals published passports with its local sealer, how it reports what each seal is worth, and why none carries legal effect yet.
+description: How a node seals published passports with its local sealer, how it reports what each seal is worth, and why none is qualified yet.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
 On top of the operator's own signature, a node can apply an **electronic seal** to each published passport, in the formats the EU's eIDAS Regulation recognises. A *qualified* seal, made with a qualified certificate, carries a legal presumption of integrity and origin that a plain signature does not.
 
-<Aside type="caution" title="No legal effect yet">
-Under eIDAS only a legal person can create an electronic seal, and there is no registered company behind this project yet. Sealing works end to end, but every seal a node makes today says plainly that it carries no legal effect.
+<Aside type="caution" title="Not qualified yet">
+Under eIDAS an electronic seal is created by a legal person, such as a registered company, and a qualified seal also needs a qualified certificate issued to that company by a qualified trust service provider. The node's local sealer uses a certificate it generates itself, so every seal a node makes today says plainly that it is not qualified. Such a seal can still be used as evidence, but it carries none of the presumptions of integrity and origin that eIDAS Art. 35(2) gives a qualified one.
 </Aside>
 
 ## The local sealer
@@ -26,7 +26,7 @@ The key and certificate persist at `SEAL_LOCAL_KEY_PATH` (default `./.seal-local
 Leave `SEAL_PROVIDER` unset, or set it to `none`, for no sealing; the node then reports that sealing is not configured. An unrecognised value stops the node, so passports are never left unsealed without warning.
 
 <Aside type="note" title="Production profile">
-The local sealer counts as a stand-in for a qualified seal, so a node started with `NODE_PROFILE=production` will not accept it. See [Operating a node securely](/engine/security#node-profiles).
+The local sealer counts as a stand-in for a qualified seal, so a node started with `NODE_PROFILE=sandbox` or `NODE_PROFILE=production` will not accept it. See [Operating a node securely](/engine/security#node-profiles).
 </Aside>
 
 ## How sealing runs

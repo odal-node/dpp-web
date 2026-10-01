@@ -89,7 +89,7 @@
     "sohMethodology": "How state of health is measured",
     "stateOfHealth": "State of health",
     "stateOfHealthPct": "State of health as a percentage",
-    "expectedLifetime": "Expected lifetime",
+    "expectedLifetime": "Expected-lifetime measurements",
     "dynamicPerformance": "Performance over time",
     "batteryStatus": "Battery status",
     "usageHistory": "Usage history",

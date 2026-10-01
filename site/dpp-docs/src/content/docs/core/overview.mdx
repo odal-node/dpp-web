@@ -10,7 +10,7 @@ The core is the regulatory library: the rules a compliant Digital Product Passpo
 - **A definition of a passport**: its identity, who issued it, what it is made of, the product-group data the regulation requires, and the lifecycle it moves through. The exact shape is in the [code](https://github.com/odal-node/dpp-core), which is the authoritative reference.
 - **Validation**: a passport is checked against its product group's versioned schema and cross-field rules. This runs locally with no network and no services, and nothing leaves the machine.
 - **Signing and verification primitives**: Ed25519 keys, JSON Web Signatures and the encrypted key store a node signs with. Anyone can verify a passport on their own, without the issuer's systems and without Odal.
-- **A lifecycle**: draft, published, suspended, superseded, retired and end of life. The transitions only go forward and are recorded, so a passport's history cannot be rewritten unnoticed.
+- **A lifecycle**: draft, published, suspended, superseded, retired and end of life. Every transition is recorded, a published passport never returns to draft, and retirement and end of life are final, so a passport's history cannot be rewritten unnoticed.
 - **The EU instrument catalog**: which acts reach which product group, whether each requires a passport, and from when, with every date marked as read from the text or assumed. The website's [regulations page](https://odal-node.io/regulations) shows it.
 - **Access control**: which reader may see which part of a passport, and the verifiable credentials that prove a reader's role.
 - **GS1 Digital Link, Asset Administration Shell and registry types**: what a passport needs to be resolved from a barcode, read by Industry 4.0 systems and registered with the EU.
