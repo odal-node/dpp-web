@@ -1,0 +1,63 @@
+---
+title: Harmonised standards
+description: The six European standards for digital product passports, which of them we have read, and how Odal Node compares with each.
+---
+
+In July 2026 the Commission published the references of six European standards for digital product passports in the Official Journal, in [Implementing Decision (EU) 2026/1736](https://eur-lex.europa.eu/eli/dec_impl/2026/1736/oj/eng). Under Article 41(2) of the Ecodesign for Sustainable Products Regulation (EU) 2024/1781, a passport that conforms to one of these standards is presumed to meet the requirements of Articles 10 and 11 that the standard covers.
+
+We have read EN 18219 and EN 18221. What we say about them below is our own summary. We do not quote the standards; the clause numbers are there so anyone with a copy can check our reading. We have not read the other four and say nothing about them beyond their titles. We do not claim conformance with any of the six.
+
+## The six
+
+| Standard | Title in the Official Journal | Read | Status |
+|---|---|---|---|
+| EN 18216:2026 | Digital product passport – Data exchange protocols | No | Not assessed |
+| EN 18219:2026 | Digital product passport – Unique identifiers | Yes | [Mostly in place, one open point](#en-18219-unique-identifiers) |
+| EN 18220:2026 | Digital product passport – Data carriers | No | Not assessed |
+| EN 18221:2026 | Digital product passport – Data storage, archiving, and persistence | Yes | [Partly in place](#en-18221-data-storage-archiving-and-persistence) |
+| EN 18222:2026 | Digital Product Passport – Application Programming Interfaces (APIs) for product passport lifecycle management and searchability | No | Not assessed |
+| EN 18223:2026 | Digital Product Passport – System interoperability | No | Not assessed |
+
+There is no EN 18217 or EN 18218 in the decision.
+
+## EN 18219: unique identifiers
+
+This standard sets out how a product's unique identifier is built. It allows several identification schemes, and an identifier has to follow one of them as well as some general rules.
+
+| Topic | Status | Odal Node |
+|---|---|---|
+| Identification scheme (clause 5) | In place | A product identified by a GTIN gets a GS1 Digital Link at the passport's level (`/01/{gtin}`, `/01/{gtin}/10/{batch}` or `/01/{gtin}/21/{serial}`), one of the routes in scheme 1. The core library and the node also accept an identification link (scheme 2, EN IEC 61406) and a decentralised identifier (scheme 3), which let a company without a GS1 membership issue passports; such a passport's carrier opens it at the operator's own resolver address. For scheme 2 the library only checks that the value is a web address, not that it follows EN IEC 61406. |
+| Length and characters (clause 4.3) | In place | The standard sets no length limit. The 20-character serial number follows GS1's rule for AI 21. Every identifier the node creates is plain ASCII, percent-encoded according to RFC 3986. |
+| Granularity (clause 4.4) | In place | Once a passport is published, its level (model, batch or item) cannot be changed. |
+| GS1 Digital Link version (scheme 1) | Open | Scheme 1 requires a named version of the GS1 Digital Link URI syntax, and EN 18219 names 1.6.0 (2022). We have not yet compared our parser and builder with that version. |
+| Issuing agency code (scheme 1) | Not assessed | Scheme 1 relies on an issuing agency registered under ISO/IEC 15459-2. We have not worked out whether this applies to someone who runs a resolver. |
+| Identifier kept after the company stops trading (clause 4.2) | Outside the software | This depends on how a node is run and on contracts. Software cannot guarantee it alone. |
+
+## EN 18221: data storage, archiving, and persistence
+
+This standard covers where a passport is stored, how earlier versions are kept, the back-up copy required by ESPR Article 10(4), and how data is copied to that back-up.
+
+Its Annex ZA says the presumption for Article 10(4) covers the technical side of the back-up only, not whether a back-up exists or who provides it. Who may act as the independent back-up provider (ESPR Article 2(32)) is a separate question.
+
+| Topic | Status | Odal Node |
+|---|---|---|
+| Storage (clause 4.1) | In place | The node stores the passports it issues. |
+| Earlier versions (clause 4.2) | Partly in place | Every change keeps a full copy of the version it replaced, and the passport as it was at an earlier moment can be retrieved through the versions route in the [API reference](/api). For now only the operator can read these versions: other authorised readers cannot yet see them under the current passport's access rules, and no back-up provider holds a copy. The standard's integrity requirement for earlier versions refers to EN 18246, which has not been published. |
+| Back-up copy (clause 4.3) | Not in place | The node's [database back-ups](/engine/backup) are for restoring a node after a failure. They do not serve passports or their earlier versions to authorised users. |
+| Access after the company leaves the market (clause 4.3) | Not built | The standard expects wider access through the back-up once the company is no longer active on the market. |
+| Documents a passport links to (clause 4.4) | Not in place | Declarations and instructions are stored as links. The node does not check that they can be downloaded and kept, and does not keep them available for the passport's lifetime. |
+| Copying data to the back-up (clause 4.5) | Not assessed | This is meant to use EN 18216 and EN 18222, which we have not read. |
+
+The node's `retired` status ends a passport's publication life. It is not the archiving of earlier versions described in clause 4.2.
+
+Full conformance with EN 18221 is not currently possible for anyone. It depends on two further standards, EN 18239 and EN 18246, which had not been published when it was issued and are not among the six cited.
+
+## The other four
+
+We have not read EN 18216, EN 18220, EN 18222 or EN 18223 and make no claims about them. EN 18216 and EN 18222 come next, because the back-up requirements in EN 18221 depend on them.
+
+## Read next
+
+- [Standards & interoperability](/core/standards): the open standards the code uses.
+- [Acts and standards](/regulatory/acts-and-standards): every act and standard the code relies on.
+- [Backup, restore and key custody](/engine/backup): what the node's own back-ups do.

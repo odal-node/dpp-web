@@ -1,22 +1,24 @@
 /*
- * @odal/brand-tokens — CSS custom properties + Tailwind 4 @theme block.
+ * @odal/brand-tokens — the brand's CSS custom properties.
  *
- * Two layers:
- *   1. :root { --odal-* } — raw brand values for direct CSS use (used by
- *      docs.odal-node.io's Starlight custom.css and any non-Tailwind site).
- *   2. @theme { --color-* } — Tailwind 4 theme exposure so any Astro site
- *      that does `@import "tailwindcss"; @import "@odal/brand-tokens/tokens.css";`
- *      gets utility classes for the full brand palette without further config.
+ * `:root { --odal-* }`: raw brand values for direct CSS use. Both sites read
+ * them: the landing's global.css, and the docs' Starlight custom.css and Scalar
+ * theme. This file has no Tailwind in it, so a site without Tailwind (the docs)
+ * can import it as plain CSS.
  *
- * Palette decision 2026-06-10 (docs/redesign/DESIGN_SPEC.md §1): the brand
+ * theme.css, beside it, exposes the same values to Tailwind 4 as utility
+ * classes (bg-primary-500, text-neutral-900 …). The landing imports both.
+ *
+ * Palette decision 2026-06-10: the brand
  * colour system follows the logo — navy field (#080C2C) + ice-blue strokes
  * (#B7D4F0) — with a darkened action blue for interactive elements so links
  * and buttons hold AA contrast on white. The former green scale is retired.
  * The `primary-*` token NAMES are kept so existing utility classes keep
  * working; only the values changed.
  *
- * Keep this file in sync with colors.ts / typography.ts / spacing.ts.
- * See CONTRIBUTING.md section 4 for the synchronisation rule.
+ * Keep the values here, in theme.css and in the TypeScript constants
+ * (colors.ts, typography.ts, spacing.ts) the same: change a token in all of
+ * them in the same pull request.
  */
 
 :root {
@@ -61,9 +63,13 @@
   --odal-regulatory-border: #fdba74;
   --odal-regulatory-text:   #9a3412;
 
-  /* status badges — semantic, not brand: shipped = green stays green */
+  /* status badges — semantic, not brand: shipped = green stays green.
+     `blocked` is its own status and not a shade of `active`: it marks work that
+     is finished and cannot be used, which is a different fact about the world
+     from work that is underway, and colouring the two alike hides it. */
   --odal-status-released:    #2e7d32;
   --odal-status-active:      #d97706;
+  --odal-status-blocked:     #9a3412;
   --odal-status-development: var(--odal-neutral-500);
 
   /* typography */
@@ -93,53 +99,4 @@
   --odal-radius-lg:   12px;
   --odal-shadow-e1:   0 1px 2px rgba(0,0,0,0.04);
   --odal-shadow-e2:   0 8px 24px rgba(0,0,0,0.08);
-}
-
-/*
- * Tailwind 4 theme exposure.
- * Any site that imports this file after `@import "tailwindcss";` gets
- * utility classes (bg-primary-500, text-neutral-900, font-sans, etc.).
- */
-@theme {
-  --color-primary-50:  #eff5fb;
-  --color-primary-100: #e3eef9;
-  --color-primary-200: #c9def3;
-  --color-primary-300: #b7d4f0;
-  --color-primary-400: #5e8fc7;
-  --color-primary-500: #2563a8;
-  --color-primary-600: #1d4f87;
-  --color-primary-700: #163d6b;
-  --color-primary-800: #11173f;
-  --color-primary-900: #080c2c;
-
-  --color-navy-900: #080c2c;
-  --color-navy-800: #11173f;
-  --color-ice-300:  #b7d4f0;
-  --color-ice-100:  #e3eef9;
-
-  --color-neutral-0:    #ffffff;
-  --color-neutral-50:   #fafaf9;
-  --color-neutral-100:  #f5f5f4;
-  --color-neutral-200:  #e7e5e4;
-  --color-neutral-300:  #d6d3d1;
-  --color-neutral-400:  #a8a29e;
-  --color-neutral-500:  #78716c;
-  --color-neutral-600:  #57534e;
-  --color-neutral-700:  #44403c;
-  --color-neutral-800:  #292524;
-  --color-neutral-900:  #1c1917;
-  --color-neutral-1000: #0a0a09;
-
-  --color-regulatory-bg:     #fff7ed;
-  --color-regulatory-border: #fdba74;
-  --color-regulatory-text:   #9a3412;
-
-  --color-status-released:    #2e7d32;
-  --color-status-active:      #d97706;
-  --color-status-development: #78716c;
-
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-               "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas,
-               "Liberation Mono", monospace;
 }

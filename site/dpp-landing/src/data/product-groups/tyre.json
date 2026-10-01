@@ -1,0 +1,15 @@
+{
+  "key": "tyre",
+  "title": "Tyres",
+  "schemaVersions": [
+    "1.0.0",
+    "1.1.0"
+  ],
+  "currentSchemaVersion": "1.1.0",
+  "productCategories": [
+    "C1",
+    "C2",
+    "C3"
+  ],
+  "plugin": "product-group-tyre"
+}

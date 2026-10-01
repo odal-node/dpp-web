@@ -1,0 +1,45 @@
+# robots.txt — docs.odal-node.io
+
+User-agent: *
+Content-signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
+
+# Apple: Applebot serves Siri, Spotlight and Safari suggestions and stays
+# allowed above. Applebot-Extended never fetches a page — it governs only
+# whether already-crawled content may train Apple's foundation models, and
+# disallowing it does NOT remove the site from Apple search results.
+User-agent: Applebot-Extended
+Disallow: /
+
+# Google: Googlebot stays allowed above. Google-Extended is the separate
+# control for Gemini training, and blocking it does not affect Search.
+User-agent: Google-Extended
+Disallow: /
+
+Sitemap: https://docs.odal-node.io/sitemap-index.xml
+# A plain-text index of the documentation for AI agents: https://docs.odal-node.io/llms.txt
+
+# ---- Content signals (EU Directive 2019/790, Art. 4) ----
+#
+# The `Content-signal` line above is the machine-readable reservation. It was
+# previously written as three commented lines in `key: value` form, which no
+# parser reads — so it neither reserved anything under Art. 4(3), which asks for
+# machine-readable means, nor signalled anything to a crawler.
+#
+# As a condition of accessing this website, you agree to abide by the following
+# content signals:
+#
+# (a)  If a content-signal = yes, you may collect content for the corresponding
+#      use.
+# (b)  If a content-signal = no, you may not collect content for the
+#      corresponding use.
+# (c)  If the website operator does not include a content signal for a
+#      corresponding use, the website operator neither grants nor restricts
+#      permission via content signal with respect to the corresponding use.
+#
+# search    = yes  Building a search index; hyperlinks and short excerpts.
+# ai-input  = yes  Using this content to ground a generated answer (RAG,
+#                  AI Overviews). Granted deliberately: this site exists to be
+#                  found and quoted, and `search` alone excludes the generated
+#                  summaries that now sit above the links.
+# ai-train  = no   Training or fine-tuning a model on this content.

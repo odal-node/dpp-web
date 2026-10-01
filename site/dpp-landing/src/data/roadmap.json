@@ -1,46 +1,414 @@
 {
-  "_comment": "Roadmap data — the single editable source for the landing roadmap (WEB_CONTENT_STRATEGY.md §4.8). Status enum: shipped | in-build | horizon. Rule: every numeric claim cites where it is measured, or it is omitted. No project-milestone months — regulatory dates live in deadlines.json.",
-  "columns": [
+  "_comment": "The public roadmap, the single editable source for /roadmap. Locked with the founder on 2026-09-25 and checked against dpp-engine main (v0.14.0) and dpp-core main that day. Rules: features and outcomes only, written for a general reader. No issue links, commands, routes, crate names, version numbers or decision-record numbers; technical detail belongs on the docs site. No dates on anything that is not built. 'variants' lists the main forms a capability takes, in plain words. Update 'updated' whenever an item moves. 2026-09-30: eighteen items added with the founder, from a scan of the code, the planning documents and the standards landscape. 'Passports in the reader's language' and 'Product images' were folded into 'The finished public passport page'. The two 'Planned' items that wait on the per-node web address now say so in their own lines, because the register holds more than those two.",
+  "updated": "2026-10-01",
+  "registers": [
     {
-      "status": "shipped",
-      "title": "Shipped",
-      "description": "Verified and available today.",
-      "items": [
-        { "label": "Open regulatory core", "detail": "The EU DPP standard in Rust — pure, dependency-free, and fully open" },
-        { "label": "Sector schemas", "detail": "Battery, textile and steel" },
-        { "label": "Signing and identity", "detail": "Local signing, did:web identity, and key rotation" },
-        { "label": "Resolution and interop", "detail": "GS1 Digital Link, QR, and AAS submodel export" },
-        { "label": "Sandboxed sector plugins", "detail": "Each sector's rules run isolated, with signature verification" },
-        { "label": "End-to-end node", "detail": "Create, sign, publish, and resolve a passport end to end" },
-        { "label": "Full lifecycle provenance", "detail": "Suspend, archive, typed end-of-life, and dual-signed transfer of responsibility — on a tamper-evident, hash-chained audit trail" },
-        { "label": "Evidence dossiers + offline verification", "detail": "Export a signed dossier and verify it with zero network — no trust in Odal required" },
-        { "label": "Registry-ready outbox", "detail": "Registration intent survives crashes and drains with backoff; the live connector activates when the EU publishes its API" },
-        { "label": "Signed compliance-ruleset channel", "detail": "Rulesets arrive as Ed25519-signed bundles, verified fail-closed and hot-swapped; a production node refuses placeholder trust adapters" },
-        { "label": "Bulk import", "detail": "CSV and Excel with dry-run validation and per-row errors" }
+      "status": "available",
+      "title": "Available now",
+      "description": "In the software today and exercised by its tests. Available is not the same as in use: nobody runs this in production yet.",
+      "themes": [
+        {
+          "theme": "Your node, your keys",
+          "items": [
+            {
+              "title": "Runs on your own infrastructure",
+              "line": "One self-contained node on servers you choose. Build our setup tool once, and it sets up and starts the node. Self-hosting for your own compliance is free."
+            },
+            {
+              "title": "Signed with your own key",
+              "line": "Every passport is signed on your servers, with a key that never leaves them, under an identity on a web domain you control. The key can be rotated without invalidating anything it already signed."
+            },
+            {
+              "title": "Releases that list their contents",
+              "line": "Each release's container images carry a list of the components inside them and a record of how they were built, so you can check what you are running. The images are not public yet."
+            }
+          ]
+        },
+        {
+          "theme": "Getting data in",
+          "items": [
+            {
+              "title": "Spreadsheets in, passports out",
+              "line": "Import your product data with a trial run first. The node reports what is wrong row by row instead of rejecting the whole file.",
+              "variants": [
+                "CSV",
+                "Excel"
+              ]
+            },
+            {
+              "title": "Checked before anything is signed",
+              "line": "A product group's rules run before signing, alongside warnings for values that look implausible. A new signed version of a group's rules can be installed on a running node without a restart.",
+              "variants": [
+                "Blocking checks",
+                "Advisory warnings",
+                "Updates without a restart"
+              ]
+            },
+            {
+              "title": "Does it need a passport?",
+              "line": "Ask the node whether a product group needs a passport, from when, and under which acts. Every date says whether it comes from the text of the law or from a reading of it."
+            }
+          ]
+        },
+        {
+          "theme": "Reading a passport",
+          "items": [
+            {
+              "title": "Scan to read",
+              "line": "The code on the product opens its public passport. No login and no fee."
+            },
+            {
+              "title": "The code, generated for you",
+              "line": "The node generates each passport's QR code as an image, pointing to its public page."
+            },
+            {
+              "title": "Each reader sees what they are entitled to",
+              "line": "Repairers, recyclers and authorities see more than the public, field by field, proven by a credential they hold rather than a setting they choose.",
+              "variants": [
+                "Public",
+                "Legitimate interest",
+                "Authorities"
+              ],
+              "link": {
+                "href": "/visibility",
+                "label": "How visibility works"
+              }
+            },
+            {
+              "title": "Export for industrial systems",
+              "line": "Passports can also be served in the Asset Administration Shell format used by Industry 4.0 systems. The field meanings use Odal's own identifiers for now, so a receiving system still has to map them."
+            }
+          ]
+        },
+        {
+          "theme": "A record for the product's whole life",
+          "items": [
+            {
+              "title": "Changes without losing history",
+              "line": "Correct a passport, replace it with a newer one, suspend it or retire it. Every earlier version stays readable, a code already printed on a product still works after its passport is replaced, and every change is written to a tamper-evident trail.",
+              "variants": [
+                "Correct",
+                "Replace",
+                "Suspend",
+                "Retire"
+              ]
+            },
+            {
+              "title": "Passports keep working when the rules change",
+              "line": "A new version of a product group's schema never breaks the passports issued under an older one. They keep resolving exactly as they were issued."
+            },
+            {
+              "title": "A handover between companies",
+              "line": "Responsibility moves from one company to another on the record: the outgoing company signs the handover and the node signs its acceptance. Either side can decline or withdraw before it completes."
+            },
+            {
+              "title": "A second life, on the record",
+              "line": "When a product is repurposed or remanufactured, its new passport links back to the passport, or passports, it came from, and says which of those happened."
+            },
+            {
+              "title": "Products made of products",
+              "line": "A passport can point to the passports of its components, and the whole chain is verified in one check."
+            },
+            {
+              "title": "A recorded end of life",
+              "line": "The end of a product's life is recorded on its passport, including the handover to a waste operator.",
+              "link": {
+                "href": "/lifecycle",
+                "label": "Follow the whole lifecycle"
+              }
+            }
+          ]
+        },
+        {
+          "theme": "Proof that stands on its own",
+          "items": [
+            {
+              "title": "A proof file anyone can check offline",
+              "line": "The passport, its signatures and its full history in one signed file. It verifies without a network connection and without trusting us.",
+              "link": {
+                "href": "/verify",
+                "label": "Check a proof file in your browser"
+              }
+            },
+            {
+              "title": "Readable when your server is not",
+              "line": "A signed, pre-rendered copy of each public page can be kept outside the node, so a scan still works while the node is down."
+            },
+            {
+              "title": "A tamper-evident change log",
+              "line": "Every change to a passport is logged. The log cannot be edited or deleted through the node, and each entry is chained to the one before it, so an entry altered behind the node's back shows."
+            }
+          ]
+        },
+        {
+          "theme": "Running it day to day",
+          "items": [
+            {
+              "title": "One tool to run it all",
+              "line": "Set up, onboard, import, publish, issue credentials and check status from a single tool.",
+              "variants": [
+                "Command line",
+                "Interactive console"
+              ]
+            },
+            {
+              "title": "Your systems stay informed",
+              "line": "Passport events are sent to your own systems, signed so a receiver can tell a real delivery from a replayed one."
+            },
+            {
+              "title": "Scan counts you own",
+              "line": "How often each passport was opened, counted on your own node. Nothing is recorded about the person who scanned."
+            },
+            {
+              "title": "Company details, recorded once",
+              "line": "Your sites and company identifiers live on the node and are stamped onto every new passport."
+            },
+            {
+              "title": "The unsold-goods disclosure",
+              "line": "Record what was discarded, why and where it went, line by line, ready for the yearly disclosure."
+            },
+            {
+              "title": "Clear about its own state",
+              "line": "The node reports which of the services it relies on are fully working and which are still stand-ins, so it is clear what is not finished yet."
+            },
+            {
+              "title": "Safe by default",
+              "line": "A node will not start with the sample admin login or key-store passphrase from its own setup files, or with an empty passphrase. One set up for production also will not start while a service it relies on, such as sealing or rule checking, is only a stand-in. Overrides exist for development, and they are logged as warnings."
+            }
+          ]
+        }
       ]
     },
     {
-      "status": "in-build",
-      "title": "In build",
-      "description": "Under active work with a defined target.",
-      "items": [
-        { "label": "Electronics sector", "detail": "Schema and plugin, prepared ahead of an electronics delegated act" },
-        { "label": "EU Central Registry connector", "detail": "Ready for the registry API; activates when the specification publishes" },
-        { "label": "eIDAS qualified-seal path", "detail": "Qualified trust service provider selection in progress" },
-        { "label": "Unsold-goods disclosure export", "detail": "Report artifact for the July 2026 textile obligation" },
-        { "label": "Operator dashboard", "detail": "Passport management UI for managed and self-hosted nodes" }
+      "status": "waiting",
+      "title": "Built, waiting on a legal step",
+      "description": "Finished and tested. What holds these back is a legal step, not engineering: a qualified seal needs a qualified certificate, which is issued only to a legal person such as a registered company, and registering passports needs the operator's legal identity.",
+      "themes": [
+        {
+          "theme": "Legal identity",
+          "items": [
+            {
+              "title": "Qualified electronic seals",
+              "line": "Sealing works end to end today with the node's own certificate, and every seal says plainly that it is not qualified. A qualified seal, which the law presumes intact and from its stated origin, needs a qualified certificate issued to the company that seals."
+            },
+            {
+              "title": "Registration in the EU registry",
+              "line": "Registering passports needs the operator's legal identity. Our connection to the registry will be finished against its official interface."
+            }
+          ]
+        }
       ]
     },
     {
-      "status": "horizon",
-      "title": "Horizon",
-      "description": "Planned; not in active work. No dates are promised here on purpose.",
-      "items": [
-        { "label": "Multi-operator hosting", "detail": "Isolated per-operator deployments at fleet scale" },
-        { "label": "Edge-cached public resolver", "detail": "CDN-cached passport pages for global scan latency" },
-        { "label": "Further sectors", "detail": "Construction, tyres, furniture, detergents — as delegated acts finalise" },
-        { "label": "Conformance services", "detail": "Verification badge against EN 18222/18223 once the standards are final" },
-        { "label": "EBSI did:ebsi", "detail": "EU-operated DID method as an alternative issuer-identity path, if registry requirements call for it" }
+      "status": "in-progress",
+      "title": "In progress",
+      "description": "Being built now. Nothing here is claimed as working.",
+      "themes": [
+        {
+          "theme": "Next",
+          "items": [
+            {
+              "title": "More ways to identify a product",
+              "line": "Every identifier scheme the European standard allows, not only a barcode number, so a company without a GS1 membership can issue passports. The open library supports them, and the node accepts them from its next release."
+            },
+            {
+              "title": "Carbon and repairability figures in the passport",
+              "line": "The node already checks a battery's declared recycled content against the legal minimums. The carbon and repairability calculators are written and published in the open library, but the node does not run them yet, so no passport carries a computed carbon or repairability figure today."
+            },
+            {
+              "title": "Spreadsheet import for every product group",
+              "line": "Import covers most product groups today. Phones and tablets, and detergents, are still to come."
+            },
+            {
+              "title": "The unsold-goods report, ready to publish",
+              "line": "The records exist today. What is missing is the finished document a company publishes on its own website each year."
+            },
+            {
+              "title": "Show only part of a passport",
+              "line": "A passport can be issued as a digital credential its holder presents in part: they choose which fields to reveal, and the reader can still check those fields were signed. The open library has it; the node does not issue it yet."
+            },
+            {
+              "title": "A live passport you can scan",
+              "line": "A sample passport served by a real node, which anyone can open from this website and scan with a phone."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "status": "planned",
+      "title": "Planned",
+      "description": "Committed to, and not yet being built.",
+      "themes": [
+        {
+          "theme": "Proven and complete",
+          "items": [
+            {
+              "title": "Proven against the standards",
+              "line": "Each standard's own official tests, run against the software, with a plain statement of what passes. Alignment with all eight European standards for digital product passports, including the two on security.",
+              "variants": [
+                "Official test suites",
+                "European passport standards"
+              ]
+            },
+            {
+              "title": "Complete toy and detergent passports",
+              "line": "Everything the toy and detergent regulations ask their passports to carry, which the software covers only in part today, including the local language and a colour image of the product.",
+              "variants": [
+                "Toys",
+                "Detergents"
+              ]
+            }
+          ]
+        },
+        {
+          "theme": "Reading a passport",
+          "items": [
+            {
+              "title": "The finished public passport page",
+              "line": "The page a scan opens, in your company's look, in the reader's language, and with product images where the rules ask for them. Today's page is a plain placeholder.",
+              "variants": [
+                "Your brand",
+                "The reader's language",
+                "Product images"
+              ]
+            }
+          ]
+        },
+        {
+          "theme": "Running it",
+          "items": [
+            {
+              "title": "Install without building anything",
+              "line": "Ready-made images and a single install command, so a node runs without being built from source first.",
+              "variants": [
+                "Ready-made images",
+                "One-command install"
+              ]
+            }
+          ]
+        },
+        {
+          "theme": "Building on a node",
+          "items": [
+            {
+              "title": "JavaScript and TypeScript packages",
+              "line": "Packages for building on a node in JavaScript and TypeScript, starting with a client for the node's interface. Each is built directly from the node's own interface and the open library, so it always says exactly what the node does. It waits on one decision first: how each node gets its own web address."
+            },
+            {
+              "title": "A dashboard for running your node",
+              "line": "A web dashboard for the day-to-day work of running a node, built on those packages. It talks to your own node straight from your browser, so your data never passes through us. It waits on one decision first: how each node gets its own web address."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "status": "considered",
+      "title": "Being considered",
+      "description": "Options, not promises. Not started, not scheduled, and deliberately without dates.",
+      "themes": [
+        {
+          "theme": "Trust and identity",
+          "items": [
+            {
+              "title": "Keys in hardware you control",
+              "line": "Signing keys held in a hardware security module or your own key service, rather than in an encrypted file on the server."
+            },
+            {
+              "title": "Proof on every scan",
+              "line": "The public passport page checks the signature in the reader's own browser, so a scan shows that the passport was signed by its company and has not changed since."
+            },
+            {
+              "title": "A public checker anyone can run",
+              "line": "Check any passport against the European standards on your own machine, without sending it anywhere."
+            },
+            {
+              "title": "Company identity through the European Business Wallet",
+              "line": "The EU has proposed a wallet that lets a company prove who it is and sign and seal documents. It could give a company's passports their legal identity. It is a proposal, not law yet."
+            },
+            {
+              "title": "Readers identified by the EU Digital Identity Wallet",
+              "line": "Repairers, recyclers and authorities prove who they are with the digital identity wallet every EU country is introducing, instead of a credential issued by the node."
+            }
+          ]
+        },
+        {
+          "theme": "Data in and out",
+          "items": [
+            {
+              "title": "Import any spreadsheet as it is",
+              "line": "The node maps your own column names, number formats and material names, so you do not reshape your files to its template first."
+            },
+            {
+              "title": "Supplier data, signed at the source",
+              "line": "Ask a supplier for component data, such as materials or recycled content, with a signed request, and receive a signed answer that goes straight into your passport."
+            },
+            {
+              "title": "The EU's shared vocabulary",
+              "line": "Passport data expressed in the common vocabulary the EU maintains, so every system reads a field the same way."
+            },
+            {
+              "title": "Connected to industrial data spaces",
+              "line": "Passports shared into industrial data spaces such as Catena-X, through the connectors those networks already use, rather than a network of our own."
+            },
+            {
+              "title": "Readable in the UN Transparency Protocol format",
+              "line": "The same signed passport, also offered in the United Nations' format for supply-chain transparency, for trading partners who use it."
+            }
+          ]
+        },
+        {
+          "theme": "Keeping up with the law",
+          "items": [
+            {
+              "title": "Rules that keep up with the law",
+              "line": "A watch on the EU acts and standards that tells a node's operator what changed and which of their passports it affects."
+            },
+            {
+              "title": "Ready for the iron and steel passport",
+              "line": "Iron and steel is expected to be the first product group to get a passport under the ecodesign rules. The software models it today and would follow the act as it is adopted."
+            },
+            {
+              "title": "Battery carbon footprint",
+              "line": "Waiting on the EU to publish the calculation method. Guessing would produce a number that looks official and is not."
+            },
+            {
+              "title": "A practice copy of the EU registry",
+              "line": "Somewhere to rehearse registering passports before connecting to the real registry."
+            }
+          ]
+        },
+        {
+          "theme": "Running a node",
+          "items": [
+            {
+              "title": "Managed deployments",
+              "line": "A node run for you, for companies that would rather not operate one themselves. It would still be yours alone: one company, one node, nothing shared with anyone else."
+            },
+            {
+              "title": "Update notices for self-hosted nodes",
+              "line": "A signed channel that tells a self-hosted node when a new release is available."
+            },
+            {
+              "title": "Monitoring from your own tools",
+              "line": "A node's health, workload and warnings, in the monitoring and alerting tools your company already runs."
+            },
+            {
+              "title": "A back-up copy held by an independent provider",
+              "line": "A copy of each passport kept by an independent service provider, so it stays available even if the company that issued it, or its server, does not."
+            }
+          ]
+        },
+        {
+          "theme": "Beyond passports",
+          "items": [
+            {
+              "title": "Records beyond passports",
+              "line": "The node already keeps one record about a company's year rather than a product: the unsold-goods disclosure. The same kind of record, signed like a passport, could cover other reporting duties."
+            }
+          ]
+        }
       ]
     }
   ]

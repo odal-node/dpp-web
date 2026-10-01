@@ -1,190 +1,242 @@
 ---
 // odal-node.io — home page.
-// Section order and copy per docs/WEB_CONTENT_STRATEGY.md §4.
-// Terminology and claims rules: see §7 (no capability-tier language, no claims
+// Section order and copy are fixed deliberately; see each section component.
+// Order (2026-09-30): hero, why now, a passport read three ways, how it works,
+// what Odal can see, for engineers, standards and licences, where it stands,
+// next step. Technical detail stays on the docs site: no code, commands or
+// routes here.
+// Terminology and claims rules: no capability-tier language, no claims
 // ahead of shipped code, "proof-bound" never "no-touch").
 import DeadlineCards from "../components/DeadlineCards.astro";
+import FlowDiagram from "../components/FlowDiagram.astro";
 import Hero from "../components/Hero.astro";
+import LicenceSplit from "../components/LicenceSplit.astro";
+import PassportPreview from "../components/PassportPreview.astro";
+import RoadmapStrip from "../components/RoadmapStrip.astro";
 import Section from "../components/Section.astro";
 import StandardsRow from "../components/StandardsRow.astro";
+import { datedPassports } from "../lib/regulations";
 import Base from "../layouts/Base.astro";
+import Button from "../components/Button.astro";
 
-const title = "Odal Node — EU Digital Product Passport Infrastructure | ESPR Compliance";
+// Counted from the registry, so the sentence cannot disagree with the cards.
+const WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+const n = datedPassports.length;
+const lead = `${WORDS[n] ?? n} passport obligation${n === 1 ? " already carries" : "s already carry"} a date in law:`;
+
+const title = "Odal Node: EU Digital Product Passport Infrastructure | ESPR Compliance";
 const description =
-  "Open-source infrastructure for EU Digital Product Passports (DPP) under ESPR. Self-hosted, sovereign compliance — your product data is validated and signed with your keys. Battery, textile, and electronics passports.";
+  "Self-hosted infrastructure for EU Digital Product Passports (DPP) under ESPR, built on an open-source core. Your product data is validated and signed with your own keys. Passports for batteries, textiles, steel and more.";
 
 // Page-specific structured data.
 const softwareAppLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
+  // Same `@id` as the node's `SoftwareSourceCode` in Base.astro, deliberately:
+  // one node described from two angles, the deployable application here and
+  // its source there, with the same licence. The core library is a separate
+  // entity (`#core`) under its own licence, so it must never share this id.
+  "@id": "https://odal-node.io/#node",
   name: "Odal Node",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Linux, Docker",
   description:
-    "Self-hosted infrastructure for EU Digital Product Passports (DPP) under the Ecodesign for Sustainable Products Regulation (ESPR). Validates product data against sector schemas, signs with your keys, and publishes verifiable passports via GS1 Digital Link.",
+    "Self-hosted infrastructure for EU Digital Product Passports (DPP) under the Ecodesign for Sustainable Products Regulation (ESPR). Validates product data against each product group's rules, signs with your keys, and publishes verifiable passports via GS1 Digital Link.",
   url: "https://odal-node.io",
   offers: {
     "@type": "Offer",
     price: "0",
     priceCurrency: "EUR",
-    description: "Open-core: dpp-core is Apache-2.0; dpp-engine is BSL-1.1 with free self-host grant.",
+    description: "Free to self-host for your own compliance under the node's BSL-1.1 grant. The core library, dpp-core, is Apache-2.0.",
   },
-  license: "https://opensource.org/licenses/Apache-2.0",
-  codeRepository: "https://github.com/odal-node/dpp-core",
+  // The node is dpp-engine, licensed BSL-1.1; only the core library is Apache-2.0.
+  license: "https://github.com/odal-node/dpp-engine/blob/main/LICENSE",
+  codeRepository: "https://github.com/odal-node/dpp-engine",
 };
 
-// The end-to-end process as one timeline. On the landing the underlying
-// services (integrator, validation, vault + in-process signing, resolver) are
-// deliberately merged into a single flow; the docs keep them as separate pages.
-const steps = [
-  { label: "Import", body: "Product data from CSV, Excel, or your ERP into your own node." },
-  { label: "Validate", body: "Against versioned sector schemas tracking the regulation, locally." },
-  { label: "Sign", body: "With your own key, generated and held on your infrastructure." },
-  { label: "Publish", body: "Only the signed passport becomes resolvable, via QR and GS1 Digital Link." },
+// For the people who will run a node. Worded from cards the page carried
+// before (and /build-on-odal for the export), so no new claim enters here.
+const engineers = [
+  {
+    k: "One service, on your infrastructure",
+    v: "The node is one self-contained service. Run it on your own infrastructure, or on a cloud you control.",
+  },
+  {
+    k: "Rules in a sandbox",
+    v: "Product-group rules run in an isolated sandbox, and new rules arrive as signed updates rather than rewrites of the software.",
+  },
+  {
+    k: "Export for Industry 4.0 systems",
+    v: "A node can serve a published passport in the Asset Administration Shell format. The field meanings use Odal's own identifiers for now, so a receiving system still has to map them.",
+  },
+  {
+    k: "Build it from the source",
+    v: "The source code is public. Build our setup tool once (you need Docker and Rust), and it sets up and starts a node on your own machine. No licence keys, no passport caps. Ever.",
+  },
 ];
 ---
 
 <Base title={title} description={description} jsonLd={[softwareAppLd]}>
+  {/* The subtitle's last two sentences and the trust lines restate facts the
+      page proves further down: the licence grant (licence cards), no caps ("Build it from the
+      source"), public source, and what Odal can and cannot see. Change them
+      together. */}
   <Hero
     eyebrow="EU Digital Product Passports"
     status
     title="Signed by you. Verified by anyone."
-    subtitle="Odal Node is sovereign infrastructure for EU Digital Product Passports. Your product data is validated and signed on your infrastructure, with your keys — the raw import files are discarded, the signed passport is stored and served. Anyone can verify it."
-    primaryHref="https://docs.odal-node.io/quick-start"
-    primaryLabel="Self-host now"
+    subtitle="Issue EU Digital Product Passports from your own infrastructure. Odal Node checks your product data against its product group's rules, signs it with your key and publishes the passport behind the product's QR code. Anyone can check it, even offline. You keep your data and your key. We never see either."
+    ctaHref="/waitlist"
+    ctaLabel="Tell us what you make"
     secondaryHref="https://docs.odal-node.io"
     secondaryLabel="Read the docs"
+    trust={[
+      "Free to self-host for your own products",
+      "No licence keys, no passport limits",
+      "Source code public on GitHub",
+    ]}
   />
 
-  <Section eyebrow="Why now" title="The deadlines are set. The infrastructure mostly isn't." wide>
+  <Section eyebrow="Why now" title="Know which date applies to your products." wide>
     <p>
-      Compliance arrives sector by sector, date by date — not "everything by 2027."
-      Three dated obligations are already in law:
+      Passports arrive one product group at a time, each with its own date.{" "}
+      {lead}
     </p>
     <div class="not-prose mt-8">
       <DeadlineCards />
     </div>
+    {/* Source: the Commission's ESPR working plan, COM(2025) 187 final,
+        16.4.2025, checked against an internal sector inventory (July 2026).
+        These are indicative adoption years for delegated acts, not passport
+        dates. */}
     <p class="mt-8">
-      The question is whether the infrastructure you adopt now still fits the next
-      sector's act. Odal Node is built so that it does: new sectors arrive as schema
-      and plugin updates, not as new systems.
+      After these, passports arrive product group by product group. The
+      Commission's 2025–2030 working plan puts iron and steel first, then
+      textiles, tyres and aluminium, then furniture and mattresses, with
+      indicative adoption from 2026 to 2029. Each act will set its own passport
+      dates when it is adopted.
+    </p>
+    <p>
+      Software you adopt now has to keep working as the next acts are adopted. In
+      Odal Node, a new product group arrives as an update to its rules, not as a
+      new system.
     </p>
   </Section>
 
-  <Section eyebrow="How it works" title="Proof-bound: the data stays yours. Every field it publishes is bound to a proof." tone="tinted">
+  <Section eyebrow="See a passport" title="One passport, read three ways." tone="muted" wide>
     <p>
-      Manufacturers keep trade secrets. Regulators and customers need data they can
-      trust. A proof-bound architecture serves both without asking either to
-      compromise: the raw import files are read once and discarded, while the signed
-      passport they produce — carrying the full product data, every field bound to a
-      proof — is what the node stores and serves, released to each audience by access
-      tier.
+      The same battery passport shows each reader the part the law gives them.
+      Pick a reader to see which parts they can read.
     </p>
-    <div class="not-prose my-6">
-      <ol class="grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-4">
-        {steps.map((s, i) => (
-          <li>
-            <div class="flex items-center">
-              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-primary-500 bg-neutral-0 text-sm font-semibold text-primary-700">
-                {i + 1}
-              </span>
-              {i < steps.length - 1 && (
-                <span class="ml-3 hidden h-0.5 flex-1 bg-primary-200 md:block" aria-hidden="true"></span>
-              )}
-            </div>
-            <h3 class="mb-1 mt-4 text-base font-semibold text-neutral-900">{s.label}</h3>
-            <p class="m-0 text-sm leading-body text-neutral-600">{s.body}</p>
-          </li>
-        ))}
-      </ol>
+    <div class="mt-8">
+      <PassportPreview />
     </div>
+  </Section>
+
+  <Section eyebrow="How it works" title="Proof-bound: your data stays with you, and every published field is signed." tone="tinted" wide>
     <p>
-      Anyone verifies the signature against your public DID document — without Odal in
-      the loop. Public fields are readable by all; restricted tiers — for repairers,
-      recyclers, and market-surveillance authorities — are released only against a
-      verified credential. What the node stores: the signed passport with every tier,
-      the audit trail, the signature. What it never stores: raw import files,
-      supply-chain detail beyond passport content, or your private keys.
+      Manufacturers have trade secrets to protect. Regulators and customers need
+      data they can trust. Odal Node handles both: your product data is validated
+      and signed on your own infrastructure, and the node serves the signed
+      passport, which carries the full product data with every field signed. Each
+      reader sees the parts their access rights allow.
+    </p>
+    <div class="mt-8">
+      <FlowDiagram />
+    </div>
+    <ul class="not-prose m-0 mt-8 flex list-none flex-wrap gap-x-8 gap-y-3 p-0 text-sm">
+      <li class="m-0"><a href="/verify" class="link-arrow">Try it: verify a proof file</a></li>
+      <li class="m-0"><a href="/lifecycle" class="link-arrow">Follow one passport's whole life</a></li>
+      <li class="m-0"><a href="/trust" class="link-arrow">What stays on your node</a></li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="Data and trust" title="What Odal Node can and cannot see." wide>
+    <p>
+      Your node runs on your infrastructure and we are not part of it, so we have
+      no access to the production data behind a passport. This comes from how the
+      software works, not from a policy. In detail:
+    </p>
+    <div class="not-prose mt-8 grid gap-6 md:grid-cols-3">
+      <div class="card p-6">
+        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We can see</h3>
+        <p class="m-0 text-sm leading-body text-neutral-600">
+          What anyone can see: the public part of the passports you publish.
+        </p>
+      </div>
+      <div class="card p-6">
+        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We cannot see</h3>
+        <p class="m-0 text-sm leading-body text-neutral-600">
+          Your private keys, your raw production data and your supply-chain
+          detail. They stay on your infrastructure, and we are not part of it.
+        </p>
+      </div>
+      <div class="card p-6">
+        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We cannot change</h3>
+        <p class="m-0 text-sm leading-body text-neutral-600">
+          Your published passports. Every field carries your signature, so a
+          change made without your key fails verification.
+        </p>
+      </div>
+    </div>
+    <p class="mt-8">
+      <a href="/trust" class="link-arrow">How this works</a>
     </p>
   </Section>
 
-  <Section eyebrow="What you get" title="Built for the compliance officer and the engineer at the same desk." wide>
-    <div class="not-prose grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {[
-        {
-          k: "Proof-bound by architecture",
-          v: "The raw import files are discarded after signing; the signed passport is what's stored and served. A property of the software, not a policy promise.",
-        },
-        {
-          k: "Standards-native",
-          v: "GS1 Digital Link 1.2 resolution, W3C VC 2.0 credentials, did:web identity, AAS submodel export.",
-        },
-        {
-          k: "Sandboxed sector plugins",
-          v: "Each sector's compliance logic runs in an isolated sandbox. New regulations land as plugins, not rewrites.",
-        },
-        {
-          k: "Honest open-core",
-          v: "dpp-core (the regulatory standard in Rust) is Apache-2.0, full capability, forever. dpp-engine is BSL-1.1 with a real self-host grant — production self-hosting is free.",
-        },
-        {
-          k: "No vendor lock-in",
-          v: "The node is a single, self-contained service. You can run it on your own infrastructure, or on a cloud you control.",
-        },
-        {
-          k: "Self-host in minutes",
-          v: "One compose file. No licence keys, no passport caps. Ever.",
-        },
-      ].map((f) => (
-        <article class="rounded-md border border-neutral-200 bg-neutral-0 p-6 transition-colors hover:border-primary-300">
+  <Section eyebrow="For your engineers" title="For the people who will run it." tone="muted" wide>
+    <div class="not-prose grid gap-6 md:grid-cols-2">
+      {engineers.map((f) => (
+        <article class="card p-6">
           <h3 class="mb-2 mt-0 text-base font-semibold text-neutral-900">{f.k}</h3>
           <p class="m-0 text-sm leading-body text-neutral-600">{f.v}</p>
         </article>
       ))}
     </div>
+    <ul class="not-prose m-0 mt-8 flex list-none flex-wrap gap-x-8 gap-y-3 p-0 text-sm">
+      <li class="m-0"><a href="https://docs.odal-node.io/quick-start" class="link-arrow">Quick start</a></li>
+      <li class="m-0"><a href="/build-on-odal" class="link-arrow">Build on Odal</a></li>
+      <li class="m-0"><a href="https://docs.odal-node.io/api" class="link-arrow">API reference</a></li>
+      <li class="m-0"><a href="/community" class="link-arrow">Community</a></li>
+      <li class="m-0"><a href="https://github.com/odal-node" rel="noopener" class="link-arrow">Code on GitHub</a></li>
+    </ul>
   </Section>
 
-
-  <Section eyebrow="Data and trust" title="What Odal Node can and cannot see." tone="tinted" wide>
-    <p>
-      Proof-bound is not a promise about our conduct; it is a property of the
-      software. The node reads your import files once and discards them — so the raw
-      production data behind a passport is never ours to access, by construction.
-      Stated precisely:
-    </p>
-    <div class="not-prose mt-8 grid gap-6 md:grid-cols-3">
-      <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
-        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We can see</h3>
-        <p class="m-0 text-sm leading-body text-neutral-600">
-          The signed passport you publish to a resolver we operate, and the
-          metadata required to serve it.
-        </p>
-      </div>
-      <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
-        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We cannot see</h3>
-        <p class="m-0 text-sm leading-body text-neutral-600">
-          Your private keys (held in-process on your infrastructure), your raw
-          production data, your supply-chain detail.
-        </p>
-      </div>
-      <div class="rounded-md border border-neutral-200 bg-neutral-0 p-6">
-        <h3 class="mb-2 mt-0 text-sm font-semibold uppercase tracking-wide text-primary-700">We could see but do not</h3>
-        <p class="m-0 text-sm leading-body text-neutral-600">
-          The contents of your import files, which the node discards after
-          validation.
-        </p>
-      </div>
-    </div>
-    <p class="mt-8 text-sm">
-      <!-- <a href="/trust" class="font-medium">Read the full breakdown →</a> -->
-    </p>
-  </Section>
-
-  <!-- <GetStarted /> -->
-
-  <Section eyebrow="Standards" title="Built on the standards the regulation itself cites." tone="muted" wide>
+  <Section eyebrow="Standards and licences" title="Built on open standards." wide>
     <div class="not-prose mt-2">
       <StandardsRow />
+    </div>
+    <h3 class="mb-4 mt-12 text-lg font-semibold text-neutral-900">Two licences: the library and the node.</h3>
+    <LicenceSplit />
+    <p class="mt-8 text-sm">
+      <a href="/regulations" class="link-arrow">The EU acts it applies</a>
+    </p>
+  </Section>
+
+  <Section eyebrow="Where it stands" title="What works today, and what comes next." tone="tinted" wide>
+    <p>
+      <strong>Nobody is running this in production.</strong> The roadmap lists
+      what is built, what is waiting on a legal step and what comes next, with
+      no dates on anything unbuilt.
+    </p>
+    <div class="mt-8">
+      <RoadmapStrip />
+    </div>
+    <p class="mt-8 text-sm">
+      <a href="/roadmap" class="link-arrow">See the roadmap</a>
+    </p>
+  </Section>
+
+  <Section eyebrow="Next step" title="Get ready for your products' passports." wide>
+    <p>
+      Check whether your product needs a passport, find your product group,
+      or tell us what you make and we will keep you posted as the software
+      takes shape.
+    </p>
+    <div class="not-prose mt-6 flex flex-wrap gap-3">
+      <Button href="/waitlist">Tell us what you make</Button>
+      <Button href="/passport-check" variant="secondary">Check if you need a passport</Button>
+      <Button href="/product-groups" variant="secondary">Find your product group</Button>
     </div>
   </Section>
 </Base>

@@ -1,54 +1,54 @@
 ---
 title: Security & cryptography
-description: How a passport proves it is genuine — the signatures, identities, and key handling that let anyone verify a passport without trusting Odal, or the issuer's servers.
+description: The signatures, identities and key handling that let anyone check a passport is genuine without trusting Odal or the issuer's servers.
 ---
 
-A Digital Product Passport is only worth the trust you can place in it. The core's security model exists to answer one question for anyone who meets a passport — a consumer, a recycler, a market-surveillance authority: *is this genuine, unaltered, and issued by who it claims to be?* It answers with open, audited cryptography and without depending on Odal being online — or existing.
+Anyone who comes across a passport, whether a consumer, a recycler or a market-surveillance authority, needs to know whether it is genuine, unaltered and issued by the company it names. The core answers that with open, audited cryptography, and the answer does not depend on Odal being online or existing.
 
-## A passport is a signed proof, not a record
+## A passport is signed
 
-When a passport is published, the validated data is wrapped as a W3C Verifiable Credential and signed with the issuer's own Ed25519 key. The signature covers the exact bytes of the passport: change a single value afterwards and verification fails. A passport is therefore not a database entry you have to take on faith — it is a proof that carries its own evidence.
+When a passport is published, the validated data is signed as a JSON Web Signature with the issuer's own Ed25519 key, twice: once over the full passport and once over its public view. Each signature covers the exact bytes it signs, so changing a single value afterwards makes verification fail. A reader does not have to trust a database entry; the passport carries its own proof. (W3C Verifiable Credentials do something else: they are what a reader presents to see restricted parts. See [Access control](/regulatory/access-control).)
 
-## The trust root is the issuer's own domain
+## The issuer's domain is the trust root
 
-A signature only means something if you know whose key made it. The core anchors identity with `did:web`: the issuer publishes their public key as a small document at a well-known address on their own domain (`/.well-known/did.json`). Verifying a passport is then an ordinary web lookup — fetch the issuer's key, check the signature.
+A signature is only useful if you know whose key made it. The core uses `did:web` for identity: the issuer publishes their public key as a small document at a fixed address on their own domain (`/.well-known/did.json`). Verifying a passport is then an ordinary web lookup: fetch the issuer's key and check the signature.
 
-The trust inherits from DNS and HTTPS — the same infrastructure that already secures the issuer's website. There is no blockchain, no central authority that has to stay online, and no role for Odal in the verification path. What this guarantees is **authenticity** (the named issuer signed it), **integrity** (it has not been altered), and **binding** (it refers to the specific product). What it deliberately does *not* guarantee is that the issuer's figures are *correct* — the core provides the proof, not the truth behind it.
+Trust comes from DNS and HTTPS, the same infrastructure that secures the issuer's website. There is no blockchain, no central authority that has to stay online, and no role for Odal in verification. The signature proves **authenticity** (the named issuer signed it), **integrity** (it has not been altered) and **binding** (it refers to the specific product). It does not prove that the issuer's figures are *correct*. The core proves who said what; it cannot check whether it is true.
 
-## Rotating keys without breaking the past
+## Rotating keys
 
-Signing keys change over time — a key is retired, a new one takes over. The core treats this as a routine, non-destructive operation. Retired keys are kept in the issuer's identity document, and every signature names the exact key that produced it. A new key signs new passports; passports signed by an older key still verify against that older key.
+Signing keys change over time: one is retired and a new one takes over. Retired keys stay in the issuer's identity document, and every signature names the exact key that produced it. A new key signs new passports, and passports signed with an older key still verify against that older key.
 
-This matters because a passport must stay verifiable for the regulation's full retention window — ten years or more. Rotating a key never invalidates anything already published, and never requires reprinting a label.
+A passport has to stay verifiable for as long as the law keeps it available: under ESPR at least the product's expected lifetime, and ten years after placing on the market under the toy, detergent and construction rules. Rotating a key never invalidates anything already published, and never requires reprinting a label.
 
-## Keys are protected at rest
+## Keys are encrypted at rest
 
-A signing key is generated from the operating system's own randomness — never derived from a password, so never guessable. The private key is then stored encrypted, never in the clear:
+A signing key is generated from the operating system's randomness. It is never derived from a password, so it cannot be guessed. The private key is stored encrypted:
 
-- The passphrase that unlocks the store is put through **Argon2id**, a deliberately slow, memory-hard function, to produce the encryption key. This makes guessing the passphrase by brute force impractical even with the file in hand.
-- That key encrypts the store with **AES-256-GCM**, an authenticated cipher — so the contents are both hidden and protected against modification.
-- A separate integrity check (HMAC) covers the whole file, so tampering is detected — including an attempt to *downgrade* the protection to a weaker scheme.
+- The passphrase that unlocks the store goes through **Argon2id**, a slow, memory-hard function, to produce the encryption key. This makes guessing the passphrase by brute force impractical, even with the file in hand.
+- That key encrypts the store with **AES-256-GCM**, an authenticated cipher, so the contents are hidden and any modification is detected.
+- A separate integrity check (HMAC) covers the whole file, so tampering is detected, including an attempt to *downgrade* the protection to a weaker scheme.
 - Key material is wiped from memory as soon as it is no longer needed.
 
-The practical guarantee is simple: the encrypted key file on its own is useless without the passphrase. Where that store lives and how a running node guards it is covered in [Operating a node securely](/engine/security).
+The encrypted key file is useless without the passphrase. Where the store lives and how a running node protects it is covered in [Operating a node securely](/engine/security).
 
-## Sector logic is isolated by construction
+## Product-group rules run in a sandbox
 
-The rules that decide whether a product's data is compliant change sector by sector and regulation by regulation — so they are deliberately *not* part of the trusted core. Each sector's compliance logic is compiled to WebAssembly and runs inside a sandbox with no ambient capabilities: no filesystem, no network, no way to reach the host. Product data goes in as plain memory, a validation verdict comes out, and nothing else crosses the boundary. Execution is bounded too — a fixed memory cap and a metered CPU budget — so a plugin that misbehaves is stopped, not obeyed. And a plugin is signature-verified before it is ever loaded.
+The rules that decide whether a product's data is compliant change with each product group and each regulation, so they are kept out of the trusted core. A product group's compliance logic is compiled to WebAssembly and runs in a sandbox with a short list of capabilities. It has no filesystem and no network: it cannot read or write a file or open a socket. Apart from computing on the data it is given, a plugin can only write a log line, read a clock fixed to one instant for the whole call, and draw OS randomness. None of that reaches the signing key, the database or any other passport. Execution is limited too, with a fixed memory cap and a metered CPU budget, so a plugin that misbehaves is stopped. Before loading a plugin, a node checks its signature against the pinned publisher key; the only way round that is an explicit override, honoured only on a development node and logged as a warning (see [Product groups & plugins](/core/sectors)).
 
-What this buys is a hard separation between *judging* data and *vouching for* it: a buggy or even hostile sector rule can fail a validation, but it can never touch the signing key, alter a passport, or forge a proof. New regulations arrive as new sandboxed plugins — the cryptographic guarantees on this page never depend on trusting them. The concrete runtime limits are described in [Operating a node securely](/engine/security).
+Judging data and signing it are therefore separate. A buggy or even hostile product-group rule can fail a validation, but it cannot touch the signing key, change a passport or forge a signature. New regulations arrive as new sandboxed plugins, and none of the guarantees on this page depends on trusting them. The exact runtime limits are in [Operating a node securely](/engine/security).
 
-## Binding the proof to the physical product
+## Linking the passport to the physical product
 
-The QR code printed on a product is a GS1 Digital Link, and the node builds it from the signed passport's own verified fields at the moment it is served — never from a stored, editable link. If the passport's signature does not verify, no QR code is produced at all: the label path fails closed rather than print a code for data that cannot prove itself.
+The QR code printed on a product is a GS1 Digital Link. The node builds it from the signed passport's own verified fields each time it is served, never from a stored link that could be edited. If the passport's signature does not verify, no QR code is produced: the node refuses to print a code for data it cannot prove.
 
-The serial number carried on the label is derived from the passport's identity — fixed-length, GS1-conformant, and non-sequential, so a public label reveals nothing about production volumes. The result is that everything printed on the product traces back to the proof: a tampered passport cannot get a fresh label, and the label carries nothing a verifier cannot check.
+The serial number on the label is derived from the passport's identity. It is fixed-length, GS1-conformant and non-sequential, so a public label reveals nothing about production volumes. Everything printed on the product traces back to the signed passport: a tampered passport cannot get a new label, and the label carries nothing a verifier cannot check.
 
-Suspected vulnerabilities go to **security@odal-node.io** under coordinated disclosure — never a public issue first.
+Suspected vulnerabilities go to **security@odal-node.io** under coordinated disclosure, never to a public issue first.
 
 ## Read next
 
-- [What the core does](/core/overview) — the standard these guarantees protect.
-- [Standards & interoperability](/core/standards) — `did:web` and the open standards verification relies on.
-- [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see) — the data boundary, stated precisely.
-- [Operating a node securely](/engine/security) — how a running node guards keys and access in production.
+- [What the core does](/core/overview): the library these guarantees protect.
+- [Standards & interoperability](/core/standards): `did:web` and the open standards verification relies on.
+- [What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see): exactly what data Odal can and cannot reach.
+- [Operating a node securely](/engine/security): how a running node protects keys and access in production.

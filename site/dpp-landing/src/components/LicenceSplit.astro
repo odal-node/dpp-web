@@ -1,0 +1,53 @@
+---
+// LicenceSplit.astro — the two licences, side by side.
+//
+// Worded as /build-on-odal words them, which matches the licence texts: the
+// core library is Apache-2.0; the node (dpp-engine) is BSL-1.1 with an
+// Additional Use Grant for self-hosting your own organisation's passports,
+// barring a hosted service for others or embedding in a competing product
+// ("competing product" is the licence's own term), and each release converts
+// to Apache-2.0 four years after it is published (the Change Date). The
+// licence texts in each repository are the ones that bind.
+import ExternalArrow from "./ExternalArrow.astro";
+
+const cards = [
+  {
+    name: "The core library",
+    licence: "Apache-2.0",
+    kind: "Open source",
+    body: "Use it, adapt it and build on it freely.",
+    href: "https://github.com/odal-node/dpp-core",
+    cta: "The library on GitHub",
+  },
+  {
+    name: "The node",
+    licence: "BSL-1.1",
+    kind: "Source available",
+    body: "Running it for your own organisation's passports is free. Offering it to others as a hosted service, or shipping it inside a competing product, needs a commercial licence. Each release becomes Apache-2.0 four years after it is published.",
+    href: "https://github.com/odal-node/dpp-engine",
+    cta: "The node on GitHub",
+  },
+];
+---
+
+<div class="not-prose">
+  <ul class="m-0 grid list-none gap-4 p-0 md:grid-cols-2">
+    {cards.map((c) => (
+      <li class="card m-0 flex flex-col p-6">
+        <p class="m-0 flex flex-wrap items-center gap-2">
+          <span class="text-base font-semibold text-neutral-900">{c.name}</span>
+          <span class="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-semibold text-primary-800">{c.licence}</span>
+          <span class="text-xs text-neutral-500">{c.kind}</span>
+        </p>
+        <p class="m-0 mt-2 text-sm leading-body text-neutral-600">{c.body}</p>
+        <p class="m-0 mt-auto pt-4 text-sm">
+          <a href={c.href} rel="noopener" class="font-medium">{c.cta}<ExternalArrow class="ml-1" /></a>
+        </p>
+      </li>
+    ))}
+  </ul>
+  <p class="m-0 mt-4 text-sm text-neutral-600">
+    <a href="https://docs.odal-node.io/getting-started/licensing" rel="noopener">The licensing page</a>{" "}
+    has the detail, and the licence texts in each repository are the ones that bind.
+  </p>
+</div>

@@ -1,17 +1,78 @@
 # Cloudflare Pages custom headers — odal-node.io
 # Security headers improve trust signals; caching improves Core Web Vitals.
 
+# HSTS: HTTPS only, remembered for a year. No includeSubDomains: that would bind
+# every *.odal-node.io host, including any not served from here, and cannot be
+# taken back for a year once browsers have seen it.
+#
+# CSP: this site loads nothing from anywhere else (no fonts, analytics or
+# embeds), so everything is 'self'. 'unsafe-inline' is for the small module
+# scripts and style attributes Astro writes into the page. /verify adds its own,
+# stricter policy below; where both apply, a browser enforces both.
+#
+# Cache-Control: no-transform keeps Cloudflare from rewriting a response. The
+# zone's free plan injects a bot-detection script into every HTML page and
+# cannot be switched off; that script sets a cookie the privacy page says the
+# site does not set. Cloudflare skips the injection when the response carries
+# no-transform. The price is that Cloudflare no longer compresses it either
+# (Pages does not compress on its own), so only HTML keeps no-transform: the
+# script goes only into HTML, and every other kind of file below drops it and
+# stays compressed. max-age=0 and must-revalidate are Pages' own defaults for
+# HTML, restated because a Cache-Control here replaces them.
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
 
+# Every rule below detaches the Cache-Control above before setting its own:
+# Pages joins two values of one header with a comma, which would leave both
+# max-ages, and no-transform, in one header. No two of these rules match the
+# same file, for the same reason.
 /_astro/*
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 /favicon.svg
+  ! Cache-Control
   Cache-Control: public, max-age=604800
 
 /og-image.png
+  ! Cache-Control
   Cache-Control: public, max-age=604800
+
+/apple-touch-icon.png
+  ! Cache-Control
+  Cache-Control: public, max-age=604800
+
+# Sitemaps, robots.txt, llms.txt and security.txt: not HTML, so compressed.
+/*.xml
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.txt
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The example proof files /verify offers.
+/verify/examples/*
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+# /verify promises that it does not upload a checked file. This makes that
+# enforceable: the page may only talk to its own origin (to fetch the
+# example files), so no script on it can send a file anywhere else, by
+# request, beacon or image. The page is built as /verify/index.html, so it
+# answers at /verify/ as well as /verify; both are named, rather than relying
+# on the splat below to match an empty remainder.
+/verify
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+
+/verify/
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+
+/verify/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'

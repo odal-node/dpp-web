@@ -1,0 +1,29 @@
+{
+  "_comment": "Questions a company settles before it issues passports, shown on every product group's checklist (/product-groups/[key]/checklist). Written by hand from how the software works, not from any act: each 'why' restates something the home page or the passport check already says (import from CSV/Excel incl. ERP exports; signature checked against an identity on your web domain; key generated and held on your infrastructure; runs on your infrastructure or a cloud you control; restricted parts released on a credential; a passport stays available for years after sale). Keep them questions, never obligations.",
+  "questions": [
+    {
+      "q": "Where does this product data live today?",
+      "why": "Spreadsheets, a product or ERP system, or supplier documents. The node imports CSV and Excel files, including exports from an ERP."
+    },
+    {
+      "q": "Which of your web domains will carry your company's identity?",
+      "why": "Anyone who checks a passport checks its signature against an identity published on your own web domain."
+    },
+    {
+      "q": "Who in your company may sign passports?",
+      "why": "The signing key is generated and held on your own infrastructure, so someone has to be responsible for it."
+    },
+    {
+      "q": "Who will run the node, and where?",
+      "why": "It runs on your own infrastructure, or on a cloud you control."
+    },
+    {
+      "q": "Who will ask to read the parts that are not public?",
+      "why": "Repairers, recyclers and authorities read those parts, each on a credential."
+    },
+    {
+      "q": "Who keeps the passports available after the product is sold?",
+      "why": "A passport has to stay available for years after the product is sold."
+    }
+  ]
+}

@@ -2,25 +2,8 @@
 // like any other module script — see api.astro for why the page needs a
 // script at all (full-page Scalar reference, mounted outside Starlight).
 import { createApiReference } from '@scalar/api-reference';
-// import { h } from 'vue';
-// import { ALPHA_BANNER_TEXT } from '../site-meta';
 
-// const AlphaBannerView = (props: { text: string }) => h('div', { class: 'odal-banner' }, props.text);
 
-// const alphaBannerPlugin = () => ({
-//   name: 'odal-alpha-banner',
-//   extensions: [],
-//   views: {
-//     'content.start': [
-//       {
-//         component: AlphaBannerView,
-//         props: {
-//           text: ALPHA_BANNER_TEXT,
-//         },
-//       },
-//     ],
-//   },
-// }) as any;
 
 createApiReference('#scalar-api-reference', {
   url: '/openapi.yaml',
@@ -34,9 +17,51 @@ createApiReference('#scalar-api-reference', {
   // The page has no theme toggle of its own: Starlight's setting (written by
   // the docs shell's ThemeSelect) is the single source of truth, applied
   // before first paint by the inline script in api.astro and kept live below.
+  // Scalar's request client defaults to relaying through proxy.scalar.com. A
+  // reader trying an endpoint against their own node would send the request —
+  // and any API key they typed in — through a third party. No proxy: requests
+  // go direct or not at all.
+  // Empty string, not undefined: the bundle resolves this with a `?? ""`
+  // fallback, so an undefined value falls through to the library default
+  // rather than overriding it.
+  proxyUrl: '',
   hideDarkModeToggle: true,
-  // plugins: [alphaBannerPlugin],
+  // Scalar otherwise declares its Inter and JetBrains Mono from
+  // fonts.scalar.com. The theme (scalar-api-reference.css) sets the docs' own
+  // system font stacks, so nothing used them, but declaring them left the page
+  // one font away from a third-party request, and the site's CSP refuses them.
+  withDefaultFonts: false,
 });
+
+// Scalar renders the spec's contact URL as a link holding only an icon, which a
+// screen reader announces as a link with no name. Each such link is named by
+// where it goes. Scalar renders after mount and again as the reader moves
+// around, so new links are named as they appear rather than once.
+const UNNAMED_LINK = 'a[href]:not([aria-label]):not([aria-labelledby]):not([title])';
+
+function nameIconOnlyLinks(added: Element): void {
+  const links = added.matches(UNNAMED_LINK)
+    ? [added as HTMLAnchorElement]
+    : added.querySelectorAll<HTMLAnchorElement>(UNNAMED_LINK);
+  for (const link of links) {
+    if (link.textContent?.trim()) continue;
+    const url = new URL(link.href, location.href);
+    const where = url.host + (url.pathname === '/' ? '' : url.pathname);
+    link.setAttribute('aria-label', link.target === '_blank' ? `${where} (opens in a new tab)` : where);
+  }
+}
+
+const referenceRoot = document.getElementById('scalar-api-reference');
+if (referenceRoot) {
+  new MutationObserver((records) => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        if (node instanceof Element) nameIconOnlyLinks(node);
+      }
+    }
+  }).observe(referenceRoot, { childList: true, subtree: true });
+  nameIconOnlyLinks(referenceRoot);
+}
 
 // Keep the resolved theme live after first paint, mirroring exactly what
 // Starlight's ThemeProvider does on the docs pages:

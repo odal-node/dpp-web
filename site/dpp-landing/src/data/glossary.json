@@ -1,0 +1,244 @@
+{
+  "_comment": "The glossary, the single editable source for /glossary and its DefinedTermSet structured data. Plain language for a general reader; every definition matches what another page of the site or the docs already states, and links there. Checked against the code and the acts' official texts on 2026-09-26. Keep terms alphabetical; the page renders them in this order. 2026-09-30: nineteen terms added and two extended with the founder, from a scan of terms the site uses without explaining. Suspend and Retire follow dpp-core's PassportStatus docs; the wallet, data-space and UN protocol terms back roadmap items and rest on the Commission's proposal COM(2025) 838, the EUDI Regulation and the UNTP specification; the series of eight standards is CEN-CENELEC's own list (news of 15 July 2026).",
+  "terms": [
+    {
+      "term": "Access credential",
+      "definition": "A digital proof of a reader's role, such as a repairer or recycler, signed by an issuer the node trusts. The reader presents it to see the restricted parts of a passport. It follows the W3C Verifiable Credentials standard.",
+      "link": { "href": "https://docs.odal-node.io/guides/credentials", "label": "Access credentials" }
+    },
+    {
+      "term": "Asset Administration Shell",
+      "definition": "A data format Industry 4.0 systems use to describe products. A node can serve any published passport in this shape.",
+      "link": { "href": "https://docs.odal-node.io/guides/integrations", "label": "Integrations" }
+    },
+    {
+      "term": "Audit trail",
+      "definition": "The history of everything that happened to a passport, written as it happens. Entries are only ever added, each linked to the one before, so a changed entry would show.",
+      "link": { "href": "/lifecycle", "label": "The lifecycle" }
+    },
+    {
+      "term": "Battery passport",
+      "definition": "The passport the Batteries Regulation requires from 18 February 2027 for electric-vehicle batteries, light-transport batteries and industrial batteries over 2 kWh.",
+      "link": { "href": "/regulations/battery-reg-2023-1542", "label": "The Batteries Regulation" }
+    },
+    {
+      "term": "Carbon footprint",
+      "definition": "The greenhouse-gas emissions linked to a product over its life. For batteries, the Commission's guidance says to leave it empty in passports for now, until the rules for calculating it apply.",
+      "link": { "href": "/example-passport", "label": "An example passport" }
+    },
+    {
+      "term": "Continuity snapshot",
+      "definition": "A signed copy of a passport's public page, kept outside the node so a scan still works while the node is down. It says how long it is valid.",
+      "link": { "href": "https://docs.odal-node.io/guides/verification", "label": "Proof and verification" }
+    },
+    {
+      "term": "Data carrier",
+      "definition": "The mark on a product, usually a QR code, that carries its identifier and opens its passport when scanned."
+    },
+    {
+      "term": "Data space",
+      "definition": "A shared network in which companies exchange data under common rules while each keeps control of its own. Catena-X, for the automotive industry, is one.",
+      "link": { "href": "/roadmap#considered", "label": "Being considered on the roadmap" }
+    },
+    {
+      "term": "Declaration of conformity",
+      "definition": "A manufacturer's signed statement that a product meets the EU rules that apply to it. A battery passport shows it to everyone.",
+      "link": { "href": "/example-passport", "label": "An example passport" }
+    },
+    {
+      "term": "Delegated act",
+      "definition": "A law the European Commission adopts under a framework regulation to fill in its detail. Under ESPR, each product group's delegated act sets whether and when its passport is required, and what it must contain.",
+      "link": { "href": "/regulations", "label": "Regulations" }
+    },
+    {
+      "term": "did:web",
+      "definition": "An identity published as a small document on a company's own web domain, holding the public keys its signatures can be checked against. Anyone can look it up; no central register is involved."
+    },
+    {
+      "term": "Digital Product Passport",
+      "definition": "A digital record that stays with a product for its whole life: what it is made of, where it came from, how to repair and recycle it. EU law is making passports compulsory one product group at a time.",
+      "link": { "href": "/lifecycle", "label": "Follow one passport's life" }
+    },
+    {
+      "term": "Economic operator",
+      "definition": "A company that puts a product on the EU market or makes it available: a manufacturer, importer, distributor or similar. The passport records who is responsible."
+    },
+    {
+      "term": "Electronic seal",
+      "definition": "A signature by an organisation under the EU's eIDAS Regulation. A qualified seal carries a legal presumption of integrity and origin, and only a company holding a qualified certificate can make one.",
+      "link": { "href": "https://docs.odal-node.io/guides/seals", "label": "Electronic seals" }
+    },
+    {
+      "term": "End of life",
+      "definition": "The recorded end of a product's service: recycled, destroyed, exported or lost. The passport keeps that record rather than being deleted.",
+      "link": { "href": "/lifecycle", "label": "The lifecycle" }
+    },
+    {
+      "term": "EPREL",
+      "definition": "The EU's energy-label database. For phones and tablets, product information goes into EPREL instead of a passport.",
+      "link": { "href": "/regulations", "label": "Regulations" }
+    },
+    {
+      "term": "ESPR",
+      "definition": "The Ecodesign for Sustainable Products Regulation (EU) 2024/1781. The framework law behind passports for most product groups, whose detail arrives through delegated acts.",
+      "link": { "href": "/regulations/espr", "label": "ESPR" }
+    },
+    {
+      "term": "ESPR working plan",
+      "definition": "The Commission's plan for which product groups get ecodesign rules next. Its years are indicative dates for adopting each act, not passport dates: each act sets its own passport dates when it is adopted.",
+      "link": { "href": "/timeline", "label": "Timeline" }
+    },
+    {
+      "term": "EU Digital Identity Wallet",
+      "definition": "The digital identity app every EU country must offer under the eIDAS Regulation, so people can prove who they are and share verified details online.",
+      "link": { "href": "/roadmap#considered", "label": "Being considered on the roadmap" }
+    },
+    {
+      "term": "EU registry",
+      "definition": "The European Commission's directory of registered passports, which ESPR required by 19 July 2026. It records where each passport lives, not its content.",
+      "link": { "href": "https://docs.odal-node.io/regulatory/central-registry", "label": "The EU registry" }
+    },
+    {
+      "term": "European Business Wallet",
+      "definition": "A wallet the European Commission has proposed for companies, to prove who they are and to sign, seal and exchange documents with legal effect across the EU. It is a proposal, not law yet.",
+      "link": { "href": "/roadmap#considered", "label": "Being considered on the roadmap" }
+    },
+    {
+      "term": "GS1 Digital Link",
+      "definition": "A web address format that carries a product's barcode number, so a phone camera can open its passport from the same code a till scans."
+    },
+    {
+      "term": "Handover",
+      "definition": "Moving responsibility for a passport from one company to another, recorded and signed on the passport itself.",
+      "link": { "href": "https://docs.odal-node.io/guides/transfer", "label": "Handing over responsibility" }
+    },
+    {
+      "term": "Harmonised standard",
+      "definition": "A European standard cited in the EU's Official Journal. Following it gives a presumption that the requirements it covers are met. Six were cited for passports in July 2026, out of a series of eight; the other two cover access and security, and the integrity of passport data.",
+      "link": { "href": "https://docs.odal-node.io/core/standards", "label": "Standards" }
+    },
+    {
+      "term": "Implementing act",
+      "definition": "A Commission act that sets technical or procedural detail, such as how passports are registered or the format of a disclosure."
+    },
+    {
+      "term": "JSON Web Signature",
+      "definition": "The open standard every passport is signed in. Anyone can check a signature against the public key its company publishes on its own web domain.",
+      "link": { "href": "https://docs.odal-node.io/core/standards", "label": "Standards" }
+    },
+    {
+      "term": "Legal person",
+      "definition": "An organisation the law treats as a person, such as a registered company. Under the EU's eIDAS Regulation, only a legal person can create an electronic seal.",
+      "link": { "href": "/roadmap#waiting", "label": "Waiting on a legal step" }
+    },
+    {
+      "term": "Legitimate interest",
+      "definition": "The basis on which some readers may see more of a battery passport than the public: repairers, remanufacturers, second-life operators and recyclers for dismantling and composition work, and a battery's buyer for making it available to energy markets.",
+      "link": { "href": "/visibility", "label": "Visibility" }
+    },
+    {
+      "term": "Market surveillance authority",
+      "definition": "The public body in each EU country that checks products already on the market and can act against those that break the rules. For batteries, it may read parts of the passport the public cannot.",
+      "link": { "href": "/authorities", "label": "For authorities" }
+    },
+    {
+      "term": "Model, batch and item",
+      "definition": "The level a passport describes: a product model, one production batch, or one individual item. The rules for each product group set the level; a battery passport, for example, describes one battery."
+    },
+    {
+      "term": "Node",
+      "definition": "One company's own running copy of Odal Node, on infrastructure it chooses. A node serves one company and shares nothing with any other.",
+      "link": { "href": "/trust", "label": "What Odal can see" }
+    },
+    {
+      "term": "Notified body",
+      "definition": "An organisation an EU country appoints to check whether products meet EU rules before they are sold. For batteries, notified bodies may read the passport's test reports, which the public cannot.",
+      "link": { "href": "/visibility", "label": "Visibility" }
+    },
+    {
+      "term": "Plugin",
+      "definition": "A product group's rules, packaged so a node can load them. It runs in an isolated sandbox, and a node refuses one that is not signed by a key its operator trusts, unless the operator deliberately switches that check off for development.",
+      "link": { "href": "/build-on-odal", "label": "Build on Odal" }
+    },
+    {
+      "term": "Product group",
+      "definition": "A group of products that share passport rules, such as batteries, textiles or toys. The group decides what a passport carries and who may read which part.",
+      "link": { "href": "/product-groups", "label": "Product groups" }
+    },
+    {
+      "term": "Proof file",
+      "definition": "One signed file holding a passport, its signatures and its full history, which anyone can check offline without trusting us. Also called an evidence dossier.",
+      "link": { "href": "/verify", "label": "Check a proof file" }
+    },
+    {
+      "term": "Proof-bound",
+      "definition": "Odal Node's name for how its passports work: your product data is validated, signed and stored on your own infrastructure, and every published field carries your signature, so trust rests on proof anyone can check, not on our word.",
+      "link": { "href": "/trust", "label": "What Odal can see" }
+    },
+    {
+      "term": "Public view",
+      "definition": "The part of a passport anyone can read by scanning the product, with no login and no fee."
+    },
+    {
+      "term": "Recycled content",
+      "definition": "The share of a material in a product that came from recycling. For some batteries, the law sets minimum shares of recycled cobalt, lead, lithium and nickel, and the Commission's guidance says to leave these shares empty in passports for now.",
+      "link": { "href": "/example-passport", "label": "An example passport" }
+    },
+    {
+      "term": "Resolver",
+      "definition": "The service behind the code on a product. It turns a scan into the passport page, in the form the reader asked for."
+    },
+    {
+      "term": "Responsible operator",
+      "definition": "The company in the EU that answers to authorities for a product, under market surveillance or product safety law. A passport records who it is."
+    },
+    {
+      "term": "Restricted parts",
+      "definition": "The parts of a passport shown only to readers the law names, such as authorities or readers with a legitimate interest, on presentation of a credential.",
+      "link": { "href": "/visibility", "label": "Visibility" }
+    },
+    {
+      "term": "Retire",
+      "definition": "Ending a passport's active life for good. A retired passport can no longer change, and it stays available as a record of what was published.",
+      "link": { "href": "https://docs.odal-node.io/guides/lifecycle", "label": "A passport's lifecycle" }
+    },
+    {
+      "term": "Signing key",
+      "definition": "The private key a company signs its passports with. It is kept on the company's own servers, encrypted, and never leaves them.",
+      "link": { "href": "/security", "label": "Security" }
+    },
+    {
+      "term": "Source available",
+      "definition": "Code anyone can read, with limits on some uses. The node is source-available under BSL-1.1: running it for your own organisation's passports is free, and each release becomes open source under Apache-2.0 four years after it is published. The core library is open source from the start.",
+      "link": { "href": "https://docs.odal-node.io/getting-started/licensing", "label": "Licensing" }
+    },
+    {
+      "term": "Substance of very high concern",
+      "definition": "A chemical the EU lists under its REACH Regulation because of serious effects on health or the environment. Each product group's ecodesign act sets how its passport tracks substances of concern, which include these."
+    },
+    {
+      "term": "Supersede",
+      "definition": "Replacing a published passport with a newer one, for example to correct a mistake. The earlier version stays readable, and a code already printed keeps working.",
+      "link": { "href": "https://docs.odal-node.io/guides/lifecycle", "label": "A passport's lifecycle" }
+    },
+    {
+      "term": "Suspend",
+      "definition": "Hiding a published passport from the public for a while, for example during a dispute over its data or a hold by an authority. It can be published again, or retired.",
+      "link": { "href": "https://docs.odal-node.io/guides/lifecycle", "label": "A passport's lifecycle" }
+    },
+    {
+      "term": "UN Transparency Protocol",
+      "definition": "The United Nations' open standard for sharing verifiable supply-chain information, including product passports, between trading partners.",
+      "link": { "href": "/roadmap#considered", "label": "Being considered on the roadmap" }
+    },
+    {
+      "term": "Unique product identifier",
+      "definition": "The identifier that ties a physical product, model or batch to its passport. European standard EN 18219 sets the schemes it may use, such as a GS1 barcode number."
+    },
+    {
+      "term": "Unsold-goods disclosure",
+      "definition": "A yearly report large companies publish on the unsold consumer products they discarded, why, and what happened to them. It is a company report, not a passport.",
+      "link": { "href": "/product-groups/unsold-goods", "label": "Unsold goods" }
+    }
+  ]
+}

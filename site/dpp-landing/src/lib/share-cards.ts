@@ -1,0 +1,80 @@
+// share-cards.ts — what each page's share image says.
+//
+// A share image is the picture a link shows when it is pasted into a chat or a
+// post. Each card repeats its page's eyebrow and headline, so a change to a
+// page's headline should be made here too. Product groups and acts are read
+// from the same records as their pages, so those cards cannot drift.
+//
+// A page with no card here keeps the site-wide image, public/og-image.png.
+import { groups, unsoldGoods } from "./product-groups";
+import { checklistGroups } from "./checker";
+import { instruments, displayTitle, kindLabel, passportView } from "./regulations";
+
+export type Card = {
+  /** The page's path, as Astro.url.pathname gives it without a trailing slash. */
+  path: string;
+  eyebrow: string;
+  title: string;
+  line: string;
+};
+
+const pages: Card[] = [
+  { path: "/lifecycle", eyebrow: "Lifecycle", title: "What happens to a passport over a product's life.", line: "One record, eight stations, from the factory to the end of its life." },
+  { path: "/visibility", eyebrow: "Visibility", title: "Each reader sees the part the law gives them.", line: "Who can read which part of a battery passport, and why." },
+  { path: "/example-passport", eyebrow: "Example", title: "An example battery passport.", line: "Sorted into what anyone can read and what only some readers can." },
+  { path: "/verify", eyebrow: "Verify", title: "Check a passport's proof file yourself.", line: "Signatures and history, checked in your browser. The page does not upload your file." },
+  { path: "/trust", eyebrow: "Data and trust", title: "What Odal Node can and cannot see.", line: "And why that does not depend on trusting us." },
+  { path: "/passport-check", eyebrow: "Passport check", title: "Does my product need a passport?", line: "Pick what you make or sell, and see which date applies and where it comes from." },
+  { path: "/timeline", eyebrow: "Timeline", title: "When passports arrive, year by year.", line: "From batteries in 2027 to vehicles in 2032, with where every date comes from." },
+  { path: "/regulations", eyebrow: "Regulations", title: "The EU acts behind the passports.", line: "Every act, the passport date it sets, and where that date comes from." },
+  { path: "/community", eyebrow: "Community", title: "Help shape Odal Node.", line: "Ask a question, suggest a feature or show what you built, on GitHub Discussions." },
+  { path: "/build-on-odal", eyebrow: "Build on Odal", title: "Write rules and integrations that run on other people's nodes.", line: "Libraries, plugins and the licence line." },
+  { path: "/roadmap", eyebrow: "Roadmap", title: "What is built, what is waiting, and what comes next.", line: "Capabilities, not tasks, and where each one stands." },
+  { path: "/faq", eyebrow: "FAQ", title: "Questions people ask first.", line: "Which products need a passport, where your data lives and who can read it." },
+  { path: "/glossary", eyebrow: "Glossary", title: "The words around a passport, explained.", line: "Product groups, delegated acts, legitimate interest, seals and more." },
+  { path: "/security", eyebrow: "Security", title: "Report a security issue privately.", line: "How we respond, and how passports and signing keys are protected." },
+  { path: "/accessibility", eyebrow: "Accessibility", title: "This site should work for everyone who needs it.", line: "The standard it aims for, how it is checked, and how to report a problem." },
+  { path: "/sitemap", eyebrow: "Site map", title: "Every page on this site.", line: "Grouped by topic, with a line on what each page is for." },
+  { path: "/privacy", eyebrow: "Privacy policy", title: "No cookies, no analytics, no trackers.", line: "Who is responsible, what the host sees, and what you can ask of us." },
+  { path: "/legal", eyebrow: "Legal notice", title: "Who runs Odal Node.", line: "Why the information here is not legal advice, and what you may reuse." },
+  { path: "/waitlist", eyebrow: "Waitlist", title: "Get ready for your products' passports.", line: "Tell us what you make, and hear when your product group is ready." },
+  { path: "/repairers-and-recyclers", eyebrow: "For repairers and recyclers", title: "The parts of a passport made for your work.", line: "What you can read, and how to get the credential that opens it." },
+  { path: "/authorities", eyebrow: "For authorities", title: "Check a passport without taking anyone's word for it.", line: "What authorities can read, and how to check a passport on your own." },
+  { path: "/product-groups", eyebrow: "Product groups", title: "What the software can build passports for.", line: "What each passport carries, and who may read each part of it." },
+];
+
+const groupCards: Card[] = [...groups, unsoldGoods].map((g) => ({
+  path: `/product-groups/${g.key}`,
+  eyebrow: g.key === unsoldGoods.key ? "Also covered" : "Product group",
+  title: g.name,
+  line: g.line,
+}));
+
+const checklistCards: Card[] = checklistGroups.map((g) => ({
+  path: `/product-groups/${g.key}/checklist`,
+  eyebrow: "Checklist",
+  title: `${g.name}: getting ready for the passport.`,
+  line: "Whether one is required and from when, what it carries, and the questions to settle first.",
+}));
+
+const actCards: Card[] = instruments.map((i) => {
+  const view = passportView(i);
+  return {
+    path: `/regulations/${i.id}`,
+    eyebrow: kindLabel(i),
+    title: displayTitle(i),
+    line: `${view.label}. ${view.detail}`,
+  };
+});
+
+export const cards: Card[] = [...pages, ...groupCards, ...checklistCards, ...actCards];
+
+const byPath = new Map(cards.map((c) => [c.path, c]));
+
+/** The image a page shares: its own card, or the site-wide image. */
+export function shareImageFor(pathname: string): { src: string; alt: string } {
+  const path = pathname.replace(/\/$/, "") || "/";
+  const card = byPath.get(path);
+  if (!card) return { src: "/og-image.png", alt: "Odal Node: Signed by you. Verified by anyone." };
+  return { src: `/og${card.path}.png`, alt: `${card.eyebrow}: ${card.title}` };
+}

@@ -1,0 +1,90 @@
+---
+// /trust — what Odal can and cannot see, stated as properties of the software.
+//
+// Describes the self-hosted node only. Managed deployments are an option under
+// consideration and are mentioned on the roadmap and nowhere else, so this page
+// makes no claim about a deployment that does not exist.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+
+const title = "Trust | Odal Node";
+const description =
+  "What Odal can and cannot see, and why that does not depend on trusting us.";
+
+const guarantees = [
+  {
+    title: "Every field carries your signature",
+    body: "Each published passport is signed with your key, so a change made after signing fails verification. Anyone can check that without us.",
+  },
+  {
+    title: "We cannot reach your node",
+    body: "When you run the node, we are not part of the deployment and have no access to anything it stores.",
+  },
+  {
+    title: "Nobody signs for you",
+    body: "Your signing key is generated and held on your own infrastructure. We cannot sign on your behalf.",
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Data and trust" title="What Odal Node can and cannot see." wide>
+    <p>
+      Odal Node is built on a proof-bound architecture: the manufacturer's
+      product data is validated, signed and stored on infrastructure the
+      manufacturer controls, and every published field carries the
+      manufacturer's signature. This is how the software works, whoever
+      operates the node.
+    </p>
+  </Section>
+
+  <Section eyebrow="Guarantees" title="Three things that do not depend on trusting us." tone="tinted" wide>
+    <ul class="not-prose m-0 grid list-none gap-6 p-0 md:grid-cols-3">
+      {guarantees.map((g) => (
+        <li class="card m-0 p-6">
+          <h3 class="m-0 text-base font-semibold text-neutral-900">{g.title}</h3>
+          <p class="m-0 mt-2 text-sm leading-body text-neutral-600">{g.body}</p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section eyebrow="Scan telemetry" title="What a scan count is, and what it is not." wide>
+    <p>
+      When a passport is resolved, the node can record that it happened, as a
+      count per passport per day, and nothing more. A scan count records{" "}
+      <strong>nothing about the person who scanned</strong>: no IP address,
+      device, location, identity or session. The software has no field to store
+      any of it, so none of it can be kept or leaked. Generating a QR-code image
+      is counted separately, because it measures label printing, not readers.
+    </p>
+  </Section>
+
+  <Section eyebrow="How it works" title="How it works, step by step." tone="muted" wide>
+    <ol>
+      <li>
+        <strong>Import.</strong> Product data arrives at your node as CSV, Excel
+        or an ERP export. This happens on infrastructure you control.
+      </li>
+      <li>
+        <strong>Validate.</strong> The node checks the data locally against the
+        product group's rules. Nothing is sent to a third party to be checked.
+      </li>
+      <li>
+        <strong>Sign.</strong> Your private signing key, generated and held on
+        your own infrastructure, signs the validated passport. The signature is
+        tied to an identity on a web domain you control.
+      </li>
+      <li>
+        <strong>Publish.</strong> The signed passport's public part becomes
+        readable through its QR code and GS1 Digital Link; other parts are
+        shown only to readers with a credential.
+      </li>
+      <li>
+        <strong>Verify.</strong> Any consumer, authority or recycler checks the
+        signature against the public identity published on your web domain.
+        Verification does not need Odal to be online, or even to exist.
+      </li>
+    </ol>
+  </Section>
+</Base>

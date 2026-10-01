@@ -1,0 +1,34 @@
+---
+// Footer.astro — Starlight's own footer (edit link, last updated, previous and
+// next), followed by one line of legal links. The documentation had no link to
+// a privacy policy at all, and its regulatory pages carried no "not legal
+// advice" note; this line puts both on every page. The policy and the legal
+// notice live on the landing site and cover both sites. Links are written to
+// production; src/middleware.ts points them at the branch preview.
+import Default from '@astrojs/starlight/components/Footer.astro';
+import { PRODUCTION_LANDING } from '../lib/origins';
+---
+
+<Default><slot /></Default>
+<p class="legal">
+  Information on this site is not legal advice.{" "}
+  <a href={`${PRODUCTION_LANDING}/legal`}>Legal notice</a>
+  <a href={`${PRODUCTION_LANDING}/privacy`}>Privacy policy</a>
+</p>
+
+<style>
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin-top: 1.5rem;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+  .legal a {
+    color: var(--sl-color-gray-3);
+  }
+  .legal a:hover {
+    color: var(--sl-color-white);
+  }
+</style>

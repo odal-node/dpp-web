@@ -1,0 +1,64 @@
+---
+// /legal — the legal notice: who runs Odal Node, what the information on
+// these sites is and is not, and what may be reused.
+//
+// 🔒 A name and a mailbox, never a location. Do not add a country, city or
+// address. When the company is registered, replace the operator section with
+// its registered name and registered details (its registered office, not a
+// home address), and name it as controller in /privacy too.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+
+const OPERATOR = "Aleksandar Temelkov";
+const MAILBOX = "contact@odal-node.io";
+
+const title = "Legal notice | Odal Node";
+const description =
+  "Who runs Odal Node, why the information on its websites is not legal advice, and what you may reuse.";
+---
+
+<Base title={title} description={description}>
+  <Section h1 eyebrow="Legal notice" title="Who runs Odal Node.">
+    <p>
+      Odal Node is run by <strong>{OPERATOR}</strong>. It is a project, not a
+      registered company yet. When the company is registered, its details are
+      published here.
+    </p>
+    <p>
+      Contact:{" "}
+      <a href={`mailto:${MAILBOX}`}>{MAILBOX}</a>. To report a security issue,
+      see <a href="/security">Security</a>. For how these sites handle your data,
+      see the <a href="/privacy">privacy policy</a>.
+    </p>
+  </Section>
+
+  <Section eyebrow="Not legal advice" title="Information, not legal advice." tone="tinted">
+    <p>
+      These websites explain EU law on digital product passports and how the
+      Odal Node software applies it. We check what we publish against the
+      official texts in the Official Journal of the European Union, but we
+      cannot promise it is complete, current or right for your products.
+    </p>
+    <p>
+      It is not legal advice. For a decision about your own products, rely on
+      the official texts and on advice about your situation.
+    </p>
+    <p>
+      Links to other websites are there for convenience. We are not
+      responsible for what those websites say.
+    </p>
+  </Section>
+
+  <Section eyebrow="Licences" title="What you may reuse.">
+    <p>
+      The core library is open source under the Apache License 2.0. The node is
+      source-available under the Business Source License 1.1, with a grant that
+      makes self-hosting for your own compliance free. See{" "}
+      <a href="/build-on-odal">Build on Odal</a> for where the line sits.
+    </p>
+    <p>
+      The source of these websites is published under the Apache License 2.0.
+      That licence does not grant use of the Odal Node name or logo.
+    </p>
+  </Section>
+</Base>
