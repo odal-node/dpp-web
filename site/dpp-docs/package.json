@@ -19,7 +19,7 @@
     "@odal/brand-tokens": "workspace:*",
     "@scalar/api-reference": "^1.62.5",
     "astro": "^7.3.5",
-    "vue": "^3.5.39"
+    "vue": "^3.5.43"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9",
