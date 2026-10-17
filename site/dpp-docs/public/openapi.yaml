@@ -137,7 +137,31 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
         '409':
-          $ref: '#/components/responses/IdempotentRequestInFlight'
+          description: |
+            One of two conflicts, told apart by the problem document.
+
+            **An earlier attempt carrying this `Idempotency-Key` is still running.**
+            Returned instead of letting a duplicate execute alongside it. Retry
+            shortly with the same key and the same body; `Retry-After` carries the
+            suggested delay. A claim left behind by a process that died mid-request
+            is reclaimed automatically after 60 seconds, so this can never wedge a
+            key permanently.
+
+            **`carrierSerial` is already attributed to another passport under the
+            same GTIN.** `errors[0].field` is `/carrierSerial`. A label that names
+            two passports resolves to neither: choose another serial, or declare
+            this passport as the successor of the one that holds it with
+            `supersedesId`.
+          headers:
+            Retry-After:
+              description: Seconds to wait before retrying. Sent for the idempotency conflict only.
+              schema:
+                type: integer
+                minimum: 1
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '422':
           $ref: '#/components/responses/ValidationError'
   /vault/api/v1/dpp/validate:
@@ -156,8 +180,9 @@ paths:
         creatable but not yet clear the publish-time schema gate, and that gap is
         reported rather than hidden until publish is attempted.
 
-        A body that create **would reject** gets back the identical `422` create
-        would have returned, not a paraphrase of it. A body create would accept
+        A body that create **would reject** gets back the identical rejection create
+        would have returned, not a paraphrase of it: a `422`, or a `409` for a
+        `carrierSerial` another passport already holds. A body create would accept
         returns `200` with the two verdicts.
 
         **`productGroupDataValid` is not a publish verdict.** It reports one of publish's
@@ -198,6 +223,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '409':
+          description: |
+            `carrierSerial` is already attributed to another passport under the same
+            GTIN. The identical `409` create would have returned. `errors[0].field`
+            is `/carrierSerial`.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '422':
           $ref: '#/components/responses/ValidationError'
   /vault/api/v1/dpps:
@@ -356,7 +390,13 @@ paths:
           application/json:
             schema:
               type: object
-              description: Free-form merge-patch. Supply only the fields being changed.
+              description: |
+                Free-form merge-patch. Supply only the fields being changed.
+
+                `carrierSerial` is fixed when the passport is created. A value other
+                than the serial the passport prints is refused with `422` naming
+                `/carrierSerial`, not ignored, because it is what the label carries.
+                The same value is accepted.
       responses:
         '200':
           description: Updated DPP record.
@@ -797,6 +837,13 @@ paths:
         5. A `dpp.published` NATS event is emitted (fire-after-commit)
 
         No request body is required.
+
+        Refused with `422` naming `/carrierSerial` when another published passport
+        already prints the same carrier serial under the same GTIN and is not in
+        this one's amendment chain. Create refuses that too, but two creates that
+        arrive together can both pass it; this is where the label goes live, so
+        the second to publish stays a draft rather than making one label name two
+        passports.
       tags:
         - DPP Lifecycle
       security:
@@ -2680,10 +2727,20 @@ paths:
         does not name one:
 
         - `serial` (AI 21) names the passport whose carrier serial it is, at any
-          level. `batch` is not consulted once a serial is given.
+          level. `batch` is consulted only if the serial finds nothing.
         - `batch` (AI 10) alone names the batch-level passport for that lot.
         - Neither names the model-level passport, or a passport with no batch and
           no serial.
+
+        **A level with no passport answers with the one above it.** An unknown
+        serial resolves to the batch-level passport for the label's `batch`, if it
+        carries one and one exists, and otherwise to the model-level passport; an
+        unknown batch resolves to the model-level passport. That is how a GS1
+        resolver answers a granular identifier, and it keeps a unit whose serial
+        was stamped by the manufacturer's own system, and never attributed here,
+        reaching the passport of its model. `404` means nothing is on record at any
+        level the label names. A level that does have a passport always answers: a
+        suspended unit is `410`, never its model's passport.
 
         A label keeps working after its passport is amended: the successor is
         served, not the superseded record.
@@ -3626,6 +3683,13 @@ paths:
         - `?linkType=gs1:pip` / `gs1:dpp` (and related) → `307` redirect to the DPP
         - `?linkType=linkset` or `Accept: application/linkset+json` → `200`
           RFC 9264 linkset
+
+        A GTIN takes a consumer product variant (AI 22), a batch (AI 10) and a
+        serial (AI 21), in that order and each optional, or a third-party
+        extension (AI 235) on its own; each of those shapes is its own path below.
+        Any other path under `/01/` cannot be a GS1 Digital Link, because its
+        qualifiers are out of order, repeated, not ones a GTIN takes, or empty, and
+        answers `400` without a lookup.
       tags:
         - Public Resolver
       security: []
@@ -3651,6 +3715,8 @@ paths:
                 type: object
         '307':
           description: Redirect to the DPP page (`Location` header).
+        '400':
+          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
         '404':
           description: No published DPP for this GTIN, or unknown link type.
         '409':
@@ -3670,8 +3736,10 @@ paths:
         whose level is not stated. **The serial is the resolution key**: it is the
         passport's carrier serial, and it names one passport whatever its level.
         An amended passport's successor carries its predecessor's serial, so the
-        label keeps resolving, to the current record. Same behaviour as
-        `/01/{gtin}` otherwise (`linkType` / `Accept` negotiation).
+        label keeps resolving, to the current record. A serial with no passport of
+        its own resolves to the model-level passport, as a GS1 resolver answers a
+        granular identifier; `404` means nothing is on record at any level. Same
+        behaviour as `/01/{gtin}` otherwise (`linkType` / `Accept` negotiation).
       tags:
         - Public Resolver
       security: []
@@ -3703,8 +3771,10 @@ paths:
                 type: object
         '307':
           description: Redirect to the DPP page (`Location` header).
+        '400':
+          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
         '404':
-          description: No published DPP for this GTIN, or unknown link type.
+          description: No published DPP at any level the label names, or unknown link type.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -3721,8 +3791,10 @@ paths:
         The carrier this node prints for a batch-level passport. **The batch is a
         resolution key**: it resolves to the batch-level passport for that lot,
         which the GTIN alone cannot name once a product has a passport per batch.
-        Same behaviour as `/01/{gtin}` otherwise (`linkType` / `Accept`
-        negotiation).
+        A lot with no passport of its own resolves to the model-level passport, as
+        a GS1 resolver answers a granular identifier; `404` means nothing is on
+        record at any level. Same behaviour as `/01/{gtin}` otherwise (`linkType` /
+        `Accept` negotiation).
       tags:
         - Public Resolver
       security: []
@@ -3754,8 +3826,10 @@ paths:
                 type: object
         '307':
           description: Redirect to the DPP page (`Location` header).
+        '400':
+          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
         '404':
-          description: No published DPP for this GTIN, or unknown link type.
+          description: No published DPP at any level the label names, or unknown link type.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -3772,8 +3846,11 @@ paths:
         The shape this node printed for a batched passport before its carrier
         followed the passport's stated level, and one any conformant label may
         carry. **The serial is the resolution key**: it names one passport
-        whatever its level, so the batch is not consulted. Same behaviour as
-        `/01/{gtin}` otherwise (`linkType` / `Accept` negotiation).
+        whatever its level, so the batch is consulted only if the serial finds
+        nothing. Then the lot's passport answers, and failing that the model's, as
+        a GS1 resolver answers a granular identifier; `404` means nothing is on
+        record at any level. Same behaviour as `/01/{gtin}` otherwise (`linkType` /
+        `Accept` negotiation).
       tags:
         - Public Resolver
       security: []
@@ -3789,7 +3866,7 @@ paths:
           required: true
           schema:
             type: string
-          description: AI 10. Not consulted once a serial is present.
+          description: AI 10. Consulted only if the serial finds nothing.
         - name: serial
           in: path
           required: true
@@ -3811,8 +3888,304 @@ paths:
                 type: object
         '307':
           description: Redirect to the DPP page (`Location` header).
+        '400':
+          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
         '404':
-          description: No published DPP for this GTIN, or unknown link type.
+          description: No published DPP at any level the label names, or unknown link type.
+        '409':
+          $ref: '#/components/responses/PassportSignatureUnverified'
+        '410':
+          $ref: '#/components/responses/Gone'
+        '502':
+          $ref: '#/components/responses/ResolverUpstreamFailure'
+        '503':
+          $ref: '#/components/responses/PassportVerificationUnavailable'
+  /01/{gtin}/22/{variant}:
+    get:
+      operationId: resolveByGtinVariant
+      summary: GS1 Digital Link resolver — GTIN + consumer product variant
+      description: |
+        A label that carries a consumer product variant (AI 22) after its GTIN.
+        This node never prints one, but a label printed elsewhere may. **The
+        variant takes no part in the lookup**: the node holds no record at that
+        level, so the label resolves exactly as `/01/{gtin}` does. Same behaviour
+        as `/01/{gtin}` otherwise (`linkType` / `Accept` negotiation).
+      tags:
+        - Public Resolver
+      security: []
+      parameters:
+        - name: gtin
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '09506000134352'
+        - name: variant
+          in: path
+          required: true
+          schema:
+            type: string
+          description: AI 22, the consumer product variant. Accepted and not looked up.
+        - name: linkType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: e.g. linkset, gs1:pip, gs1:dpp
+      responses:
+        '200':
+          description: RFC 9264 linkset (when a linkset is requested).
+          content:
+            application/linkset+json:
+              schema:
+                type: object
+        '307':
+          description: Redirect to the DPP page (`Location` header).
+        '400':
+          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+        '404':
+          description: No published DPP at any level the label names, or unknown link type.
+        '409':
+          $ref: '#/components/responses/PassportSignatureUnverified'
+        '410':
+          $ref: '#/components/responses/Gone'
+        '502':
+          $ref: '#/components/responses/ResolverUpstreamFailure'
+        '503':
+          $ref: '#/components/responses/PassportVerificationUnavailable'
+  /01/{gtin}/22/{variant}/21/{serial}:
+    get:
+      operationId: resolveByGtinVariantSerial
+      summary: GS1 Digital Link resolver — GTIN + consumer product variant + serial
+      description: |
+        A label that carries a consumer product variant (AI 22) and a serial
+        (AI 21). **The variant takes no part in the lookup**: the node holds no
+        record at that level, so the label resolves exactly as
+        `/01/{gtin}/21/{serial}` does, serial first and then the model if the serial
+        has no passport of its own. Same behaviour as `/01/{gtin}` otherwise
+        (`linkType` / `Accept` negotiation).
+      tags:
+        - Public Resolver
+      security: []
+      parameters:
+        - name: gtin
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '09506000134352'
+        - name: variant
+          in: path
+          required: true
+          schema:
+            type: string
+          description: AI 22, the consumer product variant. Accepted and not looked up.
+        - name: serial
+          in: path
+          required: true
+          schema:
+            type: string
+          description: AI 21, the carrier serial. Selects the passport.
+        - name: linkType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: e.g. linkset, gs1:pip, gs1:dpp
+      responses:
+        '200':
+          description: RFC 9264 linkset (when a linkset is requested).
+          content:
+            application/linkset+json:
+              schema:
+                type: object
+        '307':
+          description: Redirect to the DPP page (`Location` header).
+        '400':
+          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+        '404':
+          description: No published DPP at any level the label names, or unknown link type.
+        '409':
+          $ref: '#/components/responses/PassportSignatureUnverified'
+        '410':
+          $ref: '#/components/responses/Gone'
+        '502':
+          $ref: '#/components/responses/ResolverUpstreamFailure'
+        '503':
+          $ref: '#/components/responses/PassportVerificationUnavailable'
+  /01/{gtin}/22/{variant}/10/{batch}:
+    get:
+      operationId: resolveByGtinVariantBatch
+      summary: GS1 Digital Link resolver — GTIN + consumer product variant + batch/lot
+      description: |
+        A label that carries a consumer product variant (AI 22) and a batch or lot
+        (AI 10). **The variant takes no part in the lookup**: the node holds no
+        record at that level, so the label resolves exactly as
+        `/01/{gtin}/10/{batch}` does, the lot's passport first and then the model's.
+        Same behaviour as `/01/{gtin}` otherwise (`linkType` / `Accept`
+        negotiation).
+      tags:
+        - Public Resolver
+      security: []
+      parameters:
+        - name: gtin
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '09506000134352'
+        - name: variant
+          in: path
+          required: true
+          schema:
+            type: string
+          description: AI 22, the consumer product variant. Accepted and not looked up.
+        - name: batch
+          in: path
+          required: true
+          schema:
+            type: string
+          description: AI 10, the batch or lot. Selects the batch-level passport.
+        - name: linkType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: e.g. linkset, gs1:pip, gs1:dpp
+      responses:
+        '200':
+          description: RFC 9264 linkset (when a linkset is requested).
+          content:
+            application/linkset+json:
+              schema:
+                type: object
+        '307':
+          description: Redirect to the DPP page (`Location` header).
+        '400':
+          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+        '404':
+          description: No published DPP at any level the label names, or unknown link type.
+        '409':
+          $ref: '#/components/responses/PassportSignatureUnverified'
+        '410':
+          $ref: '#/components/responses/Gone'
+        '502':
+          $ref: '#/components/responses/ResolverUpstreamFailure'
+        '503':
+          $ref: '#/components/responses/PassportVerificationUnavailable'
+  /01/{gtin}/22/{variant}/10/{batch}/21/{serial}:
+    get:
+      operationId: resolveByGtinVariantBatchSerial
+      summary: GS1 Digital Link resolver — GTIN + consumer product variant + batch/lot + serial
+      description: |
+        A label that carries every qualifier a GTIN takes: a consumer product
+        variant (AI 22), a batch or lot (AI 10) and a serial (AI 21). **The variant
+        takes no part in the lookup**: the node holds no record at that level, so the
+        label resolves exactly as `/01/{gtin}/10/{batch}/21/{serial}` does, serial
+        first, then the lot's passport, then the model's. Same behaviour as
+        `/01/{gtin}` otherwise (`linkType` / `Accept` negotiation).
+      tags:
+        - Public Resolver
+      security: []
+      parameters:
+        - name: gtin
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '09506000134352'
+        - name: variant
+          in: path
+          required: true
+          schema:
+            type: string
+          description: AI 22, the consumer product variant. Accepted and not looked up.
+        - name: batch
+          in: path
+          required: true
+          schema:
+            type: string
+          description: AI 10. Consulted only if the serial finds nothing.
+        - name: serial
+          in: path
+          required: true
+          schema:
+            type: string
+          description: AI 21, the carrier serial. Selects the passport.
+        - name: linkType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: e.g. linkset, gs1:pip, gs1:dpp
+      responses:
+        '200':
+          description: RFC 9264 linkset (when a linkset is requested).
+          content:
+            application/linkset+json:
+              schema:
+                type: object
+        '307':
+          description: Redirect to the DPP page (`Location` header).
+        '400':
+          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+        '404':
+          description: No published DPP at any level the label names, or unknown link type.
+        '409':
+          $ref: '#/components/responses/PassportSignatureUnverified'
+        '410':
+          $ref: '#/components/responses/Gone'
+        '502':
+          $ref: '#/components/responses/ResolverUpstreamFailure'
+        '503':
+          $ref: '#/components/responses/PassportVerificationUnavailable'
+  /01/{gtin}/235/{extension}:
+    get:
+      operationId: resolveByGtinExtension
+      summary: GS1 Digital Link resolver — GTIN + third-party serialised extension
+      description: |
+        A label that carries a third-party serialised extension (AI 235) after its
+        GTIN. This node issues none, but a label printed elsewhere may carry one.
+        The extension stands alone: GS1 allows no further qualifier after it, so
+        only this shape is served. **It takes no part in the lookup**: the node
+        holds no record at that level, so the label resolves exactly as
+        `/01/{gtin}` does. Same behaviour as `/01/{gtin}` otherwise (`linkType` /
+        `Accept` negotiation).
+      tags:
+        - Public Resolver
+      security: []
+      parameters:
+        - name: gtin
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '09506000134352'
+        - name: extension
+          in: path
+          required: true
+          schema:
+            type: string
+          description: AI 235, the third-party serialised extension. Accepted and not looked up.
+        - name: linkType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: e.g. linkset, gs1:pip, gs1:dpp
+      responses:
+        '200':
+          description: RFC 9264 linkset (when a linkset is requested).
+          content:
+            application/linkset+json:
+              schema:
+                type: object
+        '307':
+          description: Redirect to the DPP page (`Location` header).
+        '400':
+          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+        '404':
+          description: No published DPP at any level the label names, or unknown link type.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4145,7 +4518,7 @@ components:
             - 'null'
           description: |-
             The serial of the physical unit this passport covers, as the manufacturer stamps or records it. Meaningful where `granularity` is `item` — "one passport per physical unit".
-            **Not the serial in the resolver URL.** A GS1 Digital Link carrier is `/01/{gtin}/21/{serial}` and AI 21 is a serial number, but the value there is derived from this passport's own UUID to fit GS1's length cap. That value identifies the *record*; this identifies the *product*, and nothing reconciles the two.
+            **Not the serial in the resolver URL.** A GS1 Digital Link carrier is `/01/{gtin}/21/{serial}` and AI 21 is a serial number, but the value there is `carrierSerial`: the one the operator attributed, or else a default derived from this passport's own id. A printed label resolves by that value, not by this field. This field identifies the *product* as the manufacturer records it; `carrierSerial` identifies what the *label* names.
             Absent means not stated — and today it is always absent: no route accepts one until an adopted delegated act makes a passport cover a single unit.
           example: NW-48V-000123
         productName:
@@ -4972,6 +5345,37 @@ components:
             Only for a successor created independently. `POST /dpp/{dppId}/amend`
             mints its own successor and sets this field itself; it is not settable
             through that route and does not need to be.
+        carrierSerial:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: |
+            The serial the passport's GS1 data carrier prints in AI 21, attributed by
+            the operator. Omitted, the carrier prints a default derived from the
+            passport id. An operator that already serialises its units states that
+            serial here, so the printed label names the passport under the serial the
+            unit already carries. Art. 77(3) of Regulation (EU) 2023/1542 puts the
+            choice of this identifier on the economic operator.
+
+            One to twenty characters of GS1's CSET 82 set, which is how AI 21 is
+            defined: letters, digits and a few punctuation marks, but no space.
+            Refused with `422` otherwise, and refused on a passport that is not
+            identified by a GTIN, because only a GTIN has a GS1 carrier.
+
+            **Unique under its GTIN.** A label that names two passports resolves to
+            neither, so a serial another passport already holds is refused with `409`.
+            The passport named in `supersedesId` is the exception: a successor shares
+            its predecessor's serial, because one label names the whole amendment
+            chain. The label keeps answering with the predecessor until it is
+            superseded, and with the successor from then on.
+
+            Not the manufacturer's `serialNumber`, though an operator may state the
+            same value for both. Nothing copies one into the other.
+
+            **Create-time only.** The carrier is stamped at publish, and an amendment
+            carries it forward. A `PUT` or an amendment naming a different serial is
+            refused with `422`.
+          example: SN-2026-0001
     SuspendRequest:
       type: object
       description: |
@@ -5462,7 +5866,7 @@ components:
 
             `null` for a `B-B` seal, which carries no token, and for a token that failed either check.
 
-            **Attested is not trusted.** A qualified electronic time stamp is a QTSP's service (Art. 42) and the presumption of accuracy attaches to that (Art. 41(2)); establishing it is a Trusted List question about the `TSA/QTST` service type, which this node cannot yet ask. A self-signed authority's token verifies perfectly and means nothing.
+            **Attested is not trusted.** A qualified electronic time stamp is a QTSP's service (Art. 42) and the presumption of accuracy attaches to that (Art. 41(2)); whether the authority is one is a Trusted List question about the `TSA/QTST` service type, answered by `timestampAuthority`. A self-signed authority's token verifies perfectly and means nothing, so this time is **shown** whatever that says, but counts as a proof of existence — `certificate.judgedAt.attested` — only when `timestampAuthority` is `qualifiedAtStamping`.
         conformanceLevel:
           oneOf:
             - $ref: '#/components/schemas/SealConformanceLevel'
@@ -5526,6 +5930,18 @@ components:
             Even at its widest this is **not** "not qualified in law": a provider can be qualified and its Member State's list wrong, which is that state's problem and not something this node can see.
 
             Null means **not read** — a placeholder seal, a format this node does not parse, unreadable bytes, or a deployment with no inspector wired. Never read null as "not qualified": that is a finding, and it only comes from a certificate that was actually examined.
+        timestampAuthority:
+          oneOf:
+            - $ref: '#/components/schemas/TimestampStanding'
+            - type: 'null'
+          description: |-
+            Who stamped `attestedSealedAt`, and what the EU Trusted Lists say of them — Regulation (EU) No 910/2014 Art. 42 and Art. 41(2), via the `TSA/QTST` service type.
+
+            **This decides whether the time is believed.** `certificate.judgedAt.attested` is `true` only when this is `qualifiedAtStamping`. Otherwise the time is still shown and the certificate is judged against this node's own clock and reported as unproven — `outOfBoundsNoPoe`, not `expired` — so a token minted by an authority nobody lists cannot turn an out-of-window certificate into anything but an open question.
+
+            🚨 **Read `consulted` and `unchecked` before acting on a `notListed` standing**, for the reason given on `qualification`.
+
+            Null means **not read**. A seal that was read and carries no usable timestamp answers `noAttestedTime`, which is a finding.
         verification:
           type: string
           description: 'Stated, not implied: this node did not cryptographically validate the CAdES. A detached CAdES must be checked by an independent AdES validator against the EU Trusted List.'
@@ -7816,7 +8232,7 @@ components:
 
         `evidencedLevel` reports `baseline-lta` from the **presence** of the archival material, and is right to — the material is there. This reports whether it still means anything.
 
-        An archival timestamp is what keeps a `B-LTA` seal verifiable after its signing certificate expires, which is the whole point for a retention-locked passport that outlives every certificate involved. **It expires too**: its own timestamping authority's certificate has a validity period, and ETSI's long-term profiles expect re-timestamping before that. Without this field a seal whose archival protection lapsed years ago reads exactly as it did the day it was bought.
+        An archival timestamp is what keeps a `B-LTA` seal verifiable after its signing certificate expires, which is the whole point for a retention-locked passport that outlives every certificate involved. **It expires too**: its own timestamping authority's certificate has a validity period, and ETSI's long-term profiles expect re-timestamping before that. Without this field a seal whose archival protection lapsed years ago reads exactly as it did the day it was bought. A node with a timestamp source configured renews a due seal itself, and this field is what shows the result: `current` with a later date.
 
         **A signal, not a verdict.** A seal nearing its renewal date still verifies, and that window is the only chance to renew without an outage. No threshold is applied — how much notice is enough is a policy question for the reader.
       required:
@@ -8210,6 +8626,94 @@ components:
             The territories the EU list of trusted lists names and this node could not consult, with the reason for each.
 
             🚨 **Read this before acting on a `notListed` issuer.** The two states a caller must tell apart — *this issuer is on no list* and *the list it would be on could not be read* — are otherwise identical at the point of the verdict. Empty means every territory the list of lists names was read.
+    TimestampStanding:
+      type: object
+      description: |-
+        What the EU Trusted Lists say about the authority that stamped the seal's time — Regulation (EU) No 910/2014 Art. 42 and Art. 41(2), via the `TSA/QTST` service type.
+
+        **This is what decides whether `attestedSealedAt` is believed.** A token's own signature holding says it is genuine; it says nothing about who signed it, and the signer is whoever the seal's holder chose. So the moment a seal's certificate is judged against (`certificate.judgedAt`) is treated as attested **only** when this is `qualifiedAtStamping`. In every other case the time is still reported, and the certificate is judged against this node's own clock and reported as unproven rather than as a failure.
+
+        **"At stamping" throughout, never "now."** The list carries the history, and a service withdrawn last week did not retroactively unmake the stamps it made while granted.
+
+        Matched two ways, unlike a seal's issuer. A `TSA/QTST` entry's service identity is usually the timestamping unit's own certificate and sometimes the CA above it, so a token whose signing certificate *is* the listed one needs no path, and one issued by a listed CA needs the path verified link by link.
+
+        Discriminated by `standing`. The shape of the rest depends on which one it is.
+      required:
+        - standing
+      properties:
+        standing:
+          type: string
+          enum:
+            - noAttestedTime
+            - selfIssued
+            - notListed
+            - chainIncomplete
+            - signatureNotFromListedAuthority
+            - pathUnverifiable
+            - notQualifiedAtStamping
+            - qualifiedAtStamping
+          description: |-
+            `noAttestedTime`: the seal carries no timestamp that survived its own checks — a `B-B` seal has none, and so does one whose token failed its signature, its imprint or its authority's validity window. A finding, not a failure to read.
+
+            `selfIssued`: the authority's certificate is its own issuer and no list names it. Decided from the certificate alone, so a node with no network still knows. What the local development backend produces; the time is the signer's own word.
+
+            `notListed`: some provider issued the authority's certificate, and no list consulted names that authority or its CA under `TSA/QTST`. 🚨 The only standing claiming an **absence** — read `consulted` and `unchecked` before acting on it.
+
+            `chainIncomplete`: the token did not carry enough certificates to reach a root, and no list names any issuer it does refer to. **Weaker than `notListed` deliberately**: a listed CA may sit above the gap.
+
+            `signatureNotFromListedAuthority`: a listed `TSA/QTST` CA carries the name the authority's certificate claims, and **did not sign it**. The forgery finding.
+
+            `pathUnverifiable`: a listed CA carries the claimed name and the signature could not be checked — usually a key algorithm this build does not verify. **Not an accusation, and never to be read as one.**
+
+            `notQualifiedAtStamping`: the authority is a listed `TSA/QTST` service that was not granted when it stamped.
+
+            `qualifiedAtStamping`: the authority is a listed `TSA/QTST` service, granted when it stamped. The only standing that makes the attested time count as a proof of existence.
+        subject:
+          type: string
+          description: '`selfIssued` only — the authority''s subject name, which is also its issuer name.'
+        authority:
+          type: string
+          description: The authority's subject distinguished name.
+        claimedIssuer:
+          type: string
+          description: '`signatureNotFromListedAuthority` and `pathUnverifiable` only — the issuer name the authority''s certificate claims.'
+        consulted:
+          type: integer
+          description: |-
+            `notListed` only. How many territories' verified lists were searched.
+
+            🚨 `0` means **nothing was looked at**: the answer is about nothing, and it is what a node with no trusted lists loaded reports for every provider's timestamps, qualified or not.
+        unchecked:
+          type: integer
+          description: '`notListed` only. How many territories the EU list of trusted lists names could not be verified, and so were not searched. Above zero, an authority listed *there* is indistinguishable from one listed nowhere.'
+        missingIssuer:
+          type: string
+          description: '`chainIncomplete` only. The name the walk needed next and the token did not carry.'
+        provider:
+          type:
+            - string
+            - 'null'
+          description: The listed provider, where one was matched.
+        territory:
+          type:
+            - string
+            - 'null'
+          description: The list carrying that service.
+        status:
+          allOf:
+            - $ref: '#/components/schemas/TrustServiceStatus'
+          description: |-
+            `notQualifiedAtStamping` only — the status in force when the authority stamped.
+
+            Null means the list's history does not reach back that far, which is a **different finding** from a recorded non-granted status: the list is silent about that moment rather than negative about it.
+
+            🚨 **Three shapes, not two** — see `IssuerStanding.status`. A client that assumes a string here will break on the first list entry that is neither granted nor withdrawn.
+        reason:
+          type: string
+          description: |-
+            `pathUnverifiable` only — why the signature could not be checked.
+
+            🚨 Read it as a limit of the reader, never as a finding about the seal.
     SealAuditReport:
       type: object
       description: |-
@@ -8284,7 +8788,9 @@ components:
           description: |-
             `B-LTA` seals whose archival protection expires soon.
 
-            A reporting threshold rather than a purchase trigger: nothing on this node buys a renewal. The window between "due" and "gone" is the only one in which renewing is routine rather than an incident, which is why it is reported separately from `archivalLapsed`.
+            The window between "due" and "gone" is the only one in which renewing is routine rather than an incident, which is why it is reported separately from `archivalLapsed`.
+
+            On a node with a timestamp source configured, the pass that finds a seal due **renews** it, and a seal renewed there is not counted — what remains here is what still needs attention. On a node with none, this is simply what is due, and nothing is bought.
         archivalUnverifiable:
           type: integer
           description: |-
@@ -8340,6 +8846,12 @@ components:
             take effect. Fields fixed at issuance — the product group, the schema
             version, the manufacturer, the lineage edges — are not amendable; a
             passport whose product group is wrong is not the same product.
+
+            `carrierSerial` is fixed at issuance too, and is the one such key that is
+            refused rather than ignored when it differs from the serial the passport
+            prints, with `422` naming `/carrierSerial`. It is what the label carries,
+            and the successor keeps the predecessor's so that the label stays the
+            same. The same value is accepted.
           additionalProperties: true
           example:
             productName: Model X Battery Pack (rev B)
@@ -8471,31 +8983,6 @@ components:
             title: Forbidden
             status: 403
             detail: This operation requires an admin-scoped credential.
-    IdempotentRequestInFlight:
-      description: |
-        An earlier attempt carrying this `Idempotency-Key` is still running.
-
-        Returned instead of letting a duplicate execute alongside it. Retry shortly
-        with the same key and the same body; `Retry-After` carries the suggested
-        delay.
-
-        A claim left behind by a process that died mid-request is reclaimed
-        automatically after 60 seconds, so this can never wedge a key permanently.
-      headers:
-        Retry-After:
-          description: Seconds to wait before retrying.
-          schema:
-            type: integer
-            minimum: 1
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-          example:
-            type: https://problems.odal-node.io/idempotent-request-in-flight
-            title: Idempotent Request In Flight
-            status: 409
-            detail: An earlier attempt with this `Idempotency-Key` is still running. Retry shortly; do not change the body.
     ValidationError:
       description: One or more fields failed validation.
       content:
@@ -8545,6 +9032,31 @@ components:
             title: Conflict
             status: 409
             detail: DPP is already published.
+    IdempotentRequestInFlight:
+      description: |
+        An earlier attempt carrying this `Idempotency-Key` is still running.
+
+        Returned instead of letting a duplicate execute alongside it. Retry shortly
+        with the same key and the same body; `Retry-After` carries the suggested
+        delay.
+
+        A claim left behind by a process that died mid-request is reclaimed
+        automatically after 60 seconds, so this can never wedge a key permanently.
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying.
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://problems.odal-node.io/idempotent-request-in-flight
+            title: Idempotent Request In Flight
+            status: 409
+            detail: An earlier attempt with this `Idempotency-Key` is still running. Retry shortly; do not change the body.
     Gone:
       description: |
         The passport exists but has been withdrawn from public view — it is suspended.
