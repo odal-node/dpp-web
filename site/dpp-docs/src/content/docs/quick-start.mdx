@@ -1,12 +1,12 @@
 ---
 title: Quick Start
-description: Run a node on your machine, publish a signed passport over the REST API, resolve it from its GS1 Digital Link and verify its evidence dossier.
+description: Run a node on your machine, publish a signed passport over the REST API, resolve it from its digital link and verify its evidence dossier.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-This guide takes you from `git clone` to a signed passport that resolves from a GS1
-Digital Link and verifies without Odal. You run seven commands and two API calls.
+This guide takes you from `git clone` to a signed passport that resolves from its digital
+link and verifies without Odal. You run seven commands and two API calls.
 
 Most of the time goes into the first build: about 2 minutes for the `odal` CLI and 15
 to 20 minutes for the node and resolver images on a 6-core machine. Later starts take
@@ -127,8 +127,10 @@ curl -s -X POST "http://localhost:8001/vault/api/v1/dpp/$DPP_ID/publish" \
 
 The passport is now `"status":"active"`. It carries a `jwsSignature` made with your
 Ed25519 key, and a `qrCodeUrl` of the form
-`http://localhost:8003/01/09506000134352/21/<serial>`: the GS1 Digital Link that goes
-on the product label.
+`http://localhost:8003/01/09506000134352/21/<serial>`: the digital link that goes
+on the product label. The passport has a GTIN, so its digital link is a GS1 Digital
+Link. A passport identified by an identification link or a DID gets
+`http://localhost:8003/dpp/<id>` instead.
 
 ## 6. Resolve it like a scanner
 
@@ -138,7 +140,7 @@ curl -s -H 'Accept: application/ld+json' "http://localhost:8003/dpp/$DPP_ID"
 curl -s http://localhost:8001/identity/.well-known/did.json
 ```
 
-The Digital Link answers `307` and redirects to `/dpp/<id>`. The resolver returns the
+The GS1 route answers `307` and redirects to `/dpp/<id>`. The resolver returns the
 public view as JSON-LD, as HTML (open the same URL in a browser), or as an Asset
 Administration Shell environment, depending on the `Accept` header. The DID document
 holds the public key anyone can use to verify the signature.

@@ -46,7 +46,7 @@ The resolver serves the same published passport in several forms, by content neg
 
 A request that accepts none of these gets `406 Not Acceptable`.
 
-GS1 Digital Link routes resolve a product's barcode data to its passport, and the `linkset` link type returns an RFC 9264 link set. The node also serves each passport's QR code as a PNG.
+Every passport resolves at `/dpp/{id}` on the resolver. For a product with a GTIN, GS1 Digital Link routes also resolve its barcode data to the passport, and the `linkset` link type returns an RFC 9264 link set. The node also serves each passport's QR code as a PNG.
 
 <Aside type="note" title="The shell is AAS-shaped, not IDTA-conformant">
 The Asset Administration Shell follows the IDTA metamodel's structure, but its semantic identifiers are in Odal's own namespace for now, so a receiving system still has to map them.

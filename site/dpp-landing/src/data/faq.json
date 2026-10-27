@@ -119,7 +119,7 @@
         {
           "q": "Which standards does it use?",
           "a": [
-            "Open ones: GS1 Digital Link for the code on the product, web-based identities for signatures, W3C Verifiable Credentials for proving who a reader is, and the Asset Administration Shell for industrial systems."
+            "Open ones: a digital link for the code on the product (a GS1 Digital Link when it has a barcode number), web-based identities for signatures, W3C Verifiable Credentials for proving who a reader is, and the Asset Administration Shell for industrial systems."
           ],
           "link": { "href": "https://docs.odal-node.io/core/standards", "label": "The standards in detail" }
         }

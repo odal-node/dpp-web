@@ -40,7 +40,7 @@ Judging data and signing it are therefore separate. A buggy or even hostile prod
 
 ## Linking the passport to the physical product
 
-The QR code printed on a product is a GS1 Digital Link. The node builds it from the signed passport's own verified fields each time it is served, never from a stored link that could be edited. If the passport's signature does not verify, no QR code is produced: the node refuses to print a code for data it cannot prove.
+The QR code printed on a product carries its digital link: a GS1 Digital Link when the product has a GTIN, otherwise the passport's address on the resolver. The node builds it from the signed passport's own verified fields each time it is served, never from a stored link that could be edited. If the passport's signature does not verify, no QR code is produced: the node refuses to print a code for data it cannot prove.
 
 The serial number on the label is derived from the passport's identity. It is fixed-length, GS1-conformant and non-sequential, so a public label reveals nothing about production volumes. Everything printed on the product traces back to the signed passport: a tampered passport cannot get a new label, and the label carries nothing a verifier cannot check.
 
