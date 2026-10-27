@@ -55,6 +55,10 @@
       "definition": "An identity published as a small document on a company's own web domain, holding the public keys its signatures can be checked against. Anyone can look it up; no central register is involved."
     },
     {
+      "term": "Digital link",
+      "definition": "The web address in the code on a product, which opens its passport when scanned. A GS1 Digital Link, built from the product's barcode number, is one kind. The EU standard for passport identifiers also allows identifiers a company issues itself, on its own web domain, with no GS1 membership."
+    },
+    {
       "term": "Digital Product Passport",
       "definition": "A digital record that stays with a product for its whole life: what it is made of, where it came from, how to repair and recycle it. EU law is making passports compulsory one product group at a time.",
       "link": { "href": "/lifecycle", "label": "Follow one passport's life" }
@@ -105,7 +109,7 @@
     },
     {
       "term": "GS1 Digital Link",
-      "definition": "A web address format that carries a product's barcode number, so a phone camera can open its passport from the same code a till scans."
+      "definition": "One kind of digital link: a web address format that carries a product's barcode number, so a phone camera can open its passport from the same code a till scans."
     },
     {
       "term": "Handover",

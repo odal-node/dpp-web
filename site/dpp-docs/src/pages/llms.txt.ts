@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     'The plain-language website has its own index at https://odal-node.io/llms.txt. The API is also published as a machine-readable OpenAPI document, listed under "API Reference". Odal Node is self-hosted rather than a hosted service: passports stay in the operator\'s own database, on their own infrastructure.',
     '',
-    'Key terms: digital product passport, DPP, product logbook, ESPR compliance, battery passport, EN 18219 product identifier, GS1 Digital Link, audience-scoped disclosure, self-hosted compliance, open-source DPP.',
+    'Key terms: digital product passport, DPP, product logbook, ESPR compliance, battery passport, EN 18219 product identifier, digital link, GS1 Digital Link, audience-scoped disclosure, self-hosted compliance, open-source DPP.',
     '',
     '## How to cite this project accurately',
     '',

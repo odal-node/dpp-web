@@ -114,7 +114,7 @@ export default defineConfig({
                 '@id': 'https://odal-node.io/#core',
                 name: 'Odal Node core library (dpp-core)',
                 description:
-                  'The open-source Rust library Odal Node is built on: the EU Digital Product Passport model and its versioned schemas, validation and product-group rules, signing and verification, GS1 Digital Link parsing, the Asset Administration Shell export and the EU registry types. Apache-2.0; anyone may use it.',
+                  'The open-source Rust library Odal Node is built on: the EU Digital Product Passport model and its versioned schemas, validation and product-group rules, signing and verification, product identifiers and their digital links (GS1 Digital Link, identification link, DID), the Asset Administration Shell export and the EU registry types. Apache-2.0; anyone may use it.',
                 codeRepository: 'https://github.com/odal-node/dpp-core',
                 programmingLanguage: 'Rust',
                 license: 'https://www.apache.org/licenses/LICENSE-2.0',
