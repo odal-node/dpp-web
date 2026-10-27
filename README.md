@@ -31,7 +31,7 @@ CI (`.github/workflows/ci.yml`) runs all of these on every pull request and ever
 ```bash
 pnpm -r build
 pnpm -r check                                # types and content collections, not links
-pnpm run check:links                         # internal links in both builds
+pnpm run check:links                         # internal links and anchors in both builds
 pnpm run check:spacing                       # words glued across a line break
 pnpm run check:leakage                       # internal names and private paths
 pnpm run check:llms                          # llms.txt matches the pages
