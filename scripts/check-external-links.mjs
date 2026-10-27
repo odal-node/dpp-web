@@ -50,7 +50,12 @@ export async function fetchStatus(url, { timeoutMs = 20000, fetchImpl = fetch } 
     const res = await fetchImpl(url, {
       redirect: "follow",
       signal: AbortSignal.timeout(timeoutMs),
-      headers: { "User-Agent": "odal-node-link-check (+https://github.com/odal-node/dpp-web)" },
+      headers: {
+        "User-Agent": "odal-node-link-check (+https://github.com/odal-node/dpp-web)",
+        // Ask for a page the way a browser does. crates.io answers 404 to a
+        // request that does not accept text/html, and a reader's click does.
+        Accept: "text/html,application/xhtml+xml,*/*;q=0.8",
+      },
     });
     await res.body?.cancel();
     return res.status;
