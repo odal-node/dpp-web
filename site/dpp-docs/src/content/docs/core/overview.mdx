@@ -24,23 +24,27 @@ use serde_json::json;
 fn main() -> anyhow::Result<()> {
     // 1. Validate product data against the embedded, versioned JSON Schema.
     let schemas = VersionedSchemaRegistry::new();
-    let (version, _) = schemas.latest("textile").expect("textile schema is embedded");
+    let (version, _) = schemas.latest("battery").expect("battery schema is embedded");
 
+    // An industrial LFP battery of 4.8 kWh: over the 2 kWh line above which the
+    // Battery Regulation requires a passport for an industrial battery.
     let data = json!({
         "productIdentifier": { "scheme": "gs1", "gtin": "09506000134352" },
-        "fibreComposition": [{ "fibre": "organic cotton", "pct": 100.0 }],
-        "countryOfOrigin": "PT",
-        "careInstructions": "Machine wash 30°C",
-        "chemicalComplianceStandard": "OEKO-TEX Standard 100"
+        "batteryType": "industrial",
+        "batteryChemistry": "LFP",
+        "nominalVoltageV": 48.0,
+        "nominalCapacityAh": 100.0,
+        "ratedCapacityKwh": 4.8,
+        "expectedLifetimeCycles": 3000
     });
 
-    if let Err(e) = schemas.validate("textile", version, &data) {
+    if let Err(e) = schemas.validate("battery", version, &data) {
         for err in &e.errors {
             println!("invalid at '{}': {}", err.field, err.message);
         }
         anyhow::bail!("validation failed");
     }
-    println!("valid against textile schema v{version}");
+    println!("valid against battery schema v{version}");
 
     // 2. Sign it as a compact JWS with an Ed25519 key from an encrypted keystore.
     let store = KeyStore::open(std::env::temp_dir().join("hello-keys.json"), "change-me")?;
@@ -61,11 +65,11 @@ cargo run
 ```
 
 ```text
-valid against textile schema v1.4.0
+valid against battery schema v2.8.0
 signature verifies: true
 ```
 
-Remove `"countryOfOrigin"` and the run stops with `invalid at '': "countryOfOrigin" is a required property`.
+The schema version is the newest one the installed `dpp-domain` embeds. Remove `"batteryType"` and the run stops with `invalid at '': "batteryType" is a required property`.
 
 ## What it gives you
 
