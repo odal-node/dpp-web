@@ -39,10 +39,6 @@ Any reverse proxy works. With Caddy, certificates are automatic:
 
 ```text
 api.example.com {
-    handle /.well-known/did.json {
-        rewrite * /identity/.well-known/did.json
-        reverse_proxy 127.0.0.1:8001
-    }
     reverse_proxy 127.0.0.1:8001
 }
 dpp.example.com {
@@ -50,7 +46,7 @@ dpp.example.com {
 }
 ```
 
-The node serves its DID document at `/identity/.well-known/did.json`, while `did:web` resolution fetches `/.well-known/did.json` from the domain root, hence the rewrite.
+`did:web` resolution fetches `/.well-known/did.json` from the domain root, and the node serves its DID document there as well as at `/identity/.well-known/did.json`, so the proxy needs no rewrite.
 
 ## 4. Fill in the environment
 
