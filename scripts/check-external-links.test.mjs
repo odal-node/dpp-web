@@ -53,3 +53,20 @@ test("a real request: redirects are followed, a missing page is a 404, a stalled
     server.close();
   }
 });
+
+test("a page that only answers a request for HTML is not reported broken", async () => {
+  // crates.io does this: a crate page answers 404 unless the request accepts
+  // text/html, so a checker that does not ask for HTML reports a live page gone.
+  const server = createServer((req, res) => {
+    const wantsHtml = (req.headers.accept ?? "").includes("text/html");
+    res.writeHead(wantsHtml ? 200 : 404).end();
+  });
+  await new Promise((r) => server.listen(0, "127.0.0.1", r));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  try {
+    assert.equal(await fetchStatus(`${base}/crates/dpp-domain`), 200);
+  } finally {
+    server.closeAllConnections();
+    server.close();
+  }
+});
