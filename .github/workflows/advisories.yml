@@ -1,0 +1,47 @@
+name: Advisories
+
+# A new advisory against an unchanged lockfile reaches nobody otherwise.
+#
+# The audit step in ci.yml runs on pull requests and pushes, so it answers "is
+# this change safe" and nothing else. npm advisories are published against
+# packages already in the lockfile: the tree does not change, no run is
+# triggered, and the first anyone hears of it is the next pull request, which
+# then fails for a reason it did not cause. That is how six Dependabot pull
+# requests went red in October 2026.
+#
+# This run exists to fail on a day when nothing was committed. It reads the
+# committed pnpm-lock.yaml only, so it needs no install and no build.
+
+on:
+  schedule:
+    # 06:20 UTC daily, after the dpp-core and dpp-engine scans and clear of the
+    # nightly API-spec sync.
+    - cron: '20 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  advisories:
+    name: npm advisories against the committed lockfile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+
+      # The same level the pull-request gate uses, so a finding here is one a
+      # pull request would also fail on.
+      - name: Audit dependencies
+        run: pnpm audit --audit-level high
