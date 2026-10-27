@@ -1,5 +1,8 @@
 version: 2
 updates:
+  # Version updates open against staging, where the previews are reviewed;
+  # staging is promoted to main by hand. Security updates always target the
+  # default branch whatever this says, so retarget those to staging.
   - package-ecosystem: npm
     directory: "/"
     target-branch: staging
@@ -8,6 +11,31 @@ updates:
       day: monday
     labels:
       - dependencies
+    groups:
+      # Astro, its integrations and the packages that render inside it move
+      # together. Bumped one at a time, each pull request tests a combination
+      # nobody will ship, and a peer-range mismatch fails all of them.
+      astro:
+        patterns:
+          - "astro"
+          - "@astrojs/*"
+          - "@scalar/*"
+          - "vue"
+      # Everything else in one weekly pull request, minor and patch only. A
+      # major version arrives on its own, so its changes are read on their own.
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # `astro check` refuses TypeScript 7.0 by name ("install TypeScript 6
+      # instead"), and its successor needs TypeScript 7.1 or later. Lift this
+      # when the checker supports the release Dependabot proposes.
+      - dependency-name: typescript
+        versions:
+          - "7.0.x"
 
   - package-ecosystem: github-actions
     directory: "/"
@@ -18,3 +46,9 @@ updates:
     labels:
       - dependencies
       - ci
+    groups:
+      # The workflows pin each action to a commit, so a bump touches several
+      # files at once; one pull request per week keeps them consistent.
+      actions:
+        patterns:
+          - "*"
