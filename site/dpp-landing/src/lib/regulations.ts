@@ -19,7 +19,8 @@ type Basis = "sourced" | "assumed";
 type Passport =
   | { obligation: "required"; from?: { date: string; basis: Basis } }
   | { obligation: "notRequired" }
-  | { obligation: "displacedBy"; system: string; basis?: string };
+  | { obligation: "displacedBy"; system: string; basis?: string }
+  | { obligation: "includedIn"; basis?: string };
 
 type Binding = {
   productGroup: string;
@@ -141,7 +142,7 @@ export function withPassportDates(text: string): string {
 
 export type PassportView = {
   /** Short state, for a chip. */
-  state: "required" | "not-yet-operable" | "undated" | "per-act" | "expected" | "none" | "elsewhere";
+  state: "required" | "not-yet-operable" | "undated" | "per-act" | "expected" | "none" | "elsewhere" | "included";
   label: string;
   /** One plain sentence expanding the label. */
   detail: string;
@@ -160,6 +161,16 @@ export function passportView(i: Instrument): PassportView {
       state: "elsewhere",
       label: "Handled elsewhere",
       detail: `Its product information goes into ${SYSTEM[p.system] ?? p.system}, instead of a passport.`,
+    };
+  }
+  if (p.obligation === "includedIn") {
+    // The act creates no passport and displaces none: it owes content to the
+    // passport another act requires (CRM Act Art. 28(6)). Without this branch it
+    // would fall through to "undated" and read as a passport with no date.
+    return {
+      state: "included",
+      label: "Feeds other passports",
+      detail: "It creates no passport of its own, but where another act requires one, its information has to be included in it.",
     };
   }
   if (i.status === "anticipated") {
