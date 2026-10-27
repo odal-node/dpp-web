@@ -38,9 +38,19 @@ SSH keys only, a firewall allowing only 22, 80 (for certificate issuance) and 44
 Any reverse proxy works. With Caddy, certificates are automatic:
 
 ```text
-api.example.com { reverse_proxy 127.0.0.1:8001 }
-dpp.example.com { reverse_proxy 127.0.0.1:8003 }
+api.example.com {
+    handle /.well-known/did.json {
+        rewrite * /identity/.well-known/did.json
+        reverse_proxy 127.0.0.1:8001
+    }
+    reverse_proxy 127.0.0.1:8001
+}
+dpp.example.com {
+    reverse_proxy 127.0.0.1:8003
+}
 ```
+
+The node serves its DID document at `/identity/.well-known/did.json`, while `did:web` resolution fetches `/.well-known/did.json` from the domain root, hence the rewrite.
 
 ## 4. Fill in the environment
 

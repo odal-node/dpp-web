@@ -40,15 +40,18 @@ export const GET: APIRoute = async ({ site }) => {
     '',
   ];
 
+  // `/api` is a page of its own (src/pages/api.astro), not a docs entry, so it
+  // has no collection description to read.
+  const apiLines = () => [
+    `- [API reference](${abs('/api')}): Every route a node serves, rendered from the OpenAPI document`,
+    `- [OpenAPI document](${abs('/openapi.yaml')}): The node's full HTTP interface as an OpenAPI 3.1 file`,
+  ];
+
   for (const group of sidebar as Item[]) {
     parts.push(`## ${group.label}`, '');
-    if (group.items) {
-      for (const item of group.items) if (item.link) parts.push(line(item.link));
-    } else if (group.link === '/api') {
-      parts.push(
-        `- [API reference](${abs('/api')}): Every route a node serves, rendered from the OpenAPI document`,
-        `- [OpenAPI document](${abs('/openapi.yaml')}): The node's full HTTP interface as an OpenAPI 3.1 file`,
-      );
+    for (const item of group.items ?? [group]) {
+      if (item.link === '/api') parts.push(...apiLines());
+      else if (item.link) parts.push(line(item.link));
     }
     parts.push('');
   }
