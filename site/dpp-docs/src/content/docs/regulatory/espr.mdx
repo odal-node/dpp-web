@@ -4,8 +4,9 @@ description: The Ecodesign for Sustainable Products Regulation, what it requires
 ---
 
 import { Aside } from "@astrojs/starlight/components";
+import PassportDate from "../../../components/PassportDate.astro";
 
-The Ecodesign for Sustainable Products Regulation (ESPR, EU 2024/1781) is the framework regulation that sets up the Digital Product Passport requirement across the European Union. It entered into force in 2024. **No delegated act under Article 4 has yet been adopted for any product group**, so ESPR itself obliges nobody to issue a passport today: the framework is in force, but the obligations that depend on it are not. The passport obligations that do have dates come from other acts: the Battery Regulation from 18 February 2027, the Detergents Regulation from 23 September 2029 and the Toy Safety Regulation from 1 August 2030. The Construction Products Regulation requires a passport too, but Art. 22(7) dates it 18 months after the Commission's delegated act setting up the construction passport system (Art. 75(1)), and that act has not been adopted.
+The Ecodesign for Sustainable Products Regulation (ESPR, EU 2024/1781) is the framework regulation that sets up the Digital Product Passport requirement across the European Union. It entered into force in 2024. **No delegated act under Article 4 has yet been adopted for any product group**, so ESPR itself obliges nobody to issue a passport today: the framework is in force, but the obligations that depend on it are not. The passport obligations that do have dates come from other acts: the Battery Regulation from <PassportDate act="battery-reg-2023-1542" />, the Detergents Regulation from <PassportDate act="detergents-2026-405" /> and the Toy Safety Regulation from <PassportDate act="toy-safety-2025-2509" />. The Construction Products Regulation requires a passport too, but Art. 22(7) dates it 18 months after the Commission's delegated act setting up the construction passport system (Art. 75(1)), and that act has not been adopted.
 
 ## What ESPR requires
 
@@ -45,15 +46,15 @@ ESPR is a framework. The binding detail comes in delegated acts for each product
 
 | Product group | Regulatory basis | Status today |
 |---|---|---|
-| [**Batteries**](/regulatory/battery) | Regulation (EU) 2023/1542 | Passport required from 18 Feb 2027 for EV, LMT and industrial batteries over 2 kWh; substance limits enforced now |
+| [**Batteries**](/regulatory/battery) | Regulation (EU) 2023/1542 | Passport required from <PassportDate act="battery-reg-2023-1542" short /> for EV, LMT and industrial batteries over 2 kWh; substance limits enforced now |
 | [**Textiles**](/regulatory/textile) | ESPR | No delegated act; indicative adoption 2027. Structural validation only |
 | **Iron and steel** | ESPR | No delegated act; first in the working plan, indicative adoption 2026 |
 | **Aluminium** | ESPR | No delegated act; indicative adoption 2027. Carbon checks use reference values as warnings only |
 | **Tyres** | ESPR; Tyre Labelling Regulation (EU) 2020/740 | No delegated act; indicative adoption 2027. Label classes in force |
 | **Furniture** · **Mattresses** | ESPR | No delegated act; indicative adoption 2028 and 2029 |
 | [**Phones and tablets**](/regulatory/phones) | Regulations (EU) 2023/1670 and 2023/1669 (ecodesign and energy labelling, not ESPR) | In force since 20 Jun 2025; no passport, product information goes to EPREL |
-| [**Toys**](/regulatory/toys) | Regulation (EU) 2025/2509 | Passport required from 1 Aug 2030, a date set by the Toy Safety Regulation itself |
-| [**Detergents**](/regulatory/detergents) | Regulation (EU) 2026/405 | Passport required from 23 Sep 2029, with a one-year transition for products meeting the old rules |
+| [**Toys**](/regulatory/toys) | Regulation (EU) 2025/2509 | Passport required from <PassportDate act="toy-safety-2025-2509" short />, a date set by the Toy Safety Regulation itself |
+| [**Detergents**](/regulatory/detergents) | Regulation (EU) 2026/405 | Passport required from <PassportDate act="detergents-2026-405" short />, with a one-year transition for products meeting the old rules |
 | [**Construction products**](/regulatory/construction) | Regulation (EU) 2024/3110 | Passport owed 18 months after the Commission's delegated act setting up the construction passport system (Art. 22(7), Art. 75(1)), not yet adopted. Operator owes 10 years of availability, the passport *system* 25 |
 
 Each linked group has its own page, [Vehicle passport](/regulatory/vehicles) covers the separate regime for vehicles, and [Acts and standards](/regulatory/acts-and-standards) lists every act the code relies on.

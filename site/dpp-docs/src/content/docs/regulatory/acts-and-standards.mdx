@@ -4,6 +4,7 @@ description: Every EU act and standard the Odal Node code relies on, the article
 ---
 
 import { Aside } from "@astrojs/starlight/components";
+import PassportDate from "../../../components/PassportDate.astro";
 
 This is the reference behind the website's [regulations page](https://odal-node.io/regulations): every EU act and standard the code cites, grouped by what the software does with it, with the articles it relies on, and then the acts it does not apply yet but is preparing for.
 
@@ -17,12 +18,12 @@ These are records in the core library's instrument catalog, and the website's re
 
 | Act | Passport provision the catalog rests on |
 |---|---|
-| Batteries Regulation (EU) 2023/1542 | Art. 77(1), from 18 February 2027; access by Art. 77(2) and Annex XIII |
+| Batteries Regulation (EU) 2023/1542 | Art. 77(1), from <PassportDate act="battery-reg-2023-1542" />; access by Art. 77(2) and Annex XIII |
 | Ecodesign for Sustainable Products Regulation (EU) 2024/1781 | Art. 9(1), dated act by act through delegated acts; access by Art. 11(b) |
 | Construction Products Regulation (EU) 2024/3110 | Art. 22(7): 18 months after the Art. 75(1) delegated act, not yet adopted |
-| Detergents Regulation (EU) 2026/405 | Art. 21(1), applying from 23 September 2029 (Art. 37); transition in Art. 36(2) |
-| Toy Safety Regulation (EU) 2025/2509 | Art. 19(1), applying from 1 August 2030 (Art. 59) |
-| End-of-Life Vehicles Regulation (EU) 2026/1738 | Art. 13(1): a vehicle passport from 1 September 2032 |
+| Detergents Regulation (EU) 2026/405 | Art. 21(1), applying from <PassportDate act="detergents-2026-405" /> (Art. 37); transition in Art. 36(2) |
+| Toy Safety Regulation (EU) 2025/2509 | Art. 19(1), applying from <PassportDate act="toy-safety-2025-2509" /> (Art. 59) |
+| End-of-Life Vehicles Regulation (EU) 2026/1738 | Art. 13(1): a vehicle passport from <PassportDate act="elv-2026-1738" /> |
 | Delegated Regulation (EU) 2026/296 and Implementing Regulation (EU) 2026/2 | No passport: the unsold-goods destruction derogations and disclosure format |
 | Regulations (EU) 2023/1670 and 2023/1669 | No passport: product information goes to EPREL |
 | Packaging and Packaging Waste Regulation (EU) 2025/40 | No passport: a shared data carrier only |
