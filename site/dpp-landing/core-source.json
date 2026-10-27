@@ -11,7 +11,12 @@
     "instruments": {
       "path": "crates/dpp-domain/instruments",
       "dest": "src/data/instruments",
-      "_note": "The legal acts, as typed records: CELEX id, status, passport obligation and date with its basis, and the product groups each act reaches. The only source of any regulatory date on the /regulations pages."
+      "_note": "The legal acts, as typed records: CELEX id, status, passport obligation and date with its basis, and the product groups each act reaches. The only source of any passport date on this site."
+    },
+    "instruments-for-docs": {
+      "path": "crates/dpp-domain/instruments",
+      "dest": "../dpp-docs/src/data/instruments",
+      "_note": "The same acts for docs.odal-node.io, where <PassportDate> renders every passport date from them. A copy inside the docs folder, so a pin bump changes files the docs deploy watches. Both copies come from this one commit, and check:core fails if either drifts."
     }
   }
 }
