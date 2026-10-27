@@ -48,10 +48,12 @@ pnpm run check:external                      # outside links; weekly in CI, not 
 
 | What | Pin | Refresh |
 |---|---|---|
-| Product groups and EU acts from `dpp-core` | `site/dpp-landing/core-source.json` | `pnpm --filter dpp-landing run sync:core` |
+| Product groups and EU acts from `dpp-core`, with a copy of the acts in `site/dpp-docs/src/data/instruments` for the docs | `site/dpp-landing/core-source.json` | `pnpm --filter dpp-landing run sync:core` |
 | API spec from `dpp-engine` | `site/dpp-docs/openapi-source.json` | `pnpm run sync:openapi`, or the nightly workflow |
 
 Never edit the vendored files by hand; bump the pin and sync.
+
+Never type a passport date into a page either. The docs write `<PassportDate act="<id>" />`, landing pages call `passportDateOf("<id>")`, and copy in `site/dpp-landing/src/data` writes `{passport:<id>}`. All three read the vendored acts and fail the build when an act records no date. Other regulatory dates are written beside the article that sets them.
 
 ## Releasing
 

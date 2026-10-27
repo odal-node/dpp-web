@@ -6,6 +6,7 @@ import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import { fieldLabel } from "../lib/product-groups";
 import { buckets, flat, isObj, scalar, shown } from "../lib/example-passport";
+import { passportDateOf } from "../lib/regulations";
 
 const title = "Example battery passport | Odal Node";
 const description =
@@ -49,7 +50,7 @@ const SECTIONS = [
       signed, sorted the way a node shows it to each reader.
     </p>
     <p>
-      Some public values are placeholders. For passports from February 2027,
+      Some public values are placeholders. For passports from {passportDateOf("battery-reg-2023-1542", "month")},
       the Commission's guidance says to leave the carbon footprint and the
       shares of recycled cobalt, lithium, nickel and lead empty until the rules
       for calculating and showing them apply. The software still asks for

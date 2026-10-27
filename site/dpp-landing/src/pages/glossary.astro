@@ -6,9 +6,10 @@ import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import ExternalArrow from "../components/ExternalArrow.astro";
 import glossary from "../data/glossary.json";
+import { withPassportDates } from "../lib/regulations";
 
 type Term = { term: string; definition: string; link?: { href: string; label: string } };
-const terms = glossary.terms as Term[];
+const terms = (glossary.terms as Term[]).map((t) => ({ ...t, definition: withPassportDates(t.definition) }));
 
 const title = "Glossary: Digital Product Passport terms | Odal Node";
 const description =

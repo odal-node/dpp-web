@@ -10,6 +10,7 @@
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import OurRoadmap from "../components/Roadmap.astro";
+import { passportDateOf } from "../lib/regulations";
 
 const title = "Roadmap: what is built, waiting and next | Odal Node";
 const description =
@@ -24,7 +25,7 @@ const description =
     <p>
       <strong>Nobody is running this in production.</strong> No customers, no
       pilots, no live deployments, and nothing below should be read as evidence
-      of any. The battery passport obligation begins on 18 February 2027, and we
+      of any. The battery passport obligation begins on {passportDateOf("battery-reg-2023-1542")}, and we
       would rather be correct when it arrives than early and wrong.
     </p>
     <p>

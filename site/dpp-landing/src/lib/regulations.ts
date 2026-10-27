@@ -107,6 +107,36 @@ export const formatDate = (iso: string) =>
     timeZone: "UTC",
   });
 
+/**
+ * The date an act's passport becomes mandatory, as the core records it from the
+ * act's text: "18 February 2027", or "February 2027". Pages write this instead
+ * of a date. An act with no such date fails the build, so a page cannot print a
+ * blank or a stale one.
+ */
+export function passportDateOf(id: string, form: "day" | "month" = "day"): string {
+  const act = byId.get(id);
+  if (!act) throw new Error(`passportDateOf: no vendored instrument "${id}".`);
+  const from = act.passport.obligation === "required" ? act.passport.from : undefined;
+  if (!from || from.basis !== "sourced") {
+    throw new Error(`passportDateOf: "${id}" records no passport date read from the text.`);
+  }
+  const day = formatDate(from.date);
+  return form === "month" ? day.replace(/^\d+ /, "") : day;
+}
+
+/**
+ * Copy in src/data writes `{passport:<id>}` or `{passport-month:<id>}` where a
+ * passport date goes; this fills it from passportDateOf. A token it cannot read
+ * fails the build rather than reaching the page.
+ */
+export function withPassportDates(text: string): string {
+  const filled = text.replace(/\{passport(-month)?:([a-z0-9-]+)\}/g, (_, month, id) =>
+    passportDateOf(id, month ? "month" : "day"),
+  );
+  if (filled.includes("{passport")) throw new Error(`withPassportDates: unreadable token in "${text}"`);
+  return filled;
+}
+
 // ── the passport line ────────────────────────────────────────────────────────
 
 export type PassportView = {
