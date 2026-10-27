@@ -1,0 +1,14 @@
+---
+// PassportDate.astro — the date an act's passport becomes mandatory, from the
+// vendored dpp-core instrument records. See src/lib/acts.ts.
+import { passportDate } from '../lib/acts';
+
+interface Props {
+  act: string;
+  short?: boolean;
+}
+
+const { act, short = false } = Astro.props;
+---
+
+{passportDate(act, short ? 'short' : 'long')}
