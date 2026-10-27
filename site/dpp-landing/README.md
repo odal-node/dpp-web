@@ -21,7 +21,7 @@ site/dpp-landing/
 ├── astro.config.mjs           # Astro + Tailwind 4 (@tailwindcss/vite) + sitemap; dev server on 4321
 ├── core-source.json           # the dpp-core commit the vendored records in src/data/ come from
 ├── public/
-│   ├── _headers               # Cloudflare Pages headers: HSTS, CSP, caching
+│   ├── _headers               # Cloudflare Pages headers: HSTS, CSP, caching, no-transform on HTML (root README)
 │   ├── favicon.svg            # the brand mark (also shown in the nav, hero and footer)
 │   ├── apple-touch-icon.png   # 180px PNG of the mark, for iOS
 │   ├── og-image.png           # site-wide share image
