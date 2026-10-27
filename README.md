@@ -2,7 +2,7 @@
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/odal-node/dpp-web/actions/workflows/ci.yml/badge.svg)](https://github.com/odal-node/dpp-web/actions/workflows/ci.yml)
-[![Node 22.13+](https://img.shields.io/badge/Node-22.13%2B-brightgreen.svg)](https://nodejs.org/)
+[![Node 22.23.4+](https://img.shields.io/badge/Node-22.23.4%2B-brightgreen.svg)](https://nodejs.org/)
 
 The two Odal Node websites, as one pnpm workspace deployed as two Cloudflare Pages projects.
 
@@ -16,7 +16,7 @@ Each site has its own README for its layout and Pages build settings.
 
 ## Develop
 
-Node 22.13+ and pnpm (version pinned in `package.json`, via corepack).
+Node 22.23.4+ (CI and Cloudflare build with the version in `.node-version`) and pnpm (version pinned in `package.json`, via corepack).
 
 ```bash
 pnpm install
