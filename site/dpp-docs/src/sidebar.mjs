@@ -2,44 +2,23 @@
 //
 // Kept out of astro.config.mjs so /llms.txt can list the documentation in the
 // same order and under the same headings as the sidebar, from one source.
+//
+// Groups follow what the reader is doing (Diátaxis): getting started, a task
+// with the node, running the node, looking something up, understanding the
+// design, and the law. Page URLs are independent of the groups, so regrouping
+// never breaks a link.
 export const sidebar = [
   {
-    label: 'Getting Started',
+    label: 'Get Started',
     items: [
       { label: 'Introduction', link: '/introduction' },
       { label: 'Quick Start', link: '/quick-start' },
       { label: 'Core Concepts', link: '/core-concepts' },
-      { label: 'What Odal can and cannot see', link: '/getting-started/what-odal-can-and-cannot-see' },
       { label: 'Licensing', link: '/getting-started/licensing' },
     ],
   },
   {
-    label: 'The Core',
-    collapsed: true,
-    items: [
-      { label: 'What the core does', link: '/core/overview' },
-      { label: 'Standards & interoperability', link: '/core/standards' },
-      { label: 'Security & cryptography', link: '/core/security' },
-      { label: 'Product groups & plugins', link: '/core/sectors' },
-    ],
-  },
-  {
-    label: 'The Engine',
-    collapsed: true,
-    items: [
-      { label: 'How the node works', link: '/engine/architecture' },
-      { label: 'Permanence & retention', link: '/engine/retention' },
-      { label: 'Operating securely', link: '/engine/security' },
-      { label: 'Self-Hosting', link: '/engine/self-hosted' },
-      { label: 'Production deployment', link: '/engine/deployment' },
-      { label: 'Configuration reference', link: '/engine/configuration' },
-      { label: 'Backup, restore & key custody', link: '/engine/backup' },
-      { label: 'Upgrading', link: '/engine/upgrading' },
-      { label: 'The CLI', link: '/engine/cli' },
-    ],
-  },
-  {
-    label: 'Using the node',
+    label: 'Use the Node',
     collapsed: true,
     items: [
       { label: 'Importing product data', link: '/guides/import' },
@@ -51,9 +30,47 @@ export const sidebar = [
       { label: 'Integrations and statistics', link: '/guides/integrations' },
       { label: 'Electronic seals', link: '/guides/seals' },
       { label: 'The unsold-goods disclosure', link: '/guides/unsold-goods' },
+    ],
+  },
+  {
+    label: 'Run the Node',
+    collapsed: true,
+    items: [
+      { label: 'Self-Hosting', link: '/engine/self-hosted' },
+      { label: 'Production deployment', link: '/engine/deployment' },
+      { label: 'Backup, restore & key custody', link: '/engine/backup' },
+      { label: 'Upgrading', link: '/engine/upgrading' },
+    ],
+  },
+  {
+    label: 'Use the Core Library',
+    collapsed: true,
+    items: [
+      { label: 'What the core does', link: '/core/overview' },
+      { label: 'Product groups & plugins', link: '/core/sectors' },
+      { label: 'Standards & interoperability', link: '/core/standards' },
+      { label: 'Security & cryptography', link: '/core/security' },
+    ],
+  },
+  {
+    label: 'Reference',
+    collapsed: true,
+    items: [
+      { label: 'Configuration reference', link: '/engine/configuration' },
+      { label: 'The CLI', link: '/engine/cli' },
       { label: 'Webhook events', link: '/guides/webhook-events' },
       { label: 'Error reference', link: '/guides/errors' },
       { label: 'Troubleshooting', link: '/guides/troubleshooting' },
+    ],
+  },
+  {
+    label: 'Concepts',
+    collapsed: true,
+    items: [
+      { label: 'How the node works', link: '/engine/architecture' },
+      { label: 'What Odal can and cannot see', link: '/getting-started/what-odal-can-and-cannot-see' },
+      { label: 'Permanence & retention', link: '/engine/retention' },
+      { label: 'Operating securely', link: '/engine/security' },
     ],
   },
   {
@@ -74,9 +91,7 @@ export const sidebar = [
       { label: 'Harmonised standards', link: '/regulatory/harmonised-standards' },
     ],
   },
-  {
-    label: 'API Reference',
-    link: '/api',
-    badge: { text: 'OpenAPI', variant: 'note' },
-  },
+  // A slot of its own rather than an entry in Reference: it is the page most
+  // integrators come for, and it is a separate app (src/pages/api.astro).
+  { label: 'API Reference', link: '/api', badge: { text: 'OpenAPI', variant: 'note' } },
 ];

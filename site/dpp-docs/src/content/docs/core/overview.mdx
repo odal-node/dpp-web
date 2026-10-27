@@ -3,7 +3,69 @@ title: What the core does
 description: "The regulatory library Odal Node is built on: what a passport is, how it is checked and signed, and the pieces anyone can build on."
 ---
 
-The core is the regulatory library: the rules a compliant Digital Product Passport must satisfy, written as code. It is open source under Apache-2.0, has no infrastructure of its own (no database, no server, no configuration), and anyone may build on it. Its crates are published on crates.io.
+The core is the regulatory library: the rules a compliant Digital Product Passport must satisfy, written as code. It is open source under Apache-2.0, has no infrastructure of its own (no database, no server, no configuration), and anyone may build on it. Its crates are published on [crates.io](https://crates.io/crates/dpp-domain), with API documentation on [docs.rs](https://docs.rs/dpp-domain).
+
+## Try it
+
+Validate product data against its regulatory schema, sign it, and verify the signature, using only the published crates. The first build takes about a minute.
+
+```bash
+cargo new hello-dpp && cd hello-dpp
+cargo add dpp-domain dpp-crypto serde_json anyhow
+```
+
+Replace `src/main.rs` with:
+
+```rust
+use dpp_crypto::{jws::signer, keystore::KeyStore};
+use dpp_domain::schemas::VersionedSchemaRegistry;
+use serde_json::json;
+
+fn main() -> anyhow::Result<()> {
+    // 1. Validate product data against the embedded, versioned JSON Schema.
+    let schemas = VersionedSchemaRegistry::new();
+    let (version, _) = schemas.latest("textile").expect("textile schema is embedded");
+
+    let data = json!({
+        "productIdentifier": { "scheme": "gs1", "gtin": "09506000134352" },
+        "fibreComposition": [{ "fibre": "organic cotton", "pct": 100.0 }],
+        "countryOfOrigin": "PT",
+        "careInstructions": "Machine wash 30°C",
+        "chemicalComplianceStandard": "OEKO-TEX Standard 100"
+    });
+
+    if let Err(e) = schemas.validate("textile", version, &data) {
+        for err in &e.errors {
+            println!("invalid at '{}': {}", err.field, err.message);
+        }
+        anyhow::bail!("validation failed");
+    }
+    println!("valid against textile schema v{version}");
+
+    // 2. Sign it as a compact JWS with an Ed25519 key from an encrypted keystore.
+    let store = KeyStore::open(std::env::temp_dir().join("hello-keys.json"), "change-me")?;
+    if store.public_key("issuer").is_none() {
+        store.generate_key("issuer")?;
+    }
+    let kid = store.public_key("issuer").expect("generated above").thumbprint_uri()?;
+    let jws = signer::sign(&store, "issuer", &data, &kid)?;
+
+    // 3. Verify the signature.
+    println!("signature verifies: {}", signer::verify(&store, "issuer", &jws)?);
+    Ok(())
+}
+```
+
+```bash
+cargo run
+```
+
+```text
+valid against textile schema v1.4.0
+signature verifies: true
+```
+
+Remove `"countryOfOrigin"` and the run stops with `invalid at '': "countryOfOrigin" is a required property`.
 
 ## What it gives you
 

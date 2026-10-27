@@ -24,11 +24,11 @@ A node does five things, in order:
 
 ## Background work
 
-Several things happen after the database write commits, each through its own durable queue, so a slow or absent outside service never blocks publishing and a crash never loses work:
+Work that involves an outside service goes through its own durable queue, retried with backoff, so a slow or absent service never blocks publishing:
 
-- **EU registry sync**: each published passport's registration is queued in the same transaction as the publish. See [EU Central Registry](/regulatory/central-registry).
-- **Seals**: when a seal provider is configured, a seal is queued for each published passport and applied by that provider. See [Electronic seals](/guides/seals).
-- **Webhooks**: passport events are delivered, signed, to your own systems. See [Integrations and statistics](/guides/integrations).
+- **EU registry sync**: each published passport's registration is queued in the same transaction as the publish, so a crash cannot lose it. See [EU Central Registry](/regulatory/central-registry).
+- **Seals**: when a seal provider is configured, a seal is queued as each passport is published and applied in the background. A periodic sweep queues any published passport still unsealed. See [Electronic seals](/guides/seals).
+- **Webhooks**: passport events are queued for delivery, signed, to your own systems as soon as the change commits. See [Integrations and statistics](/guides/integrations).
 - **Continuity snapshots**: when a snapshot bucket is configured, each published passport's signed public view is mirrored to it under a signed time bound, so a scan still works while the node is down.
 - **Trusted lists**: with `TRUSTED_LIST_REFRESH=on`, the node refreshes the EU trusted lists daily.
 

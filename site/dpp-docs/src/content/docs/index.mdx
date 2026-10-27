@@ -3,36 +3,49 @@ title: Documentation
 description: Software for creating, signing and serving EU Digital Product Passports under ESPR, on your own infrastructure.
 ---
 
-Odal Node creates, signs and serves EU Digital Product Passports on your own infrastructure, with your own keys. Anyone can verify a passport it publishes without going through Odal.
+Odal Node creates, signs and serves EU Digital Product Passports on your own
+infrastructure, with your own keys. Anyone can verify a passport it publishes without
+going through Odal. The regulatory library is Apache-2.0; the node is BSL-1.1 and free
+to self-host for your own compliance obligations. The project is pre-production.
 
-## Start here
+## Get started
 
-- **[Introduction](/introduction)**: what Odal Node is and who it's for.
-- **[Quick Start](/quick-start)**: run a node and produce your first signed passport.
-- **[Core Concepts](/core-concepts)**: the three ideas the design rests on.
+- **[Introduction](/introduction)**: what Odal Node is, its licences and its status.
+- **[Quick Start](/quick-start)**: run a node and publish a signed passport over the REST API.
+- **[What the core does](/core/overview)**: use the Rust library on its own.
 - **[Licensing](/getting-started/licensing)**: what is free, and where the line is.
 
-## Go deeper
-
-- **[The Core](/core/overview)**: the regulatory library, and how you build on it.
-- **[The Engine](/engine/architecture)**: how a production node runs.
-
-## Using the node
+## Use the node
 
 - **[Importing product data](/guides/import)**: spreadsheets in, draft passports out.
 - **[A passport's lifecycle](/guides/lifecycle)**: publish, correct, replace, suspend, retire, end of life.
 - **[Handing over responsibility](/guides/transfer)**: moving a passport to another operator.
 - **[Proof files and verification](/guides/verification)**: the evidence dossier and how anyone checks it.
-- **[Access credentials](/guides/credentials)**: letting repairers and recyclers see restricted parts.
+- **[Access credentials](/guides/credentials)**: letting repairers and recyclers see restricted data.
 - **[Your operator identity](/guides/operator-identity)**: operator details, identifiers and facilities.
 - **[Integrations and statistics](/guides/integrations)**: webhooks, scan counts and machine-readable views.
 - **[Electronic seals](/guides/seals)**: sealing, seal status and trusted lists.
 - **[The unsold-goods disclosure](/guides/unsold-goods)**: the yearly report, which is not a passport.
-- **[Webhook events](/guides/webhook-events)**, **[Error reference](/guides/errors)** and **[Troubleshooting](/guides/troubleshooting)**: what the node sends, what its errors mean, and what to do when something fails.
+
+## Run the node
+
+- **[Self-Hosting](/engine/self-hosted)**, **[Production deployment](/engine/deployment)**, **[Backup, restore and key custody](/engine/backup)** and **[Upgrading](/engine/upgrading)**.
+
+## Reference
+
+- **[Configuration reference](/engine/configuration)**, **[The CLI](/engine/cli)**, **[Webhook events](/guides/webhook-events)**, **[Error reference](/guides/errors)** and **[Troubleshooting](/guides/troubleshooting)**.
+
+## Concepts
+
+- **[Core Concepts](/core-concepts)**: the design in three rules.
+- **[How the node works](/engine/architecture)**, **[What Odal can and cannot see](/getting-started/what-odal-can-and-cannot-see)**, **[Permanence and retention](/engine/retention)** and **[Operating securely](/engine/security)**.
 
 ## The law
 
-- **[Regulatory Context](/regulatory/espr)**: what the law requires, and how Odal meets it.
-- **Product groups under the law**: [batteries](/regulatory/battery), [textiles](/regulatory/textile), [toys](/regulatory/toys), [detergents](/regulatory/detergents), [construction products](/regulatory/construction), [vehicles](/regulatory/vehicles), and [phones and tablets](/regulatory/phones).
+- **[ESPR overview](/regulatory/espr)**: what the regulation requires, and how the software maps to it.
+- **Product groups:** [batteries](/regulatory/battery), [textiles](/regulatory/textile), [toys](/regulatory/toys), [detergents](/regulatory/detergents), [construction products](/regulatory/construction), [vehicles](/regulatory/vehicles), and [phones and tablets](/regulatory/phones).
 - **[Acts and standards](/regulatory/acts-and-standards)**: every act and standard the code relies on.
-- **[API Reference](/api)**: the node's full HTTP interface.
+
+## API reference
+
+- **[API reference](/api)**: every route a node serves, with request and response schemas, rendered from the OpenAPI 3.1 document (also available as [`openapi.yaml`](/openapi.yaml)). Its "Test request" button calls a node straight from your browser, so that node's `CORS_ALLOWED_ORIGINS` must include this site's origin.

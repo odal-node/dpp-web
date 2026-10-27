@@ -17,12 +17,12 @@ Each group has a versioned schema, a list of the product categories it distingui
 odal product-group list          # every group, whether a passport is required and from when
 odal product-group show battery  # one group in full, with the acts behind it
 odal schema list                 # the schema version this node serves for each group
-odal template battery            # the CSV header row an import expects
+odal template battery-ev         # the CSV header row an import expects (batteries: one per category)
 ```
 
 ## One interface for every product group
 
-Each group's rules sit behind a single shared interface. Adding a group, or updating one when the regulation changes, means supplying new logic through that interface without changing the rest of the system. The core repository has ten plugins, covering every group except mattresses.
+Each group's rules sit behind a single shared interface. Adding a group, or updating one when the regulation changes, means supplying new logic through that interface without changing the rest of the system. The core repository has eleven plugins, one for each group.
 
 A group with no plugin loaded still works: its passports are checked against the schema, but no group-specific rules run and no findings are produced. The node reports this at start-up, so "no findings" is not mistaken for "checked and clean". A node started with the production profile refuses to run without a plugin for every group whose passport obligation is live.
 

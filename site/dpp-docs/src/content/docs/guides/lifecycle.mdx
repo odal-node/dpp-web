@@ -22,7 +22,7 @@ A passport starts as a draft and, once published, can never be edited or deleted
 ## Correcting and replacing
 
 - **Correct a mistake**: `odal passport amend <id> --patch correction.json --reason "…"` issues a successor carrying the correction. The original moves to *superseded*, and the new record has a new ID. Only content can be corrected (product name, carbon and repairability figures, product-group data, component links); the product group, schema version, manufacturer and lineage are fixed when the passport is first issued.
-- **Replace with an existing passport**: `odal passport supersede <id> --superseded-by <new-id>` retires a passport in favour of one that is already published and already points back at it. Use it when the replacement was created on its own rather than as a correction.
+- **Replace with an existing passport**: `odal passport supersede <id> --superseded-by <new-id>` moves a passport to *superseded* in favour of one that is already published and already points back at it. Use it when the replacement was created on its own rather than as a correction.
 
 A code already printed on a product keeps resolving after its passport is corrected or replaced.
 
