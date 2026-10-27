@@ -74,7 +74,7 @@ before they publish. The values below are valid test values.
 
 ```bash
 set -a; . ./.env; set +a
-odal bootstrap --legal-name "Example Textiles GmbH" --country DE \
+odal bootstrap --legal-name "Example Batteries GmbH" --country DE \
   --address "Musterstrasse 1, 10115 Berlin" --contact-email ops@example.com
 odal facility add --name "Berlin plant" --value 4012345000009 --country DE --default
 odal operator-id add --scheme vat --value DE123456789 --primary
@@ -93,27 +93,19 @@ stand-in, reported as `ghost`: passports work end to end, and nothing the node s
 fit for compliance use. Under the production profile the node refuses to start this way.
 See [Operating securely](/engine/security).
 
-## 5. Create and publish a passport
+## 5. Create and publish a battery passport
 
-Create a draft with the REST API. The product group data is validated against the
-textile schema before anything is stored.
+The clone carries a battery to publish: `ops/demo/samples/battery-full.json` is an
+industrial LFP battery with its performance, durability, recycled-content,
+hazardous-substance, dismantling and conformity data filled in. Battery passports have
+an obligation in force, which is why step 4 registered a facility and an operator
+identifier. Create a draft from it with the REST API; the product group data is
+validated against the battery schema before anything is stored.
 
 ```bash
 curl -s -X POST http://localhost:8001/vault/api/v1/dpp \
   -H "Authorization: Bearer $ODAL_API_KEY" -H 'Content-Type: application/json' \
-  -d '{
-    "productName": "Organic cotton T-shirt",
-    "productGroup": "textile",
-    "manufacturer": { "name": "Example Textiles GmbH", "address": "Musterstrasse 1, 10115 Berlin" },
-    "productGroupData": {
-      "productGroup": "textile",
-      "productIdentifier": { "scheme": "gs1", "gtin": "09506000134352" },
-      "fibreComposition": [{ "fibre": "organic cotton", "pct": 100.0 }],
-      "countryOfOrigin": "PT",
-      "careInstructions": "Machine wash 30°C",
-      "chemicalComplianceStandard": "OEKO-TEX Standard 100"
-    }
-  }'
+  -d @ops/demo/samples/battery-full.json
 ```
 
 The response is the draft: a UUID v7 `id`, `"status":"draft"` and the schema version it
@@ -128,7 +120,7 @@ curl -s -X POST "http://localhost:8001/vault/api/v1/dpp/$DPP_ID/publish" \
 The passport is now `"status":"active"`. It carries a `jwsSignature` made with your
 Ed25519 key, and a `qrCodeUrl` of the form
 `http://localhost:8003/01/09506000134352/21/<serial>`: the digital link that goes
-on the product label. The passport has a GTIN, so its digital link is a GS1 Digital
+on the battery's label. The battery has a GTIN, so its digital link is a GS1 Digital
 Link. A passport identified by an identification link or a DID gets
 `http://localhost:8003/dpp/<id>` instead.
 
@@ -137,7 +129,7 @@ Link. A passport identified by an identification link or a DID gets
 ```bash
 curl -si http://localhost:8003/01/09506000134352 | head -n 3
 curl -s -H 'Accept: application/ld+json' "http://localhost:8003/dpp/$DPP_ID"
-curl -s http://localhost:8001/identity/.well-known/did.json
+curl -s http://localhost:8001/.well-known/did.json
 ```
 
 The GS1 route answers `307` and redirects to `/dpp/<id>`. The resolver returns the
