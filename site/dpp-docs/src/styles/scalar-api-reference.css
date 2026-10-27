@@ -128,6 +128,19 @@
 }
 
 /*
+ * The page's own frame. Up to 1.62, Scalar's stylesheet reset `body` globally
+ * (no margin, its background-1). From 1.76 that reset applies only to
+ * `body.scalar-app`, and this page's body is not one, so the browser's 8px
+ * margin and a transparent background showed as a white border around the
+ * reference. The body carries `.light-mode` or `.dark-mode` (api.astro), so the
+ * token resolves to the current mode's page background.
+ */
+body {
+  margin: 0;
+  background-color: var(--scalar-background-1);
+}
+
+/*
  * A visible focus ring on everything that takes keyboard focus. Scalar's own
  * controls (the response-code toggles, sidebar entries, tabs) draw none, so a
  * keyboard reader could not see where they were. Unlayered, so it wins over
