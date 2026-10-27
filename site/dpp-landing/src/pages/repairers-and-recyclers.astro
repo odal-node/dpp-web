@@ -13,6 +13,7 @@ import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import Button from "../components/Button.astro";
 import access from "../data/access.json";
+import { passportDateOf } from "../lib/regulations";
 
 const title = "For repairers and recyclers: reading a Digital Product Passport | Odal Node";
 const description =
@@ -36,7 +37,7 @@ const mailto = `mailto:contact@odal-node.io?subject=${encodeURIComponent("Readin
     </p>
     <p>
       This page covers the battery passport, the first one the law requires,
-      from 18 February 2027. For other product groups, no act sets these
+      from {passportDateOf("battery-reg-2023-1542")}. For other product groups, no act sets these
       access rights yet.
     </p>
   </Section>

@@ -9,6 +9,7 @@
 import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import stations from "../data/stations.json";
+import { passportDateOf } from "../lib/regulations";
 
 const title = "Lifecycle: one passport, eight stations | Odal Node";
 const description =
@@ -81,7 +82,7 @@ const afterSale = stations.stations.filter((s) => s.n >= 6);
     <p>
       All eight stations exist in the software today. <strong>Nobody is running
       it in production:</strong> no customers, no pilots, no live deployments.
-      The battery passport obligation begins on 18 February 2027, and we would
+      The battery passport obligation begins on {passportDateOf("battery-reg-2023-1542")}, and we would
       rather be correct when it arrives than early and wrong.
     </p>
     <p>
