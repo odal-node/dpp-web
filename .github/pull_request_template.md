@@ -8,8 +8,8 @@
 
 ## Checklist
 
-CI runs these on the pull request; run them locally first, since a push to
-`staging` alone runs no CI. Links, spacing, llms.txt and sitemaps read the build, so build first.
+CI runs these on the pull request and again on the push that lands it on `staging`
+or `main`. Links, spacing, llms.txt and sitemaps read the build, so build first.
 
 - [ ] `pnpm -r build` and `pnpm -r check`
 - [ ] `pnpm run check:links`, `check:spacing`, `check:leakage`, `check:llms` and `check:sitemaps`

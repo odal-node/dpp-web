@@ -26,7 +26,7 @@ pnpm dev:docs      # http://localhost:4325; run both and they link to each other
 
 ## Checks
 
-CI (`.github/workflows/ci.yml`) runs all of these on every pull request and every push to `main`. Pushes to `staging` run no CI, so run them locally first. `check:links`, `check:spacing`, `check:llms` and `check:sitemaps` read the build, so build first.
+CI (`.github/workflows/ci.yml`) runs all of these on every pull request and every push to `staging` or `main`. `check:links`, `check:spacing`, `check:llms` and `check:sitemaps` read the build, so build first.
 
 ```bash
 pnpm -r build
@@ -80,10 +80,10 @@ A squash merge sets the sitemap `lastmod` of every page it touches to the merge 
 
 | Workflow | When | What |
 |---|---|---|
-| `ci.yml` | Pull requests, pushes to `main` | The checks above |
+| `ci.yml` | Pull requests, pushes to `staging` and `main` | The checks above |
 | `sync-openapi.yml` | Nightly, 03:17 UTC | Opens a pull request into `staging` when the engine's spec changes |
 | `external-links.yml` | Mondays, 04:41 UTC | `check:external` |
-| Dependabot | Weekly | npm and Actions updates. Its pull requests target `main`; retarget them to `staging` |
+| Dependabot | Weekly | npm and Actions version updates, opened against `staging`. Security updates always target `main`; retarget those to `staging` |
 
 Scheduled workflows run from `main` only.
 
