@@ -1,0 +1,96 @@
+name: Workflow lint
+
+# Static analysis of the workflows themselves, the same gate dpp-core runs.
+#
+# Several workflows here hold something worth taking: `sync-openapi.yml` can
+# write to the repository and open pull requests, `deploy.yml` holds a Cloudflare
+# API token, and every build runs `pnpm install`, which executes third-party
+# install scripts with a token in reach. Two tools, because they find different
+# things:
+#
+#   zizmor      security: credentials left in `.git/config` by a checkout, actions
+#               that are not pinned or whose pinned commit is not in the
+#               repository it names, an action with a published advisory,
+#               expressions that inject into a shell, and Dependabot settings.
+#   actionlint  correctness: workflow syntax, expression types, and the shell
+#               inside every `run:` (it runs `shellcheck` where that is installed,
+#               which it is on the runner).
+#
+# The one accepted finding is marked where it occurs: `sync-openapi.yml` keeps
+# its checkout credentials because it pushes with them. The default `regular`
+# persona gates. The `pedantic` one, which reports code smells such as a missing
+# `concurrency` block, is deliberately not.
+#
+# Both tools are downloaded from their release and checked against the SHA-256
+# recorded here, the same versions and hashes dpp-core pins, so the bytes that
+# run are the bytes that were read. Dependabot cannot see either pin; moving one
+# is a deliberate edit, on a pull request of its own, because a newer version may
+# find something the pinned one does not.
+#
+# Not path-filtered, so it can be made a required check without blocking every
+# pull request that leaves `.github/` alone. The weekly run covers the other way
+# a workflow goes bad: an advisory published against an action already pinned
+# here, with no commit to trigger anything.
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  ZIZMOR_VERSION: "1.30.1"
+  ZIZMOR_SHA256: e65324f4430c2717591937edcec90ccbefaf14c174f8ec9415e03ca875b46e1a
+  ACTIONLINT_VERSION: "1.7.12"
+  ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+
+jobs:
+  zizmor:
+    name: Workflows pass zizmor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install zizmor
+        run: |
+          curl -fsSL -o zizmor.tar.gz "https://github.com/zizmorcore/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu.tar.gz"
+          echo "${ZIZMOR_SHA256}  zizmor.tar.gz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/bin"
+          tar -xzf zizmor.tar.gz -C "$RUNNER_TEMP/bin" zizmor
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      # The token lets zizmor ask GitHub the questions it cannot answer from the
+      # files: whether a pinned commit belongs to the repository it names, and
+      # whether an action has a published advisory. It is the workflow's own
+      # read-only token, and nothing here writes.
+      - name: zizmor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: zizmor --format github .github
+
+  actionlint:
+    name: Workflows pass actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install actionlint
+        run: |
+          curl -fsSL -o actionlint.tar.gz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  actionlint.tar.gz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/bin"
+          tar -xzf actionlint.tar.gz -C "$RUNNER_TEMP/bin" actionlint
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - name: actionlint
+        run: actionlint -color

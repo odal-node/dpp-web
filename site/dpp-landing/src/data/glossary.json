@@ -18,7 +18,7 @@
     },
     {
       "term": "Battery passport",
-      "definition": "The passport the Batteries Regulation requires from 18 February 2027 for electric-vehicle batteries, light-transport batteries and industrial batteries over 2 kWh.",
+      "definition": "The passport the Batteries Regulation requires from {passport:battery-reg-2023-1542} for electric-vehicle batteries, light-transport batteries and industrial batteries over 2 kWh.",
       "link": { "href": "/regulations/battery-reg-2023-1542", "label": "The Batteries Regulation" }
     },
     {
@@ -53,6 +53,10 @@
     {
       "term": "did:web",
       "definition": "An identity published as a small document on a company's own web domain, holding the public keys its signatures can be checked against. Anyone can look it up; no central register is involved."
+    },
+    {
+      "term": "Digital link",
+      "definition": "The web address in the code on a product, which opens its passport when scanned. A GS1 Digital Link, built from the product's barcode number, is one kind. The EU standard for passport identifiers also allows identifiers a company issues itself, on its own web domain, with no GS1 membership."
     },
     {
       "term": "Digital Product Passport",
@@ -105,7 +109,7 @@
     },
     {
       "term": "GS1 Digital Link",
-      "definition": "A web address format that carries a product's barcode number, so a phone camera can open its passport from the same code a till scans."
+      "definition": "One kind of digital link: a web address format that carries a product's barcode number, so a phone camera can open its passport from the same code a till scans."
     },
     {
       "term": "Handover",

@@ -3,7 +3,73 @@ title: What the core does
 description: "The regulatory library Odal Node is built on: what a passport is, how it is checked and signed, and the pieces anyone can build on."
 ---
 
-The core is the regulatory library: the rules a compliant Digital Product Passport must satisfy, written as code. It is open source under Apache-2.0, has no infrastructure of its own (no database, no server, no configuration), and anyone may build on it. Its crates are published on crates.io.
+The core is the regulatory library: the rules a compliant Digital Product Passport must satisfy, written as code. It is open source under Apache-2.0, has no infrastructure of its own (no database, no server, no configuration), and anyone may build on it. Its crates are published on [crates.io](https://crates.io/crates/dpp-domain), with API documentation on [docs.rs](https://docs.rs/dpp-domain).
+
+## Try it
+
+Validate product data against its regulatory schema, sign it, and verify the signature, using only the published crates. The first build takes about a minute.
+
+```bash
+cargo new hello-dpp && cd hello-dpp
+cargo add dpp-domain dpp-crypto serde_json anyhow
+```
+
+Replace `src/main.rs` with:
+
+```rust
+use dpp_crypto::{jws::signer, keystore::KeyStore};
+use dpp_domain::schemas::VersionedSchemaRegistry;
+use serde_json::json;
+
+fn main() -> anyhow::Result<()> {
+    // 1. Validate product data against the embedded, versioned JSON Schema.
+    let schemas = VersionedSchemaRegistry::new();
+    let (version, _) = schemas.latest("battery").expect("battery schema is embedded");
+
+    // An industrial LFP battery of 4.8 kWh: over the 2 kWh line above which the
+    // Battery Regulation requires a passport for an industrial battery.
+    let data = json!({
+        "productIdentifier": { "scheme": "gs1", "gtin": "09506000134352" },
+        "batteryType": "industrial",
+        "batteryChemistry": "LFP",
+        "nominalVoltageV": 48.0,
+        "nominalCapacityAh": 100.0,
+        "ratedCapacityKwh": 4.8,
+        "expectedLifetimeCycles": 3000
+    });
+
+    if let Err(e) = schemas.validate("battery", version, &data) {
+        for err in &e.errors {
+            println!("invalid at '{}': {}", err.field, err.message);
+        }
+        anyhow::bail!("validation failed");
+    }
+    println!("valid against battery schema v{version}");
+
+    // 2. Sign it as a compact JWS with an Ed25519 key from an encrypted keystore.
+    let store = KeyStore::open(std::env::temp_dir().join("hello-keys.json"), "change-me")?;
+    if store.public_key("issuer").is_none() {
+        store.generate_key("issuer")?;
+    }
+    let kid = store.public_key("issuer").expect("generated above").thumbprint_uri()?;
+    let jws = signer::sign(&store, "issuer", &data, &kid)?;
+
+    // 3. Verify the signature.
+    println!("signature verifies: {}", signer::verify(&store, "issuer", &jws)?);
+    Ok(())
+}
+```
+
+```bash
+cargo run
+```
+
+```text
+valid against battery schema v2.10.0
+signature verifies: true
+```
+
+The schema version is the newest one the installed `dpp-domain` embeds. Remove `"batteryType"` and the run stops with `invalid at '': "batteryType" is a required property`.
 
 ## What it gives you
 
@@ -13,7 +79,7 @@ The core is the regulatory library: the rules a compliant Digital Product Passpo
 - **A lifecycle**: draft, published, suspended, superseded, retired and end of life. Every transition is recorded, a published passport never returns to draft, and retirement and end of life are final, so a passport's history cannot be rewritten unnoticed.
 - **The EU instrument catalog**: which acts reach which product group, whether each requires a passport, and from when, with every date marked as read from the text or assumed. The website's [regulations page](https://odal-node.io/regulations) shows it.
 - **Access control**: which reader may see which part of a passport, and the verifiable credentials that prove a reader's role.
-- **GS1 Digital Link, Asset Administration Shell and registry types**: what a passport needs to be resolved from a barcode, read by Industry 4.0 systems and registered with the EU.
+- **Product identifiers, digital links, Asset Administration Shell and registry types**: what a passport needs to be identified and resolved from the code on the product (a GS1 Digital Link, an identification link or a DID), read by Industry 4.0 systems and registered with the EU.
 - **Calculators**: carbon footprint, repairability and recycled-content calculations, each with a receipt of the method and version used, published for anyone to use.
 - **The plugin SDK**: how a product group's rules are written as a sandboxed plugin. See [Product groups & plugins](/core/sectors).
 

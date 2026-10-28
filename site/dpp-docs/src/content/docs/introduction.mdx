@@ -1,32 +1,83 @@
 ---
 title: Introduction
-description: What Odal Node is, who it's for, and how it is organised.
+description: What Odal Node is, how it is licensed, what state it is in, and how it is organised.
 ---
 
-Odal Node is software for creating, signing and serving **EU Digital Product Passports (DPPs)** under the Ecodesign for Sustainable Products Regulation (ESPR). A manufacturer uses it to produce passports that anyone can verify, without handing its production data to a third party.
+import { Aside } from "@astrojs/starlight/components";
 
-Each passport also has a history: publication, amendments, transfer of responsibility and end of life. The node records it on a tamper-evident, hash-chained audit trail and can export all of it as a **signed evidence dossier**, which an auditor can verify offline.
+Odal Node is software for creating, signing and serving **EU Digital Product Passports
+(DPPs)** under the Ecodesign for Sustainable Products Regulation (ESPR) and the Battery
+Regulation. A manufacturer runs it on its own infrastructure and publishes passports
+that anyone can verify, without handing product data to a third party.
 
-## Who it's for
+`dpp-core` is an open-source Rust library under Apache-2.0: stateless, with no database
+and no network I/O. `dpp-engine` is the self-hostable node built on it, under the
+Business Source License 1.1. Running it in production for your own organisation's
+products and compliance obligations is free. Offering it to third parties as a hosted
+service, or embedding it in a competing product, needs a commercial licence.
 
-- **Manufacturers and operators** facing an ESPR deadline who need to issue compliant passports and keep control of their data.
-- **Developers** who want to run it on their own infrastructure, with no licence keys and no capability caps.
-- **Authorities, recyclers and customers** who need to check that a passport is genuine. They check it against the manufacturer's public identity; Odal is not involved.
+<Aside type="note" title="Status: pre-production">
+CI runs the full passport lifecycle against PostgreSQL on every change, but no operator
+runs a node against real product data yet. The API and the database schema still change
+between minor versions.
 
-## How it's organised
+These pages describe the `main` branch of each repository, which is what the
+[quick start](/quick-start) builds. A tagged release can lag behind it: each
+repository's `CHANGELOG.md` says what a release contains.
+</Aside>
 
-Odal Node has two parts, each under its own licence:
+Every passport also has a history: publication, amendments, transfer of responsibility
+and end of life. The node records it in a hash-chained audit trail and can export all of
+it as a **signed evidence dossier** that an auditor verifies offline.
+
+## Why self-hosted
+
+- **Supplier data stays on your infrastructure.** Product, supplier and
+  bill-of-materials data lives in your own PostgreSQL. Odal never receives it. What
+  leaves your network is what you configure or the law requires: the public passport
+  view, the EU registry submission and the independent back-up copy.
+- **No lock-in.** The data model, schemas and validation rules are Apache-2.0.
+  Passports are JWS-signed with your own key and verify against your `did:web`
+  document, with no Odal service involved. Views are standard formats: JSON-LD, HTML
+  and the Asset Administration Shell.
+- **Data residency is your choice.** The node runs wherever you run it: your data
+  centre, your cloud account, your region.
+- **One node per company.** One database and one signing key, nothing shared with
+  another operator.
+
+## What it is built from
+
+| Part | Technology |
+|---|---|
+| Services | Rust: an Axum HTTP API (`dpp-node`) and a separate public resolver (`dpp-resolver`) |
+| Storage | PostgreSQL, with a least-privilege application role, an append-only hash-chained audit trail, and transactional outboxes for EU registry registration |
+| Product group rules | WebAssembly plugins in a `wasmtime` sandbox: no filesystem or network, fuel-metered CPU, a 64 MiB memory cap, signature-checked before loading |
+| API | OpenAPI 3.1, browsable in the [API reference](/api) |
+| Events | Signed webhooks, and NATS JetStream when configured |
+
+## Who it is for
+
+- **Manufacturers and operators** with an ESPR or Battery Regulation deadline who need
+  to issue passports and keep control of their data.
+- **Developers** who integrate passports into an ERP, a PLM system or a data pipeline
+  through the REST API, or who build on the Rust library directly.
+- **Authorities, recyclers and customers** who need to check that a passport is genuine.
+  They verify it against the manufacturer's public identity; Odal is not involved.
+
+## How it is organised
 
 | Part | Licence | What it is |
 |---|---|---|
-| [`dpp-core`](https://github.com/odal-node/dpp-core) | Apache‑2.0 | The regulatory library: the rules a compliant passport must satisfy. |
-| [`dpp-engine`](https://github.com/odal-node/dpp-engine) | BSL‑1.1 | The service that runs those rules in production. |
+| [`dpp-core`](https://github.com/odal-node/dpp-core) | Apache-2.0 | Rust crates on crates.io: the passport model and versioned schemas, validation rules, signing, credentials, product identifiers and digital links, AAS export |
+| [`dpp-engine`](https://github.com/odal-node/dpp-engine) | BSL-1.1 | The node: HTTP API over PostgreSQL, `did:web` identity, public resolver, Wasm plugin sandbox, bulk import, the `odal` CLI |
 
-The core holds the rules and the engine applies them. [Core Concepts](/core-concepts) explains why they are split this way: the rules stay open and free, and the operational layer around them is what pays for the project. [Licensing](/getting-started/licensing) covers what each licence allows.
+The core holds the rules and the engine runs them. [Core Concepts](/core-concepts)
+explains the split, and [Licensing](/getting-started/licensing) covers what each licence
+allows.
 
 ## Next steps
 
-- [Quick Start](/quick-start): run a node and produce your first signed passport.
-- [Core Concepts](/core-concepts): the three ideas the design rests on.
-- [A passport's lifecycle](/guides/lifecycle): what you can do with a passport once it exists.
-- [Self-Hosting](/engine/self-hosted): run the engine on your own infrastructure.
+- [Quick Start](/quick-start): run a node and publish your first signed passport.
+- [What the core does](/core/overview): use the Rust library on its own.
+- [API reference](/api): every route the node serves.
+- [Core Concepts](/core-concepts): the design in three rules.

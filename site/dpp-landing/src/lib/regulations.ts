@@ -19,7 +19,8 @@ type Basis = "sourced" | "assumed";
 type Passport =
   | { obligation: "required"; from?: { date: string; basis: Basis } }
   | { obligation: "notRequired" }
-  | { obligation: "displacedBy"; system: string; basis?: string };
+  | { obligation: "displacedBy"; system: string; basis?: string }
+  | { obligation: "includedIn"; basis?: string };
 
 type Binding = {
   productGroup: string;
@@ -107,11 +108,41 @@ export const formatDate = (iso: string) =>
     timeZone: "UTC",
   });
 
+/**
+ * The date an act's passport becomes mandatory, as the core records it from the
+ * act's text: "18 February 2027", or "February 2027". Pages write this instead
+ * of a date. An act with no such date fails the build, so a page cannot print a
+ * blank or a stale one.
+ */
+export function passportDateOf(id: string, form: "day" | "month" = "day"): string {
+  const act = byId.get(id);
+  if (!act) throw new Error(`passportDateOf: no vendored instrument "${id}".`);
+  const from = act.passport.obligation === "required" ? act.passport.from : undefined;
+  if (!from || from.basis !== "sourced") {
+    throw new Error(`passportDateOf: "${id}" records no passport date read from the text.`);
+  }
+  const day = formatDate(from.date);
+  return form === "month" ? day.replace(/^\d+ /, "") : day;
+}
+
+/**
+ * Copy in src/data writes `{passport:<id>}` or `{passport-month:<id>}` where a
+ * passport date goes; this fills it from passportDateOf. A token it cannot read
+ * fails the build rather than reaching the page.
+ */
+export function withPassportDates(text: string): string {
+  const filled = text.replace(/\{passport(-month)?:([a-z0-9-]+)\}/g, (_, month, id) =>
+    passportDateOf(id, month ? "month" : "day"),
+  );
+  if (filled.includes("{passport")) throw new Error(`withPassportDates: unreadable token in "${text}"`);
+  return filled;
+}
+
 // ── the passport line ────────────────────────────────────────────────────────
 
 export type PassportView = {
   /** Short state, for a chip. */
-  state: "required" | "not-yet-operable" | "undated" | "per-act" | "expected" | "none" | "elsewhere";
+  state: "required" | "not-yet-operable" | "undated" | "per-act" | "expected" | "none" | "elsewhere" | "included";
   label: string;
   /** One plain sentence expanding the label. */
   detail: string;
@@ -130,6 +161,16 @@ export function passportView(i: Instrument): PassportView {
       state: "elsewhere",
       label: "Handled elsewhere",
       detail: `Its product information goes into ${SYSTEM[p.system] ?? p.system}, instead of a passport.`,
+    };
+  }
+  if (p.obligation === "includedIn") {
+    // The act creates no passport and displaces none: it owes content to the
+    // passport another act requires (CRM Act Art. 28(6)). Without this branch it
+    // would fall through to "undated" and read as a passport with no date.
+    return {
+      state: "included",
+      label: "Feeds other passports",
+      detail: "It creates no passport of its own, but where another act requires one, its information has to be included in it.",
     };
   }
   if (i.status === "anticipated") {

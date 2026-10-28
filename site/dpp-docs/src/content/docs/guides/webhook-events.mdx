@@ -34,7 +34,7 @@ Every delivery's body is the same versioned envelope:
 | `dpp.passport.updated` | A draft passport was changed |
 | `dpp.passport.published` | A passport was signed and published |
 | `dpp.passport.suspended` | A published passport was suspended |
-| `dpp.passport.superseded` | A passport was replaced by a successor; `data` carries `successorId`, and the superseded record stays resolvable |
+| `dpp.passport.superseded` | A passport was replaced by a successor, either a corrected one issued with `amend` or an existing one linked with `supersede`; `data` carries `successorId`, and the superseded record stays resolvable |
 | `dpp.passport.retired` | A passport was retired |
 | `dpp.passport.deactivated` | A passport's end of life was declared |
 | `dpp.passport.transferred` | A handover of responsibility changed state |

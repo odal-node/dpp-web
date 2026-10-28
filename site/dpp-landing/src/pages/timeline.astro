@@ -8,7 +8,7 @@ import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import BasisMark from "../components/BasisMark.astro";
 import { years, undated, planSource } from "../lib/timeline";
-import { basisLabel, formatDate } from "../lib/regulations";
+import { basisLabel, formatDate, passportDateOf } from "../lib/regulations";
 
 const title = "Timeline: when Digital Product Passports arrive | Odal Node";
 const description =
@@ -26,7 +26,7 @@ const marked = years.some(({ year, entries }) => year === thisYear && entries.so
 <Base title={title} description={description}>
   <Section h1 eyebrow="Timeline" title="When passports arrive, year by year." wide>
     <p>
-      Batteries come first, in February 2027. Detergents, toys and vehicles
+      Batteries come first, in {passportDateOf("battery-reg-2023-1542", "month")}. Detergents, toys and vehicles
       follow on dates their own laws set, and the Commission plans acts for more
       product groups, each of which will set its own passport date.
     </p>

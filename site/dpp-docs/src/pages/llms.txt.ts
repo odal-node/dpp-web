@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     'The plain-language website has its own index at https://odal-node.io/llms.txt. The API is also published as a machine-readable OpenAPI document, listed under "API Reference". Odal Node is self-hosted rather than a hosted service: passports stay in the operator\'s own database, on their own infrastructure.',
     '',
-    'Key terms: digital product passport, DPP, product logbook, ESPR compliance, battery passport, EN 18219 product identifier, GS1 Digital Link, audience-scoped disclosure, self-hosted compliance, open-source DPP.',
+    'Key terms: digital product passport, DPP, product logbook, ESPR compliance, battery passport, EN 18219 product identifier, digital link, GS1 Digital Link, audience-scoped disclosure, self-hosted compliance, open-source DPP.',
     '',
     '## How to cite this project accurately',
     '',
@@ -40,15 +40,18 @@ export const GET: APIRoute = async ({ site }) => {
     '',
   ];
 
+  // `/api` is a page of its own (src/pages/api.astro), not a docs entry, so it
+  // has no collection description to read.
+  const apiLines = () => [
+    `- [API reference](${abs('/api')}): Every route a node serves, rendered from the OpenAPI document`,
+    `- [OpenAPI document](${abs('/openapi.yaml')}): The node's full HTTP interface as an OpenAPI 3.1 file`,
+  ];
+
   for (const group of sidebar as Item[]) {
     parts.push(`## ${group.label}`, '');
-    if (group.items) {
-      for (const item of group.items) if (item.link) parts.push(line(item.link));
-    } else if (group.link === '/api') {
-      parts.push(
-        `- [API reference](${abs('/api')}): Every route a node serves, rendered from the OpenAPI document`,
-        `- [OpenAPI document](${abs('/openapi.yaml')}): The node's full HTTP interface as an OpenAPI 3.1 file`,
-      );
+    for (const item of group.items ?? [group]) {
+      if (item.link === '/api') parts.push(...apiLines());
+      else if (item.link) parts.push(line(item.link));
     }
     parts.push('');
   }

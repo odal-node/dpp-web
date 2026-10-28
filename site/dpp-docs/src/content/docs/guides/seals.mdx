@@ -31,7 +31,7 @@ The local sealer counts as a stand-in for a qualified seal, so a node started wi
 
 ## How sealing runs
 
-Each published passport's seal is queued in the same transaction as the publish and applied in the background, so publishing never waits on sealing and a crash never loses one. `SEAL_CONFORMANCE_LEVEL` (`B`, `T`, `LT` or `LTA`, default `LTA`) sets the level every seal is made at.
+Each published passport's seal is queued as soon as the publish commits and applied in the background, so publishing never waits on sealing. A periodic sweep queues any published passport that is still unsealed, so a crash between the two does not leave a passport without its seal. `SEAL_CONFORMANCE_LEVEL` (`B`, `T`, `LT` or `LTA`, default `LTA`) sets the level every seal is made at.
 
 ## What a node reports about a seal
 

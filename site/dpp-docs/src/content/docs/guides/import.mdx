@@ -12,10 +12,10 @@ Product data arrives the way it already exists: in spreadsheets and exports. Eve
 Each product group has a CSV template: the header row the import expects.
 
 ```bash
-odal template battery -o battery.csv
+odal template battery-industrial -o battery.csv
 ```
 
-Templates and bulk import cover nine of the eleven product groups today; phones and tablets, and detergents, are still to come. The JSON Schema behind each group is available too, with `odal schema show <group>`.
+Templates and bulk import cover all eleven product groups. Batteries have one template per category (`battery-ev`, `battery-lmt`, `battery-industrial`), because what a battery passport must carry depends on its category; an unknown key answers with the list of valid ones. The JSON Schema behind each group is available too, with `odal schema show <group>`.
 
 ## Import, with a trial run first
 

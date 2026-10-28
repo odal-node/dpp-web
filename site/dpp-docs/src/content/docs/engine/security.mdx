@@ -22,7 +22,7 @@ The public passport endpoint needs no credential. It only serves passports that 
 
 ## Least privilege in the database
 
-The node connects to PostgreSQL with an application role that cannot change the schema and has no DELETE grant except on the import-job table, where a cleanup sweep needs one. Schema migrations run under a *separate*, privileged credential that is used only at start-up and never kept in the connection pool. The database also enforces the [permanence guarantees](/engine/retention) itself: a trigger rejects edits to a locked passport, and the audit trail is append-only at the database level, so those rules hold even if the application code is wrong.
+The node connects to PostgreSQL with an application role that cannot change the schema and can DELETE only from four counter and queue tables (import jobs, scan counts, QR-render counts and idempotency keys), each pruned by a clean-up task. No table holding passport, audit, evidence, seal or operator-identity data has a DELETE grant. Schema migrations run under a *separate*, privileged credential that is used only at start-up and never kept in the connection pool. The database also enforces the [permanence guarantees](/engine/retention) itself: a trigger rejects edits to a locked passport, and the audit trail is append-only at the database level, so those rules hold even if the application code is wrong.
 
 ## The node fails closed
 

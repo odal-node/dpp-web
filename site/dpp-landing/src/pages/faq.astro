@@ -10,10 +10,14 @@ import Base from "../layouts/Base.astro";
 import Section from "../components/Section.astro";
 import ExternalArrow from "../components/ExternalArrow.astro";
 import faq from "../data/faq.json";
+import { withPassportDates } from "../lib/regulations";
 
 type Item = { q: string; a: string[]; link?: { href: string; label: string } };
 type Group = { title: string; items: Item[] };
-const groups = faq.groups as Group[];
+const groups = (faq.groups as Group[]).map((g) => ({
+  ...g,
+  items: g.items.map((it) => ({ ...it, a: it.a.map(withPassportDates) })),
+}));
 
 const title = "FAQ: Digital Product Passports and Odal Node | Odal Node";
 const description =

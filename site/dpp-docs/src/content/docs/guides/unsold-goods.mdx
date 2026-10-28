@@ -16,18 +16,25 @@ The disclosure is about a company over a financial year, published on its own we
 The disclosure is many lines, not one figure: Art. 24(1) asks for the numbers per type or category of product, and separately per reason and destination.
 
 ```bash
-odal unsold-goods record …    # record one line
-odal unsold-goods list        # recorded lines, newest first
+odal unsold-goods record --period 2026 --units 120 --kg 54.5 --category apparel \
+  --reason endOfSeason --destination donation --country DE
+odal unsold-goods list --period 2026
 ```
 
-Each line follows the format Implementing Regulation (EU) 2026/2 prescribes:
+A node records each line today with:
 
-- the product category, by customs (Combined Nomenclature) code;
-- the number of units and the weight discarded, each marked when it is an estimate, and whether packaging is included;
-- the reason, drawn from the derogations of Delegated Regulation (EU) 2026/296;
-- what happened to the products: the shares prepared for reuse, recycled, otherwise recovered, disposed of, or unknown, as the Waste Framework Directive defines them.
+- the financial year;
+- the number of units and their weight, both required, because Art. 24(1)(a) asks for the number and the weight;
+- a category (`apparel`, `footwear`, `homeTextile`, `accessories` or `other`);
+- the reason (`endOfSeason`, `qualityDefect`, `packagingDefect`, `overProduction`, `customerReturn` or `other`);
+- the destination (`donation`, `recycling`, `repurposing`, `supplierReturn` or `exemptDestruction`); `exemptDestruction` requires a justification naming the Art. 25 exemption, and every other destination refuses one;
+- the country of disposal.
 
-The company is identified from the node's operator settings, by its European unique identifier (EUID) where it has one. The report also carries the measures taken and planned to prevent destruction.
+The company is identified from the node's operator settings.
+
+<Aside type="caution" title="Not yet the 2026/2 format">
+Implementing Regulation (EU) 2026/2 prescribes a more detailed line: the category by customs (Combined Nomenclature) code, estimate and packaging markers on the figures, the reason drawn from the derogations of Delegated Regulation (EU) 2026/296, the shares by waste-treatment outcome, the company's European unique identifier, and the measures taken to prevent destruction. The core library models that format; the node's recording does not use it yet.
+</Aside>
 
 ## Publishing it
 

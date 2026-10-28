@@ -15,7 +15,7 @@
         {
           "q": "Do my products need one, and from when?",
           "a": [
-            "It depends on the product group. Electric-vehicle, light-transport and larger industrial batteries need one from 18 February 2027, detergents from 23 September 2029 and toys from 1 August 2030. New vehicles need their own vehicle passport from 1 September 2032. Most other product groups get their date from a Commission act that has not been adopted yet.",
+            "It depends on the product group. Electric-vehicle, light-transport and larger industrial batteries need one from {passport:battery-reg-2023-1542}, detergents from {passport:detergents-2026-405} and toys from {passport:toy-safety-2025-2509}. New vehicles need their own vehicle passport from {passport:elv-2026-1738}. Most other product groups get their date from a Commission act that has not been adopted yet.",
             "The regulations page lists every act the software tracks and where each date comes from. It is a summary, not legal advice."
           ],
           "link": { "href": "/regulations", "label": "See every act and its date" }
@@ -119,7 +119,7 @@
         {
           "q": "Which standards does it use?",
           "a": [
-            "Open ones: GS1 Digital Link for the code on the product, web-based identities for signatures, W3C Verifiable Credentials for proving who a reader is, and the Asset Administration Shell for industrial systems."
+            "Open ones: a digital link for the code on the product (a GS1 Digital Link when it has a barcode number), web-based identities for signatures, W3C Verifiable Credentials for proving who a reader is, and the Asset Administration Shell for industrial systems."
           ],
           "link": { "href": "https://docs.odal-node.io/core/standards", "label": "The standards in detail" }
         }
