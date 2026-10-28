@@ -1,4 +1,8 @@
 version: 2
+# Every entry waits a week after a release before proposing it (`cooldown`). A
+# release that is malicious or broken is usually withdrawn within days, and
+# nothing on these sites needs to be first to adopt one. Security updates ignore
+# the cooldown.
 updates:
   # Version updates open against staging, where the previews are reviewed;
   # staging is promoted to main by hand. Security updates always target the
@@ -9,6 +13,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
     groups:
@@ -43,6 +49,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
       - ci

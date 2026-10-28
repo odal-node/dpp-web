@@ -40,7 +40,11 @@ jobs:
     steps:
       # Work lands through staging (see the README), so the bump is made on top
       # of staging and proposed into it, not into main.
-      - name: Checkout
+      #
+      # This is the one checkout that keeps its credentials: the last step pushes
+      # the bump branch with them. Nothing in the job uploads an artifact, which
+      # is how persisted credentials leak, so the finding is accepted here.
+      - name: Checkout # zizmor: ignore[artipacked]
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: staging
