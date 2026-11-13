@@ -119,7 +119,7 @@ version from `.node-version`.
 
 ## Cloudflare
 
-- **Pages:** each project builds from the repository root (see the site READMEs). Production is `main`. Every branch gets a preview at `<branch>.<project>.pages.dev`, which Cloudflare marks `noindex`.
+- **Pages:** each project builds from the repository root (see the site READMEs). Production is `main`. Every branch gets a preview at `<branch>.<project>.pages.dev`, which Cloudflare marks `noindex`. Production also answers at `<project>.pages.dev`, which Cloudflare does not mark; each site's `_headers` sends `X-Robots-Tag: noindex` on every `pages.dev` host, so only the custom domains get indexed.
 - **Headers:** each site's `public/_headers` sets HSTS, a same-origin CSP and caching.
 - **`no-transform` on HTML:** the free plan injects a bot-detection script into every HTML page, and it cannot be switched off. The script sets a `cf_clearance` cookie, which the privacy page says the sites do not set. `Cache-Control: no-transform` on HTML stops that injection and Cloudflare's email obfuscation, at the cost of Cloudflare no longer compressing HTML. Other files stay compressed.
 - **Editing cache rules:** Pages joins two values of one header with a comma. A rule that sets its own `Cache-Control` must first detach the inherited one with `! Cache-Control`, and no two cache rules may match the same file.
