@@ -67,6 +67,10 @@ export default defineConfig({
       ],
       favicon: '/favicon.svg',
       head: [
+        // Search engines' icon fetchers (DuckDuckGo, Bing) read /favicon.ico,
+        // not the SVG Starlight links. sizes="32x32" keeps browsers that
+        // understand SVG on the SVG.
+        { tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico', sizes: '32x32' } },
         // Structured data. This site had none, which is the odd gap: it is the
         // content-rich property, and the one a search engine or an assistant
         // has most reason to quote. `SoftwareSourceCode` is the accurate type —

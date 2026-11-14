@@ -23,6 +23,7 @@ site/dpp-docs/
 ├── public/
 │   ├── _headers                       # Cloudflare Pages headers: HSTS, CSP, caching, no-transform on HTML (root README)
 │   ├── favicon.svg                    # the brand mark
+│   ├── favicon.ico                    # 16/32/48px raster of the mark, for search engines’ icon fetchers
 │   └── openapi.yaml                   # the engine's API spec, vendored (do not edit here)
 ├── scripts/
 │   └── sync-openapi.mjs               # sync:openapi / check:openapi against openapi-source.json
