@@ -80,3 +80,17 @@
 
 /verify/*
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+
+# The production deployment also answers at <project>.pages.dev, byte for byte
+# the same as odal-node.io. Cloudflare marks branch previews noindex but not
+# that host, so search engines could index it as a duplicate. Every page already
+# names its odal-node.io URL as canonical; this keeps the pages.dev copy out
+# of the index outright. A rule with a host matches only that host, so the
+# custom domain is untouched. The second rule covers <hash>.<project>.pages.dev
+# deployment URLs, which Cloudflare already marks; it is stated here so the
+# file does not depend on that.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex
