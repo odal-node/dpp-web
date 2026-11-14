@@ -108,6 +108,9 @@ const coreLd = {
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonicalHref} />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+    {/* Search engines' icon fetchers (DuckDuckGo, Bing) read /favicon.ico, not
+        an SVG. sizes="32x32" keeps browsers that understand SVG on the SVG. */}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {/* iOS does not use an SVG here; it wants a 180px PNG. */}
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

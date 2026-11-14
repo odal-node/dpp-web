@@ -24,6 +24,7 @@ site/dpp-landing/
 │   ├── _headers               # Cloudflare Pages headers: HSTS, CSP, caching, no-transform on HTML (root README)
 │   ├── favicon.svg            # the brand mark (also shown in the nav, hero and footer)
 │   ├── apple-touch-icon.png   # 180px PNG of the mark, for iOS
+│   ├── favicon.ico            # 16/32/48px raster of the mark, for search engines’ icon fetchers
 │   ├── og-image.png           # site-wide share image
 │   └── verify/examples/       # engine-built proof files for /verify
 ├── scripts/

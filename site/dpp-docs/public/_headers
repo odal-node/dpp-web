@@ -45,6 +45,10 @@
   ! Cache-Control
   Cache-Control: public, max-age=604800
 
+/favicon.ico
+  ! Cache-Control
+  Cache-Control: public, max-age=604800
+
 # Vendored from the engine and re-synced on change, so it must not be pinned
 # for a year the way a hashed asset can be.
 /openapi.yaml
