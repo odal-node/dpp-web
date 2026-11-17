@@ -71,10 +71,22 @@ export const cards: Card[] = [...pages, ...groupCards, ...checklistCards, ...act
 
 const byPath = new Map(cards.map((c) => [c.path, c]));
 
-/** The image a page shares: its own card, or the site-wide image. */
-export function shareImageFor(pathname: string): { src: string; alt: string } {
+/**
+ * The image a page shares, with its pixel size: its own card (1200×630, drawn by
+ * lib/share-image.ts), or the site-wide image. That one is 2400×1260, twice the
+ * size, so it stays sharp when opened on its own or on a high-density screen,
+ * and survives LinkedIn's re-compression.
+ */
+export function shareImageFor(pathname: string): { src: string; alt: string; width: number; height: number } {
   const path = pathname.replace(/\/$/, "") || "/";
   const card = byPath.get(path);
-  if (!card) return { src: "/og-image.png", alt: "Odal Node: Signed by you. Verified by anyone. Your passports. Your keys. Your node." };
-  return { src: `/og${card.path}.png`, alt: `${card.eyebrow}: ${card.title}` };
+  if (!card) {
+    return {
+      src: "/og-image.png",
+      alt: "Odal Node: Signed by you. Verified by anyone. Your passports. Your keys. Your node.",
+      width: 2400,
+      height: 1260,
+    };
+  }
+  return { src: `/og${card.path}.png`, alt: `${card.eyebrow}: ${card.title}`, width: 1200, height: 630 };
 }

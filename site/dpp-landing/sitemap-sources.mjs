@@ -6,10 +6,16 @@
 // layout, nav and footer) is left out on purpose: a new menu item is not a
 // change to what a page says, and counting it would move every date at once.
 // A page added later needs no entry unless its content lives elsewhere.
-import { fileURLToPath } from "node:url";
-import { lastCommitDate } from "../../scripts/git-lastmod.mjs";
+//
+// The same map dates each page in its <head> (layouts/Base.astro): published
+// is the first commit of its files, modified the last.
+import { firstCommitDate, lastCommitDate } from "../../scripts/git-lastmod.mjs";
 
-const root = fileURLToPath(new URL(".", import.meta.url));
+// The package directory. Not import.meta.url: the layout imports this file too,
+// and Vite bundles it into dist for that, where import.meta.url no longer
+// points here. Every build runs from the package directory, which
+// lib/share-image.ts relies on as well.
+const root = process.cwd();
 
 const regulations = ["src/lib/regulations.ts", "src/components/ActCard.astro", "src/components/BasisMark.astro"];
 
@@ -68,3 +74,9 @@ function sources(pathname) {
 }
 
 export const lastmodFor = (pathname) => lastCommitDate(root, sources(pathname));
+
+/** A page's published and modified dates (ISO 8601), either undefined when git cannot say. */
+export function datesFor(pathname) {
+  const files = sources(pathname.endsWith("/") ? pathname : `${pathname}/`);
+  return { published: firstCommitDate(root, files), modified: lastCommitDate(root, files) };
+}
