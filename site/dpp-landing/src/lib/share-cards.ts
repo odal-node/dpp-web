@@ -75,6 +75,6 @@ const byPath = new Map(cards.map((c) => [c.path, c]));
 export function shareImageFor(pathname: string): { src: string; alt: string } {
   const path = pathname.replace(/\/$/, "") || "/";
   const card = byPath.get(path);
-  if (!card) return { src: "/og-image.png", alt: "Odal Node: Signed by you. Verified by anyone. A passport passes six stations on a node the company runs itself: validate, sign, resolve, disclose, hand over, verify. A passport node for every company that owes a passport." };
+  if (!card) return { src: "/og-image.png", alt: "Odal Node: Signed by you. Verified by anyone. Your passports. Your keys. Your node." };
   return { src: `/og${card.path}.png`, alt: `${card.eyebrow}: ${card.title}` };
 }
