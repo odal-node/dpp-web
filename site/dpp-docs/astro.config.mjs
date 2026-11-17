@@ -147,10 +147,12 @@ export default defineConfig({
         // Two independent reasons: Slack, LinkedIn and X do not reliably
         // render an SVG `og:image`, and 400x400 is not the aspect ratio an
         // unfurler expects. `og-image.png` is the landing site's card, reused
-        // — one brand, one preview — at the conventional 1200x630.
+        // — one brand, one preview — at twice the conventional 1200x630, so it
+        // stays sharp when opened on its own and through LinkedIn's re-compression.
         { tag: 'meta', attrs: { property: 'og:image', content: 'https://docs.odal-node.io/og-image.png' } },
-        { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
-        { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '2400' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '1260' } },
+        { tag: 'meta', attrs: { name: 'author', content: 'Aleksandar Temelkov' } },
         { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://docs.odal-node.io/og-image.png' } },
         // Without this, X renders the small square card whatever the image is.
         // The landing layout already sets it; this site set no card type at all.
@@ -179,6 +181,8 @@ export default defineConfig({
       // Starlight's footer plus a line of legal links (privacy, legal notice,
       // not legal advice) on every page. See the component for why.
       components: { Footer: './src/components/Footer.astro' },
+      // Each page's published and modified dates in its <head>, from git.
+      routeMiddleware: './src/routeData.ts',
     }),
   ],
   output: 'static',

@@ -1,7 +1,8 @@
 // git-lastmod.mjs — when a page's content last changed, for the sitemaps'
 // <lastmod>. Each site maps its URLs to the files the page is built from
 // (site/*/sitemap-sources.mjs); this reads the last commit that touched any of
-// them.
+// them. The same map gives each page's published and modified dates in its
+// <head>: the first and the last such commit.
 //
 // A search engine uses <lastmod> only while it stays honest: it must move when
 // a page's content changes and stay put when it does not. The build time on
@@ -46,6 +47,23 @@ export function lastCommitDate(root, files) {
   if (!existing.length) return undefined;
   try {
     return git(["log", "-1", "--format=%cI", "--", ...existing], root) || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * The first commit date (ISO 8601) of any of `files`: when the page was first
+ * published. Like lastCommitDate, undefined rather than a guess. Git does not
+ * follow a rename across several paths, so a page whose file was renamed dates
+ * from the rename.
+ */
+export function firstCommitDate(root, files) {
+  if (!fullHistory(root)) return undefined;
+  const existing = files.filter((f) => existsSync(path.join(root, f)));
+  if (!existing.length) return undefined;
+  try {
+    return git(["log", "--reverse", "--format=%cI", "--", ...existing], root).split("\n")[0] || undefined;
   } catch {
     return undefined;
   }

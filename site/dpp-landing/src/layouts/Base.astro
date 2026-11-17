@@ -5,6 +5,7 @@ import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import { shareImageFor } from "../lib/share-cards";
+import { datesFor } from "../../sitemap-sources.mjs";
 
 interface Props {
   title: string;
@@ -22,6 +23,10 @@ const canonicalHref = canonical ?? new URL(Astro.url.pathname, Astro.site).toStr
 // Each page's own share card where it has one (lib/share-cards.ts).
 const share = shareImageFor(Astro.url.pathname);
 const ogImage = new URL(share.src, Astro.site).toString();
+// When the page was first published and last changed, from the git history of
+// the files it is built from (sitemap-sources.mjs), the same dates the
+// sitemap's <lastmod> carries. Never the build time.
+const dates = datesFor(Astro.url.pathname);
 
 // Base structured data — present on every page.
 const organizationLd = {
@@ -105,6 +110,7 @@ const coreLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="author" content="Aleksandar Temelkov" />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonicalHref} />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
@@ -122,11 +128,15 @@ const coreLd = {
     <meta property="og:url" content={canonicalHref} />
     <meta property="og:type" content="website" />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:width" content={String(share.width)} />
+    <meta property="og:image:height" content={String(share.height)} />
     <meta property="og:image:alt" content={share.alt} />
     <meta property="og:site_name" content="Odal Node" />
     <meta property="og:locale" content="en_US" />
+    {dates.published && <meta property="article:published_time" content={dates.published} />}
+    {dates.modified && <meta property="article:modified_time" content={dates.modified} />}
+    {/* LinkedIn's Post Inspector names its own form of the publish date. */}
+    {dates.published && <meta name="publish_date" property="og:publish_date" content={dates.published} />}
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
