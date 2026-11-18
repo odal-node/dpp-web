@@ -1,22 +1,22 @@
 name: Sync API spec pin
 
-# Proposes a bump of the vendored OpenAPI spec. It opens a pull request; it
-# never pushes to main, and it never turns an unrelated pull request red.
+# Brings the vendored OpenAPI spec forward when the engine publishes a release.
 #
-# WHY A PULL REQUEST AND NOT A GATE
+# The API reference follows the engine's latest release (its highest vX.Y.Z tag),
+# not the engine's main branch. The job runs every night but acts once per
+# release: when the newest tag is not the one staging records in
+# site/dpp-docs/openapi-source.json, it copies the spec at that tag, runs the
+# checks ci.yml runs, commits the bump to staging, and makes sure a pull request
+# from staging to main is open for the maintainer to approve. It never pushes to
+# main.
+#
+# WHY A COMMIT TO STAGING, AND THE PROMOTION REQUEST TO MAIN
 #
 # site/dpp-docs/scripts/sync-openapi.mjs compares the vendored copy against the
-# spec at the commit recorded in openapi-source.json — deliberately not against
-# whatever is currently on the engine's main. Pinning is what keeps this repo's
-# CI deterministic: an unrelated merge in the engine cannot redden a pull
-# request here, and a correction that must land in both repos does not deadlock
-# on which one merges first. See that script's header.
-#
-# This job does not change that. The pinned-commit check in ci.yml is untouched
-# and remains the gate. All this does is notice the pin has fallen behind and
-# put the bump in front of a human as a reviewable diff — which is what the
-# "reviewable line in a diff" in openapi-source.json's comment describes, done
-# on a schedule instead of from memory.
+# spec at the commit recorded in openapi-source.json, not against whatever is on
+# the engine's main. That keeps this repo's CI deterministic. The pinned-commit
+# check in ci.yml is unchanged and remains the gate. Promotion to main is the
+# pull request this job opens, which the maintainer approves.
 
 on:
   schedule:
@@ -38,25 +38,33 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      # Work lands through staging (see the README), so the bump is made on top
-      # of staging and proposed into it, not into main.
+      # The bump is made on top of staging and pushed there (see the README),
+      # and the promotion to main is the pull request opened at the end.
       #
-      # This is the one checkout that keeps its credentials: the last step pushes
-      # the bump branch with them. Nothing in the job uploads an artifact, which
-      # is how persisted credentials leak, so the finding is accepted here.
+      # The token is SYNC_PAT when it is configured. A push made with the default
+      # GITHUB_TOKEN does not start workflow runs, so the commit would reach
+      # staging with no CI on it. SYNC_PAT makes that push start CI like a
+      # person's would. Without it the job still works; the warning step below
+      # says so.
+      #
+      # This is the one checkout that keeps its credentials: the push to staging
+      # uses them. Nothing in the job uploads an artifact, which is how persisted
+      # credentials leak, so the finding is accepted here.
       - name: Checkout # zizmor: ignore[artipacked]
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: staging
+          token: ${{ secrets.SYNC_PAT || github.token }}
 
-      # Full history: the sync script reads the spec out of the engine's git
-      # objects, and records the commit it copied from.
+      # Full history and tags. The release is chosen from the engine's tags, and
+      # the sync script reads the spec out of the engine's git objects at that tag.
       - name: Checkout dpp-engine (source of the vendored API spec)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: odal-node/dpp-engine
           path: .dpp-engine
           fetch-depth: 0
+          fetch-tags: true
           persist-credentials: false
 
       - name: Enable Corepack
@@ -68,15 +76,44 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
 
+      # Once per release. The newest release is the highest vX.Y.Z tag by version
+      # order, pre-releases included, because GitHub's "latest release" skips the
+      # engine's pre-releases. If staging already records that tag, there is
+      # nothing to do and every later step is skipped.
+      - name: Is there a release staging does not pin yet?
+        id: release
+        run: |
+          set -euo pipefail
+          TAG=$(git -C .dpp-engine tag --list 'v*' --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '1p' || true)
+          if [ -z "$TAG" ]; then
+            echo "::error::no release tag (vX.Y.Z) in dpp-engine"
+            exit 1
+          fi
+          RECORDED=$(node -p "require('./site/dpp-docs/openapi-source.json').tag ?? ''")
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          if [ "$RECORDED" = "$TAG" ]; then
+            echo "already at ${TAG}; nothing to do"
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release ${TAG} is newer than the one staging records (${RECORDED:-none})"
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install dependencies
+        if: steps.release.outputs.new == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Sync the vendored spec and its pin
+        if: steps.release.outputs.new == 'true'
         run: pnpm run sync:openapi
         env:
           DPP_ENGINE_DIR: ${{ github.workspace }}/.dpp-engine
+          # The tag resolved above, so the sync copies exactly the release the
+          # check compared against staging.
+          DPP_ENGINE_REF: ${{ steps.release.outputs.tag }}
 
       - name: Is there anything to propose?
+        if: steps.release.outputs.new == 'true'
         id: diff
         run: |
           if git diff --quiet -- site/dpp-docs/public/openapi.yaml site/dpp-docs/openapi-source.json; then
@@ -88,13 +125,11 @@ jobs:
           fi
 
       # The same checks ci.yml runs, executed here rather than trusted to run
-      # later. A pull request opened with GITHUB_TOKEN does not trigger workflow
-      # runs — GitHub blocks that to stop workflows recursing — so without this
-      # the bump would arrive with no evidence attached. If SYNC_PAT is
-      # configured the pull request does get a normal CI run as well, and this
-      # step is then belt and braces.
+      # later. The push below lands on staging with the evidence already checked.
+      # If SYNC_PAT is configured the push also starts a normal CI run on staging,
+      # and this step is then belt and braces.
       - name: Verify the bumped copy builds and passes its own checks
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.release.outputs.new == 'true' && steps.diff.outputs.changed == 'true'
         run: |
           pnpm run check:openapi
           pnpm -r build
@@ -106,12 +141,11 @@ jobs:
         env:
           DPP_ENGINE_DIR: ${{ github.workspace }}/.dpp-engine
 
-      # A PAT makes the pull request trigger CI like a human's would, which
-      # matters because main requires passing checks and GITHUB_TOKEN pull
-      # requests never get them. Without the secret this still works — the
-      # request is opened, and a reviewer closing and reopening it starts CI.
-      - name: Choose a token
-        if: steps.diff.outputs.changed == 'true'
+      # Without SYNC_PAT the push to staging is made with the default token, which
+      # does not start CI on staging. The bump still lands; a person has to start
+      # the run by hand.
+      - name: Check whether SYNC_PAT is configured
+        if: steps.release.outputs.new == 'true' && steps.diff.outputs.changed == 'true'
         id: token
         env:
           SYNC_PAT: ${{ secrets.SYNC_PAT }}
@@ -120,52 +154,73 @@ jobs:
             echo "ci_runs=true" >> "$GITHUB_OUTPUT"
           else
             echo "ci_runs=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::SYNC_PAT is not configured. The pull request will open but CI will not run on it automatically; close and reopen it to start a run."
+            echo "::warning::SYNC_PAT is not configured. Without it the push to staging does not start CI, so no run will check this commit. Start a CI run on staging by hand before promoting it."
           fi
 
-      # A fixed branch, force-updated. A second night's bump supersedes the
-      # first rather than opening a second request against the same file.
-      - name: Open or update the pull request
-        if: steps.diff.outputs.changed == 'true'
+      # One commit, straight onto staging, after the checks above passed on it. A
+      # plain push and never --force: if staging moved while this job ran, the
+      # push is rejected and the job fails loudly. The next night's run retries.
+      - name: Commit the bump and push it to staging
+        if: steps.release.outputs.new == 'true' && steps.diff.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.SYNC_PAT || github.token }}
-          CI_RUNS: ${{ steps.token.outputs.ci_runs }}
+          TAG: ${{ steps.release.outputs.tag }}
         run: |
           set -euo pipefail
-          BRANCH=chore/sync-openapi-pin
-          PIN=$(node -p "require('./site/dpp-docs/openapi-source.json').commit")
-          SHORT=${PIN:0:9}
+          SHA=$(node -p "require('./site/dpp-docs/openapi-source.json').commit")
+          SHORT=${SHA:0:9}
+          # The sync must have recorded the tag the check resolved.
+          RECORDED=$(node -p "require('./site/dpp-docs/openapi-source.json').tag")
+          if [ "$RECORDED" != "$TAG" ]; then
+            echo "::error::openapi-source.json records ${RECORDED}, not the release ${TAG} the check resolved; nothing was committed"
+            exit 1
+          fi
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
           git add site/dpp-docs/public/openapi.yaml site/dpp-docs/openapi-source.json
-          git commit -m "chore(docs): bump the vendored API spec to ${SHORT}"
-          git push --force origin "$BRANCH"
-
-          if gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
-            echo "Pull request already open for $BRANCH; the force-push updated it."
-            exit 0
+          git commit -m "chore(docs): bump the vendored API spec to ${TAG} (${SHORT})"
+          if ! git push origin staging; then
+            echo "::error::the push to staging was rejected, most likely because staging moved during this run. The next night's run retries."
+            exit 1
           fi
 
-          cat > /tmp/pr-body.md <<EOF
-          The vendored \`public/openapi.yaml\` and its pin now point at
-          \`odal-node/dpp-engine@${SHORT}\`.
+      # The promotion pull request to main, for the maintainer to approve. One is
+      # kept open at a time. When one already exists, the new release is added to
+      # it as a comment, because the push above already put the commit on it.
+      - name: Open the promotion pull request, or comment on the open one
+        if: steps.release.outputs.new == 'true' && steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_PAT || github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          CI_RUNS: ${{ steps.token.outputs.ci_runs }}
+        run: |
+          set -euo pipefail
+          SHA=$(node -p "require('./site/dpp-docs/openapi-source.json').commit")
+          SHORT=${SHA:0:9}
+          OPEN=$(gh pr list --head staging --base main --state open --json number --jq 'length')
 
-          Opened automatically because the pin had fallen behind. The
-          pinned-commit drift check in CI is unchanged — this only moves the
-          pin, deliberately and reviewably.
+          if [ "$OPEN" -eq 0 ]; then
+            cat > /tmp/pr-body.md <<EOF
+          This promotes the vendored API reference to engine release \`${TAG}\`.
 
-          Build, checks, links, leakage and the spec drift check were all run
-          against this content in the sync job before this request was opened.
+          \`staging\` already carries the bump. The nightly job committed it there
+          for \`odal-node/dpp-engine@${SHORT}\` (\`${SHA}\`).
+
+          Build, checks, links, leakage and the spec drift check all passed in the
+          job before that commit was pushed. Merging this request publishes the
+          API reference for ${TAG} on main.
           EOF
 
-          if [ "$CI_RUNS" != "true" ]; then
-            printf '\n> CI does not run automatically on a pull request opened with the default token. Close and reopen this request to start a run.\n' >> /tmp/pr-body.md
-          fi
+            if [ "$CI_RUNS" != "true" ]; then
+              printf '\n> CI does not run automatically on a pull request opened with the default token. Close and reopen this request to start a run.\n' >> /tmp/pr-body.md
+            fi
 
-          gh pr create \
-            --base staging \
-            --head "$BRANCH" \
-            --title "chore(docs): bump the vendored API spec to ${SHORT}" \
-            --body-file /tmp/pr-body.md
+            gh pr create \
+              --base main \
+              --head staging \
+              --title "chore(landing,docs): API reference for engine ${TAG}" \
+              --body-file /tmp/pr-body.md
+          else
+            NUMBER=$(gh pr list --head staging --base main --state open --json number --jq '.[0].number')
+            gh pr comment "$NUMBER" --body "The nightly job pushed the API reference for engine release ${TAG} to staging, as odal-node/dpp-engine@${SHA}. This request now carries it."
+          fi
