@@ -19,7 +19,7 @@ Dev server runs on `http://localhost:4325`, so it can run beside the landing sit
 ```
 site/dpp-docs/
 ├── astro.config.mjs                   # Starlight config: redirects, head (JSON-LD, share image), dev server on 4325
-├── openapi-source.json                # the dpp-engine commit public/openapi.yaml is vendored from
+├── openapi-source.json                # the dpp-engine release tag and commit public/openapi.yaml is vendored from
 ├── public/
 │   ├── _headers                       # Cloudflare Pages headers: HSTS, CSP, caching, no-transform on HTML (root README)
 │   ├── favicon.svg                    # the brand mark

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Odal Node API
-  version: 0.15.0
+  version: 0.16.0
   description: |
     The HTTP API of a self-hosted Odal Node: create, validate, sign, publish and
     serve EU Digital Product Passports. Pre-production: the API can still change
@@ -152,7 +152,9 @@ paths:
             same GTIN.** `errors[0].field` is `/carrierSerial`. A label that names
             two passports resolves to neither: choose another serial, or declare
             this passport as the successor of the one that holds it with
-            `supersedesId`.
+            `supersedesId`. A draft holds its serial, and so does a passport that
+            was published and then retired. A draft that was retired without ever
+            being published holds none.
           headers:
             Retry-After:
               description: Seconds to wait before retrying. Sent for the idempotency conflict only.
@@ -482,6 +484,12 @@ paths:
 
         Each version is the complete record, so a reader reconstitutes rather than
         replays. Versions are append-only and are kept for the passport's lifetime.
+
+        **This is the operator's own machine access.** An authority, a notified body
+        or a person with a legitimate interest holds a credential and no API key, and
+        reads a past version with `asOf` on `GET /vault/credential/dpp/{dppId}`
+        (`readDppByCredential`), which serves it filtered to the credential's
+        audience, with the proof for that audience.
       tags:
         - DPP Management
       security:
@@ -514,6 +522,11 @@ paths:
             a version at a time before the record existed is a question with no true
             answer, and answering with the initial one would assert that the passport
             existed then.
+
+            A moment in the future is `422`, by the clock that stamps each version:
+            a change not yet made could still be the state then. Any other moment is
+            answered the same way whenever it is asked, since the version is read
+            after any change in progress on the passport has committed.
           schema:
             type: string
             format: date-time
@@ -538,7 +551,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
-          description: '`asOf` was given and is not an RFC 3339 timestamp.'
+          description: '`asOf` was given and is not an RFC 3339 timestamp, or is in the future.'
           content:
             application/problem+json:
               schema:
@@ -1121,7 +1134,11 @@ paths:
         (terminal). The record is retained, never deleted: the passport
         outlives the product. Destruction (`reason.kind: destroyed`) is only
         lawful with a recognised derogation from the unsold-goods destruction
-        ban (ESPR Art. 25 delegated act).
+        ban (ESPR Art. 25 delegated act), so the derogation's `category` must be
+        one of the points of Art. 2 of Commission Delegated Regulation (EU)
+        2026/296. Any other category is refused with `422` before anything is
+        written, naming the points. The status is terminal, so a lawful basis that
+        does not exist would otherwise stay on the record.
       tags:
         - DPP Lifecycle
       security:
@@ -1156,6 +1173,16 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '422':
+          description: |
+            A destruction that cites a derogation category which is not a point of
+            Art. 2 of Delegated Regulation (EU) 2026/296. The `errors` member names
+            `/reason/derogation/category` and the points accepted. The passport is
+            not changed.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/dpp/{dppId}/transfer/initiate:
     post:
       operationId: initiateDppTransfer
@@ -1165,6 +1192,11 @@ paths:
         transfer chain. Only a `published` DPP can be transferred. In the
         managed single-node model the caller supplies both the outgoing and
         incoming operator; the node signs on the outgoing operator's behalf.
+
+        A `422` also answers an initiation whose passport's transfer chain was
+        changed by another request while this one was running. Only one of two
+        requests started together is recorded; the other is refused, leaves nothing
+        behind, and can be sent again.
       tags:
         - DPP Lifecycle
       security:
@@ -1246,7 +1278,9 @@ paths:
         '422':
           description: |
             There is no pending handover to accept, the pending record carries no
-            outgoing signature, or that signature failed verification.
+            outgoing signature, or that signature failed verification. Also a
+            transfer chain that another request changed while this one was running:
+            nothing is written, and the request can be sent again.
           content:
             application/problem+json:
               schema:
@@ -1307,7 +1341,9 @@ paths:
         '422':
           description: |
             There is no pending handover to reject, or the record's state does not
-            permit it. Core allows a reject only from `Initiated`.
+            permit it. Core allows a reject only from `Initiated`. Also a transfer
+            chain that another request changed while this one was running: nothing
+            is written, and the request can be sent again.
           content:
             application/problem+json:
               schema:
@@ -1366,7 +1402,9 @@ paths:
         '422':
           description: |
             There is no pending handover to cancel, or the record's state does not
-            permit it. Core allows a cancel from `Initiated` or `Accepted`.
+            permit it. Core allows a cancel from `Initiated` or `Accepted`. Also a
+            transfer chain that another request changed while this one was running:
+            nothing is written, and the request can be sent again.
           content:
             application/problem+json:
               schema:
@@ -2498,8 +2536,8 @@ paths:
           $ref: '#/components/responses/IdempotentRequestInFlight'
         '422':
           description: |
-            The request cannot produce a usable credential: an authority role, a
-            `holderDid` that is not a DID, a `country` that is not alpha-2, a
+            The request cannot produce a usable credential: an authority role, or a
+            custom role named like one, a `holderDid` that is not a DID, a `country` that is not alpha-2, a
             `validForDays` outside 1–90, or a `productCategories` list that cannot
             work as written (one given without `productGroups`, one holding a value
             no named group's passports can state, or one that leaves a named group
@@ -2954,6 +2992,33 @@ paths:
                 $ref: '#/components/schemas/NodeState'
         '401':
           $ref: '#/components/responses/Unauthorized'
+  /vault/api/v1/node/health:
+    get:
+      operationId: getNodeHealth
+      summary: Node operational health
+      description: |
+        Reports what an operator pages on. `signals` are outcomes of the node's own
+        work that leave no other trace (signing at publish, loading the ruleset),
+        each with whether it is failing now, how often it has failed, and when it
+        last failed and last succeeded, kept across restarts. `registryOutbox` is
+        the registry-sync outbox's pending, submitted, stalled and rejected counts,
+        read live. Authenticated, so a monitor that cannot scrape `/metrics` can
+        read them with an API key. The unauthenticated `/health` answers liveness
+        only.
+      tags:
+        - Node
+      security:
+        - BearerApiKey: []
+        - BasicAuth: []
+      responses:
+        '200':
+          description: Node operational health counters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeHealth'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /vault/api/v1/whoami:
     get:
       operationId: whoami
@@ -3177,6 +3242,45 @@ paths:
 
         Returns the public view (not an error) when credential verification
         is not configured on this node.
+
+        ✅ **A past version: `asOf`.** EN 18221:2026 clause 4.2 expects the
+        version of a passport at a past moment to be retrievable by authenticated,
+        authorised actors. With `asOf` this route returns the version that was
+        current at that instant, to the readers who hold a credential and no API
+        key, which `GET /dpp/{dppId}/versions?asOf=` is not for. It is the same body
+        a live read gives the same credential: the payload that audience's
+        publish-time proof covers, with that proof attached and `disclosureSet`
+        naming the classes. A published passport's views are frozen when it is
+        signed, so a version carries exactly the classes it was published with, and
+        the proof verifies against the operator's key as a live one does.
+
+        **`asOf` needs a credential that grants more than the public view.** The
+        clause speaks of *authenticated, authorised* actors, so the rule above does
+        not apply: without a credential the answer is `401`, and a credential that
+        does not cover this passport gets `403` naming the axis in
+        `X-DPP-Credential-Out-Of-Scope`. The public proof is frozen at publish, so it
+        is the same bytes for every version of a published passport, and serving it
+        for a past instant would answer a question about the past with the present
+        passport. A node that cannot verify credentials answers `401` too, and says
+        so. Both are decided before any version is served, and a credential
+        presented against a passport it does not cover is recorded like any other.
+
+        A moment after the passport's last change is answered by the live record,
+        which is the state at that time. A moment before the passport was created
+        is `404`, and one in the future `422`: nothing was its state then. A version
+        is served on the terms a live read is: a moment the passport was a draft is
+        `404`, and one it was suspended `410`.
+
+        The same moment is answered the same way whenever it is asked. The live
+        record and the version are read together, after any change in progress on
+        the passport has committed, and the future is measured by the clock that
+        stamps each version, so no later change can land on a moment already
+        answered.
+
+        A past version served is recorded to the audit trail with the instant
+        asked for (`asOf`) and the archived version that answered it
+        (`archivedVersionId`, `null` when the live record did), as is a credential
+        refused one for scope.
       tags:
         - Credentialed Access
       security: []
@@ -3189,9 +3293,25 @@ paths:
         - name: X-DPP-Credential
           in: header
           required: false
-          description: A verifiable access credential. Absent means public access.
+          description: |
+            A verifiable access credential. Absent means public access, except with
+            `asOf`, which is read only with one.
           schema:
             type: string
+        - name: asOf
+          in: query
+          required: false
+          description: |
+            An RFC 3339 instant. Returns the passport as it stood then, filtered to
+            the credential's audience. Requires a credential that covers this
+            passport: see the description above.
+
+            Not before the passport was created (`404`), and not in the future
+            (`422`). Write the offset as `Z`: a literal `+` in a query string is a
+            space.
+          schema:
+            type: string
+            format: date-time
       responses:
         '200':
           description: Passport filtered to the resolved audience.
@@ -3225,19 +3345,56 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
-          description: The presented credential failed verification.
+          description: |
+            The presented credential failed verification. Also `asOf` without a
+            credential, which a past version is read only with, and `asOf` on a node
+            that cannot verify credentials, which says so.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: |
+            `asOf` with a verified credential that grants nothing beyond the public
+            view on this passport, so it cannot read a past version. Never returned
+            without `asOf`, where such a credential is served the public view.
+          headers:
+            X-DPP-Credential-Out-Of-Scope:
+              description: |
+                The axis the credential missed, as on a `200`: `product-group`,
+                `product-category` or `no-product-category`. Absent when the
+                credential covers the passport and its audience is the public one.
+              required: false
+              schema:
+                type: string
+                enum:
+                  - product-group
+                  - product-category
+                  - no-product-category
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
         '404':
-          description: Not found or not published.
+          description: |
+            Not found or not published. With `asOf`, also a moment before the
+            passport was created, and a moment it was not yet published, where no
+            published version covers it.
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
         '410':
-          description: This passport has been suspended.
+          description: |
+            This passport has been suspended. With `asOf`, it was suspended at that
+            moment.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: |
+            `asOf` was given and is not an RFC 3339 timestamp, or is in the future.
           content:
             application/problem+json:
               schema:
@@ -4087,13 +4244,21 @@ paths:
       summary: GS1 Digital Link resolver
       description: |
         GS1 Digital Link resolution keyed by GTIN-14, the carrier this node prints
-        for a model-level passport. It has not been assessed against the GS1
-        Conformant Resolver Standard, and nothing here claims conformance. Behaviour
-        depends on the `linkType` query / `Accept` header:
+        for a model-level passport. It was assessed against release 1.2.1 of the GS1
+        Conformant Resolver Standard, and this node does not claim to conform to it:
+        `docs/architecture/GS1_RESOLVER_CONFORMANCE.md` in the engine repository
+        lists, criterion by criterion, what is met and what is not.
+
+        Behaviour depends on the `linkType` query / `Accept` header:
         - default → `307` redirect to the HTML DPP page
-        - `?linkType=gs1:pip` / `gs1:dpp` (and related) → `307` redirect to the DPP
+        - `?linkType=gs1:pip`, `gs1:dpp` or `gs1:defaultLink` → `307` redirect to
+          the DPP page. Any other link type → `404`: the linkset does not offer it
         - `?linkType=linkset` or `Accept: application/linkset+json` → `200`
           RFC 9264 linkset
+
+        A redirect carries the request's query string on to its target. A trailing
+        slash is tolerated. A GTIN of fewer than 14 digits is read as its
+        14-digit form, which is also how a linkset names it.
 
         A GTIN takes a consumer product variant (AI 22), a batch (AI 10) and a
         serial (AI 21), in that order and each optional, or a third-party
@@ -4101,6 +4266,11 @@ paths:
         Any other path under `/01/` cannot be a GS1 Digital Link, because its
         qualifiers are out of order, repeated, not ones a GTIN takes, or empty, and
         answers `400` without a lookup.
+
+        A compressed link that holds an EPC binary string is read too, at the root
+        of this host: `/eh…` (hexadecimal) or `/ex…` (URI-safe base 64). Only the
+        SGTIN-96 and SGTIN-198 schemes are decoded; a link of any other scheme
+        answers `404`, and one that cannot be decompressed answers `400`.
       tags:
         - Public Resolver
       security: []
@@ -4119,17 +4289,22 @@ paths:
           description: e.g. linkset, gs1:pip, gs1:dpp
       responses:
         '200':
-          description: RFC 9264 linkset (when a linkset is requested).
+          description: RFC 9264 linkset (when a linkset is requested). It validates against GS1's linkset schema, is anchored at the uncompressed request URI, and holds the links of every level from the one the request names up to the GTIN.
+          headers:
+            Link:
+              description: The JSON-LD context for the linkset, with relation `http://www.w3.org/ns/json-ld#context`.
+              schema:
+                type: string
           content:
             application/linkset+json:
               schema:
                 type: object
         '307':
-          description: Redirect to the DPP page (`Location` header).
+          description: Redirect to the DPP page (`Location` header), carrying the request's query string on.
         '400':
-          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+          description: 'The path is not a valid GS1 Digital Link: the GTIN is not digits, has the wrong length or a wrong check digit, or a qualifier is out of order, repeated, longer than its Application Identifier allows or outside GS1 character set 82, or `linkType` is given more than once.'
         '404':
-          description: No published DPP for this GTIN, or unknown link type.
+          description: No published DPP for this GTIN, or a link type the linkset does not offer.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4175,17 +4350,22 @@ paths:
           description: e.g. linkset, gs1:pip, gs1:dpp
       responses:
         '200':
-          description: RFC 9264 linkset (when a linkset is requested).
+          description: RFC 9264 linkset (when a linkset is requested). It validates against GS1's linkset schema, is anchored at the uncompressed request URI, and holds the links of every level from the one the request names up to the GTIN.
+          headers:
+            Link:
+              description: The JSON-LD context for the linkset, with relation `http://www.w3.org/ns/json-ld#context`.
+              schema:
+                type: string
           content:
             application/linkset+json:
               schema:
                 type: object
         '307':
-          description: Redirect to the DPP page (`Location` header).
+          description: Redirect to the DPP page (`Location` header), carrying the request's query string on.
         '400':
-          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+          description: 'The path is not a valid GS1 Digital Link: the GTIN is not digits, has the wrong length or a wrong check digit, or a qualifier is out of order, repeated, longer than its Application Identifier allows or outside GS1 character set 82, or `linkType` is given more than once.'
         '404':
-          description: No published DPP at any level the label names, or unknown link type.
+          description: No published DPP at any level the label names, or a link type the linkset does not offer.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4230,17 +4410,22 @@ paths:
           description: e.g. linkset, gs1:pip, gs1:dpp
       responses:
         '200':
-          description: RFC 9264 linkset (when a linkset is requested).
+          description: RFC 9264 linkset (when a linkset is requested). It validates against GS1's linkset schema, is anchored at the uncompressed request URI, and holds the links of every level from the one the request names up to the GTIN.
+          headers:
+            Link:
+              description: The JSON-LD context for the linkset, with relation `http://www.w3.org/ns/json-ld#context`.
+              schema:
+                type: string
           content:
             application/linkset+json:
               schema:
                 type: object
         '307':
-          description: Redirect to the DPP page (`Location` header).
+          description: Redirect to the DPP page (`Location` header), carrying the request's query string on.
         '400':
-          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+          description: 'The path is not a valid GS1 Digital Link: the GTIN is not digits, has the wrong length or a wrong check digit, or a qualifier is out of order, repeated, longer than its Application Identifier allows or outside GS1 character set 82, or `linkType` is given more than once.'
         '404':
-          description: No published DPP at any level the label names, or unknown link type.
+          description: No published DPP at any level the label names, or a link type the linkset does not offer.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4292,17 +4477,22 @@ paths:
           description: e.g. linkset, gs1:pip, gs1:dpp
       responses:
         '200':
-          description: RFC 9264 linkset (when a linkset is requested).
+          description: RFC 9264 linkset (when a linkset is requested). It validates against GS1's linkset schema, is anchored at the uncompressed request URI, and holds the links of every level from the one the request names up to the GTIN.
+          headers:
+            Link:
+              description: The JSON-LD context for the linkset, with relation `http://www.w3.org/ns/json-ld#context`.
+              schema:
+                type: string
           content:
             application/linkset+json:
               schema:
                 type: object
         '307':
-          description: Redirect to the DPP page (`Location` header).
+          description: Redirect to the DPP page (`Location` header), carrying the request's query string on.
         '400':
-          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+          description: 'The path is not a valid GS1 Digital Link: the GTIN is not digits, has the wrong length or a wrong check digit, or a qualifier is out of order, repeated, longer than its Application Identifier allows or outside GS1 character set 82, or `linkType` is given more than once.'
         '404':
-          description: No published DPP at any level the label names, or unknown link type.
+          description: No published DPP at any level the label names, or a link type the linkset does not offer.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4345,17 +4535,22 @@ paths:
           description: e.g. linkset, gs1:pip, gs1:dpp
       responses:
         '200':
-          description: RFC 9264 linkset (when a linkset is requested).
+          description: RFC 9264 linkset (when a linkset is requested). It validates against GS1's linkset schema, is anchored at the uncompressed request URI, and holds the links of every level from the one the request names up to the GTIN.
+          headers:
+            Link:
+              description: The JSON-LD context for the linkset, with relation `http://www.w3.org/ns/json-ld#context`.
+              schema:
+                type: string
           content:
             application/linkset+json:
               schema:
                 type: object
         '307':
-          description: Redirect to the DPP page (`Location` header).
+          description: Redirect to the DPP page (`Location` header), carrying the request's query string on.
         '400':
-          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+          description: 'The path is not a valid GS1 Digital Link: the GTIN is not digits, has the wrong length or a wrong check digit, or a qualifier is out of order, repeated, longer than its Application Identifier allows or outside GS1 character set 82, or `linkType` is given more than once.'
         '404':
-          description: No published DPP at any level the label names, or unknown link type.
+          description: No published DPP at any level the label names, or a link type the linkset does not offer.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4405,17 +4600,22 @@ paths:
           description: e.g. linkset, gs1:pip, gs1:dpp
       responses:
         '200':
-          description: RFC 9264 linkset (when a linkset is requested).
+          description: RFC 9264 linkset (when a linkset is requested). It validates against GS1's linkset schema, is anchored at the uncompressed request URI, and holds the links of every level from the one the request names up to the GTIN.
+          headers:
+            Link:
+              description: The JSON-LD context for the linkset, with relation `http://www.w3.org/ns/json-ld#context`.
+              schema:
+                type: string
           content:
             application/linkset+json:
               schema:
                 type: object
         '307':
-          description: Redirect to the DPP page (`Location` header).
+          description: Redirect to the DPP page (`Location` header), carrying the request's query string on.
         '400':
-          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+          description: 'The path is not a valid GS1 Digital Link: the GTIN is not digits, has the wrong length or a wrong check digit, or a qualifier is out of order, repeated, longer than its Application Identifier allows or outside GS1 character set 82, or `linkType` is given more than once.'
         '404':
-          description: No published DPP at any level the label names, or unknown link type.
+          description: No published DPP at any level the label names, or a link type the linkset does not offer.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4465,17 +4665,22 @@ paths:
           description: e.g. linkset, gs1:pip, gs1:dpp
       responses:
         '200':
-          description: RFC 9264 linkset (when a linkset is requested).
+          description: RFC 9264 linkset (when a linkset is requested). It validates against GS1's linkset schema, is anchored at the uncompressed request URI, and holds the links of every level from the one the request names up to the GTIN.
+          headers:
+            Link:
+              description: The JSON-LD context for the linkset, with relation `http://www.w3.org/ns/json-ld#context`.
+              schema:
+                type: string
           content:
             application/linkset+json:
               schema:
                 type: object
         '307':
-          description: Redirect to the DPP page (`Location` header).
+          description: Redirect to the DPP page (`Location` header), carrying the request's query string on.
         '400':
-          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+          description: 'The path is not a valid GS1 Digital Link: the GTIN is not digits, has the wrong length or a wrong check digit, or a qualifier is out of order, repeated, longer than its Application Identifier allows or outside GS1 character set 82, or `linkType` is given more than once.'
         '404':
-          description: No published DPP at any level the label names, or unknown link type.
+          description: No published DPP at any level the label names, or a link type the linkset does not offer.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4531,17 +4736,22 @@ paths:
           description: e.g. linkset, gs1:pip, gs1:dpp
       responses:
         '200':
-          description: RFC 9264 linkset (when a linkset is requested).
+          description: RFC 9264 linkset (when a linkset is requested). It validates against GS1's linkset schema, is anchored at the uncompressed request URI, and holds the links of every level from the one the request names up to the GTIN.
+          headers:
+            Link:
+              description: The JSON-LD context for the linkset, with relation `http://www.w3.org/ns/json-ld#context`.
+              schema:
+                type: string
           content:
             application/linkset+json:
               schema:
                 type: object
         '307':
-          description: Redirect to the DPP page (`Location` header).
+          description: Redirect to the DPP page (`Location` header), carrying the request's query string on.
         '400':
-          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+          description: 'The path is not a valid GS1 Digital Link: the GTIN is not digits, has the wrong length or a wrong check digit, or a qualifier is out of order, repeated, longer than its Application Identifier allows or outside GS1 character set 82, or `linkType` is given more than once.'
         '404':
-          description: No published DPP at any level the label names, or unknown link type.
+          description: No published DPP at any level the label names, or a link type the linkset does not offer.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4586,17 +4796,22 @@ paths:
           description: e.g. linkset, gs1:pip, gs1:dpp
       responses:
         '200':
-          description: RFC 9264 linkset (when a linkset is requested).
+          description: RFC 9264 linkset (when a linkset is requested). It validates against GS1's linkset schema, is anchored at the uncompressed request URI, and holds the links of every level from the one the request names up to the GTIN.
+          headers:
+            Link:
+              description: The JSON-LD context for the linkset, with relation `http://www.w3.org/ns/json-ld#context`.
+              schema:
+                type: string
           content:
             application/linkset+json:
               schema:
                 type: object
         '307':
-          description: Redirect to the DPP page (`Location` header).
+          description: Redirect to the DPP page (`Location` header), carrying the request's query string on.
         '400':
-          description: 'The GTIN in the path is not valid: not digits, the wrong length, or a wrong check digit.'
+          description: 'The path is not a valid GS1 Digital Link: the GTIN is not digits, has the wrong length or a wrong check digit, or a qualifier is out of order, repeated, longer than its Application Identifier allows or outside GS1 character set 82, or `linkType` is given more than once.'
         '404':
-          description: No published DPP at any level the label names, or unknown link type.
+          description: No published DPP at any level the label names, or a link type the linkset does not offer.
         '409':
           $ref: '#/components/responses/PassportSignatureUnverified'
         '410':
@@ -4605,6 +4820,30 @@ paths:
           $ref: '#/components/responses/ResolverUpstreamFailure'
         '503':
           $ref: '#/components/responses/PassportVerificationUnavailable'
+  /.well-known/gs1resolver:
+    get:
+      operationId: getResolverDescription
+      summary: GS1 resolver description file
+      description: |
+        The resolver description file that the GS1 Conformant Resolver Standard asks
+        a resolver to publish at this path (section 3). It names the root this
+        resolver answers under and the GS1 primary keys it supports, which is the GTIN
+        (AI 01) and no other. A client can read it to learn what a resolver at this
+        host resolves before asking it. Public, unauthenticated.
+
+        The document validates against the description-file schema GS1 publishes.
+        Publishing it is not a claim of conformance to the standard; see
+        `/01/{gtin}`.
+      tags:
+        - Public Resolver
+      security: []
+      responses:
+        '200':
+          description: The description file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolverDescription'
   /vault/health:
     get:
       operationId: vaultHealth
@@ -4957,7 +5196,7 @@ components:
           items:
             $ref: '#/components/schemas/MaterialEntry'
         co2ePerUnit:
-          description: 'CO₂e per unit: manufacturer-supplied or engine-calculated. An object, not a bare number: a figure without its lifecycle stage and system boundary is not comparable to another product''s.'
+          description: 'CO₂e per unit as the operator declared it, through create or `PUT`. It is never filled from a calculation: the calculated figure is `complianceResult.co2eScore`. An object, not a bare number: a figure without its lifecycle stage and system boundary is not comparable to another product''s.'
           anyOf:
             - $ref: '#/components/schemas/CarbonFootprint'
             - type: 'null'
@@ -4969,7 +5208,7 @@ components:
         complianceResult:
           allOf:
             - $ref: '#/components/schemas/ComplianceResult'
-          description: The computed compliance determination, attached at create/update. Part of the signed payload and immutable after retention lock. Absent until a determination has been computed.
+          description: 'The compliance determination of the content the passport holds: computed at create and at every update, and once more over the content signed at first publish, which is the determination the signatures cover. Part of the signed payload and immutable after retention lock, so a re-publish keeps it. Absent when none could be made: no product group data, nothing registered to evaluate the product group, or an evaluator that could not assess it. The calculated CO₂e and repairability figures are `co2eScore` and `repairabilityIndex` here, never in `co2ePerUnit` or `repairabilityScore`.'
         lintResult:
           allOf:
             - $ref: '#/components/schemas/LintResult'
@@ -5932,8 +6171,12 @@ components:
       properties:
         category:
           type: string
-          description: The derogation category as named by the delegated act.
-          example: health-and-safety
+          description: |
+            One of the points of Art. 2 of Commission Delegated Regulation (EU)
+            2026/296, spelled as the unsold-goods disclosure spells a discard reason
+            (camelCase), such as `dangerousProduct` for point (a). Any other value is
+            refused with `422`, and the refusal lists them all.
+          example: dangerousProduct
         actCitation:
           type:
             - string
@@ -7697,7 +7940,10 @@ components:
 
         A product-group-specific role that none of the named ones fit uses the object
         form: the variant is externally tagged, so it is an object where the rest are
-        strings. It carries a legitimate interest like the others.
+        strings. It carries a legitimate interest like the others, so a custom label
+        that is an authority role's name, or the start of one's, is refused with `422`
+        as well. Case, `-`, `_` and spaces do not matter: `market-surveillance`,
+        `Market Surveillance` and `customs` are refused, and `customs-broker` is not.
       oneOf:
         - type: string
           title: Named role
@@ -8131,6 +8377,100 @@ components:
             the rules a passport was checked under are observable. Absent on a
             standalone vault.
           example: baseline
+    NodeHealth:
+      type: object
+      properties:
+        signals:
+          $ref: '#/components/schemas/NodeSignals'
+          description: |
+            Outcomes of the node's own work that leave no other trace, by signal name,
+            kept in the database across restarts. Absent on a deployment with no
+            signal store wired, such as a standalone vault.
+        registryOutbox:
+          $ref: '#/components/schemas/RegistryOutboxHealth'
+          description: |
+            The registry-sync outbox's counts. Absent on a deployment with no outbox
+            wired, such as a standalone vault.
+    NodeSignals:
+      type: object
+      description: |
+        Every signal the node keeps, by name. Each is listed whether or not anything
+        has been recorded for it yet. A later release may add signals; alarm on each
+        one's `failing`.
+      required:
+        - signing
+        - rulesetLoad
+      properties:
+        signing:
+          $ref: '#/components/schemas/NodeSignal'
+          description: |
+            Signing a passport at publish. A failure is a publish refused because the
+            passport could not be signed.
+        rulesetLoad:
+          $ref: '#/components/schemas/NodeSignal'
+          description: |
+            Loading the Compliance Current ruleset from its channel, at boot, on each
+            poll, or on an operator's reload. A failure is a channel that could not be
+            read or a bundle it served that was refused; the node keeps the ruleset it
+            had. Recorded only when a channel is configured.
+    NodeSignal:
+      type: object
+      required:
+        - failing
+        - failures
+      properties:
+        failing:
+          type: boolean
+          description: |
+            Whether the latest recorded outcome is a failure. The field to alarm on:
+            it clears on the next success.
+          example: false
+        failures:
+          type: integer
+          format: int64
+          minimum: 0
+          description: |
+            Failures since the node was first started. Kept in the database and never
+            reset, so it says how often, not whether the node is failing now.
+          example: 0
+        lastFailedAt:
+          type: string
+          format: date-time
+          description: |
+            When the latest failure was recorded, by the node's database clock. Absent
+            until the first.
+        lastSucceededAt:
+          type: string
+          format: date-time
+          description: |
+            When the latest success was recorded, by the node's database clock. Absent
+            until the first.
+    RegistryOutboxHealth:
+      type: object
+      required:
+        - pending
+        - submitted
+        - stalled
+        - rejected
+      properties:
+        pending:
+          type: integer
+          format: int64
+          description: Rows awaiting a drain attempt.
+        submitted:
+          type: integer
+          format: int64
+          description: Rows accepted by the registry and awaiting its verdict.
+        stalled:
+          type: integer
+          format: int64
+          description: |
+            Pending and submitted rows that have reached the stall threshold. A row here
+            is not going to succeed without someone looking at it.
+        rejected:
+          type: integer
+          format: int64
+          description: Rows the registry terminally rejected.
     NodeProfile:
       type: string
       description: 'The deployment profile a node was started under (`NODE_PROFILE`), which decides the trust tiers it will boot on. `development` boots on any tier, placeholders included, and is what an unset or unrecognised value means. `sandbox` is a real deployment against test authorities: it refuses a placeholder on a required trust port and accepts a sandbox tier. `production` accepts only live tiers on required ports.'
@@ -8216,6 +8556,46 @@ components:
           - did:web:id.odal-node.io#urn:ietf:params:oauth:jwk-thumbprint:sha-256:<thumbprint>
         assertionMethod:
           - did:web:id.odal-node.io#urn:ietf:params:oauth:jwk-thumbprint:sha-256:<thumbprint>
+    ResolverDescription:
+      type: object
+      description: |
+        The resolver description file that the GS1 Conformant Resolver Standard asks a
+        resolver to publish at `/.well-known/gs1resolver` (section 3). It validates
+        against the description-file schema GS1 publishes. Publishing it is not a claim
+        that this resolver conforms to the standard.
+      required:
+        - name
+        - resolverRoot
+        - supportedPrimaryKeys
+        - linkTypeDefaultCanBeLinkset
+        - jsonLdContextLocation
+      properties:
+        name:
+          type: string
+          description: A name for the resolver.
+        resolverRoot:
+          type: string
+          format: uri
+          description: This resolver's public root, with no trailing slash.
+        supportedPrimaryKeys:
+          type: array
+          items:
+            type: string
+          description: The GS1 primary keys, by AI, that this resolver resolves.
+        linkTypeDefaultCanBeLinkset:
+          type: boolean
+          description: Whether `linkset` may be made the default link type. It may not.
+        jsonLdContextLocation:
+          type: string
+          format: uri
+          description: The JSON-LD context a linkset's `Link` header points at.
+      example:
+        name: Odal Node resolver
+        resolverRoot: https://id.odal-node.io
+        supportedPrimaryKeys:
+          - '01'
+        linkTypeDefaultCanBeLinkset: false
+        jsonLdContextLocation: https://ref.gs1.org/standards/resolver/linkset-context
     InternalSignRequest:
       type: object
       required:
@@ -8739,12 +9119,14 @@ components:
           description: |-
             The complete record as it stood at the time, not a diff.
 
+            As it was stored, and never upcast: a version taken from a passport written under an earlier schema keeps that schema's shape, which can differ from the shape the live passport is read in. It is the record as the operator stored it then: a draft's own changes are archived too, so a version can be a draft that was never published.
+
             Whole rather than differential so that retrieval is a read rather than a replay: a chain of diffs makes every historical version depend on every one before it, and one corrupt link loses everything after it. The clause asks that the version be retrievable, and a stored version is retrievable where a derived one is computed and hoped for.
         supersededAt:
           type: string
           format: date-time
           description: |-
-            When this version stopped being current: the instant the change that replaced it was applied.
+            When this version stopped being current: the instant the change that replaced it was applied, by the database's clock, so versions order as their changes did whichever process made them.
 
             One timestamp rather than a validity range: the previous version's `supersededAt` is this one's start, and two fields that must agree are two fields that can disagree.
     PublishBlocker:

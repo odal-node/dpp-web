@@ -55,7 +55,7 @@ commit, so a page cannot describe the software differently from its source:
 | What | Pin | Refresh |
 |---|---|---|
 | Product groups and EU acts from `dpp-core`, with a copy of the acts in `site/dpp-docs/src/data/instruments` for the docs | `site/dpp-landing/core-source.json` | `pnpm --filter dpp-landing run sync:core` |
-| API spec from `dpp-engine` | `site/dpp-docs/openapi-source.json` | `pnpm run sync:openapi`, or the nightly workflow |
+| API spec from the latest `dpp-engine` release | `site/dpp-docs/openapi-source.json` | `pnpm run sync:openapi`, or the nightly workflow, which commits a new release to `staging` and opens the promotion pull request to `main` |
 
 Never edit the vendored files by hand; bump the pin and sync.
 
@@ -110,7 +110,7 @@ Dates come from git history (`scripts/git-lastmod.mjs`).
 |---|---|---|
 | `ci.yml` | Pull requests, pushes to `staging` and `main` | The checks above |
 | `advisories.yml` | Daily, 06:20 UTC | `pnpm audit --audit-level high` against the committed lockfile, so a new advisory surfaces on a day nothing was committed |
-| `sync-openapi.yml` | Nightly, 03:17 UTC | Opens a pull request into `staging` when the engine's spec changes |
+| `sync-openapi.yml` | Nightly, 03:17 UTC | When the engine publishes a release that `staging` does not pin, commits the bump to `staging` and opens the pull request from `staging` to `main`, or comments on the one already open |
 | `external-links.yml` | Mondays, 04:41 UTC | `check:external` |
 | Dependabot | Mondays | Version updates against `staging`, grouped: the Astro packages together, other npm minor and patch updates together, and all GitHub Actions together. TypeScript 7.0 is held back because `astro check` refuses it. Security updates always target `main`; retarget those to `staging` |
 
