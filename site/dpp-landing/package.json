@@ -15,10 +15,10 @@
     "test:verify": "node --test tests/verify.test.ts"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/sitemap": "^3.7.5",
     "@odal/brand-tokens": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.4.2",
+    "astro": "^7.4.12",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
