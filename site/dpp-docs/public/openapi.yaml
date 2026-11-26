@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Odal Node API
-  version: 0.16.0
+  version: 0.17.0
   description: |
     The HTTP API of a self-hosted Odal Node: create, validate, sign, publish and
     serve EU Digital Product Passports. Pre-production: the API can still change
@@ -60,7 +60,7 @@ tags:
   - name: Webhooks
     description: 'Signed outbound event delivery: subscribe, list, remove, test.'
   - name: Personal Data
-    description: Erasing the records a passport's `personalData` statements name. A record is held outside the passport so it can be erased, and no route reads one.
+    description: Storing, listing and erasing the records a passport's `personalData` statements name. A record is held outside the passport so it can be erased, and no route returns a record's content.
   - name: Plugins
     description: 'Signed product group plugin installation: verify, persist, hot-swap (admin-only).'
   - name: Ruleset
@@ -726,6 +726,16 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          description: |
+            The stored transfer chain is one dpp-core refuses to read, so
+            whether responsibility may have transferred cannot be answered, and
+            the seal is not served without that answer. The detail names the
+            passport and the record dpp-core cited.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/dpp/{dppId}/seal/repair:
     post:
       operationId: repairDppSeal
@@ -858,8 +868,10 @@ paths:
         1. `qrCodeUrl` is set to the passport's GS1 Digital Link carrier:
            `{resolverBase}/01/{gtin}/21/{serial}` for a trade item, else
            `{resolverBase}/dpp/{id}`
-        2. The identity service signs the VC payload with Ed25519 (best-effort;
-           signing failure does not block publish: `jwsSignature` may be null)
+        2. The identity service signs the VC payload with Ed25519. Publishing fails
+           closed: when the signer cannot sign, the answer is `500` and the passport
+           stays a `draft` with no `jwsSignature`, rather than being published
+           without a signature the resolver would then refuse to serve
         3. `retentionLocked` is set to `true` permanently
         4. `status` = `active`, `publishedAt` = now
         5. A `dpp.published` NATS event is emitted (fire-after-commit)
@@ -872,6 +884,15 @@ paths:
         arrive together can both pass it; this is where the label goes live, so
         the second to publish stays a draft rather than making one label name two
         passports.
+
+        A draft states its `responsibleOperator` here, from the operator as it
+        stands now and the role and legal basis it was given. Where the product
+        group's passport obligation is live, a passport whose responsible operator
+        cannot be stated is refused with `422`, naming what the node lacks: no role
+        and basis were stated for the node or with the passport, or the operator's
+        `legalName` or `country` is not configured. Nothing is defaulted, because a
+        published passport is corrected by a successor and not an edit. Any other
+        product group publishes without one.
       tags:
         - DPP Lifecycle
       security:
@@ -902,6 +923,8 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /vault/api/v1/dpp/{dppId}/amend:
     post:
       operationId: amendDpp
@@ -1132,13 +1155,17 @@ paths:
       description: |
         Transition a `published` or `suspended` DPP to `deactivated`
         (terminal). The record is retained, never deleted: the passport
-        outlives the product. Destruction (`reason.kind: destroyed`) is only
-        lawful with a recognised derogation from the unsold-goods destruction
-        ban (ESPR Art. 25 delegated act), so the derogation's `category` must be
-        one of the points of Art. 2 of Commission Delegated Regulation (EU)
-        2026/296. Any other category is refused with `422` before anything is
-        written, naming the points. The status is terminal, so a lawful basis that
-        does not exist would otherwise stay on the record.
+        outlives the product. A destruction (`reason.kind: destroyed`) states
+        whether the product was an unsold consumer product (`unsold`), and cites a
+        derogation only where the ESPR Art. 25(1) ban reaches it: an unsold
+        product with a CN code in Annex VII, destroyed from 19 July 2026 by an
+        operator that its `enterpriseSize` does not exempt. The derogation is a
+        point of Art. 2 of Commission Delegated Regulation (EU) 2026/296 by its
+        name, as in `"reason": {"kind": "destroyed", "derogation":
+        "damagedOrContaminated"}`. A destruction the ban reaches that cites none,
+        and the free-text `{"category": ...}` of earlier releases, are refused
+        with `422` before anything is written. The status is terminal, so a
+        lawful basis that does not exist would otherwise stay on the record.
       tags:
         - DPP Lifecycle
       security:
@@ -1175,10 +1202,32 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           description: |
-            A destruction that cites a derogation category which is not a point of
-            Art. 2 of Delegated Regulation (EU) 2026/296. The `errors` member names
-            `/reason/derogation/category` and the points accepted. The passport is
-            not changed.
+            A declaration refused, with the passport unchanged, for one of four
+            reasons, each named in the `errors` member:
+
+            - `/unsold`: the request does not say whether the product was an
+              unsold consumer product;
+            - `/reason/derogation`: the derogation is the free-text object
+              `{"category": ...}` rather than a point of Art. 2 of Delegated
+              Regulation (EU) 2026/296 by its name, and the refusal lists the
+              points;
+            - `/reason/derogation`: the ESPR Art. 25(1) ban reaches the product
+              (unsold, a CN code in Annex VII, from 19 July 2026, an operator that
+              is not exempt) and no point is cited;
+            - `/materialRecovery`: the value holds a number dpp-core cannot hash
+              exactly, such as an integer too large for a double to hold, so the
+              declaration could not be chained into the audit trail.
+
+            A name that is not one of the points is not a derogation and fails as
+            the body is read.
+
+            A `discardRecordId` is refused with the passport unchanged when the
+            reason is not `destroyed`, when it names no discard record this node
+            holds, or when the record and the reason do not cite the same derogation
+            point: one citing a point and the other none, or two different points.
+            Both citing none agree. Such a refusal carries no `errors` member. On
+            success the passport is joined to the discard record in the same
+            transaction as the destruction, and the audit entry records the citation.
           content:
             application/problem+json:
               schema:
@@ -1230,7 +1279,18 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
-          $ref: '#/components/responses/Conflict'
+          description: |
+            The passport is not published, so it cannot be transferred.
+
+            Also the stored transfer chain is one dpp-core refuses to read: it breaks
+            the chain's invariants, for instance a record for another passport, a
+            broken operator sequence, or a completion without both signatures. The
+            detail names the passport and the record dpp-core cited. Nothing is
+            written.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '422':
           $ref: '#/components/responses/ValidationError'
   /vault/api/v1/dpp/{dppId}/transfer/accept:
@@ -1271,6 +1331,16 @@ paths:
             This DPP has no transfer chain at all: no handover has ever been
             initiated for it. A chain that exists but carries nothing pending is a
             `422`, not this.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: |
+            The stored transfer chain is one dpp-core refuses to read: it breaks the
+            chain's invariants, for instance a record for another passport, a broken
+            operator sequence, or a completion without both signatures. The detail names
+            the passport and the record dpp-core cited. Nothing is written.
           content:
             application/problem+json:
               schema:
@@ -1338,6 +1408,16 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '409':
+          description: |
+            The stored transfer chain is one dpp-core refuses to read: it breaks the
+            chain's invariants, for instance a record for another passport, a broken
+            operator sequence, or a completion without both signatures. The detail names
+            the passport and the record dpp-core cited. Nothing is written.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '422':
           description: |
             There is no pending handover to reject, or the record's state does not
@@ -1399,6 +1479,16 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '409':
+          description: |
+            The stored transfer chain is one dpp-core refuses to read: it breaks the
+            chain's invariants, for instance a record for another passport, a broken
+            operator sequence, or a completion without both signatures. The detail names
+            the passport and the record dpp-core cited. Nothing is written.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '422':
           description: |
             There is no pending handover to cancel, or the record's state does not
@@ -1452,7 +1542,18 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
-          $ref: '#/components/responses/Conflict'
+          description: |
+            The passport is a draft, which has no signature to export.
+
+            Also the stored transfer chain is one dpp-core refuses to read: it breaks
+            the chain's invariants, for instance a record for another passport, a
+            broken operator sequence, or a completion without both signatures. The
+            detail names the passport and the record dpp-core cited. No dossier is
+            stored.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
     get:
       operationId: listDppEvidence
       summary: List stored evidence dossiers for a passport
@@ -1498,6 +1599,161 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+  /vault/api/v1/dpp/{dppId}/personal-data:
+    post:
+      operationId: storePersonalDataRecord
+      summary: Hold personal data for a draft passport, where it can be erased
+      description: |
+        Holds personal data related to one marked field of a draft passport in a
+        record outside the passport, and answers the record's identifier. A published
+        passport is signed, frozen, archived and copied to the back-up provider, so
+        personal data it is not required to carry cannot live in it: withdrawn
+        consent (GDPR Art. 7(3)) obliges erasure (Art. 17(1)(b)), and nothing the
+        passport is copied to can be erased from.
+
+        **Order.** The statement in the passport names the record, and the record is
+        stored for a passport, so a client creates the draft first (stating
+        `{"held": "nothing"}` for the field, or leaving it out while the field is
+        empty), stores the record here, then patches the statement in with
+        `{"held": "outside", "lawfulBasis": …, "record": "<id>"}`
+        (`PUT /api/v1/dpp/{dppId}`).
+
+        **Only a draft.** A passport that is no longer a draft has a statement that
+        can no longer be changed to name a new record, so it is refused with `409`.
+
+        **The passport is judged before the body is read.** A passport this node does
+        not hold is `404`, and one that is not a draft is `409`, whatever the body
+        holds, including a body that is not the JSON object described here. Only a
+        draft reads the body and refuses it.
+
+        **Only a marked field.** `field` must be one the passport's product group
+        schema marks as able to hold personal data. A statement can only be made
+        about such a field, so a record for any other could never be named; it is
+        refused with `422`, and the detail lists the fields that are marked.
+
+        **A retry stores a second record.** The route takes no `Idempotency-Key`, and
+        a key sent to it is refused with `400`. The key store keeps a hash of the raw
+        request body, which here is the personal data, and nothing could erase that
+        hash once the record is erased. A caller that lost the answer lists the
+        passport's records (`GET`, below), finds the first and erases it with
+        `DELETE /api/v1/personal-data/{record}`.
+
+        **The content is never returned.** The answer carries the record's
+        identifier, the field and when it was stored, and no route of this node
+        returns a record's content. It is not logged either: the node records who
+        stored a record, and the record's identifier, and nothing about the passport
+        or the data.
+
+        **Size.** The body may be at most 64 KiB. A larger one is refused with
+        `413`, once the passport is known to be a draft.
+
+        Admin-scoped, like every other route of this tag: the identifiers it handles
+        relate to whoever owns the item (GDPR Recital 26).
+      tags:
+        - Personal Data
+      security:
+        - BearerApiKey: []
+        - BasicAuth: []
+      parameters:
+        - name: dppId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/DppId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorePersonalDataRequest'
+      responses:
+        '201':
+          description: The record is held. Its identifier is what the passport's statement names in `personalData.<field>.record`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalDataRecordSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: This node holds no passport with that identifier.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: The passport is not a draft. Only a draft takes a new record, because the statement of any other cannot be changed to name one.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '413':
+          description: The request body is larger than 64 KiB.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: '`field` is not one the passport''s product group schema marks as able to hold personal data (the detail lists the ones it marks), or `content` is `null`. A body that is JSON but not the object described here is also `422`, and text that is not JSON at all is `400`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      operationId: listPersonalDataRecords
+      summary: List the records of personal data held for a passport
+      description: |
+        Every record held for the passport, present or erased, oldest first: the
+        identifier, the field, whether the content is still held, and the instant
+        (stored, or erased). Never the content, which no route of this node returns.
+
+        This is how an operator learns the identifier of a record whose statement was
+        never written (an orphan), or of one whose answer was lost, and erases it
+        with `DELETE /api/v1/personal-data/{record}`.
+
+        **A passport that has no records is a `200` with none.** A passport this node
+        does not hold is `404`, so an operator can tell a mistyped identifier from a
+        passport with nothing stored. Any status of passport can be listed: a record
+        outlives the draft it was stored for.
+
+        **A listing is as sensitive as the passport's individual-item data.** An
+        identifier relates to whoever owns the item, and information that can be
+        linked to a person is personal data (GDPR Recital 26), so the route is
+        admin-scoped like the one that erases.
+      tags:
+        - Personal Data
+      security:
+        - BearerApiKey: []
+        - BasicAuth: []
+      parameters:
+        - name: dppId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/DppId'
+      responses:
+        '200':
+          description: The passport's records, oldest first. Empty when it has none.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalDataRecordList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: This node holds no passport with that identifier.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/evidence/{id}:
     get:
       operationId: getEvidenceDossier
@@ -1522,10 +1778,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EvidenceDossier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          description: |
+            The stored dossier embeds a transfer chain that dpp-core refuses to
+            read, so it cannot be served as a dossier. The detail names the
+            passport and the record dpp-core cited. Verifying it answers `200`,
+            with the transfer-chain check failed, when the rest of the dossier
+            reads, and `409` when the rest cannot be read either.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/evidence/{id}/verify:
     post:
       operationId: verifyStoredEvidenceDossier
@@ -1534,6 +1803,13 @@ paths:
         An integrity check against the stored dossier's own signatures and
         hash chains. A tamper is still a `200` response: the report's
         `checks` name which check failed.
+
+        A dossier whose transfer chain dpp-core refuses to read is reported the
+        same way: the `transfer_chain` check fails, naming the passport and the
+        record dpp-core cited, and every other check is reported as usual. That
+        report also carries an `input_fidelity` check, which compares the stored
+        document with what was read from it; the report of a dossier that reads
+        normally does not.
       tags:
         - Evidence Dossiers
       security:
@@ -1553,15 +1829,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerificationReport'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          description: |
+            The stored dossier embeds a transfer chain that dpp-core refuses to
+            read, and the rest of the document cannot be read either, so there is
+            nothing to report on. The detail names the passport and the record
+            dpp-core cited.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/evidence/verify:
     post:
       operationId: verifyUploadedEvidenceDossier
       summary: Verify an uploaded dossier document
-      description: Same checks as the stored-dossier verify endpoint, run against an uploaded document instead.
+      description: |
+        Same checks as the stored-dossier verify endpoint, run against an uploaded
+        document instead.
+
+        A `transferChain` member that dpp-core refuses to read is a failed
+        `transfer_chain` check in a `200` report, naming the passport and the
+        record dpp-core cited, with every other check reported as usual. A
+        `transferChain` that is malformed in any other way is a `422`, like any
+        other malformed dossier.
       tags:
         - Evidence Dossiers
       security:
@@ -1584,6 +1880,10 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '422':
           description: Not a valid dossier (malformed JSON or an unrecognised field).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/dpp/{dppId}/registry:
     get:
       operationId: getDppRegistryStatus
@@ -1623,6 +1923,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          description: |
+            The stored transfer chain is one dpp-core refuses to read, so the
+            passport's current responsible operator cannot be named. The detail
+            names the passport and the record dpp-core cited.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/dpp/{dppId}/registry/handle:
     post:
       operationId: recordDppRegistryHandle
@@ -2003,6 +2312,12 @@ paths:
         Requires an admin-scoped key. Reading the configuration back does not:
         `GET` is open to any authenticated caller, since a passport's issuer is
         public information the moment one is published.
+
+        **`responsibility`** is the role the operator answers in and the law that
+        makes it answerable (ESPR Annex III point (k)), stated once for the node.
+        Publish refuses a passport of a product group whose passport obligation is
+        live until one is stated, and never defaults it. A role the basis cannot
+        name is refused with `400`.
       tags:
         - Operator
       security:
@@ -2584,11 +2899,13 @@ paths:
         data, and the operator needs a basis for keeping the tombstone; to show that
         it erased (Art. 5(2)) is one. Nothing in this node deletes it.
 
-        **No route reads a record.** A record is served by no resolver, public,
-        credentialed or authenticated view of a passport, and is never part of the
-        archive of past versions or of the back-up copy. Serving one is a disclosure
-        that needs a basis of its own, which only the controller can establish for
-        each purpose.
+        **No route returns a record's content.** A record is served by no resolver,
+        public, credentialed or authenticated view of a passport, and is never part of
+        the archive of past versions or of the back-up copy. Serving one is a
+        disclosure that needs a basis of its own, which only the controller can
+        establish for each purpose. A record is stored with
+        `POST /api/v1/dpp/{dppId}/personal-data` and found, to be erased, with
+        `GET` on the same path, which lists identifiers and instants and no content.
 
         Admin-scoped, like every other route that removes something: the write scope
         produces and moves passports, and none of that destroys anything.
@@ -2622,13 +2939,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-  /vault/api/v1/unsold-goods:
+  /vault/api/v1/discard-records:
     get:
-      operationId: listUnsoldGoods
-      summary: List unsold-goods disclosure lines
+      operationId: listDiscardRecords
+      summary: List the discard records of a financial year
       description: |
-        Every recorded ESPR Art. 24 disclosure line, newest first, optionally
-        narrowed to one financial year.
+        The discard records whose day of discard falls within the financial year
+        named by `financialYearStart` and `financialYearEnd`, both days included,
+        earliest discard first. A year whose start is after its end lists nothing.
 
         Admin rather than write: these are the operator's own annual figures, and
         reading them back is an administrative act rather than part of producing
@@ -2639,62 +2957,62 @@ paths:
         - BearerApiKey: []
         - BasicAuth: []
       parameters:
-        - name: reportingPeriod
+        - name: financialYearStart
           in: query
-          required: false
-          description: Financial year as `YYYY`. Omit for every period.
+          required: true
+          description: First day of the financial year, as `YYYY-MM-DD`.
           schema:
             type: string
-            pattern: ^[0-9]{4}$
+            format: date
+        - name: financialYearEnd
+          in: query
+          required: true
+          description: Last day of the financial year, as `YYYY-MM-DD`.
+          schema:
+            type: string
+            format: date
       responses:
         '200':
-          description: The disclosure lines.
+          description: The discard records of the year.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UnsoldGoodsEntry'
+                  $ref: '#/components/schemas/StoredDiscardRecord'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '422':
-          description: '`reportingPeriod` is not a four-digit year.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
     post:
-      operationId: recordUnsoldGoods
-      summary: Record an unsold-goods disclosure line
+      operationId: createDiscardRecord
+      summary: Record a discard of unsold consumer products
       description: |
-        Records one line of the ESPR Art. 24 disclosure of unsold consumer products
-        discarded in a financial year.
+        Records one discard of unsold consumer products, with the passports of the
+        units it discards.
+
+        **Every discard is a record.** A record is made for each discard, not only
+        for a destruction under a derogation: ESPR Art. 24(2) has the operator
+        demonstrate the delivery and reception of every discarded product. A
+        derogation is cited where a destruction relies on one, and the documents
+        behind it are attached with `POST …/evidence`.
+
+        **Checked as sent.** The record is checked against dpp-core's discard-record
+        schema before it is read, so a misspelt field is refused with `422` rather
+        than dropped.
 
         **This is not a passport.** There is no digital product passport anywhere in
-        Art. 24 or Art. 25: the subject is an *operator over a financial year*, the
-        medium is the operator's own website, and the trigger is discarding unsold
-        stock: none of which is a product placed on the market. These routes
-        therefore sit beside the other operator-scoped ones, and no `unsold-goods`
-        product group carries passports.
-
-        **Destruction must be justified.** Art. 25 prohibits destroying unsold
-        consumer products listed in Annex VII from 19 July 2026, so
-        `destination: exemptDestruction` requires `destructionJustification` and is
-        refused with `422` without it. The converse is refused too: a justification
-        on any other destination describes nothing.
-
-        **Annex VII scope is not decided here.** That is a CN-code prefix test, and
-        the goods in a disclosure line do not arrive carrying CN codes.
-        `productCategory` is the operator's own categorisation for Art. 24(1)(a).
+        Art. 24 or Art. 25: the subject is an operator over a financial year, so
+        these routes sit beside the other operator-scoped ones.
 
         **Retry with an `Idempotency-Key`.** This route serves no `DELETE`, so a
-        duplicate line is permanent, and Art. 24 is disclosed publicly for a
+        duplicate record is permanent, and Art. 24 is disclosed publicly for a
         financial year, so a discard counted twice overstates what the operator
         actually did.
 
-        Requires a write-scoped key; reading the lines back requires admin.
+        Requires a write-scoped key; reading the records back requires admin.
       tags:
         - Unsold goods
       security:
@@ -2707,14 +3025,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUnsoldGoodsEntry'
+              $ref: '#/components/schemas/CreateDiscardRecordRequest'
       responses:
         '201':
-          description: The recorded line.
+          description: The stored record.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnsoldGoodsEntry'
+                $ref: '#/components/schemas/StoredDiscardRecord'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2725,10 +3043,191 @@ paths:
           $ref: '#/components/responses/IdempotentRequestInFlight'
         '422':
           description: |
-            The line cannot be recorded: a `reportingPeriod` that is not a
-            four-digit year, a negative count or weight, a `countryOfDisposal` that
-            is not alpha-2, a destruction with no justification, or a justification
-            on something that was not destroyed.
+            The record cannot be stored: `record` does not match dpp-core's
+            discard-record schema, cannot be read into a discard, or names a
+            passport this node does not hold.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /vault/api/v1/discard-records/{id}/evidence:
+    post:
+      operationId: attachDiscardRecordEvidence
+      summary: Attach a document to a discard record
+      description: |
+        Attaches a document to a discard record under an evidence kind. The request
+        is `multipart/form-data` with two fields: `kind`, the evidence kind as
+        dpp-core names it, and `file`, the document.
+
+        **Stored once.** The document is stored under the SHA-256 of its bytes. A
+        document cited by two records is one stored file, and the attachment is
+        recorded against each record.
+
+        **Size.** A file may be at most 25 MiB. A larger one is refused with `413`.
+
+        **Once per kind.** A record holds a given document under a given kind once.
+        Attaching the same document under the same kind again is refused with `409`.
+
+        Requires a write-scoped key.
+      tags:
+        - Unsold goods
+      security:
+        - BearerApiKey: []
+        - BasicAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The discard record's id.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - kind
+                - file
+              properties:
+                kind:
+                  $ref: '#/components/schemas/EvidenceKind'
+                file:
+                  type: string
+                  format: binary
+                  description: The document, at most 25 MiB.
+      responses:
+        '201':
+          description: The attachment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachedEvidence'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: The record already holds this document under this kind.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '413':
+          description: The file is larger than 25 MiB.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /vault/api/v1/discard-records/{id}/missing-evidence:
+    get:
+      operationId: discardRecordMissingEvidence
+      summary: Show the evidence a discard record still lacks
+      description: |
+        The requirements of the discard record that no attached document meets,
+        read against the operator's enterprise size. An operator that has stated no
+        size is read as large. A micro or small enterprise, or a medium-sized one
+        before 19 July 2030, owes nothing for a discard, so its list is empty.
+
+        Admin rather than write, as the listing is.
+      tags:
+        - Unsold goods
+      security:
+        - BearerApiKey: []
+        - BasicAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The discard record's id.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: What the record still lacks.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingEvidence'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /vault/api/v1/obligations:
+    get:
+      operationId: listObligations
+      summary: Dated obligations in a window, with the notices announced for each
+      description: |
+        The obligations the node's calendar holds that take effect between `from` and
+        `to`, both days included, in date order.
+
+        For each sourced obligation, `notices` lists the notice sent on the day it
+        takes effect, and one for each configured lead time before it. Each notice
+        says whether the node has recorded it as announced, and when. A notice the
+        calendar would send that is not recorded reads as not announced, which covers
+        a notice still to come and a notice whose day passed while the node was not
+        announcing. An upcoming notice whose date has already been reached is never
+        sent; this route does not read the clock, so it cannot tell that notice apart
+        from one still due.
+
+        `conflicts` lists each date a signed ruleset offered for an obligation the
+        build holds from an adopted text, where the two disagree. The build's date is
+        the one announced.
+
+        The notices come from the ledger the webhook deliveries are queued from. With
+        `OBLIGATION_NOTICES` unset, the node records no new notices; one recorded
+        before it was unset still reads as announced, since the ledger is never
+        erased. Only on a node that has never announced does every notice read as not
+        announced. The standalone vault answers from the built-in calendar and
+        announces nothing.
+      tags:
+        - Obligations
+      security:
+        - BearerApiKey: []
+        - BasicAuth: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          description: First day of the window, inclusive, as `YYYY-MM-DD`.
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          description: |
+            Last day of the window, inclusive, as `YYYY-MM-DD`. At most 3660 days
+            after `from`.
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: The obligations taking effect in the window.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObligationsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: |
+            `from` or `to` is missing or is not an ISO date, `from` is after `to`, or
+            the window is wider than 3660 days.
           content:
             application/problem+json:
               schema:
@@ -2918,16 +3417,32 @@ paths:
                 $ref: '#/components/schemas/InstalledPlugin'
         '400':
           description: Malformed multipart body (missing `wasm`/`sig`, or the product group could not be determined).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           description: A non-admin credential attempted to install a plugin.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '409':
           $ref: '#/components/responses/IdempotentRequestInFlight'
         '422':
           description: 'The artifact was rejected: bad signature, incompatible ABI, or a non-instantiable/incompatible module.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '501':
           description: This node has no plugin host configured; runtime install is unavailable.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /vault/api/v1/ruleset/reload:
     post:
       operationId: reloadRuleset
@@ -2964,10 +3479,18 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           description: A non-admin credential attempted to reload the ruleset.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '422':
           description: 'The bundle was refused and the ruleset in force is unchanged. The problem `code` says which refusal: `RULESET_REJECTED` (bad signature, content-hash mismatch, or a malformed manifest; distrust the bytes), `RULESET_NOT_YET_EFFECTIVE` (authentic but its rules start later; leave it staged and re-offer it once the date arrives), or `RULESET_SUPERSEDED` (authentic but older than what is running; this is the rollback refusal, and something served a stale bundle).'
         '501':
           description: This node has no signed ruleset channel configured; it is running its compiled-in baseline and there is nothing to re-read.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '503':
           description: 'The channel could not be read at all: the bundle file is missing or unreadable, or what arrived was not a bundle. Transport-level; retry once the drop is fixed.'
   /vault/api/v1/node/state:
@@ -3076,7 +3599,7 @@ paths:
       responses:
         '200':
           description: |-
-            Published passport record. With `?schema_view`, the body is instead `{ passport, schemaView }`.
+            Published passport record. With `?schema_view`, the body is instead `{ passport, schemaView }` (`SchemaViewResponse`).
 
             **The body's `id` is not always the `dppId` that was asked for.** A passport in the `superseded` status serves the published record that replaced it. ESPR Art. 9(1) has the data carrier link to *the* passport for the product, and a carrier is printed on a physical thing and cannot be recalled, so this door has to keep landing on whichever record is current, which is what `/01/{gtin}` beside it has always done.
 
@@ -3094,7 +3617,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PassportResponse'
+                oneOf:
+                  - $ref: '#/components/schemas/RedactedPassportResponse'
+                  - $ref: '#/components/schemas/SchemaViewResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -3193,11 +3718,13 @@ paths:
           example: 2.0.0
       responses:
         '200':
-          description: Published passport record. With `?schema_view`, the body is instead `{ passport, schemaView }`.
+          description: Published passport record. With `?schema_view`, the body is instead `{ passport, schemaView }` (`SchemaViewResponse`).
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PassportResponse'
+                oneOf:
+                  - $ref: '#/components/schemas/RedactedPassportResponse'
+                  - $ref: '#/components/schemas/SchemaViewResponse'
         '404':
           $ref: '#/components/responses/NotFound'
         '410':
@@ -3341,7 +3868,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PassportResponse'
+                $ref: '#/components/schemas/RedactedPassportResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -4015,7 +4542,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PassportResponse'
+                $ref: '#/components/schemas/RedactedPassportResponse'
             text/html:
               schema:
                 type: string
@@ -4868,6 +5395,10 @@ paths:
           description: |
             The process is serving. Body carries `status`, `service`, `version` and
             `coreVersion`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultHealth'
   /vault/ready:
     get:
       operationId: vaultReady
@@ -4891,6 +5422,10 @@ paths:
       responses:
         '200':
           description: The database answered; the vault can serve requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultReadiness'
         '503':
           $ref: '#/components/responses/ServiceUnavailable'
   /vault/api/v1/info:
@@ -5139,20 +5674,26 @@ components:
           description: What is wrong with that member, in one sentence.
           example: '''batteryModelId'' is mandatory for a ''industrial'' battery and is absent'
     PassportResponse:
+      allOf:
+        - $ref: '#/components/schemas/PassportProperties'
+        - required:
+            - id
+            - productName
+            - productGroup
+            - manufacturer
+            - materials
+            - status
+            - schemaVersion
+            - createdAt
+            - updatedAt
+            - retentionLocked
+            - version
+      description: |-
+        The canonical Digital Product Passport record, as the **authenticated** reads and writes serve it. Fields marked required are emitted on every such read; the rest are omitted when unset rather than sent as null, so a consumer must treat absence and null as the same thing.
+        The routes that serve a redacted view (the public reads, the audience-scoped credential read and the resolver) answer with `RedactedPassportResponse` instead, because a redaction removes fields this schema requires.
+    PassportProperties:
       type: object
-      description: The canonical Digital Product Passport record. Fields marked required are emitted on every read; the rest are omitted when unset rather than sent as null, so a consumer must treat absence and null as the same thing.
-      required:
-        - id
-        - productName
-        - productGroup
-        - manufacturer
-        - materials
-        - status
-        - schemaVersion
-        - createdAt
-        - updatedAt
-        - retentionLocked
-        - version
+      description: The properties of a Digital Product Passport record, shared by the full authenticated read (`PassportResponse`) and the redacted reads (`RedactedPassportResponse`). Which of them a representation always carries is the `required` list of the schema that composes this one.
       properties:
         id:
           $ref: '#/components/schemas/DppId'
@@ -5318,7 +5859,7 @@ components:
             - $ref: '#/components/schemas/ResponsibleOperatorSnapshot'
           description: |-
             Who is answerable for this product and under which law (Regulation (EU) 2024/1781 Annex III(k)). Frozen at publish for the same reason as `operatorIdentifier`: published content is covered by the signature over it, so a later transfer mints a new version rather than rewriting this one.
-            **Nothing writes this yet**, so it is always absent: the snapshot needs the operator's role and the legal basis that makes them answerable, and neither is operator configuration today.
+            The role and legal basis are what the operator stated, for the node (`PATCH /operator`, `responsibility`) or with the passport when it was created, and are never defaulted. Everything else is the operator's own, read from the node again at publish. **Absent** when none was stated: a product group whose passport obligation is live is refused at publish without one, and any other publishes without it.
         facility:
           allOf:
             - $ref: '#/components/schemas/FacilitySnapshot'
@@ -5327,6 +5868,77 @@ components:
           allOf:
             - $ref: '#/components/schemas/SealedEnvelope'
           description: The eIDAS electronic seal applied to this passport. Absent until a seal has been applied; check its `placeholder` flag rather than inferring validity from presence.
+    RedactedPassportResponse:
+      allOf:
+        - $ref: '#/components/schemas/PassportProperties'
+        - $ref: '#/components/schemas/RedactedPassportRequired'
+      description: |-
+        A Digital Product Passport as a **redacted** read serves it: the public reads, the audience-scoped credential read and the resolver's JSON representation. It is the same record as `PassportResponse`, filtered by the disclosure policy for the audience asking, so fewer fields are always present.
+        Which fields a redacted view always carries is not written by hand. The list is derived from the disclosure policy, for every product group, every schema version and every audience these routes serve, and kept in `RedactedPassportRequired.yaml`. A field the policy withholds from any of them, such as `retentionLocked`, is not in it.
+        Proofs are not part of a redacted payload: the redaction removes `jwsSignature`, `seal` and `disclosureSignatures` for every audience, and the route attaches the one proof that covers the bytes it serves.
+    RedactedPassportRequired:
+      required:
+        - id
+        - productName
+        - productGroup
+        - manufacturer
+        - materials
+        - status
+        - schemaVersion
+        - createdAt
+        - updatedAt
+        - version
+    SchemaViewResponse:
+      type: object
+      description: 'What a public read answers when it is asked for `schema_view`: the published passport exactly as the plain read serves it, alongside a view of its product group data under the requested schema version.'
+      required:
+        - passport
+        - schemaView
+      properties:
+        passport:
+          $ref: '#/components/schemas/RedactedPassportResponse'
+        schemaView:
+          $ref: '#/components/schemas/DerivedView'
+    DerivedView:
+      type: object
+      description: 'A passport''s product group data re-viewed under a newer schema version, built at read time by upcasting the published data along the schema''s lenses. It is derived and never signed: the passport it accompanies, and the proof attached to that passport, are the record.'
+      required:
+        - data
+        - derived
+        - from
+        - to
+        - lensChain
+        - lossy
+      properties:
+        data:
+          type: object
+          description: The product group data, transformed to conform to `to`.
+        derived:
+          type: boolean
+          description: Always `true`. The view is computed at read time, not signed source.
+        from:
+          type: string
+          description: The schema version the passport was published under.
+          example: 1.0.0
+        to:
+          type: string
+          description: The schema version the data now conforms to, the one `schema_view` asked for. Equal to `from` when the request names the passport's own version.
+          example: 2.0.0
+        lensChain:
+          type: array
+          description: The hops applied, oldest first, each a `[from, to]` pair. Empty when `from` and `to` are equal.
+          items:
+            type: array
+            minItems: 2
+            maxItems: 2
+            items:
+              type: string
+          example:
+            - - 1.0.0
+              - 2.0.0
+        lossy:
+          type: boolean
+          description: '`true` when any hop dropped or defaulted information, so `data` says less than, or other than, the published passport.'
     DppId:
       type: string
       format: uuid
@@ -5418,7 +6030,9 @@ components:
           description: 'ISO 3166-1 alpha-2 country of the manufacturer, upper case. Structural rather than descriptive: whether an operator is established in the Union separates a manufacturer from an importer or an authorised representative, and that decides who carries the passport obligation. Before this field existed the country was written into `address`, where nothing downstream could tell it apart from a postal address. Absent means not stated, never stateless.'
           example: DE
         didWebUrl:
-          type: string
+          type:
+            - string
+            - 'null'
           format: uri
           description: did:web URL for the manufacturer
           example: https://ecotech.example.com/.well-known/did.json
@@ -5464,13 +6078,17 @@ components:
           description: Weight in kilograms
           example: 12.5
         recycledPct:
-          type: number
+          type:
+            - number
+            - 'null'
           minimum: 0
           maximum: 100
           description: Percentage of recycled content (0.0–100.0)
           example: 35
         countryOfOrigin:
-          type: string
+          type:
+            - string
+            - 'null'
           minLength: 2
           maxLength: 2
           description: ISO 3166-1 alpha-2 country code
@@ -5769,6 +6387,9 @@ components:
           type: object
           additionalProperties: true
           description: Calculation receipt (input hash, ruleset id and version, factor dataset version and table hash) for notified-body audit. Present only when a calculation actually ran.
+        inputHash:
+          type: string
+          description: The content hash of the product group key and `productGroupData` this determination was computed over. A first publish refuses a determination whose hash is missing or no longer matches the passport's content, so a determination never describes content other than what was published. Absent on a determination recorded before the node bound one.
     ComplianceStatus:
       type: string
       description: 'Overall compliance determination. `PASSTHROUGH_NO_VALIDATION` means no product group plugin was loaded and nothing was assessed: it is not a pass.'
@@ -6027,6 +6648,17 @@ components:
             **`waste` is refused here.** The other four describe how a unit came to be, and Art. 77(7) makes each operation produce a *new* passport, so a repurposed unit is created as `repurposed`. `waste` is the one value that happens to a record which continues, and under that article's second subparagraph it moves responsibility as well, so it belongs to a versioning event on the passport becoming waste rather than to the creation of a new one.
 
             Omitting it is lawful everywhere. For a battery it reads as *not stated* rather than *not applicable*, and publish does not refuse it: the lint result says so instead, because a default would put a claim about a unit onto a record that is about to be signed.
+        responsibility:
+          allOf:
+            - $ref: '#/components/schemas/OperatorResponsibility'
+          description: |-
+            The role the operator answers in for **this** product and the law that makes it answerable (ESPR Annex III point (k)). Optional: the node's own statement (`PATCH /operator`, `responsibility`) applies when this is omitted. It can be sent here because the basis belongs to the pairing of operator and product, so one value for the whole node would make an operator whose products fall under different laws sign one of them wrongly.
+
+            Only these two facts travel with the request. The name, contact details, identifier and DID in the passport's `responsibleOperator` are the operator's own and come from the node, and are read again at publish.
+
+            A role the basis cannot name is refused with `422`, and so is a statement the node cannot make (no operator name or country configured). A statement sent is kept or refused and never dropped.
+
+            **Create-time only.** `responsibleOperator` is protected from patching, so a different statement for a draft is a new draft.
         personalData:
           type: object
           additionalProperties:
@@ -6109,6 +6741,17 @@ components:
       properties:
         reason:
           $ref: '#/components/schemas/DeactivationReason'
+        unsold:
+          type:
+            - boolean
+            - 'null'
+          description: 'Whether the product was an unsold consumer product, which a passport does not record. Required with a `destroyed` reason (`422` otherwise): with the operator''s `enterpriseSize` it decides whether the ESPR Art. 25(1) ban reaches the product, and so whether the destruction cites a derogation.'
+        discardRecordId:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: The discard record that documents this destruction (ESPR Art. 24 and Art. 25). Only with a `destroyed` reason. The record must cite the same derogation point as the reason, or both must cite none; otherwise the request is refused with `422`. On success the passport is joined to the record in the same transaction as the destruction, and the audit entry of the destruction records the citation.
         declaredBy:
           type:
             - string
@@ -6118,13 +6761,16 @@ components:
           type:
             - object
             - 'null'
-          description: Optional recovered-material summary (Battery Annex XIII circularity).
+          description: |
+            Optional recovered-material summary (Battery Annex XIII circularity).
+            A number dpp-core cannot hash exactly, such as an integer too large for a
+            double to hold, is refused with `422` naming `/materialRecovery`.
         notes:
           type:
             - string
             - 'null'
     DeactivationReason:
-      description: Why a passport reached end-of-life, internally tagged by `kind`. Destruction alone requires a `derogation` citing the lawful basis.
+      description: Why a passport reached end-of-life, internally tagged by `kind`. A destruction that the ESPR Art. 25(1) ban reaches cites a `derogation`, its lawful basis.
       oneOf:
         - type: object
           required:
@@ -6137,14 +6783,13 @@ components:
         - type: object
           required:
             - kind
-            - derogation
           properties:
             kind:
               type: string
               enum:
                 - destroyed
             derogation:
-              $ref: '#/components/schemas/DerogationRef'
+              $ref: '#/components/schemas/Derogation'
         - type: object
           required:
             - kind
@@ -6163,25 +6808,29 @@ components:
                 - lost
       example:
         kind: recycled
-    DerogationRef:
-      type: object
-      required:
-        - category
-      description: A recognised derogation from the ESPR Art. 25 destruction ban. The category list is fixed by the applicable delegated act; validated against that list at the engine boundary, not by this schema.
-      properties:
-        category:
-          type: string
-          description: |
-            One of the points of Art. 2 of Commission Delegated Regulation (EU)
-            2026/296, spelled as the unsold-goods disclosure spells a discard reason
-            (camelCase), such as `dangerousProduct` for point (a). Any other value is
-            refused with `422`, and the refusal lists them all.
-          example: dangerousProduct
-        actCitation:
-          type:
-            - string
-            - 'null'
-          description: The act/article this derogation is grounded in (e.g. an OJ/CELEX ref).
+    Derogation:
+      type: string
+      description: |
+        The derogation from the ESPR Art. 25(1) destruction ban that a destruction
+        relies on: a point of Art. 2 of Commission Delegated Regulation (EU) 2026/296,
+        named as the unsold-goods records name a discard reason. The letter of each
+        point, in order, is (a) to (j).
+
+        The free-text object `{"category": ...}` that earlier releases accepted is
+        refused on a new declaration with `422`: it cannot be checked against the list.
+        An event stored with one still reads.
+      enum:
+        - dangerousProduct
+        - nonCompliantWithLaw
+        - intellectualPropertyInfringement
+        - licensedPeriodExpired
+        - markingsCannotBeRemoved
+        - damagedOrContaminated
+        - defectiveBeyondRepair
+        - offeredForDonationNotAccepted
+        - donatedButNoRecipientFound
+        - reusedButNoRecipientFound
+      example: damagedOrContaminated
     TransferInitiateRequest:
       type: object
       required:
@@ -6270,6 +6919,83 @@ components:
           type: string
           format: date-time
           description: When the record's content was erased.
+    PersonalDataRecordSummary:
+      type: object
+      description: |-
+        A record of personal data held for a passport: which record it is, which field
+        it relates to, whether its content is still held, and when. Never the content.
+
+        A present record carries when it was stored. An erased one carries when it was
+        erased, since that is all its tombstone keeps.
+
+        The identifier relates to whoever owns the item, so this is as sensitive as the
+        passport's individual-item data (GDPR Recital 26).
+      required:
+        - record
+        - field
+        - state
+      properties:
+        record:
+          type: string
+          description: The record's identifier, as the passport's statement names it.
+        field:
+          type: string
+          description: The marked field the record relates to, as a dotted path inside `productGroupData`.
+          example: usageHistory.negativeEvents
+        state:
+          $ref: '#/components/schemas/PersonalDataRecordState'
+        storedAt:
+          type: string
+          format: date-time
+          description: When the record was stored. Absent once it is erased.
+        erasedAt:
+          type: string
+          format: date-time
+          description: When the record's content was erased. Absent while it is present.
+    PersonalDataRecordList:
+      type: object
+      description: |-
+        Every record of personal data held for a passport, present or erased, oldest
+        first. None of their content.
+      required:
+        - records
+      properties:
+        records:
+          type: array
+          description: Empty when no record was ever stored for the passport.
+          items:
+            $ref: '#/components/schemas/PersonalDataRecordSummary'
+    PersonalDataRecordState:
+      type: string
+      description: |-
+        Whether a record's content is still held.
+
+        `present`: the content is held and can be erased. `erased`: the content is gone
+        and the tombstone remains.
+      enum:
+        - present
+        - erased
+    StorePersonalDataRequest:
+      type: object
+      description: |-
+        Personal data to hold for one marked field of a draft passport, outside the
+        passport, where it can be erased.
+
+        The body may be at most 64 KiB; a larger one is refused with `413`.
+      required:
+        - field
+        - content
+      properties:
+        field:
+          type: string
+          minLength: 1
+          description: 'The field the data relates to, as a dotted path inside `productGroupData` (`usageHistory.negativeEvents`). It must be one the passport''s product group schema marks as able to hold personal data (`x-personal-data`): a statement can only name a record for such a field, so a record for any other would be held for nothing and is refused with `422`.'
+          example: repairHistoryUrl
+        content:
+          description: The personal data, in whatever shape the controller keeps it. Any JSON value except `null`. It is never returned by any route of this node.
+          not:
+            type: 'null'
+      additionalProperties: false
     ValidateResponse:
       type: object
       description: 'The dry-run verdict. Two booleans rather than one, because create and publish deliberately differ: a body can be creatable as a draft and not yet publishable, and collapsing that into a single flag would hide the gap until the caller tried to publish.'
@@ -7587,8 +8313,8 @@ components:
           example: Johannes Strauss 12
         country:
           type: string
-          minLength: 2
           maxLength: 2
+          description: ISO 3166-1 alpha-2 country code. Empty on a node whose operator has not been configured yet, which is what a read answers on a fresh install.
           example: DE
         contactEmail:
           type: string
@@ -7650,6 +8376,16 @@ components:
             - 'null'
           format: date-time
           description: When this operator's identity was last verified against the EU registry. Null when no verification has succeeded; never treat absence as verified.
+        enterpriseSize:
+          description: The operator's enterprise size class, which decides whether the ESPR Art. 25(1) destruction ban reaches it. Absent means not stated, treated as not exempt.
+          anyOf:
+            - $ref: '#/components/schemas/EnterpriseSize'
+            - type: 'null'
+        responsibility:
+          description: The role this operator answers in and the law that makes it answerable, stated once for the node (ESPR Annex III point (k)). Absent means not stated, and the node never fills one in. A passport can state its own with `responsibility` on its create request, and that wins for the passport. A passport that carries none of its own and finds none here is refused at publish for a product group whose passport obligation is live, and any other publishes without a `responsibleOperator`.
+          anyOf:
+            - $ref: '#/components/schemas/OperatorResponsibility'
+            - type: 'null'
     UpdateOperatorConfig:
       type: object
       description: Merge-patch update. Supply only the fields being changed.
@@ -7690,6 +8426,57 @@ components:
             - 'null'
           format: date-time
           description: When this operator's identity was last verified against the EU registry. Null when no verification has succeeded; never treat absence as verified.
+        enterpriseSize:
+          description: The operator's enterprise size class, which decides whether the ESPR Art. 25(1) destruction ban reaches it. Omitted or null leaves the current value unchanged, so a size once stated is corrected by stating another. A node that has never been given one treats the operator as not exempt.
+          anyOf:
+            - $ref: '#/components/schemas/EnterpriseSize'
+            - type: 'null'
+        responsibility:
+          description: 'The role this operator answers in and the law that makes it answerable, for the node as a whole: what a passport says under ESPR Annex III point (k) when its create request sends none of its own. Both halves travel together. Omitted or null leaves the current statement unchanged, so one stated is corrected by stating another. A role the basis cannot name is refused with `400`.'
+          anyOf:
+            - $ref: '#/components/schemas/OperatorResponsibility'
+            - type: 'null'
+    EnterpriseSize:
+      type: string
+      description: |
+        The operator's enterprise size class, as Commission Recommendation
+        2003/361/EC defines them. It decides whether the ESPR Art. 25(1) ban on
+        destroying unsold products of Annex VII reaches the operator: micro and small
+        enterprises are exempt, and medium-sized ones until 19 July 2030. An operator
+        that has stated no size is treated as not exempt.
+      enum:
+        - micro
+        - small
+        - medium
+        - large
+      example: large
+    OperatorResponsibility:
+      type: object
+      required:
+        - role
+        - basis
+      additionalProperties: false
+      description: |
+        The role an operator answers in for a product, and the law that makes it
+        answerable: the two facts ESPR Annex III point (k) asks of the economic
+        operator responsible for a product that this node cannot derive. The
+        operator's name, contact details, identifier and DID are its own and come
+        from the node.
+
+        **Stated, never defaulted.** A guessed basis is a false claim and not a
+        missing one, and a published passport is corrected by a successor rather than
+        an edit. An operator that has stated neither has a passport that says
+        nothing about it.
+
+        **The role must be one the basis can name.** Under `marketSurveillanceArt4`,
+        Art. 4(2) of Regulation (EU) 2019/1020 names a manufacturer, an importer, an
+        authorised representative and a fulfilment service provider and no other
+        role, so any other role is refused. The other bases do not narrow the role.
+      properties:
+        role:
+          $ref: '#/components/schemas/OperatorRole'
+        basis:
+          $ref: '#/components/schemas/ResponsibilityBasis'
     Facility:
       type: object
       required:
@@ -8067,177 +8854,157 @@ components:
             The credential document, so a caller can show the holder what it says
             without decoding the JWS. Shape follows W3C VC Data Model v2.0.
           additionalProperties: true
-    CreateUnsoldGoodsEntry:
+    CreateDiscardRecordRequest:
       type: object
       description: |
-        One line of an ESPR Art. 24 disclosure: a category of unsold consumer products
-        discarded in a financial year, with the reason and where it went.
+        One discard of unsold consumer products, and the passports of the units it
+        discards.
 
-        A disclosure is many of these, not one row. Art. 24(1) asks for the figures
-        "differentiated per type or category of products", and separately per reason
-        and destination, which a single aggregate cannot express.
-
-        The operator is **not** part of the request. The report is about this node's
-        own operator, taken from its operator config; there is no second operator on a
-        single-tenant node for it to legitimately be.
+        `record` is checked as sent, against dpp-core's discard-record schema, before
+        it is read. A field that schema does not have is refused, not dropped. The
+        schema is not restated here: dpp-core publishes it, and this description
+        names only the version the node checks against, which the response reports
+        as `schemaVersion`.
       required:
-        - reportingPeriod
-        - unitCount
-        - volumeKg
-        - productCategory
-        - reason
-        - destination
-        - countryOfDisposal
+        - record
+      additionalProperties: false
       properties:
-        reportingPeriod:
-          type: string
-          pattern: ^[0-9]{4}$
+        record:
+          type: object
           description: |
-            The financial year the goods were discarded in. Art. 24(1) discloses "the
-            preceding financial year", annually, so this is a year and not a month or
-            a quarter.
-          example: '2026'
-        unitCount:
-          type: integer
-          format: int64
-          minimum: 0
+            The discard, as dpp-core's discard-record schema describes it: the day it
+            was discarded, the CN codes, the units and the weight (each marked when it
+            is an estimate), the derogation it relies on where one applies, the
+            treatment and the receiver.
+        passportIds:
+          type: array
           description: |
-            How many products. Art. 24(1)(a) asks for the number **and** the weight;
-            both are required here because a disclosure carrying only one cannot
-            satisfy it.
-          example: 1240
-        volumeKg:
-          type: number
-          format: double
-          minimum: 0
-          description: Their total weight in kilograms.
-          example: 860.5
-        productCategory:
-          $ref: '#/components/schemas/UnsoldProductCategory'
-        reason:
-          $ref: '#/components/schemas/UnsoldDiscardReason'
-        destination:
-          $ref: '#/components/schemas/UnsoldDestination'
-        destructionJustification:
-          type: string
-          description: |
-            Which Art. 25 exemption the destruction relies on.
-
-            **Required** when `destination` is `exemptDestruction`, and **refused**
-            otherwise. ESPR Art. 25 prohibits destroying unsold consumer products
-            listed in Annex VII from 19 July 2026, so a recorded destruction has to say
-            why it was permitted; a justification attached to a donation describes
-            nothing.
-          example: Contaminated stock unfit for use under Art. 25(5)
-        countryOfDisposal:
-          type: string
-          pattern: ^[A-Za-z]{2}$
-          description: |
-            ISO 3166-1 alpha-2 country the goods were disposed of in.
-
-            Either case is accepted and the stored value is upper-cased. The pattern
-            is what makes the description enforceable: a length bound alone admits
-            `1?`, which satisfies the published contract and is then refused by the
-            handler: a contract looser than the implementation is the kind a
-            generated client trusts.
-          example: DE
-    UnsoldGoodsEntry:
+            The passports of the units this discard discards. A join in this node's
+            storage, not part of the record. Duplicates are stored once.
+          items:
+            type: string
+            format: uuid
+    StoredDiscardRecord:
       type: object
-      description: A stored ESPR Art. 24 disclosure line.
+      description: A stored discard record, as the node holds it. Append-only.
       required:
         - id
-        - reportingPeriod
-        - volumeKg
-        - productCategory
-        - reason
-        - destination
-        - countryOfDisposal
+        - schemaVersion
+        - record
+        - passportIds
         - createdAt
+      additionalProperties: false
       properties:
         id:
           type: string
           format: uuid
-        reportingPeriod:
+          description: Minted by the node when the record is stored.
+        schemaVersion:
           type: string
-          example: '2026'
-        unitCount:
-          type:
-            - integer
-            - 'null'
-          format: int64
-          description: |
-            Null only for a row written before the count had a column: the write path
-            requires it, so anything recorded through this API carries one.
-        volumeKg:
-          type: number
-          format: double
-        productCategory:
-          $ref: '#/components/schemas/UnsoldProductCategory'
-        reason:
-          $ref: '#/components/schemas/UnsoldDiscardReason'
-        destination:
-          $ref: '#/components/schemas/UnsoldDestination'
-        destructionJustification:
-          type: string
-          description: Present only for `exemptDestruction`.
-        countryOfDisposal:
-          type: string
-          pattern: ^[A-Z]{2}$
-          description: ISO 3166-1 alpha-2 country the goods were disposed of in.
-        operatorName:
-          type:
-            - string
-            - 'null'
-          description: |
-            The operator the disclosure is about: this node's own legal name at the
-            time the line was recorded. Report content, not a tenant key.
+          example: 1.0.0
+          description: The version of dpp-core's discard-record schema the record was checked against.
+        record:
+          type: object
+          description: The discard, as dpp-core's discard-record schema describes it.
+        passportIds:
+          type: array
+          description: The passports of the units this discard discards, sorted.
+          items:
+            type: string
+            format: uuid
         createdAt:
           type: string
           format: date-time
-    UnsoldProductCategory:
+    AttachedEvidence:
+      type: object
+      description: A document attached to a discard record.
+      required:
+        - discardRecordId
+        - kind
+        - sha256
+        - sizeBytes
+      additionalProperties: false
+      properties:
+        discardRecordId:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/EvidenceKind'
+        sha256:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          description: Lower-case hex SHA-256 of the stored bytes. The file's identity.
+        sizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+    MissingEvidence:
+      type: object
+      description: |
+        The evidence a discard record still lacks. A requirement is missing when no
+        attached document meets it. That is not proof of a breach: the Regulation
+        excepts information the competent authority already holds under another act,
+        which only the operator can say.
+      required:
+        - enterpriseSize
+        - missingEvidence
+      additionalProperties: false
+      properties:
+        enterpriseSize:
+          $ref: '#/components/schemas/EnterpriseSize'
+          description: The operator's size class the requirements were read for. Unset reads as large.
+        missingEvidence:
+          type: array
+          description: Each requirement no attached document meets. Empty when none is missing.
+          items:
+            $ref: '#/components/schemas/EvidenceRequirement'
+    EvidenceRequirement:
+      type: object
+      description: |
+        One thing a discard record must be able to show: a document of any one of
+        the listed kinds. A record's requirements are read as an AND of such
+        alternatives.
+      required:
+        - anyOf
+        - basis
+      additionalProperties: false
+      properties:
+        anyOf:
+          type: array
+          minItems: 1
+          description: Any one of these kinds meets the requirement.
+          items:
+            $ref: '#/components/schemas/EvidenceKind'
+        basis:
+          type: string
+          description: The provision that makes it a requirement, cited by its article.
+    EvidenceKind:
       type: string
       description: |
-        The operator's own categorisation of the discarded goods, for Art. 24(1)(a)'s
-        "differentiated per type or category of products", which prescribes no
-        vocabulary.
-
-        This is **not** Annex VII ban scope. Annex VII gives two *code-valued*
-        headings, matched by CN **prefix**: apparel and clothing accessories (`4203`,
-        `61`, `62`, `6504`, `6505`), and footwear (`6401`–`6405`), with clothing
-        accessories inside the first heading rather than beside it. Reading this list
-        as those headings gets both their count and their shape wrong.
+        A kind of document an operator keeps to stand behind a discard, as dpp-core
+        names them. Three provisions name them: the derogation documentation of
+        Delegated Regulation (EU) 2026/296 Article 3, the delivery and treatment
+        documentation of Implementing Regulation (EU) 2026/2 Article 4, and the
+        derogation statement given to the waste treatment operator. The last is a
+        duty to provide, never one a record is found lacking.
       enum:
-        - apparel
-        - footwear
-        - homeTextile
-        - accessories
-        - other
-      example: apparel
-    UnsoldDiscardReason:
-      type: string
-      description: Why the goods went unsold, for Art. 24(1)(b).
-      enum:
-        - endOfSeason
-        - qualityDefect
-        - packagingDefect
-        - overProduction
-        - customerReturn
-        - other
-      example: endOfSeason
-    UnsoldDestination:
-      type: string
-      description: |
-        Where the goods went, for Art. 24(1)(c).
-
-        `exemptDestruction` is the only value recording an act that is otherwise
-        prohibited, and the only one that requires `destructionJustification`.
-      enum:
-        - donation
-        - recycling
-        - repurposing
-        - supplierReturn
-        - exemptDestruction
-      example: recycling
+        - safetyAssessment
+        - chemicalsTestReport
+        - nonComplianceSelfAssessment
+        - infringementDecision
+        - infringementNotification
+        - internalInvestigation
+        - ipLicenceOrContract
+        - destructionJustification
+        - reuseFeasibilityAssessment
+        - qualityAssessmentEvidence
+        - inspectionRecord
+        - donationOfferEvidence
+        - donationReceiptDeclaration
+        - wasteOperatorSourceDocumentation
+        - deliveryDocumentation
+        - treatmentStatement
+        - derogationStatement
     CreatedApiKeyResponse:
       type: object
       required:
@@ -8525,6 +9292,46 @@ components:
             type: string
           example:
             - passthrough_compliance
+    VaultHealth:
+      type: object
+      required:
+        - status
+        - service
+        - version
+        - coreVersion
+      description: The vault's liveness answer. It checks nothing beyond the process itself.
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+        service:
+          type: string
+          description: The crate that is serving.
+          example: dpp-vault
+        version:
+          type: string
+          description: This node's own dpp-vault crate version.
+          example: 0.16.0
+        coreVersion:
+          type: string
+          description: The dpp-domain (dpp-core) version this build was compiled against.
+          example: 0.24.0
+    VaultReadiness:
+      type: object
+      required:
+        - status
+        - db
+      description: The vault's readiness answer when its database responded to a ping.
+      properties:
+        status:
+          type: string
+          enum:
+            - ready
+        db:
+          type: string
+          enum:
+            - ok
     DidDocument:
       type: object
       description: |
@@ -9081,6 +9888,195 @@ components:
         reaching act is `provisional` or `watch`, the requirement is a reading of
         instruments that have not yet bound anything.
       example: provisional
+    ObligationsResponse:
+      type: object
+      description: |
+        The obligations taking effect in a window, with the notices the node has
+        announced for each, and the dates a signed ruleset overruled.
+      required:
+        - from
+        - to
+        - events
+        - conflicts
+      properties:
+        from:
+          type: string
+          format: date
+          description: First day of the window, as asked.
+        to:
+          type: string
+          format: date
+          description: Last day of the window, as asked.
+        events:
+          type: array
+          description: The obligations taking effect in the window, in date order.
+          items:
+            $ref: '#/components/schemas/ObligationEntry'
+        conflicts:
+          type: array
+          description: |
+            Dates a signed ruleset offered for an obligation whose sourced date this
+            build holds, where the two disagree. The build's date is the one announced.
+            Empty when no ruleset in force carries a schedule.
+          items:
+            $ref: '#/components/schemas/ScheduleConflict'
+    ObligationEntry:
+      type: object
+      description: |
+        One dated obligation: the calendar's event for it, with the notices the node
+        sends for it.
+
+        The event fields are the ones a `dpp.obligation.*` webhook payload carries under
+        `obligation`. `productGroup` is absent for an act whose passport date names no
+        product group this build models. `categories` is absent where the source does
+        not narrow the obligation, which is not a statement that every category is
+        reached. `bundle` is present only for an obligation a signed ruleset added.
+      required:
+        - id
+        - date
+        - kind
+        - citation
+        - summary
+        - basis
+        - notices
+      properties:
+        id:
+          type: string
+          description: Stable identifier of the obligation.
+          example: battery.due-diligence-report
+        date:
+          type: string
+          format: date
+          description: The first day the obligation applies, in UTC terms.
+        kind:
+          $ref: '#/components/schemas/ObligationKind'
+        citation:
+          type: string
+          description: The provision, or the act, that fixes the date.
+        summary:
+          type: string
+          description: One sentence saying what changes, for a person to read.
+        productGroup:
+          type: string
+          description: The product group the obligation reaches.
+        categories:
+          type: array
+          description: The product categories the source narrows the obligation to.
+          items:
+            type: string
+        basis:
+          $ref: '#/components/schemas/DateBasis'
+          description: |
+            Whether the date traces to an adopted text. Only `sourced` dates have
+            notices.
+        bundle:
+          $ref: '#/components/schemas/BundleOrigin'
+          description: The signed ruleset the obligation came from, when one added it.
+        notices:
+          type: array
+          description: |
+            The notices of this obligation, earliest first: the one on the day it takes
+            effect, and one for each configured lead time. Empty for a date that is not
+            sourced.
+          items:
+            $ref: '#/components/schemas/ObligationNotice'
+    ObligationNotice:
+      type: object
+      description: |
+        One notice of an obligation: the day it is due, and whether the node has
+        announced it.
+      required:
+        - noticeId
+        - eventType
+        - noticeDay
+        - announced
+        - announcedAt
+      properties:
+        noticeId:
+          type: string
+          format: uuid
+          description: |
+            The notice's id, which a webhook delivery carries as its `eventId`. It is
+            derived from the obligation, its date, its kind and the lead time, so the
+            same notice has the same id on every node and in every release.
+        eventType:
+          type: string
+          enum:
+            - dpp.obligation.effective
+            - dpp.obligation.upcoming
+          description: '`dpp.obligation.upcoming` ahead of the date, `dpp.obligation.effective` on it.'
+        leadDays:
+          type: integer
+          minimum: 1
+          description: The lead time, in days, of an upcoming notice. Absent for the day itself.
+        noticeDay:
+          type: string
+          format: date
+          description: The day the notice is sent.
+        announced:
+          type: boolean
+          description: Whether the node has recorded this notice as announced.
+        announcedAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: When the node recorded the notice. `null` while it is not announced.
+    ObligationKind:
+      type: string
+      enum:
+        - passportStart
+        - contentRequirement
+        - minimumShare
+        - restriction
+      description: |
+        What kind of obligation takes effect on the date.
+
+        - `passportStart`: an act's passport obligation begins.
+        - `contentRequirement`: a passport data point becomes owed, or stops being barred.
+        - `minimumShare`: a minimum share, of recycled content for one, starts to bind.
+        - `restriction`: a substance restriction starts to bind, or a carve-out from one ends.
+      example: passportStart
+    ScheduleConflict:
+      type: object
+      description: |
+        A date a signed ruleset offered for an obligation this build holds from an
+        adopted text, where the two disagree. The build's date stays in the calendar and
+        is the one announced: this build's rules select their answers by it. A conflict
+        usually means the law moved and this build has not.
+      required:
+        - id
+        - buildDate
+        - bundleDate
+        - bundle
+      properties:
+        id:
+          type: string
+          description: The obligation's id.
+        buildDate:
+          type: string
+          format: date
+          description: The sourced date this build holds, and keeps.
+        bundleDate:
+          type: string
+          format: date
+          description: The date the signed ruleset offered.
+        bundle:
+          $ref: '#/components/schemas/BundleOrigin'
+    BundleOrigin:
+      type: object
+      description: The signed ruleset bundle a scheduled date came from.
+      required:
+        - bundleVersion
+        - contentSha256
+      properties:
+        bundleVersion:
+          type: string
+          description: The bundle's version label, as its publisher chose it.
+          example: 2026-Q3.1
+        contentSha256:
+          type: string
+          description: The content hash the publisher signed over.
     CreateLifeStatus:
       type: string
       description: |-
@@ -10061,6 +11057,20 @@ components:
             title: Conflict
             status: 409
             detail: DPP is already published.
+    InternalServerError:
+      description: |
+        The request was well formed and the node failed while serving it. The body
+        names no cause: the detail is in the node's own log, correlated by
+        `requestId`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://problems.odal-node.io/internal-server-error
+            title: Internal Server Error
+            status: 500
+            detail: An internal error occurred.
     IdempotentRequestInFlight:
       description: |
         An earlier attempt carrying this `Idempotency-Key` is still running.
